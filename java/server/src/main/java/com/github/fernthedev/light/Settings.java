@@ -3,14 +3,14 @@ package com.github.fernthedev.light;
 public class Settings {
 
     private String password="password";
-    private boolean useNativeDLLs = true;
+    private boolean useNatives = false;
 
-    public boolean useNativeDLLs() {
-        return useNativeDLLs;
+    public boolean useNatives() {
+        return useNatives;
     }
 
-    public void useUseNativeDLLs(boolean useNativeDLLs) {
-        this.useNativeDLLs = useNativeDLLs;
+    public void useNatives(boolean useNativeDLLs) {
+        this.useNatives = useNativeDLLs;
     }
 
     public String getPassword() {

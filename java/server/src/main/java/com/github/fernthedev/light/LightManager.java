@@ -42,7 +42,7 @@ public class LightManager {
 
         boolean runPi4j = false;
 
-        if(settings.useNativeDLLs() ) {
+        if(settings.useNatives() ) {
 
             if(Platform.isLinux()) {
                 try {
