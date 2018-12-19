@@ -1,0 +1,9 @@
+com\github\fernthedev\client\Client.class
+com\github\fernthedev\client\netty\ClientHandler.class
+com\github\fernthedev\client\netty\MulticastClient.class
+com\github\fernthedev\client\waitForCommand.class
+com\github\fernthedev\client\EventListener.class
+com\github\fernthedev\client\ServerAddress.class
+com\github\fernthedev\client\Main.class
+com\github\fernthedev\client\ClientThread$1.class
+com\github\fernthedev\client\ClientThread.class
