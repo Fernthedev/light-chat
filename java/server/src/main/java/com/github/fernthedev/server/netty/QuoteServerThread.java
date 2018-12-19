@@ -1,9 +1,5 @@
 package com.github.fernthedev.server.netty;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-
 public class QuoteServerThread extends Thread {
 
     protected DatagramSocket socket = null;

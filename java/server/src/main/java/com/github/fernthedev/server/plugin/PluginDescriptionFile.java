@@ -13,7 +13,6 @@ import org.yaml.snakeyaml.nodes.Tag;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.*;
 
 /**
  * This type is the runtime-container for the information in the plugin.yml.

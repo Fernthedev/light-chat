@@ -9,7 +9,6 @@ import com.github.fernthedev.server.netty.ProcessingHandler;
 import com.github.fernthedev.server.plugin.PluginManager;
 import com.github.fernthedev.universal.StaticHandler;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;

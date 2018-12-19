@@ -3,8 +3,6 @@ package com.github.fernthedev.light;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 
-import java.io.File;
-
 public interface LightDLL extends Library {
 
 

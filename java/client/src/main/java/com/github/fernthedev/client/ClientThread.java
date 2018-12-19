@@ -5,7 +5,6 @@ import com.github.fernthedev.exceptions.DebugException;
 import com.github.fernthedev.packets.Packet;
 import com.github.fernthedev.universal.StaticHandler;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;

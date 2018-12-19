@@ -4,7 +4,6 @@ import com.github.fernthedev.server.*;
 import com.github.fernthedev.server.event.chat.ServerPlugin;
 import com.github.fernthedev.universal.StaticHandler;
 import com.google.gson.Gson;
-import com.pi4j.io.gpio.*;
 import com.pi4j.util.CommandArgumentParser;
 import com.sun.jna.Platform;
 
