@@ -44,8 +44,8 @@ public class LightManager {
             if(Platform.isLinux()) {
                 try {
                     //NativeLibrary.addSearchPath("blinkso", "C:\\blinkso");
-                    String filename = Main.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6);
-                    System.load("/home/pi/Desktop/libblink.so");
+                   // String filename = Main.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6);
+                   // System.load("/home/pi/Desktop/libblink.so");
 
                     LightDLL lightDLL = LightDLL.getINSTANCE();
                     runLight = lightDLL::setLightSwitch;

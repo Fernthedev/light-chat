@@ -9,13 +9,11 @@ public interface LightDLL extends Library {
 
 
     static LightDLL getINSTANCE()  {
-        String currentDirectory;
-        File file = new File(".");
-        currentDirectory = file.getAbsolutePath();
-        return Native.load(currentDirectory + "/libblink.so",
-                LightDLL.class);
+        String currentDirectory = System.getProperty("user.dir");
+        return Native.load("blink", LightDLL.class);
     }
 
-    void setLightSwitch(boolean value);
+    void setLightSwitch(int pinSwitch, boolean var);
+    void setLightSwitch(boolean var);
 
 }
