@@ -1,14 +1,12 @@
 package com.github.fernthedev.light;
 
-import com.github.fernthedev.server.Command;
-import com.github.fernthedev.server.CommandSender;
-import com.github.fernthedev.server.Console;
-import com.github.fernthedev.server.Server;
+import com.github.fernthedev.server.*;
 import com.github.fernthedev.server.event.chat.ServerPlugin;
 import com.github.fernthedev.universal.StaticHandler;
 import com.google.gson.Gson;
 import com.pi4j.io.gpio.*;
 import com.pi4j.util.CommandArgumentParser;
+import com.sun.jna.Platform;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -20,6 +18,7 @@ public class LightManager {
     private GpioPinDigitalOutput output;
 
     private GpioController gpio;
+    private RunLight runLight;
 
     public static File settingsFile = new File(getCurrentPath(),"settings.json");
 
@@ -38,24 +37,56 @@ public class LightManager {
 
         load();
 
+        boolean runPi4j = false;
 
-        try {
+        if(settings.useNativeDLLs() ) {
+
+            if(Platform.isLinux()) {
+                try {
+                    //NativeLibrary.addSearchPath("blinkso", "C:\\blinkso");
+                    String filename = Main.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6);
+                    System.load("/home/pi/Desktop/libblink.so");
+
+                    LightDLL lightDLL = LightDLL.getINSTANCE();
+                    runLight = lightDLL::setLightSwitch;
+                } catch (UnsatisfiedLinkError e) {
+                    e.printStackTrace();
+                    Server.getLogger().error("Unable to find DLL it seems");
+                    Server.getLogger().error(e.getMessage(), e.getCause());
+                    runPi4j = true;
+                }
+            }else{
+                Server.getLogger().error("Not linux, won't load properly DLLs");;
+            }
+        }else runPi4j = true;
+
+        if(runPi4j) {
+            try {
 // create gpio controller
 
-            gpio = GpioFactory.getInstance();
-            // lookup the pin by address
-            Pin pin = CommandArgumentParser.getPin(
-                    RaspiPin.class,    // pin provider class to obtain pin instance from
-                    RaspiPin.GPIO_06);             // argument array to search in
+                gpio = GpioFactory.getInstance();
+                // lookup the pin by address
+                Pin pin = CommandArgumentParser.getPin(
+                        RaspiPin.class,    // pin provider class to obtain pin instance from
+                        RaspiPin.GPIO_06);             // argument array to search in
 // We are using PIN 06 as per the attached diagram
-            output = gpio.provisionDigitalOutputPin(pin, "My Output", PinState.HIGH);
-            // switch ON
-            output.high();
-            // switch OFF
-            output.low();
-        } catch (UnsatisfiedLinkError | Exception e) {
+                output = gpio.provisionDigitalOutputPin(pin, "My Output", PinState.HIGH);
+                // switch ON
+                output.high();
+                // switch OFF
+                output.low();
 
-            Server.getLogger().error(e.getMessage(),e.getCause());
+                runLight = value -> {
+                    if(value) {
+                        output.high();
+                    }
+                    if(!value) {
+                        output.low();
+                    }
+                };
+            } catch (UnsatisfiedLinkError | Exception e) {
+                Server.getLogger().error(e.getMessage(), e.getCause());
+            }
         }
 
         server.registerCommand(new Command("light") {
@@ -86,6 +117,10 @@ public class LightManager {
         ChangePassword changePassword = new ChangePassword("changepassword",this);
         server.registerCommand(changePassword);
         server.getPluginManager().registerEvents(changePassword, new ServerPlugin());
+    }
+
+    private interface RunLight {
+        void setLightValue(boolean value);
     }
 
     private void load() {
@@ -131,11 +166,11 @@ public class LightManager {
     }
 
     public void setOn() {
-        output.high();
+        runLight.setLightValue(true);
     }
 
     public void setOff() {
-        output.low();
+        runLight.setLightValue(false);
     }
 
 }
