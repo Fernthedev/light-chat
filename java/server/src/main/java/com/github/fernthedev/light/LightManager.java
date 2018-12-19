@@ -16,8 +16,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 
-public class LightManager {
+public class LightManager implements Runnable{
 
+    private final Server server;
     private GpioPinDigitalOutput output;
 
     private GpioController gpio;
@@ -33,30 +34,32 @@ public class LightManager {
     }
 
     public LightManager(Server server) {
+        this.server = server;
+    }
 
+    @Override
+    public void run() {
         settings = new Settings();
-
-
-
         load();
 
         boolean runPi4j = false;
-
         if(settings.useNatives() ) {
-
             if(Platform.isLinux()) {
                 try {
                     //NativeLibrary.addSearchPath("blinkso", "C:\\blinkso");
-                   // String filename = Main.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6);
-                   // System.load("/home/pi/Desktop/libblink.so");
+                    // String filename = Main.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6);
+                    // System.load("/home/pi/Desktop/libblink.so");
 
                     LightDLL lightDLL = LightDLL.getINSTANCE();
                     runLight = lightDLL::setLightSwitch;
                 } catch (UnsatisfiedLinkError e) {
-                    e.printStackTrace();
-                    Server.getLogger().error("Unable to find DLL it seems");
-                    Server.getLogger().error(e.getMessage(), e.getCause());
-                    runPi4j = true;
+                    try {
+                        throw new RuntimeException(e);
+                    } catch (RuntimeException ignored) {
+                        Server.getLogger().error("Unable to find DLL it seems");
+                        Server.getLogger().error(e.getMessage(), e.getCause());
+                        runPi4j = true;
+                    }
                 }
             }else{
                 Server.getLogger().error("Not linux, won't load properly DLLs");;
@@ -65,14 +68,14 @@ public class LightManager {
 
         if(runPi4j) {
             try {
-// create gpio controller
+            // create gpio controller
 
                 gpio = GpioFactory.getInstance();
                 // lookup the pin by address
                 Pin pin = CommandArgumentParser.getPin(
                         RaspiPin.class,    // pin provider class to obtain pin instance from
                         RaspiPin.GPIO_06);             // argument array to search in
-// We are using PIN 06 as per the attached diagram
+                // We are using PIN 06 as per the attached diagram
                 output = gpio.provisionDigitalOutputPin(pin, "My Output", PinState.HIGH);
                 // switch ON
                 output.high();
@@ -127,7 +130,7 @@ public class LightManager {
     }
 
     private void load() {
-        if(!settingsFile.exists()) {
+        if (!settingsFile.exists()) {
             try {
                 settingsFile.createNewFile();
                 try (FileWriter writer = new FileWriter(settingsFile)) {
@@ -140,10 +143,20 @@ public class LightManager {
             }
         }
 
-        try {
-            settings = new Gson().fromJson(StaticHandler.getFile(settingsFile), Settings.class);
-        } catch(Exception e) {
-            Server.getLogger().error(e.getMessage(),e.getCause());
+        if (settingsFile.exists()) {
+            try {
+                settings = new Gson().fromJson(StaticHandler.getFile(settingsFile), Settings.class);
+            } catch (Exception e) {
+                if (StaticHandler.isDebug) {
+                    Server.getLogger().error(e.getMessage(), e.getCause());
+                }
+                settingsFile.delete();
+                if (!settingsFile.exists()) {
+                    load();
+                }
+            }
+        }else {
+            Server.getLogger().error("Unable to load settings, seems it is missing");
         }
     }
 
