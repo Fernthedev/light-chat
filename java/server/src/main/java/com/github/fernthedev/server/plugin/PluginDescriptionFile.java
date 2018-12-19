@@ -13,6 +13,7 @@ import org.yaml.snakeyaml.nodes.Tag;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.*;
 
 /**
  * This type is the runtime-container for the information in the plugin.yml.
@@ -236,7 +237,7 @@ public final class PluginDescriptionFile {
      *     plugin.yml to fail loading.
      * <li>Used to determine the name of the plugin's data folder. Data
      *     folders are placed in the ./plugins/ directory by default, but this
-     *     behavior should not be relied on. {@link Plugin#getDataFolder()}
+     *     behavior should not be relied on.
      *     should be used to reference the data folder.
      * <li>It is good practice to name your jar the same as this, for example
      *     'MyPlugin.jar'.
@@ -280,7 +281,6 @@ public final class PluginDescriptionFile {
      * Gives the fully qualified name of the main class for a plugin. The
      * format should follow the {@link ClassLoader#loadClass(String)} syntax
      * to successfully be resolved at runtime. For most plugins, this is the
-     * class that extends {@link JavaPlugin}.
      * <ul>
      * <li>This must contain the full namespace including the class file
      *     itself.
@@ -489,7 +489,6 @@ public final class PluginDescriptionFile {
     /**
      * Gives the token to prefix plugin-specific logging messages with.
      * <ul>
-     * <li>This includes all messages using {@link Plugin#getLogger()}.
      * <li>If not specified, the server uses the plugin's {@link #getName()
      *     name}.
      * <li>This should clearly indicate what plugin is being logged.
@@ -778,7 +777,7 @@ public final class PluginDescriptionFile {
     }
 
     private Map<String, Object> saveMap() {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
 
         map.put("name", name);
         map.put("main", main);

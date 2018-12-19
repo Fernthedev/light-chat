@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -26,7 +27,7 @@ import java.util.regex.Pattern;
  * Represents a Java plugin loader, allowing plugins in the form of .jar
  */
 public final class JavaPluginLoader implements PluginLoader {
-    final Server server;
+    private final Server server;
     private final Pattern[] fileFilters = new Pattern[] { Pattern.compile("\\.jar$"), };
     private final Map<String, Class<?>> classes = new java.util.concurrent.ConcurrentHashMap<String, Class<?>>(); // Spigot
     private final List<PluginClassLoader> loaders = new CopyOnWriteArrayList<PluginClassLoader>();
