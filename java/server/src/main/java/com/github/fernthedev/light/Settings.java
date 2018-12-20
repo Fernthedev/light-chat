@@ -6,15 +6,7 @@ import org.jetbrains.annotations.NotNull;
 public class Settings {
 
     private String password="password";
-    private boolean useNatives = false;
 
-    public boolean useNatives() {
-        return useNatives;
-    }
-
-    public void useNatives(boolean useNativeDLLs) {
-        this.useNatives = useNativeDLLs;
-    }
 
     public String getPassword() {
         return password;
@@ -54,9 +46,6 @@ public class Settings {
             case "password":
                 setPassword((String) value);
                 break;
-            case "usenatives":
-                useNatives((Boolean) value);
-                break;
             default:
                 throw new IllegalArgumentException("No such value named " + oldValue + " found");
         }
@@ -67,8 +56,6 @@ public class Settings {
         switch (key.toLowerCase()) {
             case "password":
                 return getPassword();
-            case "usenatives":
-                return useNatives();
             default:
                 throw new IllegalArgumentException("No such value named " + key + " found");
         }

@@ -11,7 +11,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import com.pi4j.io.gpio.*;
 import com.pi4j.util.CommandArgumentParser;
-import com.sun.jna.Platform;
 
 import java.io.File;
 import java.io.FileReader;
@@ -53,55 +52,31 @@ public class LightManager implements Runnable{
         load();
 
 
+        try {
+        // create gpio controller
+            Server.getLogger().info("Loading pi4j java");
+            gpio = GpioFactory.getInstance();
+            // lookup the pin by address
+            Pin pin = CommandArgumentParser.getPin(
+                    RaspiPin.class,    // pin provider class to obtain pin instance from
+                    RaspiPin.GPIO_06);             // argument array to search in
+            // We are using PIN 06 as per the attached diagram
+            output = gpio.provisionDigitalOutputPin(pin, "My Output", PinState.HIGH);
+            // switch ON
+            output.high();
+            // switch OFF
+            output.low();
 
-        boolean runPi4j = false;
-        if(settings.useNatives() ) {
-            if(Platform.isLinux()) {
-                try {
-                    //NativeLibrary.addSearchPath("blinkso", "C:\\blinkso");
-                    // String filename = Main.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6);
-                    // System.load("/home/pi/Desktop/libblink.so");
-
-                    Server.getLogger().info("Loading natives");
-                    LightDLL lightDLL = LightDLL.getINSTANCE();
-                    runLight = lightDLL::setLightSwitch;
-                } catch (UnsatisfiedLinkError e) {
-                    Server.getLogger().error("Unable to find DLL it seems, resorting to pi4j java");
-                    Server.getLogger().error(e.getMessage(), e.getCause());
-                    runPi4j = true;
+            runLight = value -> {
+                if(value) {
+                    output.high();
                 }
-            }else{
-                Server.getLogger().error("Not linux, won't load properly DLLs");;
-            }
-        }else runPi4j = true;
-
-        if(runPi4j) {
-            try {
-            // create gpio controller
-                Server.getLogger().info("Loading pi4j java");
-                gpio = GpioFactory.getInstance();
-                // lookup the pin by address
-                Pin pin = CommandArgumentParser.getPin(
-                        RaspiPin.class,    // pin provider class to obtain pin instance from
-                        RaspiPin.GPIO_06);             // argument array to search in
-                // We are using PIN 06 as per the attached diagram
-                output = gpio.provisionDigitalOutputPin(pin, "My Output", PinState.HIGH);
-                // switch ON
-                output.high();
-                // switch OFF
-                output.low();
-
-                runLight = value -> {
-                    if(value) {
-                        output.high();
-                    }
-                    if(!value) {
-                        output.low();
-                    }
-                };
-            } catch (UnsatisfiedLinkError | Exception e) {
-                Server.getLogger().error(e.getMessage(), e.getCause());
-            }
+                if(!value) {
+                    output.low();
+                }
+            };
+        } catch (UnsatisfiedLinkError | Exception e) {
+            Server.getLogger().error(e.getMessage(), e.getCause());
         }
 
         server.registerCommand(new Command("light") {
