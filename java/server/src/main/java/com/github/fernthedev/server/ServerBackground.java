@@ -67,6 +67,8 @@ public class ServerBackground implements Runnable {
 
             boolean found = false;
 
+
+
             command = command.replaceAll(" {2}"," ");
 
             if(!command.equals("")) {
@@ -85,6 +87,7 @@ public class ServerBackground implements Runnable {
 
 
                             if(!chatEvent.isCancelled()) {
+
                                 new Thread(new CommandHandler(server.getConsole(), serverCommand, args)).start();
                             }
                             break;

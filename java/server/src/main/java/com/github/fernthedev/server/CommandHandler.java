@@ -31,6 +31,7 @@ public class CommandHandler implements Runnable {
     @Override
     public void run() {
         serverCommand.onCommand(commandSender,args);
+
         Server.closeThread(Thread.currentThread());
     }
 }

@@ -111,9 +111,6 @@ public class ClientPlayer implements CommandSender {
         return "[" + getAdress() + "] [" + deviceName + "|" + id +"]";
     }
 
-    public String getNameAddress() {
-        return "[ClientPlayer] IP: " + getAdress();
-    }
 
     public String getAdress() {
         if (channel.remoteAddress() == null) {
@@ -144,5 +141,10 @@ public class ClientPlayer implements CommandSender {
     @Override
     public void sendMessage(String message) {
         sendPacket(new MessagePacket(message));
+    }
+
+    @Override
+    public String getName() {
+        return deviceName;
     }
 }

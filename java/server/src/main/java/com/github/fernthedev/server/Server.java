@@ -5,6 +5,8 @@ import com.github.fernthedev.packets.LostServerConnectionPacket;
 import com.github.fernthedev.packets.MessagePacket;
 import com.github.fernthedev.packets.Packet;
 import com.github.fernthedev.server.backend.BanManager;
+import com.github.fernthedev.server.backend.LoggerManager;
+import com.github.fernthedev.server.event.chat.ServerPlugin;
 import com.github.fernthedev.server.netty.ProcessingHandler;
 import com.github.fernthedev.server.plugin.PluginManager;
 import com.github.fernthedev.universal.StaticHandler;
@@ -209,15 +211,18 @@ public class Server implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }*/
+        LoggerManager loggerManager = new LoggerManager();
         pluginManager = new PluginManager();
 
         banManager = new BanManager();
+        pluginManager.registerEvents(loggerManager,new ServerPlugin());
 
         logger.info("Running on [" + StaticHandler.os + "]");
 
         if(StaticHandler.os.equalsIgnoreCase("Linux") || StaticHandler.os.contains("Linux") || StaticHandler.isLight) {
             logger.info("Running LightManager (Note this is for raspberry pies only)");
-            new LightManager(this);
+            Thread thread4 = new Thread(new LightManager(this));
+            thread4.start();
         }else{
             logger.info("Detected system is not linux. LightManager will not run (manual run with -lightmanager arg)");
         }
@@ -237,19 +242,13 @@ public class Server implements Runnable {
     public static synchronized void closeThread(Thread thread) {
         if(thread == Server.thread) throw new IllegalArgumentException("Cannot be same thread it's joining on");
 
-        Thread thread1 = new Thread(() -> {
+        new Thread(() -> {
             try {
                 thread.join();
             } catch (InterruptedException e) {
-                logger.error(e.getMessage(),e.getCause());
+                logger.error(e.getMessage(), e.getCause());
             }
         });
-
-        try {
-            thread1.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     public static void sendMessage(String message) {
@@ -261,7 +260,7 @@ public class Server implements Runnable {
         return port;
     }
 
-    public static Logger getLogger() {
+    public synchronized static Logger getLogger() {
         return logger;
     }
 

@@ -36,6 +36,7 @@ public class StaticHandler {
 
         version = translateData.getVersion();
         Logger.getLogger("io.netty").setLevel(Level.OFF);
+
     }
 
     private class TranslateData {

@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static com.github.fernthedev.server.CommandHandler.commandList;
+
 public class EventListener {
 
     private Server server;
@@ -97,55 +99,53 @@ public class EventListener {
             String[] checkmessage = command.split(" ", 2);
             List<String> messageword = new ArrayList<>();
 
-            String commandName = null;
-
-
             if (checkmessage.length > 1) {
+                String [] messagewordCheck = command.split(" ");
+
                 int index = 0;
 
+                for(String message : messagewordCheck) {
+                    if(message == null) continue;
 
+                    message = message.replaceAll(" {2}"," ");
 
-                for(String message : checkmessage) {
                     index++;
-
-
-
-                    if(index == 1 || message == null || message.equals("") || message.equals(" ")) {
-
-                        if(!(message == null || message.equals("") || message.equals(" "))) {
-                            commandName = message;
-                        }
-
-                        continue;
-                    }
+                    if(index == 1 || message.equals("")) continue;
 
 
                     messageword.add(message);
                 }
-            }else
-                commandName = checkmessage[0];
+            }
+
+            command = checkmessage[0];
 
 
-            for(Command commandCheck : CommandHandler.commandList) {
-                if(commandCheck.getCommandName().equals(commandName)) {
-                    String[] args = new String[messageword.size()];
-                    args = messageword.toArray(args);
+            command = command.replaceAll(" {2}"," ");
 
-                    String print = commandCheck.getCommandName();
-
-                    if(checkmessage.length > 1) {
-                        print += " " + checkmessage[1];
-                    }
-
-
-                    Server.getLogger().info(clientPlayer + " /" + print);
-                    ChatEvent chatEvent = new ChatEvent(clientPlayer,commandCheck.getCommandName(),true);
+            if(!command.equals("")) {
+                try {
+                    ChatEvent chatEvent = new ChatEvent(clientPlayer,command,true,true);
                     Server.getInstance().getPluginManager().callEvent(chatEvent);
-
-                    if(!chatEvent.isCancelled()) {
-                        new Thread(new CommandHandler(clientPlayer, commandCheck, args)).start();
+                    if(chatEvent.isCancelled()) {
+                        return;
                     }
-                    break;
+
+                    for (Command serverCommand : commandList) {
+                        if (serverCommand.getCommandName().equalsIgnoreCase(command)) {
+                            String[] args = new String[messageword.size()];
+                            args = messageword.toArray(args);
+
+                            // Server.getLogger().info("Executing " + command);
+
+
+                            if(!chatEvent.isCancelled()) {
+                                new Thread(new CommandHandler(clientPlayer, serverCommand, args)).start();
+                            }
+                            break;
+                        }
+                    }
+                } catch (Exception e) {
+                    Server.getLogger().error(e.getMessage(),e.getCause());
                 }
             }
         }

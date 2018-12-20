@@ -7,11 +7,14 @@ import com.github.fernthedev.server.Server;
 import com.github.fernthedev.server.event.chat.ServerPlugin;
 import com.github.fernthedev.universal.StaticHandler;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonReader;
 import com.pi4j.io.gpio.*;
 import com.pi4j.util.CommandArgumentParser;
 import com.sun.jna.Platform;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -20,6 +23,8 @@ public class LightManager implements Runnable{
 
     private final Server server;
     private GpioPinDigitalOutput output;
+
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     private GpioController gpio;
     private RunLight runLight;
@@ -40,7 +45,14 @@ public class LightManager implements Runnable{
     @Override
     public void run() {
         settings = new Settings();
+
+        if(!settingsFile.exists()) {
+            saveSettings();
+        }
+
         load();
+
+
 
         boolean runPi4j = false;
         if(settings.useNatives() ) {
@@ -50,16 +62,13 @@ public class LightManager implements Runnable{
                     // String filename = Main.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6);
                     // System.load("/home/pi/Desktop/libblink.so");
 
+                    Server.getLogger().info("Loading natives");
                     LightDLL lightDLL = LightDLL.getINSTANCE();
                     runLight = lightDLL::setLightSwitch;
                 } catch (UnsatisfiedLinkError e) {
-                    try {
-                        throw new RuntimeException(e);
-                    } catch (RuntimeException ignored) {
-                        Server.getLogger().error("Unable to find DLL it seems");
-                        Server.getLogger().error(e.getMessage(), e.getCause());
-                        runPi4j = true;
-                    }
+                    Server.getLogger().error("Unable to find DLL it seems, resorting to pi4j java");
+                    Server.getLogger().error(e.getMessage(), e.getCause());
+                    runPi4j = true;
                 }
             }else{
                 Server.getLogger().error("Not linux, won't load properly DLLs");;
@@ -69,7 +78,7 @@ public class LightManager implements Runnable{
         if(runPi4j) {
             try {
             // create gpio controller
-
+                Server.getLogger().info("Loading pi4j java");
                 gpio = GpioFactory.getInstance();
                 // lookup the pin by address
                 Pin pin = CommandArgumentParser.getPin(
@@ -120,6 +129,73 @@ public class LightManager implements Runnable{
                 }
             }
         });
+        server.registerCommand(new Command("settings") {
+            @Override
+            public void onCommand(CommandSender sender, String[] args) {
+
+                if(args.length == 0) {
+                    sender.sendMessage("Possible args: set,get,reload,save");
+                }else {
+                    boolean authenticated = ChangePassword.authenticate(sender);
+                    if (authenticated) {
+                        long timeStart, timeEnd, timeElapsed;
+                        String arg = args[0];
+
+                        switch (arg.toLowerCase()) {
+                            case "set":
+                                if (args.length > 2) {
+                                    String oldValue = args[1];
+                                    String newValue = args[2];
+
+                                    try {
+                                        settings.setNewValue(oldValue, newValue);
+                                        sender.sendMessage("Set " + oldValue + " to " + newValue);
+                                    } catch (ClassCastException | IllegalArgumentException e) {
+                                        sender.sendMessage("Error:" + e.getMessage());
+                                    }
+                                } else sender.sendMessage("Usage: settings set {oldvalue} {newvalue}");
+                                break;
+
+                            case "get":
+                                if (args.length > 1) {
+                                    String key = args[1];
+
+                                    try {
+                                        Object value = settings.getValue(key);
+                                        sender.sendMessage("Value of " + key + ": " + value);
+                                    } catch (ClassCastException | IllegalArgumentException e) {
+                                        sender.sendMessage("Error:" + e.getMessage());
+                                    }
+                                } else sender.sendMessage("Usage: settings get {key}");
+                                break;
+
+                            case "reload":
+                                sender.sendMessage("Reloading.");
+                                timeStart = System.nanoTime();
+                                saveSettings();
+
+                                load();
+                                timeEnd = System.nanoTime();
+                                timeElapsed = (timeEnd - timeStart) / 1000000;
+                                sender.sendMessage("Finished reloading. Took " + timeElapsed + "ms");
+                                break;
+
+                            case "save":
+                                sender.sendMessage("Saving.");
+                                timeStart = System.nanoTime();
+                                saveSettings();
+                                timeEnd = System.nanoTime();
+                                timeElapsed = (timeEnd - timeStart) / 1000000;
+                                sender.sendMessage("Finished saving. Took " + timeElapsed + "ms");
+                                break;
+                            default:
+                                sender.sendMessage("No such argument found " + arg + " found");
+                                break;
+                        }
+                    }
+                }
+            }
+        });
         ChangePassword changePassword = new ChangePassword("changepassword",this);
         server.registerCommand(changePassword);
         server.getPluginManager().registerEvents(changePassword, new ServerPlugin());
@@ -130,32 +206,30 @@ public class LightManager implements Runnable{
     }
 
     private void load() {
-        if (!settingsFile.exists()) {
-            try {
-                settingsFile.createNewFile();
-                try (FileWriter writer = new FileWriter(settingsFile)) {
-                    writer.write(new Gson().toJson(settings));
-                } catch (Exception e) {
-                    Server.getLogger().error(e.getMessage(), e.getCause());
-                }
-            } catch (IOException e) {
-                Server.getLogger().error(e.getMessage(), e.getCause());
-            }
+        if(settings == null) {
+            settings = new Settings();
+            saveSettings();
         }
 
         if (settingsFile.exists()) {
             try {
-                settings = new Gson().fromJson(StaticHandler.getFile(settingsFile), Settings.class);
+                try(JsonReader reader = new JsonReader(new FileReader(settingsFile))) {
+
+                    settings = gson.fromJson(reader, Settings.class);
+                    saveSettings();
+
+                }
             } catch (Exception e) {
                 if (StaticHandler.isDebug) {
                     Server.getLogger().error(e.getMessage(), e.getCause());
                 }
                 settingsFile.delete();
                 if (!settingsFile.exists()) {
+                    settings = null;
                     load();
                 }
             }
-        }else {
+        } else {
             Server.getLogger().error("Unable to load settings, seems it is missing");
         }
     }
@@ -167,11 +241,10 @@ public class LightManager implements Runnable{
             } catch (IOException e) {
                 Server.getLogger().error(e.getMessage(), e.getCause());
             }
-
         }
 
         try (FileWriter writer = new FileWriter(settingsFile)) {
-            writer.write(new Gson().toJson(settings));
+            writer.write(gson.toJson(settings));
         } catch (Exception e) {
             Server.getLogger().error(e.getMessage(), e.getCause());
         }
@@ -188,5 +261,7 @@ public class LightManager implements Runnable{
     public void setOff() {
         runLight.setLightValue(false);
     }
+
+
 
 }

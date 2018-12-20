@@ -18,4 +18,9 @@ public class Console implements CommandSender, Serializable {
     public void sendMessage(String message) {
         Server.getLogger().info(message);
     }
+
+    @Override
+    public String getName() {
+        return "Server";
+    }
 }
