@@ -1,1 +1,1 @@
-This is basically just a fork of my chatroom program that allows turning on and off lights hooked to the raspberry pi. This can either use the pi4j lib or the DLLs designed for this program. It's event system is heavily inspired by bukkit's
+This is basically just a fork of my chatroom program that allows turning on and off lights hooked to the raspberry pi. This uses the pi4j lib. It's event system is heavily inspired by bukkit's
