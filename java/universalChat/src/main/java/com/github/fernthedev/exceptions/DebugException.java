@@ -1,6 +1,6 @@
 package com.github.fernthedev.exceptions;
 
-public class DebugException extends Exception {
+public class DebugException extends RuntimeException {
 
     public DebugException() { }
 

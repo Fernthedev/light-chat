@@ -2,6 +2,7 @@ package com.github.fernthedev.server;
 
 import com.github.fernthedev.universal.StaticHandler;
 import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ public class Main {
     public static void main(String[] args) {
         new StaticHandler();
         scanner = new Scanner(System.in);
+        Logger.getLogger("io.netty").setLevel(Level.OFF);
 
         int port = -1;
 

@@ -1,14 +1,14 @@
 package com.github.fernthedev.client;
 
 import com.github.fernthedev.universal.StaticHandler;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Main {
 
@@ -77,7 +77,7 @@ public class Main {
 
         }
 
-        if(StaticHandler.isDebug) Client.getLogger().setLevel(Level.DEBUG);
+        if(StaticHandler.isDebug) Client.getLogger().setLevel(Level.ALL);
         else Client.getLogger().setLevel(Level.INFO);
 
         while(host == null || host.equalsIgnoreCase("") || port == -1) {
@@ -89,7 +89,6 @@ public class Main {
         }
 
         client = new Client(host,port);
-        Client.getLogger().isDebugEnabled();
         client.initialize();
     }
 

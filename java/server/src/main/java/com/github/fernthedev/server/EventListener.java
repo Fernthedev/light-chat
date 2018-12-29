@@ -69,8 +69,8 @@ public class EventListener {
             clientPlayer.setId(id);
             clientPlayer.os = packet.getOS();
 
-
             Server.getLogger().info(clientPlayer.getDeviceName() + " has connected to the server [" + clientPlayer.os+"]");
+            clientPlayer.sendPacket(new RegisterPacket());
             Server.getLogger().debug("NAME:ID " + clientPlayer.getDeviceName() + ":" + clientPlayer.getId());
             Server.getLogger().debug(PlayerHandler.players.get(clientPlayer.getId()).getDeviceName() + " the name." + PlayerHandler.players.get(clientPlayer.getId()).getId() + " the id");
         } else if(p instanceof PongPacket) {
@@ -156,6 +156,7 @@ public class EventListener {
     }
 
     private void disconnectIllegalName(ConnectedPacket packet,String message) {
+        Server.getLogger().info(clientPlayer + " was disconnected for illegal name. Name: " + packet.getName() + " Reason: " + message);
         clientPlayer.sendObject(new IllegalConnection("You have been disconnected for illegal name. Name: " + packet.getName() + " Reason: " + message));
         clientPlayer.close();
     }

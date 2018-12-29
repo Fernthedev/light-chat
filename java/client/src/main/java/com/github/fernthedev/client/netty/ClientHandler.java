@@ -4,32 +4,35 @@ import com.github.fernthedev.client.Client;
 import com.github.fernthedev.client.EventListener;
 import com.github.fernthedev.packets.ConnectedPacket;
 import com.github.fernthedev.packets.Packet;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 
-public class ClientHandler extends ChannelInboundHandlerAdapter {
+import java.util.logging.Level;
 
-    private EventListener listener;
+@ChannelHandler.Sharable
+public class ClientHandler extends ChannelHandlerAdapter {
+
+    protected EventListener listener;
 
     public ClientHandler(Client client,EventListener listener) {
         this.listener = listener;
         this.client = client;
+        String os = client.getOSName();
+        connectedPacket = new ConnectedPacket(client.name,os);
     }
 
-    private Client client;
+    protected Client client;
+    protected ConnectedPacket connectedPacket;
 
     @Override
     public void channelActive(ChannelHandlerContext ctx)
             throws Exception {
-
-
         client.registered = true;
 
-        String os = System.getProperty("os.name").toLowerCase();
 
-
-        ctx.writeAndFlush(new ConnectedPacket(client.name,os));
-        Client.getLogger().debug("Sent connect packet for request");
+        ctx.writeAndFlush(connectedPacket);
+        Client.getLogger().log(Level.FINE,"Sent connect packet for request");
     }
 
     @Override

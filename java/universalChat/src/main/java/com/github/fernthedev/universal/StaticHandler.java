@@ -2,8 +2,6 @@ package com.github.fernthedev.universal;
 
 import com.google.common.io.Resources;
 import com.google.gson.Gson;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 
 import java.io.File;
@@ -35,7 +33,7 @@ public class StaticHandler {
         TranslateData translateData = gson.fromJson(getFile("variables.json"),TranslateData.class);
 
         version = translateData.getVersion();
-        Logger.getLogger("io.netty").setLevel(Level.OFF);
+
 
     }
 

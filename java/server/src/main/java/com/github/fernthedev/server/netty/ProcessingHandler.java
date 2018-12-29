@@ -44,10 +44,6 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         if(Server.socketList.containsKey(ctx.channel())) {
             EventListener eventListener = new EventListener(server, Server.socketList.get(ctx.channel()));
 
-            for (Object packetLos : packetsLost) {
-                eventListener.recieved(packetLos);
-            }
-
             eventListener.recieved(requestData);
 
             ctx.flush();

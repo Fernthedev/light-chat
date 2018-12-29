@@ -1,32 +1,30 @@
 package com.github.fernthedev.client;
 
-import com.github.fernthedev.exceptions.LostConnectionServer;
-import org.apache.log4j.Logger;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class Client {
     public boolean registered;
-    private Scanner scanner;
-    boolean running = false;
+    protected Scanner scanner;
+    public boolean running = false;
 
 
+    protected static final Logger logger = Logger.getLogger(Client.class.getName());
 
-    private static final Logger logger = Logger.getLogger(Client.class);
-
-     int port;
-     String host;
+     public int port;
+     public String host;
 
     public String name;
-    static waitForCommand WaitForCommand;
-    static Thread waitThread;
+    public static com.github.fernthedev.client.WaitForCommand WaitForCommand;
+    public static Thread waitThread;
 
-    static Thread currentThread;
+    public static Thread currentThread;
 
-    private ClientThread clientThread;
+    protected ClientThread clientThread;
 
     /*
     static {
@@ -36,69 +34,40 @@ public class Client {
     }*/
 
 
-    Client(String host, int port) {
+    public Client(String host, int port) {
         this.port = port;
         this.host = host;
         this.scanner = Main.scanner;
-        name = null;
-        WaitForCommand = new waitForCommand(this);
+        try {
+            name = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            logger.log(Level.WARNING,e.getMessage(),e.getCause());
+            clientThread.close();
+        }
+        WaitForCommand = new WaitForCommand(this);
 
         clientThread = new ClientThread(this);
 
         currentThread = new Thread(clientThread);
-
     }
 
-    void initialize() {
+    protected void getProperties() {
+        System.getProperties().list(System.out);
+    }
+
+    public void initialize() {
         logger.info("Initializing");
         name = null;
         clientThread.connected = false;
         clientThread.connectToServer = true;
         clientThread.running = true;
 
-
-
-        /*
-        if(!registered) {
-            logger.info("Type in your desired username:");
-            while (!registered || name == null) {
-                    name = Main.readLine("");
-
-                    if(name == null || name.equals("")) {
-                        registered = false;
-                        name = null;
-                    }
-                    else
-                    registered = true;
-            }
-        }*/
-
-
-
-        try {
-            name = InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            getLogger().error(e.getMessage(),e.getCause());
-            clientThread.close();
-        }
-
-        while(!clientThread.connected && clientThread.connectToServer) {
             clientThread.connect();
 
-        }
     }
 
-
-
-
-
-
-    void throwException() {
-        try {
-            throw new LostConnectionServer(host);
-        } catch (LostConnectionServer lostConnectionServer) {
-            lostConnectionServer.printStackTrace();
-        }
+    public String getOSName() {
+        return System.getProperty("os.name");
     }
 
     public static Logger getLogger() {

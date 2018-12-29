@@ -13,7 +13,6 @@ import com.github.fernthedev.universal.StaticHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
@@ -151,9 +150,9 @@ public class Server implements Runnable {
 
         bootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
-                .childHandler(new ChannelInitializer<SocketChannel>() {
+                .childHandler(new ChannelInitializer<Channel>() {
                     @Override
-                    public void initChannel(SocketChannel ch) {
+                    public void initChannel(Channel ch) {
 
                         ch.pipeline().addLast(new ObjectEncoder(),
                                 new ObjectDecoder(ClassResolvers.cacheDisabled(null)),

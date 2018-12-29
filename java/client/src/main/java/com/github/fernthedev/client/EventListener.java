@@ -6,12 +6,13 @@ import com.github.fernthedev.packets.latency.PingReceive;
 import com.github.fernthedev.packets.latency.PongPacket;
 
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 public class EventListener {
 
-    private Client client;
+    protected Client client;
 
-    EventListener(Client client) {
+    public EventListener(Client client) {
         this.client = client;
     }
 
@@ -33,13 +34,16 @@ public class EventListener {
 
             ClientThread.miliPingDelay = ClientThread.endTime - ClientThread.startTime;
 
-            Client.getLogger().debug("Ping: " + TimeUnit.NANOSECONDS.toMillis(ClientThread.miliPingDelay) + "ms");
+            Client.getLogger().log(Level.FINE,"Ping: " + TimeUnit.NANOSECONDS.toMillis(ClientThread.miliPingDelay) + "ms");
 
         } else if (p instanceof MessagePacket) {
             MessagePacket messagePacket = (MessagePacket) p;
-            Client.getLogger().info(messagePacket);
+            Client.getLogger().info(messagePacket.toString());
         } else if (p instanceof IllegalConnection) {
             Client.getLogger().info(((IllegalConnection) p).getMessage());
+        } else if (p instanceof RegisterPacket) {
+            client.registered = true;
+            Client.getLogger().info("Successfully connected to server");
         }
     }
 

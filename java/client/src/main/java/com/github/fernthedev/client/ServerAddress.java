@@ -2,11 +2,11 @@ package com.github.fernthedev.client;
 
 public class ServerAddress {
 
-    private String address;
-    private int port;
-    private String version;
+    protected String address;
+    protected int port;
+    protected String version;
 
-    private int clientNumbers = 0;
+    protected int clientNumbers = 0;
 
     public ServerAddress(String address,int port,String version) {
         this.address = address;
