@@ -83,8 +83,6 @@ public class ServerBackground implements Runnable {
                             String[] args = new String[messageword.size()];
                             args = messageword.toArray(args);
 
-                           // Server.getLogger().info("Executing " + command);
-
 
                             if(!chatEvent.isCancelled()) {
 

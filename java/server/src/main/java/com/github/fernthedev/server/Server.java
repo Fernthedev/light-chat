@@ -1,6 +1,8 @@
 package com.github.fernthedev.server;
 
+import com.github.fernthedev.light.ChangePassword;
 import com.github.fernthedev.light.LightManager;
+import com.github.fernthedev.light.SettingsManager;
 import com.github.fernthedev.packets.LostServerConnectionPacket;
 import com.github.fernthedev.packets.MessagePacket;
 import com.github.fernthedev.packets.Packet;
@@ -20,6 +22,7 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -39,6 +42,8 @@ public class Server implements Runnable {
     private Console console;
     private BanManager banManager;
     private PluginManager pluginManager;
+
+    private SettingsManager settingsManager;
 
     public Console getConsole() {
         return console;
@@ -210,6 +215,80 @@ public class Server implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }*/
+
+        settingsManager = new SettingsManager(server,new File(SettingsManager.getCurrentPath(),"settings.json"));
+        settingsManager.setup();
+
+        server.registerCommand(new Command("settings") {
+            @Override
+            public void onCommand(CommandSender sender, String[] args) {
+
+                if(args.length == 0) {
+                    sender.sendMessage("Possible args: set,get,reload,save");
+                }else {
+                    boolean authenticated = ChangePassword.authenticate(sender);
+                    if (authenticated) {
+                        long timeStart;
+                        long timeEnd;
+                        long timeElapsed;
+                        String arg = args[0];
+
+                        switch (arg.toLowerCase()) {
+                            case "set":
+                                if (args.length > 2) {
+                                    String oldValue = args[1];
+                                    String newValue = args[2];
+
+                                    try {
+                                        settingsManager.getSettings().setNewValue(oldValue, newValue);
+                                        sender.sendMessage("Set " + oldValue + " to " + newValue);
+                                    } catch (ClassCastException | IllegalArgumentException e) {
+                                        sender.sendMessage("Error:" + e.getMessage());
+                                    }
+                                } else sender.sendMessage("Usage: settings set {oldvalue} {newvalue}");
+                                break;
+
+                            case "get":
+                                if (args.length > 1) {
+                                    String key = args[1];
+
+                                    try {
+                                        Object value = settingsManager.getSettings().getValue(key);
+                                        sender.sendMessage("Value of " + key + ": " + value);
+                                    } catch (ClassCastException | IllegalArgumentException e) {
+                                        sender.sendMessage("Error:" + e.getMessage());
+                                    }
+                                } else sender.sendMessage("Usage: settings get {key}");
+                                break;
+
+                            case "reload":
+                                sender.sendMessage("Reloading.");
+                                timeStart = System.nanoTime();
+                                settingsManager.saveSettings();
+
+                                settingsManager.load();
+                                timeEnd = System.nanoTime();
+                                timeElapsed = (timeEnd - timeStart) / 1000000;
+                                sender.sendMessage("Finished reloading. Took " + timeElapsed + "ms");
+                                break;
+
+                            case "save":
+                                sender.sendMessage("Saving.");
+                                timeStart = System.nanoTime();
+                                settingsManager.saveSettings();
+                                timeEnd = System.nanoTime();
+                                timeElapsed = (timeEnd - timeStart) / 1000000;
+                                sender.sendMessage("Finished saving. Took " + timeElapsed + "ms");
+                                break;
+                            default:
+                                sender.sendMessage("No such argument found " + arg + " found");
+                                break;
+                        }
+                    }
+                }
+            }
+        });
+
         LoggerManager loggerManager = new LoggerManager();
         pluginManager = new PluginManager();
 
@@ -220,7 +299,7 @@ public class Server implements Runnable {
 
         if(StaticHandler.os.equalsIgnoreCase("Linux") || StaticHandler.os.contains("Linux") || StaticHandler.isLight) {
             logger.info("Running LightManager (Note this is for raspberry pies only)");
-            Thread thread4 = new Thread(new LightManager(this));
+            Thread thread4 = new Thread(new LightManager(this,settingsManager));
             thread4.start();
         }else{
             logger.info("Detected system is not linux. LightManager will not run (manual run with -lightmanager arg)");
