@@ -70,6 +70,7 @@ public class LightFileFormatter {
 
                     line = line.replaceAll(" {2}"," ");
                     String[] args = new String[messageWord.size()];
+                    args = messageWord.toArray(args);
 
                     if(line.equalsIgnoreCase("pin") && args.length > 1) {
                         if(args[0].matches("[0-9]+")) {
