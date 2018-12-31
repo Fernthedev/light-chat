@@ -89,9 +89,7 @@ public class LightManager implements Runnable{
             }
         });
 
-        ChangePassword changePassword = new ChangePassword("changepassword",this);
-        server.registerCommand(changePassword);
-        server.getPluginManager().registerEvents(changePassword, new ServerPlugin());
+
     }
 
     private interface RunLight {

@@ -16,11 +16,11 @@ import java.util.HashMap;
 public class ChangePassword extends Command implements Listener {
     private static HashMap<CommandSender,PlayerInfo> checking = new HashMap<>();
 
-    private static LightManager lightManager;
+    private static SettingsManager settingsManager;
 
-    public ChangePassword(@NotNull String command,LightManager lightManager) {
+    public ChangePassword(@NotNull String command,SettingsManager settingsManager) {
         super(command);
-        ChangePassword.lightManager = lightManager;
+        ChangePassword.settingsManager = settingsManager;
     }
 
     @Override
@@ -83,14 +83,14 @@ public class ChangePassword extends Command implements Listener {
                 if(playerInfo.mode == Mode.NEW_PASSWORD) {
                     if(StringUtils.isAlphanumeric(event.getMessage())) {
                         event.getSender().sendMessage("Setting password now");
-                        lightManager.getSettings().setPassword(event.getMessage());
-                        lightManager.saveSettings();
+                        settingsManager.getSettings().setPassword(event.getMessage());
+                        settingsManager.saveSettings();
                         checking.remove(event.getSender());
                     }else event.getSender().sendMessage("Password can only be alphanumeric");
                 }
 
                 if(playerInfo.mode == Mode.OLD_PASSWORD) {
-                    if(lightManager.getSettings().getPassword().equals(event.getMessage())) {
+                    if(settingsManager.getSettings().getPassword().equals(event.getMessage())) {
                         event.getSender().sendMessage("Correct password. Choose new password:");
                         playerInfo.mode = Mode.NEW_PASSWORD;
                     }else{
@@ -105,7 +105,7 @@ public class ChangePassword extends Command implements Listener {
                 }
 
                 if(playerInfo.mode == Mode.AUTHENTICATE) {
-                    if(lightManager.getSettings().getPassword().equals(event.getMessage())) {
+                    if(settingsManager.getSettings().getPassword().equals(event.getMessage())) {
                         event.getSender().sendMessage("Correct password. Successfully authenticated:");
                         playerInfo.authenticated = true;
                         checking.remove(event.getSender());
@@ -125,8 +125,8 @@ public class ChangePassword extends Command implements Listener {
 
             if(event.getSender() instanceof Console) {
                 Server.getLogger().info("Setting password now");
-                lightManager.getSettings().setPassword(event.getMessage());
-                lightManager.saveSettings();
+                settingsManager.getSettings().setPassword(event.getMessage());
+                settingsManager.saveSettings();
                 checking.remove(event.getSender());
             }
         }

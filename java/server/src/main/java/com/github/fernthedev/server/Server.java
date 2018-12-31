@@ -289,6 +289,10 @@ public class Server implements Runnable {
             }
         });
 
+        ChangePassword changePassword = new ChangePassword("changepassword",settingsManager);
+        server.registerCommand(changePassword);
+        server.getPluginManager().registerEvents(changePassword, new ServerPlugin());
+
         LoggerManager loggerManager = new LoggerManager();
         pluginManager = new PluginManager();
 
