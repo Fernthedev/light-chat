@@ -3,6 +3,7 @@ package com.github.fernthedev.light;
 import com.github.fernthedev.server.Server;
 import com.pi4j.io.gpio.*;
 import com.pi4j.system.SystemInfo;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -101,9 +102,9 @@ public class LightFileFormatter {
                     if(line.equalsIgnoreCase("sleep")) {
                         if(args.length > 0) {
                             String amount = args[0];
-                            if(amount.matches("[0-9]+")) {
-                                long time = Long.parseLong(amount);
-                                Thread.sleep(time);
+                            if(amount.replaceAll("\\.","").matches("[0-9]+")) {
+                                double time = Double.parseDouble(amount);
+                                Thread.sleep((long) time);
                             }
                         }
                     }
@@ -115,6 +116,25 @@ public class LightFileFormatter {
         });
 
         thread.start();
+    }
+
+    /**
+     * Read folder directory rather one file
+     * @param path The folder directory
+     * @throws FileNotFoundException When path is non-existent or not folder
+     */
+    public void readDirectory(File path) throws FileNotFoundException {
+        File[] files = path.listFiles();
+
+        if(!path.exists() || files == null) throw new FileNotFoundException("The folder specified, " + path.getAbsolutePath() + " is either not a folder or does not exist");
+
+        for(File file : files) {
+
+            if(FilenameUtils.getExtension(file.getName()).equals("pia")) {
+                readFormatFile(file);
+            }
+
+        }
     }
 
     /**

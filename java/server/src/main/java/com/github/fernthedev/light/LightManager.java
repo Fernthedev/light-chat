@@ -1,9 +1,11 @@
 package com.github.fernthedev.light;
 
 import com.github.fernthedev.server.*;
-import com.github.fernthedev.server.event.chat.ServerPlugin;
 import com.pi4j.io.gpio.*;
 import com.pi4j.util.CommandArgumentParser;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 
 public class LightManager implements Runnable{
 
@@ -53,6 +55,8 @@ public class LightManager implements Runnable{
             Server.getLogger().error(e.getMessage(), e.getCause());
         }
 
+        LightFileFormatter fileFormatter = new LightFileFormatter(this,gpio);
+
         server.registerCommand(new Command("light") {
             @Override
             public void onCommand(CommandSender sender, String[] args) {
@@ -76,6 +80,32 @@ public class LightManager implements Runnable{
                             case "on":
                                 setOn();
                                 sender.sendMessage("Set light to on");
+                                break;
+                            case "readfolder":
+                                if(args.length > 1) {
+                                    String path = args[1];
+
+                                    if(path.startsWith("./")) {
+                                        path = System.getProperty("user.dir") + path.substring(path.indexOf("./") + 1);
+                                        sender.sendMessage("Reading folder " + path);
+                                    }
+
+                                    try {
+                                        fileFormatter.readDirectory(new File(path));
+                                    } catch (FileNotFoundException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                }else sender.sendMessage("Please specify a file to read.");
+                                break;
+
+                            case "readfile":
+                                if(args.length > 1) {
+                                    String path = args[1];
+
+                                    fileFormatter.readFormatFile(new File(path));
+
+                                }
                                 break;
                             default:
                                 sender.sendMessage("No argument found");

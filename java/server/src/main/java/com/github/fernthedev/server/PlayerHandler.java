@@ -1,10 +1,13 @@
 package com.github.fernthedev.server;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class PlayerHandler {
 
-    public static HashMap<Integer, ClientPlayer> players = new HashMap<>();
+    private PlayerHandler() {}
+
+    public static Map<Integer, ClientPlayer> players = new HashMap<>();
 
 
 

@@ -41,6 +41,27 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.2.0</version>
                 <configuration>
+                    <minimizeJar>true</minimizeJar>
+                    <filters>
+                        <filter>
+                            <artifact>log4j:log4j</artifact>
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                        </filter>
+                        <filter>
+                            <artifact>commons-logging:commons-logging</artifact>
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                        </filter>
+                        <filter>
+                            <artifact>com.pi4j:pi4j-core</artifact>
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                        </filter>
+                    </filters>
                     <!-- put your configurations here -->
                 </configuration>
                 <executions>

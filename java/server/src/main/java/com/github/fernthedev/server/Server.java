@@ -92,7 +92,7 @@ public class Server implements Runnable {
                     e.printStackTrace();
                 }
             }
-        });
+        },"AwaitThread");
     }
 
     static synchronized void sendObjectToAllPlayers(Object packet) {
@@ -172,7 +172,7 @@ public class Server implements Runnable {
         running = true;
         logger.info("Server socket registered");
         ServerBackground serverBackground = new ServerBackground(this);
-        new Thread(serverBackground).start();
+        new Thread(serverBackground,"ServerBackgroundThread").start();
         //Timer pingPongTimer = new Timer("pingpong");
 
 
@@ -200,7 +200,7 @@ public class Server implements Runnable {
         try {
             logger.info("Server started successfully at localhost (Connect with " + InetAddress.getLocalHost().getHostAddress() + ") using port " + port);
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
         }
 
         if (!future.isSuccess()) {
@@ -289,12 +289,16 @@ public class Server implements Runnable {
             }
         });
 
+
+
+        pluginManager = new PluginManager();
+
         ChangePassword changePassword = new ChangePassword("changepassword",settingsManager);
         server.registerCommand(changePassword);
         server.getPluginManager().registerEvents(changePassword, new ServerPlugin());
 
         LoggerManager loggerManager = new LoggerManager();
-        pluginManager = new PluginManager();
+
 
         banManager = new BanManager();
         pluginManager.registerEvents(loggerManager,new ServerPlugin());
@@ -303,7 +307,7 @@ public class Server implements Runnable {
 
         if(StaticHandler.os.equalsIgnoreCase("Linux") || StaticHandler.os.contains("Linux") || StaticHandler.isLight) {
             logger.info("Running LightManager (Note this is for raspberry pies only)");
-            Thread thread4 = new Thread(new LightManager(this,settingsManager));
+            Thread thread4 = new Thread(new LightManager(this,settingsManager),"LightManagerThread");
             thread4.start();
         }else{
             logger.info("Detected system is not linux. LightManager will not run (manual run with -lightmanager arg)");
@@ -330,7 +334,7 @@ public class Server implements Runnable {
             } catch (InterruptedException e) {
                 logger.error(e.getMessage(), e.getCause());
             }
-        });
+        },"CloseThread");
     }
 
     public static void sendMessage(String message) {
