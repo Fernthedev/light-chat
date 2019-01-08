@@ -13,6 +13,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 
+/**
+ * Can be used to authenticate command senders.
+ */
 public class ChangePassword extends Command implements Listener {
     private static HashMap<CommandSender,PlayerInfo> checking = new HashMap<>();
 
