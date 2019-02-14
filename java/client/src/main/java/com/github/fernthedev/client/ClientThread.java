@@ -202,7 +202,7 @@ public class ClientThread implements Runnable {
                         Client.getLogger().log(Level.WARNING,e.getMessage(),e.getCause());
                     }
                 }
-            },"QuitThread");
+            },"QuitThread").start();
         } catch (InterruptedException e) {
             Client.getLogger().log(Level.WARNING,e.getMessage(),e.getCause());
         }

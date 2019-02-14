@@ -100,8 +100,6 @@ public class ClientPlayer implements CommandSender {
     public void sendObject(Packet packet,boolean encrypt) {
         if (packet != null) {
 
-            channel.writeAndFlush(packet);
-
             /*
             // Length is 16 byte
             SecretKeySpec sks = new SecretKeySpec(serverKey.getBytes(), StaticHandler.getCipherTransformation());
