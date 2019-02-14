@@ -3,8 +3,15 @@ package com.github.fernthedev.server;
 import com.github.fernthedev.packets.*;
 import com.github.fernthedev.packets.latency.PongPacket;
 import com.github.fernthedev.server.event.chat.ChatEvent;
+import com.github.fernthedev.universal.EncryptionHandler;
+import com.github.fernthedev.universal.StaticHandler;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.crypto.*;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -22,57 +29,14 @@ public class EventListener {
         this.clientPlayer = clientPlayer;
     }
     
-    public void recieved(Object p) {
+    public void recieved(SealedObject pe) {
+        Packet p = (Packet) EncryptionHandler.decrypt(pe, clientPlayer.getServerKey());
 
-       // Server.getLogger().info(clientPlayer + " is the sender of packet");
+        // Server.getLogger().info(clientPlayer + " is the sender of packet");
 
         if(p instanceof TestConnectPacket) {
             TestConnectPacket packet = (TestConnectPacket) p;
             Server.getLogger().info("Connected packet: " + packet.getMessage());
-        }
-
-        else if(p instanceof ConnectedPacket) {
-            ConnectedPacket packet = (ConnectedPacket)p;
-            //Server.getLogger().info("Connected packet recieved from " + clientPlayer.getAdress());
-            int id = 1;
-
-            if(PlayerHandler.players.size() > 0) {
-                while(id < PlayerHandler.players.size()) {
-                    id++;
-                }
-            }
-
-            if(!isAlphaNumeric(packet.getName())) {
-                disconnectIllegalName(packet,"Name requires alphanumeric characters only");
-                return;
-            }
-
-            for(ClientPlayer player : PlayerHandler.players.values()) {
-                if(player.getDeviceName().equalsIgnoreCase(packet.getName())) {
-                    disconnectIllegalName(packet,"Name already in use");
-                    return;
-                }
-            }
-
-            if(Server.getInstance().getBanManager().isBanned(clientPlayer)) {
-                clientPlayer.sendObject(new MessagePacket("Your have been banned."));
-                clientPlayer.close();
-                return;
-            }
-
-            //Server.getLogger().info("Players: " + PlayerHandler.players.size());
-
-            PlayerHandler.players.put(id, clientPlayer);
-
-            clientPlayer.registered = true;
-            clientPlayer.setDeviceName(packet.getName());
-            clientPlayer.setId(id);
-            clientPlayer.os = packet.getOS();
-
-            Server.getLogger().info(clientPlayer.getDeviceName() + " has connected to the server [" + clientPlayer.os+"]");
-            clientPlayer.sendPacket(new RegisterPacket());
-            Server.getLogger().debug("NAME:ID " + clientPlayer.getDeviceName() + ":" + clientPlayer.getId());
-            Server.getLogger().debug(PlayerHandler.players.get(clientPlayer.getId()).getDeviceName() + " the name." + PlayerHandler.players.get(clientPlayer.getId()).getId() + " the id");
         } else if(p instanceof PongPacket) {
 
             clientPlayer.endTime = System.nanoTime();
@@ -151,13 +115,73 @@ public class EventListener {
         }
     }
 
+    private Object decrypt(SealedObject sealedObject) throws IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
+        SecretKeySpec sks = new SecretKeySpec(clientPlayer.getClientKey().getBytes(), StaticHandler.getCipherTransformation());
+        Cipher cipher = Cipher.getInstance(StaticHandler.getCipherTransformation());
+        cipher.init(Cipher.DECRYPT_MODE, sks);
+
+        try {
+            return sealedObject.getObject(cipher);
+        } catch (ClassNotFoundException | IllegalBlockSizeException | BadPaddingException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void handleConnect(ConnectedPacket packet) {
+        //Server.getLogger().info("Connected packet recieved from " + clientPlayer.getAdress());
+        int id = 1;
+
+        if(PlayerHandler.players.size() > 0) {
+            while(id < PlayerHandler.players.size()) {
+                id++;
+            }
+        }
+
+        if(!isAlphaNumeric(packet.getName())) {
+            disconnectIllegalName(packet,"Name requires alphanumeric characters only");
+            return;
+        }
+
+        for(ClientPlayer player : PlayerHandler.players.values()) {
+            if(player.getDeviceName().equalsIgnoreCase(packet.getName())) {
+                disconnectIllegalName(packet,"Name already in use");
+                return;
+            }
+        }
+
+        if(Server.getInstance().getBanManager().isBanned(clientPlayer)) {
+            clientPlayer.sendObject(new MessagePacket("Your have been banned."),false);
+            clientPlayer.close();
+            return;
+        }
+
+        clientPlayer.setClientUUID(packet.getUuid(),packet.getPrivateKey());
+
+
+        //Server.getLogger().info("Players: " + PlayerHandler.players.size());
+
+        PlayerHandler.players.put(id, clientPlayer);
+
+        clientPlayer.registered = true;
+        clientPlayer.setDeviceName(packet.getName());
+        clientPlayer.setId(id);
+        clientPlayer.os = packet.getOS();
+
+        Server.getLogger().info(clientPlayer.getDeviceName() + " has connected to the server [" + clientPlayer.os+"]");
+        clientPlayer.sendObject(new RegisterPacket());
+        Server.getLogger().debug("NAME:ID " + clientPlayer.getDeviceName() + ":" + clientPlayer.getId());
+        Server.getLogger().debug(PlayerHandler.players.get(clientPlayer.getId()).getDeviceName() + " the name." + PlayerHandler.players.get(clientPlayer.getId()).getId() + " the id");
+
+    }
+
     public boolean isAlphaNumeric(String name) {
         return StringUtils.isAlphanumericSpace(name.replace('-',' '));
     }
 
     private void disconnectIllegalName(ConnectedPacket packet,String message) {
         Server.getLogger().info(clientPlayer + " was disconnected for illegal name. Name: " + packet.getName() + " Reason: " + message);
-        clientPlayer.sendObject(new IllegalConnection("You have been disconnected for illegal name. Name: " + packet.getName() + " Reason: " + message));
+        clientPlayer.sendObject(new IllegalConnection("You have been disconnected for illegal name. Name: " + packet.getName() + " Reason: " + message),false);
         clientPlayer.close();
     }
 }

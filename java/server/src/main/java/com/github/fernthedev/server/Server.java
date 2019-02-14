@@ -9,6 +9,7 @@ import com.github.fernthedev.packets.Packet;
 import com.github.fernthedev.server.backend.BanManager;
 import com.github.fernthedev.server.backend.LoggerManager;
 import com.github.fernthedev.server.event.chat.ServerPlugin;
+import com.github.fernthedev.server.netty.MulticastServer;
 import com.github.fernthedev.server.netty.ProcessingHandler;
 import com.github.fernthedev.server.plugin.PluginManager;
 import com.github.fernthedev.universal.StaticHandler;
@@ -23,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -95,12 +97,12 @@ public class Server implements Runnable {
         },"AwaitThread");
     }
 
-    static synchronized void sendObjectToAllPlayers(Object packet) {
+    static synchronized void sendObjectToAllPlayers(Packet packet) {
         for(Channel channel : socketList.keySet()) {
 
             ClientPlayer clientPlayer = socketList.get(channel);
 
-            if (packet instanceof Packet) {
+            if (packet != null) {
                 if (clientPlayer.channel.isActive()) {
                     clientPlayer.sendObject(packet);
                 }
@@ -258,7 +260,7 @@ public class Server implements Runnable {
                                     } catch (ClassCastException | IllegalArgumentException e) {
                                         sender.sendMessage("Error:" + e.getMessage());
                                     }
-                                } else sender.sendMessage("Usage: settings get {key}");
+                                } else sender.sendMessage("Usage: settings get {serverKey}");
                                 break;
 
                             case "reload":
@@ -289,7 +291,14 @@ public class Server implements Runnable {
             }
         });
 
-
+        if(settingsManager.getSettings().isUseMulticast()) {
+            try {
+                MulticastServer multicastServer = new MulticastServer("Multicast Thread",this);
+                multicastServer.start();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         pluginManager = new PluginManager();
 

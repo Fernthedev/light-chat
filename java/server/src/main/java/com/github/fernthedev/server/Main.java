@@ -66,7 +66,7 @@ public class Main {
         }
 
         Server server = new Server(port);
-        new Thread(server).start();
+        new Thread(server,"ServerMainThread").start();
     }
 
     public static String readLine(String message) {

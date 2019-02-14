@@ -1,8 +1,13 @@
 package com.github.fernthedev.client;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,18 +18,39 @@ public class Client {
     public boolean running = false;
 
 
-    protected static final Logger logger = Logger.getLogger(Client.class.getName());
+    protected static Logger logger;
 
-     public int port;
-     public String host;
+    public int port;
+    public String host;
+
+    @Getter
+    @Setter
+    @NonNull
+    protected String serverKey;
+
+    @Getter
+    @Setter
+    @NonNull
+    protected String privateKey;
+
+
+
+    @Getter
+    protected UUID uuid;
 
     public String name;
-    public static com.github.fernthedev.client.WaitForCommand WaitForCommand;
+    public static WaitForCommand waitForCommand;
     public static Thread waitThread;
 
     public static Thread currentThread;
 
     protected ClientThread clientThread;
+
+    protected boolean closeConsole = true;
+
+    public boolean isCloseConsole() {
+        return closeConsole;
+    }
 
     /*
     static {
@@ -38,17 +64,24 @@ public class Client {
         this.port = port;
         this.host = host;
         this.scanner = Main.scanner;
+
+        logger = Logger.getLogger(Client.class.getName());
+
         try {
             name = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
-            logger.log(Level.WARNING,e.getMessage(),e.getCause());
+            logger.log(Level.WARNING, e.getMessage(), e.getCause());
             clientThread.close();
         }
-        WaitForCommand = new WaitForCommand(this);
 
         clientThread = new ClientThread(this);
 
-        currentThread = new Thread(clientThread);
+        waitForCommand = new WaitForCommand(this);
+
+
+
+        currentThread = new Thread(clientThread,"MainThread");
+
     }
 
     protected void getProperties() {
@@ -62,7 +95,9 @@ public class Client {
         clientThread.connectToServer = true;
         clientThread.running = true;
 
-            clientThread.connect();
+
+
+        clientThread.connect();
 
     }
 
@@ -70,7 +105,11 @@ public class Client {
         return System.getProperty("os.name");
     }
 
-    public static Logger getLogger() {
+    public static synchronized Logger getLogger() {
+        if(logger == null) {
+            logger = Logger.getLogger(Client.class.getName());
+        }
+
         return logger;
     }
 

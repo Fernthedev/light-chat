@@ -1,11 +1,28 @@
 package com.github.fernthedev.client.netty;
 
-@Deprecated
+
+import com.github.fernthedev.client.ServerAddress;
+import com.github.fernthedev.exceptions.DebugChainedException;
+import com.github.fernthedev.universal.MulticastData;
+import com.github.fernthedev.universal.StaticHandler;
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class MulticastClient {
-/*
+
     public List<ServerAddress> serversAddress = new ArrayList<>();
 
-    private Map<String,ServerAddress> addressServerAddressMap = new HashMap<>();
+    private Map<String, ServerAddress> addressServerAddressMap = new HashMap<>();
 
     public void checkServers(int amount) {
         try {
@@ -56,5 +73,5 @@ public class MulticastClient {
         } catch (IOException | DebugChainedException e) {
             e.printStackTrace();
         }
-    }*/
+    }
 }

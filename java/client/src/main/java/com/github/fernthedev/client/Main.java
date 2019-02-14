@@ -77,9 +77,6 @@ public class Main {
 
         }
 
-        if(StaticHandler.isDebug) Client.getLogger().setLevel(Level.ALL);
-        else Client.getLogger().setLevel(Level.INFO);
-
         while(host == null || host.equalsIgnoreCase("") || port == -1) {
             if(host == null || host.equals(""))
                 host= readLine("Host:");
@@ -88,7 +85,13 @@ public class Main {
                 port = readInt("Port:");
         }
 
+
+
+       if(StaticHandler.isDebug) Client.getLogger().setLevel(Level.ALL);
+        else Client.getLogger().setLevel(Level.INFO);
+
         client = new Client(host,port);
+
         client.initialize();
     }
 

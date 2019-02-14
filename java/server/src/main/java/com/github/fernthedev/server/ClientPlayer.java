@@ -3,9 +3,14 @@ package com.github.fernthedev.server;
 import com.github.fernthedev.packets.MessagePacket;
 import com.github.fernthedev.packets.Packet;
 import com.github.fernthedev.packets.latency.PingPacket;
+import com.github.fernthedev.universal.EncryptionHandler;
 import io.netty.channel.Channel;
+import lombok.Getter;
+import lombok.Setter;
 
+import javax.crypto.SealedObject;
 import java.net.InetSocketAddress;
+import java.util.UUID;
 
 import static com.github.fernthedev.server.Server.socketList;
 
@@ -18,6 +23,27 @@ public class ClientPlayer implements CommandSender {
     public boolean registered = false;
 
     public String os;
+
+    @Getter
+    private UUID uuid;
+
+    @Getter
+    private UUID clientUUID;
+
+    @Getter
+    private String clientKey;
+
+    @Getter
+    @Setter
+    private String serverKey;
+
+    public void setClientUUID(UUID uuid,String privateKey) {
+        this.clientUUID = uuid;
+
+        this.clientKey = EncryptionHandler.decrypt(privateKey,serverKey);
+    }
+
+
 
     public void setDeviceName(String deviceName) {
         this.deviceName = deviceName;
@@ -44,8 +70,12 @@ public class ClientPlayer implements CommandSender {
         return connected;
     }
 
-    public ClientPlayer(Channel channel) {
+    public ClientPlayer(Channel channel,UUID uuid) {
         this.channel = channel;
+        this.uuid = uuid;
+
+        serverKey = EncryptionHandler.makeSHA256Hash(uuid.toString());
+
     }
 
     public int getId() {
@@ -67,18 +97,37 @@ public class ClientPlayer implements CommandSender {
         }
     }
 
-    public void sendObject(Object packet) {
-        if (packet instanceof Packet) {
+    public void sendObject(Packet packet,boolean encrypt) {
+        if (packet != null) {
 
             channel.writeAndFlush(packet);
-            // out.flush();
-           /* if(!(packet instanceof PingPacket)) {
-                Server.getLogger().info("Sent " + packet);
-            }*/
+
+            /*
+            // Length is 16 byte
+            SecretKeySpec sks = new SecretKeySpec(serverKey.getBytes(), StaticHandler.getCipherTransformation());
+
+            // Create cipher
+            Cipher cipher = Cipher.getInstance(StaticHandler.getCipherTransformation());
+            cipher.init(Cipher.ENCRYPT_MODE, sks);*/
+
+
+            if(encrypt) {
+                SealedObject sealedObject = EncryptionHandler.encrypt(packet, clientKey);
+
+
+                channel.writeAndFlush(sealedObject);
+            }else{
+                channel.writeAndFlush(packet);
+            }
 
         } else {
             Server.getLogger().info("not packet");
         }
+    }
+
+
+    public void sendObject(Packet packet) {
+        sendObject(packet,true);
     }
 
     public void close() {
@@ -124,7 +173,7 @@ public class ClientPlayer implements CommandSender {
 
     public void ping() {
         startTime = System.nanoTime();
-        sendPacket(new PingPacket());
+        sendObject(new PingPacket(),false);
     }
 
     public static void pingAll() {
