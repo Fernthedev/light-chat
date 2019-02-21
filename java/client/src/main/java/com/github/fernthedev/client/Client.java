@@ -41,6 +41,7 @@ public class Client {
     public String name;
     public static WaitForCommand waitForCommand;
     public static Thread waitThread;
+    private static CLogger cLogger;
 
     public static Thread currentThread;
 
@@ -52,13 +53,6 @@ public class Client {
         return closeConsole;
     }
 
-    /*
-    static {
-        System.setProperty("java.util.logging.SimpleFormatter.format",
-                "[%1$tF %1$tT] [%4$-7s] %5$s %n");
-        logger = Logger.getLogger(Client.class.getName());
-    }*/
-
 
     public Client(String host, int port) {
         this.port = port;
@@ -66,6 +60,7 @@ public class Client {
         this.scanner = Main.scanner;
 
         logger = Logger.getLogger(Client.class.getName());
+        cLogger = new CLogger(logger);
 
         try {
             name = InetAddress.getLocalHost().getHostName();
@@ -105,12 +100,12 @@ public class Client {
         return System.getProperty("os.name");
     }
 
-    public static synchronized Logger getLogger() {
+    public static synchronized CLogger getLogger() {
         if(logger == null) {
             logger = Logger.getLogger(Client.class.getName());
         }
 
-        return logger;
+        return cLogger;
     }
 
     public ClientThread getClientThread() {

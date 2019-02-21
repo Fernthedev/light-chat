@@ -53,12 +53,12 @@ public class ClientHandler extends ChannelHandlerAdapter {
 
             packet = (Packet) EncryptionHandler.decrypt(ob, client.getPrivateKey());
 
-            listener.recieved(packet);
+            listener.received(packet);
             ctx.flush();
         }else if (msg instanceof Packet){
             packet = (Packet) msg;
 
-            listener.recieved(packet);
+            listener.received(packet);
             ctx.flush();
         }
 

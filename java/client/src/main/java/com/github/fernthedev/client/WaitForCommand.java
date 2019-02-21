@@ -43,7 +43,6 @@ public class WaitForCommand implements Runnable {
 
             if (scanner.hasNextLine()) {
                 String message = scanner.nextLine();
-
                 sendMessage(message);
             }
             //   }

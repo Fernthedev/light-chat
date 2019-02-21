@@ -36,6 +36,7 @@ public class MulticastClient {
                 byte[] buf = new byte[256];
                 packet = new DatagramPacket(buf, buf.length);
 
+                socket.setSoTimeout(2000);
                 socket.receive(packet);
 
                 String received = new String(packet.getData());

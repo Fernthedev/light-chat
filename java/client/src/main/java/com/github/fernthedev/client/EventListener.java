@@ -8,7 +8,6 @@ import com.github.fernthedev.universal.EncryptionHandler;
 import org.apache.commons.lang3.Validate;
 
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 
 public class EventListener {
 
@@ -18,7 +17,7 @@ public class EventListener {
         this.client = client;
     }
 
-    public void recieved(Packet p) {
+    public void received(Packet p) {
 
 
         if(p instanceof TestConnectPacket) {
@@ -38,7 +37,7 @@ public class EventListener {
 
             ClientThread.miliPingDelay = ClientThread.endTime - ClientThread.startTime;
 
-            Client.getLogger().log(Level.FINE,"Ping: " + TimeUnit.NANOSECONDS.toMillis(ClientThread.miliPingDelay) + "ms");
+            Client.getLogger().debug("Ping: " + TimeUnit.NANOSECONDS.toMillis(ClientThread.miliPingDelay) + "ms");
 
         } else if (p instanceof MessagePacket) {
             MessagePacket messagePacket = (MessagePacket) p;
@@ -73,7 +72,7 @@ public class EventListener {
 
 
 
-            Client.getLogger().fine("Sent connect packet for request");
+            Client.getLogger().debug("Sent connect packet for request");
 
         }
     }

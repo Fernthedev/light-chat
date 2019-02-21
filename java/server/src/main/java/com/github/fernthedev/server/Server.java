@@ -1,6 +1,6 @@
 package com.github.fernthedev.server;
 
-import com.github.fernthedev.light.ChangePassword;
+import com.github.fernthedev.light.AuthenticationManager;
 import com.github.fernthedev.light.LightManager;
 import com.github.fernthedev.light.SettingsManager;
 import com.github.fernthedev.packets.LostServerConnectionPacket;
@@ -20,6 +20,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
+import lombok.Getter;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,6 +46,7 @@ public class Server implements Runnable {
     private BanManager banManager;
     private PluginManager pluginManager;
 
+    @Getter
     private SettingsManager settingsManager;
 
     public Console getConsole() {
@@ -228,7 +230,7 @@ public class Server implements Runnable {
                 if(args.length == 0) {
                     sender.sendMessage("Possible args: set,get,reload,save");
                 }else {
-                    boolean authenticated = ChangePassword.authenticate(sender);
+                    boolean authenticated = AuthenticationManager.authenticate(sender);
                     if (authenticated) {
                         long timeStart;
                         long timeEnd;
@@ -302,9 +304,9 @@ public class Server implements Runnable {
 
         pluginManager = new PluginManager();
 
-        ChangePassword changePassword = new ChangePassword("changepassword",settingsManager);
-        server.registerCommand(changePassword);
-        server.getPluginManager().registerEvents(changePassword, new ServerPlugin());
+        AuthenticationManager authenticationManager = new AuthenticationManager("changepassword",settingsManager);
+        server.registerCommand(authenticationManager);
+        server.getPluginManager().registerEvents(authenticationManager, new ServerPlugin());
 
         LoggerManager loggerManager = new LoggerManager();
 

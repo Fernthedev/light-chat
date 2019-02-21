@@ -42,24 +42,28 @@ public class ProcessingHandler extends ChannelHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg)
             throws Exception {
 
-        EventListener eventListener = new EventListener(server, Server.socketList.get(ctx.channel()));
+        new Thread(() -> {
+            EventListener eventListener = new EventListener(server, Server.socketList.get(ctx.channel()));
 
-        if(msg instanceof SealedObject) {
-            SealedObject requestData = (SealedObject) msg;
-
-
-            if (Server.socketList.containsKey(ctx.channel())) {
+            if (msg instanceof SealedObject) {
+                SealedObject requestData = (SealedObject) msg;
 
 
-                eventListener.recieved(requestData);
-                ctx.flush();
+                if (Server.socketList.containsKey(ctx.channel())) {
+
+
+                    eventListener.received(requestData);
+                    ctx.flush();
+
+                }
+            } else if (msg instanceof ConnectedPacket) {
+                if (Server.socketList.containsKey(ctx.channel())) {
+                    eventListener.handleConnect((ConnectedPacket) msg);
+                    ctx.flush();
+                }
             }
-        }else if(msg instanceof ConnectedPacket) {
-            if(Server.socketList.containsKey(ctx.channel())) {
-                eventListener.handleConnect((ConnectedPacket) msg);
-                ctx.flush();
-            }
-        }
+        }).start();
+
 
 
     }

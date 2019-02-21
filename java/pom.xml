@@ -50,6 +50,12 @@
                             </includes>
                         </filter>
                         <filter>
+                            <artifact>com.github.fernthedev:universalChat</artifact>
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                        </filter>
+                        <filter>
                             <artifact>commons-logging:commons-logging</artifact>
                             <includes>
                                 <include>**</include>

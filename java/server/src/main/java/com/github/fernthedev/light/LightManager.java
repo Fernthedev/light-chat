@@ -64,7 +64,7 @@ public class LightManager implements Runnable{
                     boolean authenticated = false;
 
                     if(sender instanceof ClientPlayer) {
-                        authenticated = ChangePassword.authenticate(sender);
+                        authenticated = AuthenticationManager.authenticate(sender);
                     }
 
                     if(sender instanceof Console) authenticated = true;

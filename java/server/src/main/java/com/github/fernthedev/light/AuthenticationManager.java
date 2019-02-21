@@ -7,23 +7,23 @@ import com.github.fernthedev.server.backend.LoggerManager;
 import com.github.fernthedev.server.event.EventHandler;
 import com.github.fernthedev.server.event.Listener;
 import com.github.fernthedev.server.event.chat.ChatEvent;
-import com.github.fernthedev.universal.StaticHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Can be used to authenticate command senders.
  */
-public class ChangePassword extends Command implements Listener {
-    private static HashMap<CommandSender,PlayerInfo> checking = new HashMap<>();
+public class AuthenticationManager extends Command implements Listener {
+    private static Map<CommandSender,PlayerInfo> checking = new HashMap<>();
 
     private static SettingsManager settingsManager;
 
-    public ChangePassword(@NotNull String command,SettingsManager settingsManager) {
+    public AuthenticationManager(@NotNull String command, SettingsManager settingsManager) {
         super(command);
-        ChangePassword.settingsManager = settingsManager;
+        AuthenticationManager.settingsManager = settingsManager;
     }
 
     @Override
@@ -45,28 +45,28 @@ public class ChangePassword extends Command implements Listener {
         }
     }
 
-    public static boolean authenticate(CommandSender sender) {
-        if(sender instanceof Console) {
+    public static synchronized boolean authenticate(CommandSender sender) {
+        if (sender instanceof Console) {
             return true;
         }
 
         PlayerInfo playerInfo = new PlayerInfo(sender);
 
-        if(!checking.containsKey(sender)) {
-            checking.put(sender,playerInfo);
+        if (!checking.containsKey(sender)) {
+            checking.put(sender, playerInfo);
         }
 
-        if(sender instanceof ClientPlayer) {
+        if (sender instanceof ClientPlayer) {
             playerInfo.mode = Mode.AUTHENTICATE;
             sender.sendMessage("Type in password:");
             sender.sendPacket(new FillPasswordPacket());
         }
 
-        while(checking.containsKey(sender)) {
+        while (checking.containsKey(sender)) {
             try {
-                Thread.sleep(1);
+                Thread.sleep(30);
             } catch (InterruptedException e) {
-                if(StaticHandler.isDebug) Server.getLogger().error(e.getMessage(),e.getCause());
+                e.printStackTrace();
             }
         }
 
@@ -76,6 +76,7 @@ public class ChangePassword extends Command implements Listener {
     @EventHandler
     public void onChatEvent(ChatEvent event) {
         if(checking.containsKey(event.getSender())) {
+            Server.getLogger().info("check");
 
             event.setCancelled(true);
             PlayerInfo playerInfo = checking.get(event.getSender());

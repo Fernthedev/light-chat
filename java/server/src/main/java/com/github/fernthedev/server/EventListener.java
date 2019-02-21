@@ -1,11 +1,13 @@
 package com.github.fernthedev.server;
 
+import com.github.fernthedev.light.AuthenticationManager;
 import com.github.fernthedev.packets.*;
 import com.github.fernthedev.packets.latency.PongPacket;
 import com.github.fernthedev.server.event.chat.ChatEvent;
 import com.github.fernthedev.universal.EncryptionHandler;
 import com.github.fernthedev.universal.StaticHandler;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
@@ -29,7 +31,7 @@ public class EventListener {
         this.clientPlayer = clientPlayer;
     }
     
-    public void recieved(SealedObject pe) {
+    public void received(SealedObject pe) {
         Packet p = (Packet) EncryptionHandler.decrypt(pe, clientPlayer.getServerKey());
 
         // Server.getLogger().info(clientPlayer + " is the sender of packet");
@@ -48,7 +50,9 @@ public class EventListener {
         } else if (p instanceof MessagePacket) {
             MessagePacket messagePacket = (MessagePacket) p;
 
-            ChatEvent chatEvent = new ChatEvent(clientPlayer,messagePacket.getMessage(),false);
+            Server.getLogger().info("tested13ewqaww");
+
+            ChatEvent chatEvent = new ChatEvent(clientPlayer,messagePacket.getMessage(),false,true);
             Server.getInstance().getPluginManager().callEvent(chatEvent);
 
             if(!chatEvent.isCancelled()) {
@@ -129,7 +133,7 @@ public class EventListener {
     }
 
     public void handleConnect(ConnectedPacket packet) {
-        //Server.getLogger().info("Connected packet recieved from " + clientPlayer.getAdress());
+        //Server.getLogger().info("Connected packet received from " + clientPlayer.getAdress());
         int id = 1;
 
         if(PlayerHandler.players.size() > 0) {
@@ -150,7 +154,7 @@ public class EventListener {
             }
         }
 
-        if(Server.getInstance().getBanManager().isBanned(clientPlayer)) {
+        if(server.getBanManager().isBanned(clientPlayer)) {
             clientPlayer.sendObject(new MessagePacket("Your have been banned."),false);
             clientPlayer.close();
             return;
@@ -163,10 +167,23 @@ public class EventListener {
 
         PlayerHandler.players.put(id, clientPlayer);
 
-        clientPlayer.registered = true;
+
         clientPlayer.setDeviceName(packet.getName());
         clientPlayer.setId(id);
         clientPlayer.os = packet.getOS();
+
+        if(server.getSettingsManager().getSettings().isPasswordRequiredForLogin()) {
+            boolean authenticated = AuthenticationManager.authenticate(clientPlayer);
+            if(!authenticated) {
+                clientPlayer.sendObject(new MessagePacket("Incorrect password"));
+                clientPlayer.close();
+                return;
+            }
+
+            Validate.notNull(clientPlayer);
+        }
+
+        clientPlayer.registered = true;
 
         Server.getLogger().info(clientPlayer.getDeviceName() + " has connected to the server [" + clientPlayer.os+"]");
         clientPlayer.sendObject(new RegisterPacket());

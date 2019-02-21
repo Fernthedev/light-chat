@@ -11,6 +11,7 @@ public class Settings {
 
     private String password="password";
     private boolean useMulticast = false;
+    private boolean passwordRequiredForLogin = false;
 
     public void setNewValue(@NotNull String oldValue,@NotNull String newValue) {
 

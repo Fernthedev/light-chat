@@ -1,12 +1,10 @@
 package com.github.fernthedev.client;
 
+import com.github.fernthedev.client.netty.MulticastClient;
 import com.github.fernthedev.universal.StaticHandler;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,7 +14,7 @@ public class Main {
 
     static Client client;
 
-    //private MulticastClient multicastClient;
+    private MulticastClient multicastClient;
 
     private String host = null;
     private int port = -1;
@@ -52,10 +50,10 @@ public class Main {
             }
         }
 
-        /*if(host == null || host.equals("") || port == -1) {
-            multicastClient = new MulticastClient();
-            //check(4);
-        }*/
+        if(host == null || host.equals("") || port == -1) {
+             multicastClient = new MulticastClient();
+            check(4);
+        }
 
 
         if(System.console() == null && !StaticHandler.isDebug) {
@@ -87,15 +85,13 @@ public class Main {
 
 
 
-       if(StaticHandler.isDebug) Client.getLogger().setLevel(Level.ALL);
-        else Client.getLogger().setLevel(Level.INFO);
 
         client = new Client(host,port);
 
         client.initialize();
     }
 
-    /*
+
     private void check(int amount) {
         multicastClient.checkServers(amount);
 
@@ -160,7 +156,7 @@ public class Main {
                 }
             }
         }
-    }*/
+    }
 
     public static void main(String[] args) {
         new Main(args);

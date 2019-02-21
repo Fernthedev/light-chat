@@ -1,5 +1,6 @@
 package com.github.fernthedev.server;
 
+import com.github.fernthedev.packets.MessagePacket;
 import com.github.fernthedev.packets.Packet;
 import com.github.fernthedev.packets.latency.PingPacket;
 import io.netty.channel.Channel;
@@ -120,7 +121,7 @@ public class ServerThread implements Runnable {
 
 
             if(registerTimeout > 10) {
-                System.out.println(registerTimeout + " is timeout");
+                clientPlayer.sendObject(new MessagePacket("Timed out"),false);
                 clientPlayer.close();
             }
 

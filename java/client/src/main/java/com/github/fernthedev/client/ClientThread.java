@@ -18,7 +18,6 @@ import javax.crypto.SealedObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
 
 public class ClientThread implements Runnable {
 
@@ -102,7 +101,7 @@ public class ClientThread implements Runnable {
             channel = future.channel();
 
         } catch (InterruptedException e) {
-            Client.getLogger().log(Level.WARNING,e.getMessage(),e.getCause());
+            Client.getLogger().logError(e.getMessage(),e.getCause());
         }
 
 
@@ -162,7 +161,7 @@ public class ClientThread implements Runnable {
 
             Client.getLogger().info("Disconnected");
         } catch (InterruptedException e) {
-            Client.getLogger().log(Level.WARNING,e.getMessage(),e.getCause());
+            Client.getLogger().logError(e.getMessage(),e.getCause());
         }
     }
 
@@ -178,7 +177,7 @@ public class ClientThread implements Runnable {
                         try {
                             throw new DebugException();
                         } catch (DebugException e) {
-                            Client.getLogger().log(Level.WARNING, e.getMessage(), e.getCause());
+                            Client.getLogger().logError(e.getMessage(),e.getCause());
                         }
                     }
 
@@ -190,7 +189,7 @@ public class ClientThread implements Runnable {
                 }
             }
 
-            Client.getLogger().log(Level.FINE,"Closing client!");
+            Client.getLogger().log("Closing client!");
 
             new Thread(() -> {
                 List<Thread> threads = new ArrayList<>(Thread.getAllStackTraces().keySet());
@@ -199,12 +198,12 @@ public class ClientThread implements Runnable {
                     try {
                         thread.join();
                     } catch (InterruptedException e) {
-                        Client.getLogger().log(Level.WARNING,e.getMessage(),e.getCause());
+                        Client.getLogger().logError(e.getMessage(),e.getCause());
                     }
                 }
             },"QuitThread").start();
         } catch (InterruptedException e) {
-            Client.getLogger().log(Level.WARNING,e.getMessage(),e.getCause());
+            Client.getLogger().logError(e.getMessage(),e.getCause());
         }
 
 
