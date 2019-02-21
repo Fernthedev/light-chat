@@ -105,10 +105,6 @@ public class Client {
     }
 
     public static synchronized CLogger getLogger() {
-        if(logger == null) {
-            logger = Logger.getLogger(Client.class.getName());
-        }
-
         return cLogger;
     }
 
