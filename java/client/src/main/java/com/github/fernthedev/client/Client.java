@@ -3,13 +3,12 @@ package com.github.fernthedev.client;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.apache.log4j.Logger;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 public class Client {
@@ -59,13 +58,13 @@ public class Client {
         this.host = host;
         this.scanner = Main.scanner;
 
-        logger = Logger.getLogger(Client.class.getName());
-        cLogger = new CLogger(logger);
+        registerLogger();
+
 
         try {
             name = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
-            logger.log(Level.WARNING, e.getMessage(), e.getCause());
+            getLogger().logError(e.getMessage(), e.getCause());
             clientThread.close();
         }
 
@@ -94,6 +93,11 @@ public class Client {
 
         clientThread.connect();
 
+    }
+
+    private void registerLogger() {
+        logger = Logger.getLogger(Client.class.getName());
+        cLogger = new CLogger(logger);
     }
 
     public String getOSName() {

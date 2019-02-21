@@ -3,9 +3,7 @@ package com.github.fernthedev.client;
 import com.github.fernthedev.universal.StaticHandler;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 @RequiredArgsConstructor
 public class CLogger implements ILogManager {
@@ -19,7 +17,7 @@ public class CLogger implements ILogManager {
 
     @Override
     public void logError(String log, Throwable e) {
-        logger.log(Level.SEVERE,log,e);
+        logger.error(log,e);
     }
 
     @Override
