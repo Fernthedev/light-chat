@@ -13,6 +13,7 @@ import java.io.StringReader;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,8 +26,8 @@ public class MulticastClient {
     private Map<String, ServerAddress> addressServerAddressMap = new HashMap<>();
 
     public void checkServers(int amount) {
-        try {
-            MulticastSocket socket = new MulticastSocket(4446);
+        try(MulticastSocket socket = new MulticastSocket(4446);) {
+
             InetAddress group = InetAddress.getByName(StaticHandler.address);
             socket.joinGroup(group);
 
@@ -71,6 +72,8 @@ public class MulticastClient {
 
             socket.leaveGroup(group);
             socket.close();
+        }catch (SocketTimeoutException ignored) {
+
         } catch (IOException | DebugChainedException e) {
             e.printStackTrace();
         }

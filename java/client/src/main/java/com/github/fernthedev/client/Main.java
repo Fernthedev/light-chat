@@ -26,10 +26,10 @@ public class Main {
         scanner = new Scanner(System.in);
 
 
-        for(int i = 0;i < args.length;i++) {
+        for (int i = 0; i < args.length; i++) {
             String arg = args[i];
 
-            if(arg.equalsIgnoreCase("-port")) {
+            if (arg.equalsIgnoreCase("-port")) {
                 try {
                     port = Integer.parseInt(args[i + 1]);
                 } catch (NumberFormatException | IndexOutOfBoundsException e) {
@@ -37,7 +37,7 @@ public class Main {
                 }
             }
 
-            if(arg.equalsIgnoreCase("-ip")) {
+            if (arg.equalsIgnoreCase("-ip")) {
                 try {
                     host = args[i + 1];
                 } catch (IndexOutOfBoundsException e) {
@@ -45,23 +45,23 @@ public class Main {
                 }
             }
 
-            if(arg.equalsIgnoreCase("-debug")) {
+            if (arg.equalsIgnoreCase("-debug")) {
                 StaticHandler.isDebug = true;
             }
         }
 
-        if(host == null || host.equals("") || port == -1) {
-             multicastClient = new MulticastClient();
+        if (host == null || host.equals("") || port == -1) {
+            multicastClient = new MulticastClient();
             check(4);
         }
 
 
-        if(System.console() == null && !StaticHandler.isDebug) {
+        if (System.console() == null && !StaticHandler.isDebug) {
 
             String filename = Main.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6);
-            Client.getLogger().info("No console found");
+            System.out.println("No console found");
 
-            String[] newArgs = new String[]{"cmd","/c","start","cmd","/c","java -jar -Xmx2G -Xms2G \"" + filename + "\""};
+            String[] newArgs = new String[]{"cmd", "/c", "start", "cmd", "/c", "java -jar -Xmx2G -Xms2G \"" + filename + "\""};
 
             List<String> launchArgs = new ArrayList<>(Arrays.asList(newArgs));
             launchArgs.addAll(Arrays.asList(args));
@@ -75,18 +75,16 @@ public class Main {
 
         }
 
-        while(host == null || host.equalsIgnoreCase("") || port == -1) {
-            if(host == null || host.equals(""))
-                host= readLine("Host:");
+        while (host == null || host.equalsIgnoreCase("") || port == -1) {
+            if (host == null || host.equals(""))
+                host = readLine("Host:");
 
-            if(port == -1)
+            if (port == -1)
                 port = readInt("Port:");
         }
 
 
-
-
-        client = new Client(host,port);
+        client = new Client(host, port);
 
         client.initialize();
     }
@@ -95,24 +93,22 @@ public class Main {
     private void check(int amount) {
         multicastClient.checkServers(amount);
 
-        if(!multicastClient.serversAddress.isEmpty()) {
-            Map<Integer,ServerAddress> servers = new HashMap<>();
+        if (!multicastClient.serversAddress.isEmpty()) {
+            Map<Integer, ServerAddress> servers = new HashMap<>();
             System.out.println("Select one of these servers, or use none to skip, refresh to refresh");
             int index = 0;
             for (ServerAddress serverAddress : multicastClient.serversAddress) {
                 index++;
-                servers.put(index,serverAddress);
-                if(serverAddress.getVersion().equals(StaticHandler.getVersion())) {
+                servers.put(index, serverAddress);
+                if (serverAddress.getVersion().equals(StaticHandler.getVersion())) {
                     System.out.println(">" + index + " | " + serverAddress.getAddress() + ":" + serverAddress.getPort());
-                }else{
+                } else {
                     System.out.println(">" + index + " | " + serverAddress.getAddress() + ":" + serverAddress.getPort() + " (Server's version is " + serverAddress.getVersion() + " while yours is " + StaticHandler.getVersion() + ")");
                     System.out.println("This server might not work correctly.");
                 }
             }
 
-            boolean continuecheck = true;
-
-            while(scanner.hasNextLine() && continuecheck) {
+            while (scanner.hasNextLine()) {
                 String answer = scanner.nextLine();
 
                 boolean checked = false;
@@ -120,8 +116,6 @@ public class Main {
                 answer = answer.replaceAll(" ", "");
 
                 if (answer.equalsIgnoreCase("none")) {
-                    checked = true;
-                    continuecheck = false;
                     break;
                 }
 
@@ -141,7 +135,6 @@ public class Main {
                             host = serverAddress.getAddress();
                             port = serverAddress.getPort();
                             System.out.println("Selected " + serverAddress.getAddress() + ":" + serverAddress.getPort());
-                            continuecheck = false;
                             break;
                         } else {
                             System.out.println("Not in the list");
@@ -162,24 +155,22 @@ public class Main {
         new Main(args);
     }
 
-    public static String readLine(String message) {
-        if(!(message == null || message.equals(""))) {
-            Client.getLogger().info(message);
+    private static String readLine(String message) {
+        if (!(message == null || message.equals(""))) {
+            System.out.println(message);
         }
-        if(scanner.hasNextLine()) {
+        if (scanner.hasNextLine()) {
             return scanner.nextLine();
-        }
-        else return null;
+        } else return null;
     }
 
-    public static int readInt(String message) {
-        if(!(message == null || message.equals(""))) {
-            Client.getLogger().info(message);
+    private static int readInt(String message) {
+        if (!(message == null || message.equals(""))) {
+            System.out.println(message);
         }
-        if(scanner.hasNextLine()) {
+        if (scanner.hasNextLine()) {
             return scanner.nextInt();
-        }
-        else return -1;
+        } else return -1;
     }
 
 }
