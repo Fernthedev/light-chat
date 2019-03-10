@@ -14,6 +14,6 @@ public class MessagePacket extends Packet {
 
     @Override
     public String toString() {
-        return message;
+        return "Packet Message: " + message;
     }
 }

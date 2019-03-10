@@ -13,7 +13,7 @@ public class WaitForCommand implements Runnable {
     protected Client client;
     protected boolean checked;
 
-   public WaitForCommand(Client client) {
+    public WaitForCommand(Client client) {
         running = false;
         this.client = client;
         checked = false;
@@ -41,15 +41,10 @@ public class WaitForCommand implements Runnable {
         while (client.running && scanner.hasNextLine()) {
             //  if (client.registered) {
 
-            //if (scanner.hasNextLine()) {
-            if (!checked) {
-                Client.getLogger().info("Type Command:");
-                checked = true;
+            if (scanner.hasNextLine()) {
+                String message = scanner.nextLine();
+                sendMessage(message);
             }
-            String message = scanner.nextLine();
-
-            sendMessage(message);
-            // }
             //   }
         }
     }

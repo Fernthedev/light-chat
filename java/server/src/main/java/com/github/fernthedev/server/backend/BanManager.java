@@ -1,6 +1,7 @@
 package com.github.fernthedev.server.backend;
 
 import com.github.fernthedev.server.ClientPlayer;
+import com.github.fernthedev.server.Server;
 import com.github.fernthedev.universal.StaticHandler;
 import com.google.gson.Gson;
 
@@ -21,6 +22,7 @@ public class BanManager {
     public boolean isBanned(ClientPlayer clientPlayer) {
         for(BannedData bannedData : banned) {
             if(bannedData.getIp().equals(clientPlayer.getAdress())) {
+                Server.getLogger().info("Found banned " + bannedData.getIp());
                 return true;
             }
         }
@@ -69,8 +71,9 @@ public class BanManager {
 
         banned.clear();
         BannedData[] bannedDatas = new Gson().fromJson(StaticHandler.getFile(bansFile),BannedData[].class);
-        if(bannedDatas != null)
-        banned.addAll(Arrays.asList(bannedDatas));
+        if(bannedDatas != null) {
+            banned.addAll(Arrays.asList(bannedDatas));
+        }
     }
 
 

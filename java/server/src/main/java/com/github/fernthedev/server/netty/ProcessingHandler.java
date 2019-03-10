@@ -1,17 +1,20 @@
 package com.github.fernthedev.server.netty;
 
-import com.github.fernthedev.packets.Packet;
+import com.github.fernthedev.packets.ConnectedPacket;
+import com.github.fernthedev.packets.RequestInfoPacket;
 import com.github.fernthedev.server.*;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 
+import javax.crypto.SealedObject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @ChannelHandler.Sharable
-public class ProcessingHandler extends ChannelInboundHandlerAdapter {
+public class ProcessingHandler extends ChannelHandlerAdapter {
 
 
 
@@ -39,15 +42,30 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg)
             throws Exception {
 
-        Packet requestData = (Packet) msg;
-
-        if(Server.socketList.containsKey(ctx.channel())) {
+        new Thread(() -> {
             EventListener eventListener = new EventListener(server, Server.socketList.get(ctx.channel()));
 
-            eventListener.recieved(requestData);
+            if (msg instanceof SealedObject) {
+                SealedObject requestData = (SealedObject) msg;
 
-            ctx.flush();
-        }
+
+                if (Server.socketList.containsKey(ctx.channel())) {
+
+
+                    eventListener.received(requestData);
+                    ctx.flush();
+
+                }
+            } else if (msg instanceof ConnectedPacket) {
+                if (Server.socketList.containsKey(ctx.channel())) {
+                    eventListener.handleConnect((ConnectedPacket) msg);
+                    ctx.flush();
+                }
+            }
+        }).start();
+
+
+
     }
 
     @Override
@@ -78,7 +96,7 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         if (channel != null) {
             Server server = Server.channelServerHashMap.get(ctx.channel());
 
-            ClientPlayer clientPlayer = new ClientPlayer(channel);
+            ClientPlayer clientPlayer = new ClientPlayer(channel,UUID.randomUUID());
 
             //Server.getLogger().info("Registering " + clientPlayer.getNameAddress());
 
@@ -100,6 +118,8 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
             clientPlayer.setThread(serverThread);
 
             runningFernThread.startThread();
+
+            ctx.writeAndFlush(new RequestInfoPacket(clientPlayer.getServerKey()));
 
         }else{
             Server.getLogger().info("Channel is null");

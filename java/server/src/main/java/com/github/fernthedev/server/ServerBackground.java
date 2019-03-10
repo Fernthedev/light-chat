@@ -166,7 +166,7 @@ public class ServerBackground implements Runnable {
             @Override
             public void onCommand(CommandSender sender,String[] args) {
                 if(sender instanceof Console) {
-                    sender.sendMessage("Players: (" + (PlayerHandler.players.size() - 1) + ")");
+                    sender.sendMessage("Players: (" + (PlayerHandler.players.size() ) + ")");
 
                     for (ClientPlayer clientPlayer : new HashMap<>(Server.socketList).values()) {
                         sender.sendMessage(clientPlayer.getDeviceName() + " :" + clientPlayer.getId() + " { " + clientPlayer.getAdress() + "} Ping:" + clientPlayer.delayTime + "ms");

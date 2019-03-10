@@ -8,7 +8,7 @@ public class PlayerInfo {
 
     public boolean authenticated = false;
 
-    public ChangePassword.Mode mode = ChangePassword.Mode.AUTHENTICATE;
+    public AuthenticationManager.Mode mode = AuthenticationManager.Mode.AUTHENTICATE;
     public int tries = 0;
 
 

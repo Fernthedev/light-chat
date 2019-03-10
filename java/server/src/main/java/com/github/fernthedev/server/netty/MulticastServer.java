@@ -1,8 +1,19 @@
 package com.github.fernthedev.server.netty;
 
-@Deprecated
-public class MulticastServer  { //extends QuoteServerThread {
-/*
+
+import com.github.fernthedev.server.PlayerHandler;
+import com.github.fernthedev.server.Server;
+import com.github.fernthedev.universal.MulticastData;
+import com.github.fernthedev.universal.StaticHandler;
+import com.google.gson.Gson;
+
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.util.concurrent.TimeUnit;
+
+public class MulticastServer  extends QuoteServerThread {
+
     private Server server;
 
     public MulticastServer(String name,Server server) throws IOException {
@@ -37,5 +48,5 @@ public class MulticastServer  { //extends QuoteServerThread {
         }
         socket.close();
     }
-*/
+
 }

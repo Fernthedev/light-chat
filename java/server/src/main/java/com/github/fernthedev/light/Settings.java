@@ -1,20 +1,19 @@
 package com.github.fernthedev.light;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
+@Getter
+@Setter
+@Data
 public class Settings {
 
     private String password="password";
-
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    private boolean useMulticast = false;
+    private boolean passwordRequiredForLogin = false;
 
     public void setNewValue(@NotNull String oldValue,@NotNull String newValue) {
 

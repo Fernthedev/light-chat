@@ -1,10 +1,14 @@
 package com.github.fernthedev.client;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import org.apache.log4j.Logger;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.UUID;
 
 
 public class Client {
@@ -13,42 +17,65 @@ public class Client {
     public boolean running = false;
 
 
-    protected static final Logger logger = Logger.getLogger(Client.class.getName());
+    protected static Logger logger;
 
-     public int port;
-     public String host;
+    public int port;
+    public String host;
+
+    @Getter
+    @Setter
+    @NonNull
+    protected String serverKey;
+
+    @Getter
+    @Setter
+    @NonNull
+    protected String privateKey;
+
+
+
+    @Getter
+    protected UUID uuid;
 
     public String name;
-    public static com.github.fernthedev.client.WaitForCommand WaitForCommand;
+    public static WaitForCommand waitForCommand;
     public static Thread waitThread;
+    private static CLogger cLogger;
 
     public static Thread currentThread;
 
     protected ClientThread clientThread;
 
-    /*
-    static {
-        System.setProperty("java.util.logging.SimpleFormatter.format",
-                "[%1$tF %1$tT] [%4$-7s] %5$s %n");
-        logger = Logger.getLogger(Client.class.getName());
-    }*/
+    protected boolean closeConsole = true;
+
+    public boolean isCloseConsole() {
+        return closeConsole;
+    }
 
 
     public Client(String host, int port) {
         this.port = port;
         this.host = host;
         this.scanner = Main.scanner;
+
+        registerLogger();
+
+
         try {
             name = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
-            logger.log(Level.WARNING,e.getMessage(),e.getCause());
+            getLogger().logError(e.getMessage(), e.getCause());
             clientThread.close();
         }
-        WaitForCommand = new WaitForCommand(this);
 
         clientThread = new ClientThread(this);
 
-        currentThread = new Thread(clientThread);
+        waitForCommand = new WaitForCommand(this);
+
+
+
+        currentThread = new Thread(clientThread,"MainThread");
+
     }
 
     protected void getProperties() {
@@ -62,16 +89,23 @@ public class Client {
         clientThread.connectToServer = true;
         clientThread.running = true;
 
-            clientThread.connect();
 
+
+        clientThread.connect();
+
+    }
+
+    private void registerLogger() {
+        logger = Logger.getLogger(Client.class.getName());
+        cLogger = new CLogger(logger);
     }
 
     public String getOSName() {
         return System.getProperty("os.name");
     }
 
-    public static Logger getLogger() {
-        return logger;
+    public static synchronized CLogger getLogger() {
+        return cLogger;
     }
 
     public ClientThread getClientThread() {

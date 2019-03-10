@@ -2,6 +2,7 @@ package com.github.fernthedev.universal;
 
 import com.google.common.io.Resources;
 import com.google.gson.Gson;
+import lombok.Getter;
 import org.json.simple.JSONObject;
 
 import java.io.File;
@@ -23,7 +24,17 @@ public class StaticHandler {
     public static String os = System.getProperty("os.name");
     public static boolean isLight = false;
 
+    @Getter
+    private static final String cipherTransformation = "AES/CBC/PKCS5Padding";
 
+    @Getter
+    private static final String ObjecrCipherTrans = "AES";
+
+    @Getter
+    private static final String keySpecTransformation = "AES";
+
+    @Getter
+    private static final String KeyFactoryString = "PBKDF2WithHmacSHA1";
 
     public static String getVersion() {
         return version;

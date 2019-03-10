@@ -4,7 +4,6 @@ import com.github.fernthedev.server.Server;
 import com.github.fernthedev.universal.StaticHandler;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.stream.JsonReader;
 
 import java.io.File;
 import java.io.FileReader;
@@ -23,7 +22,7 @@ public class SettingsManager {
     private Settings settings;
     private File settingsFile;
 
-    {
+    static {
         new File(getCurrentPath(), "settings.json");
     }
 
@@ -56,12 +55,11 @@ public class SettingsManager {
 
         if (settingsFile.exists()) {
             try {
-                try(JsonReader reader = new JsonReader(new FileReader(settingsFile))) {
+                    settings = gson.fromJson(new FileReader(settingsFile), Settings.class);
 
-                    settings = gson.fromJson(reader, Settings.class);
                     saveSettings();
 
-                }
+
             } catch (Exception e) {
                 if (StaticHandler.isDebug) {
                     Server.getLogger().error(e.getMessage(), e.getCause());
@@ -88,12 +86,11 @@ public class SettingsManager {
             }
         }
 
-        try (FileWriter writer = new FileWriter(settingsFile)) {
+        try (FileWriter writer = new FileWriter(settingsFile,false)) {
             writer.write(gson.toJson(settings));
         } catch (Exception e) {
             Server.getLogger().error(e.getMessage(), e.getCause());
         }
-
     }
 
     public Settings getSettings() {

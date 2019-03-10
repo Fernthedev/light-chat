@@ -3,6 +3,7 @@ package com.github.fernthedev.client;
 import com.github.fernthedev.client.netty.ClientHandler;
 import com.github.fernthedev.exceptions.DebugException;
 import com.github.fernthedev.packets.Packet;
+import com.github.fernthedev.universal.EncryptionHandler;
 import com.github.fernthedev.universal.StaticHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -11,10 +12,12 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
+import lombok.Getter;
 
+import javax.crypto.SealedObject;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
+import java.util.UUID;
 
 public class ClientThread implements Runnable {
 
@@ -33,8 +36,10 @@ public class ClientThread implements Runnable {
 
     public boolean connectToServer;
 
+
     protected Thread readingThread;
 
+    @Getter
     protected ClientHandler clientHandler;
 
     protected ChannelFuture future;
@@ -60,6 +65,7 @@ public class ClientThread implements Runnable {
         this.client = client;
         listener = new EventListener(client);
         running = true;
+        client.uuid = UUID.randomUUID();
         clientHandler = new ClientHandler(client, listener);
     }
 
@@ -95,7 +101,7 @@ public class ClientThread implements Runnable {
             channel = future.channel();
 
         } catch (InterruptedException e) {
-            Client.getLogger().log(Level.WARNING,e.getMessage(),e.getCause());
+            Client.getLogger().logError(e.getMessage(),e.getCause());
         }
 
 
@@ -107,13 +113,14 @@ public class ClientThread implements Runnable {
 
             if (!Client.currentThread.isAlive()) {
                 running = true;
+
                 Client.currentThread.start();
             }
 
             if(!WaitForCommand.running) {
                 client.running = true;
                // client.getLogger().info("NEW WAIT FOR COMMAND THREAD");
-                Client.waitThread = new Thread(Client.WaitForCommand);
+                Client.waitThread = new Thread(Client.waitForCommand,"CommandThread");
                 Client.waitThread.start();
                 Client.getLogger().info("Command thread started");
             }
@@ -123,15 +130,25 @@ public class ClientThread implements Runnable {
 
 
 
-    public void sendObject(Object packet) {
-        if (packet instanceof Packet) {
-            if (channel.isActive()) {
-                channel.writeAndFlush(packet);
+    public void sendObject(Packet packet,boolean encrypt) {
+        if (packet != null) {
 
+            if (encrypt) {
+                SealedObject sealedObject = EncryptionHandler.encrypt(packet, client.getServerKey());
+
+                channel.writeAndFlush(sealedObject);
+
+            } else {
+                channel.writeAndFlush(packet);
             }
-        }else {
+
+        } else {
             Client.getLogger().info("not packet");
         }
+    }
+
+    public void sendObject(Packet packet) {
+        sendObject(packet,true);
     }
 
     public void disconnect() {
@@ -144,7 +161,7 @@ public class ClientThread implements Runnable {
 
             Client.getLogger().info("Disconnected");
         } catch (InterruptedException e) {
-            Client.getLogger().log(Level.WARNING,e.getMessage(),e.getCause());
+            Client.getLogger().logError(e.getMessage(),e.getCause());
         }
     }
 
@@ -160,7 +177,7 @@ public class ClientThread implements Runnable {
                         try {
                             throw new DebugException();
                         } catch (DebugException e) {
-                            Client.getLogger().log(Level.WARNING, e.getMessage(), e.getCause());
+                            Client.getLogger().logError(e.getMessage(),e.getCause());
                         }
                     }
 
@@ -172,7 +189,7 @@ public class ClientThread implements Runnable {
                 }
             }
 
-            Client.getLogger().log(Level.FINE,"Closing client!");
+            Client.getLogger().log("Closing client!");
 
             new Thread(() -> {
                 List<Thread> threads = new ArrayList<>(Thread.getAllStackTraces().keySet());
@@ -181,12 +198,12 @@ public class ClientThread implements Runnable {
                     try {
                         thread.join();
                     } catch (InterruptedException e) {
-                        Client.getLogger().log(Level.WARNING,e.getMessage(),e.getCause());
+                        Client.getLogger().logError(e.getMessage(),e.getCause());
                     }
                 }
-            });
+            },"QuitThread").start();
         } catch (InterruptedException e) {
-            Client.getLogger().log(Level.WARNING,e.getMessage(),e.getCause());
+            Client.getLogger().logError(e.getMessage(),e.getCause());
         }
 
 
@@ -195,7 +212,7 @@ public class ClientThread implements Runnable {
     public void run() {
         //client.print(running);
        // client.print("Checking for " + client.host + ":" + client.port + " socket " + channel);
-        while (running) {
+        while (running & client.isCloseConsole()) {
             if (System.console() == null && !StaticHandler.isDebug) close();
         }
 
