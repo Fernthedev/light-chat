@@ -114,7 +114,7 @@ public class LightManager implements Runnable{
                         sender.sendMessage("Unable to authorize command.");
                     }
                 }else{
-                    sender.sendMessage("Incorrect usage. Arguments: off,on");
+                    sender.sendMessage("Incorrect usage. Arguments: off,on, readfile, readfolder");
                 }
             }
         });
