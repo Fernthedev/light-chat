@@ -111,7 +111,7 @@ public class LightManager implements Runnable{
                                     if(path.startsWith("./")) {
                                         file = new File(System.getProperty("user.dir"),path);
                                         path = path.substring(path.indexOf("./") + 1);
-                                        sender.sendMessage("Reading folder " + path);
+                                        sender.sendMessage("Reading file " + path);
                                     }
 
                                     fileFormatter.readFormatFile(file);
