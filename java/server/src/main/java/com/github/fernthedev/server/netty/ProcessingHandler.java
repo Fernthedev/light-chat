@@ -42,7 +42,6 @@ public class ProcessingHandler extends ChannelHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg)
             throws Exception {
 
-        new Thread(() -> {
             EventListener eventListener = new EventListener(server, Server.socketList.get(ctx.channel()));
 
             if (msg instanceof SealedObject) {
@@ -51,18 +50,20 @@ public class ProcessingHandler extends ChannelHandlerAdapter {
 
                 if (Server.socketList.containsKey(ctx.channel())) {
 
+                    new Thread(() -> eventListener.received(requestData)).start();
 
-                    eventListener.received(requestData);
                     ctx.flush();
-
+                    Thread.currentThread().interrupt();
                 }
             } else if (msg instanceof ConnectedPacket) {
                 if (Server.socketList.containsKey(ctx.channel())) {
-                    eventListener.handleConnect((ConnectedPacket) msg);
+                    new Thread(() -> eventListener.handleConnect((ConnectedPacket) msg)).start();
+
                     ctx.flush();
+                    Thread.currentThread().interrupt();
                 }
             }
-        }).start();
+
 
 
 
@@ -109,15 +110,15 @@ public class ProcessingHandler extends ChannelHandlerAdapter {
 
 
             // And From your main() method or any other method
-            FernThread runningFernThread;
+            Thread runningFernThread;
 
 
             ServerThread serverThread = new ServerThread(server, channel, clientPlayer, listener);
 
-            runningFernThread = new FernThread(serverThread);
+            runningFernThread = new Thread(serverThread);
             clientPlayer.setThread(serverThread);
 
-            runningFernThread.startThread();
+            runningFernThread.start();
 
             ctx.writeAndFlush(new RequestInfoPacket(clientPlayer.getServerKey()));
 

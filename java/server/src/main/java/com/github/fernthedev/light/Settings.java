@@ -55,6 +55,10 @@ public class Settings {
         switch (key.toLowerCase()) {
             case "password":
                 return getPassword();
+            case "usemulticast":
+                return isUseMulticast();
+            case "passwordlogin":
+                return isPasswordRequiredForLogin();
             default:
                 throw new IllegalArgumentException("No such value named " + key + " found");
         }

@@ -188,18 +188,17 @@ public class Server implements Runnable {
         }
 
 
-        Runtime.getRuntime().addShutdownHook(new FernThread() {
-            @Override
-            public void run() {
-                for (ServerThread serverThread : Server.serverThreads) {
-                    if (serverThread.clientPlayer.channel.isOpen()) {
-                        Server.getLogger().info("Gracefully shutting down/");
-                        Server.sendObjectToAllPlayers(new LostServerConnectionPacket());
-                        serverThread.clientPlayer.close();
-                    }
+
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            for (ServerThread serverThread : Server.serverThreads) {
+                if (serverThread.clientPlayer.channel.isOpen()) {
+                    Server.getLogger().info("Gracefully shutting down/");
+                    Server.sendObjectToAllPlayers(new LostServerConnectionPacket());
+                    serverThread.clientPlayer.close();
                 }
             }
-        });
+        }));
 
         try {
             logger.info("Server started successfully at localhost (Connect with " + InetAddress.getLocalHost().getHostAddress() + ") using port " + port);
@@ -362,17 +361,6 @@ public class Server implements Runnable {
     }
 
     /**
-     * Please use the {@link #registerCommand(Command) registerCommand} method instead of this since it is deprecated
-     * @param serverCommand Command to be registered
-     * @return Returns the instance to use it's usage method
-     */
-    @Deprecated
-    public Command addServerCommand(@NotNull Command serverCommand) {
-        commandList.add(serverCommand);
-        return serverCommand;
-    }
-
-    /**
      * This registers the command
      * @param command Command to be registered
      * @return Returns the instance to use it's usage method
@@ -388,17 +376,5 @@ public class Server implements Runnable {
 
     public PluginManager getPluginManager() {
         return pluginManager;
-    }
-
-    /**
-     * Please use the {@link #registerCommand(Command) registerCommand} method instead of this since it is deprecated
-     * You should instead do client/console check within the command itself
-     * @param command the command to be registered
-     * @return Returns the instance to use it's usage method
-     */
-    @Deprecated
-    public Command addClientCommand(@NotNull Command command) {
-        commandList.add(command);
-        return command;
     }
 }

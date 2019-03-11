@@ -22,10 +22,10 @@ public class EventListener {
 
         if(p instanceof TestConnectPacket) {
             TestConnectPacket packet = (TestConnectPacket) p;
-            Client.getLogger().info("Connected packet: " + packet.getMessage());
+            client.getLogger().info("Connected packet: " + packet.getMessage());
         } else if(p instanceof LostServerConnectionPacket) {
             LostServerConnectionPacket packet = (LostServerConnectionPacket)p;
-            Client.getLogger().info("Lost connection to server! Must have shutdown!");
+            client.getLogger().info("Lost connection to server! Must have shutdown!");
             client.getClientThread().disconnect();
         }else if(p instanceof PingPacket) {
             ClientThread.startTime = System.nanoTime();
@@ -37,16 +37,16 @@ public class EventListener {
 
             ClientThread.miliPingDelay = ClientThread.endTime - ClientThread.startTime;
 
-            Client.getLogger().debug("Ping: " + TimeUnit.NANOSECONDS.toMillis(ClientThread.miliPingDelay) + "ms");
+            client.getLogger().debug("Ping: " + TimeUnit.NANOSECONDS.toMillis(ClientThread.miliPingDelay) + "ms");
 
         } else if (p instanceof MessagePacket) {
             MessagePacket messagePacket = (MessagePacket) p;
-            Client.getLogger().info(messagePacket.getMessage());
+            client.getLogger().info(messagePacket.getMessage());
         } else if (p instanceof IllegalConnection) {
-            Client.getLogger().info(((IllegalConnection) p).getMessage());
+            client.getLogger().info(((IllegalConnection) p).getMessage());
         } else if (p instanceof RegisterPacket) {
             client.registered = true;
-            Client.getLogger().info("Successfully connected to server");
+            client.getLogger().info("Successfully connected to server");
         }else if(p instanceof RequestInfoPacket) {
             RequestInfoPacket packet = (RequestInfoPacket) p;
 
@@ -72,8 +72,11 @@ public class EventListener {
 
 
 
-            Client.getLogger().debug("Sent connect packet for request");
+            client.getLogger().debug("Sent connect packet for request");
 
+        }else if(p instanceof TimedOutRegistration) {
+            client.getLogger().info("Timed out on registering.");
+            client.getClientThread().close();
         }
     }
 

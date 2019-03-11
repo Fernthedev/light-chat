@@ -6,6 +6,7 @@ import com.github.fernthedev.packets.latency.PingPacket;
 import com.github.fernthedev.universal.EncryptionHandler;
 import io.netty.channel.Channel;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
 import javax.crypto.SealedObject;
@@ -53,6 +54,8 @@ public class ClientPlayer implements CommandSender {
 
     private String deviceName;
 
+    @Getter
+    @Setter
     private int id = -1;
 
     public long delayTime;
@@ -78,14 +81,6 @@ public class ClientPlayer implements CommandSender {
 
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
     /**
      * PingPong delay
      */
@@ -97,9 +92,7 @@ public class ClientPlayer implements CommandSender {
         }
     }
 
-    public void sendObject(Packet packet,boolean encrypt) {
-        if (packet != null) {
-
+    public synchronized void sendObject(@NonNull Packet packet, boolean encrypt) {
             /*
             // Length is 16 byte
             SecretKeySpec sks = new SecretKeySpec(serverKey.getBytes(), StaticHandler.getCipherTransformation());
@@ -108,18 +101,15 @@ public class ClientPlayer implements CommandSender {
             Cipher cipher = Cipher.getInstance(StaticHandler.getCipherTransformation());
             cipher.init(Cipher.ENCRYPT_MODE, sks);*/
 
+            Server.getLogger().info("Sending {" + packet + "} encryption: " + encrypt);
+        if (encrypt) {
+            SealedObject sealedObject = EncryptionHandler.encrypt(packet, clientKey);
 
-            if(encrypt) {
-                SealedObject sealedObject = EncryptionHandler.encrypt(packet, clientKey);
 
-
-                channel.writeAndFlush(sealedObject);
-            }else{
-                channel.writeAndFlush(packet);
-            }
-
+            channel.writeAndFlush(sealedObject);
         } else {
-            Server.getLogger().info("not packet");
+            channel.writeAndFlush(packet);
+            Server.getLogger().info("Sent {" + packet + "} encryption: " + encrypt + "\n");
         }
     }
 

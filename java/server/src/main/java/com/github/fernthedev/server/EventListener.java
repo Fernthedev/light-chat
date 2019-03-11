@@ -50,7 +50,6 @@ public class EventListener {
         } else if (p instanceof MessagePacket) {
             MessagePacket messagePacket = (MessagePacket) p;
 
-            Server.getLogger().info("tested13ewqaww");
 
             ChatEvent chatEvent = new ChatEvent(clientPlayer,messagePacket.getMessage(),false,true);
             Server.getInstance().getPluginManager().callEvent(chatEvent);
@@ -165,17 +164,19 @@ public class EventListener {
 
         //Server.getLogger().info("Players: " + PlayerHandler.players.size());
 
-        PlayerHandler.players.put(id, clientPlayer);
-
 
         clientPlayer.setDeviceName(packet.getName());
         clientPlayer.setId(id);
         clientPlayer.os = packet.getOS();
 
+        PlayerHandler.players.put(clientPlayer.getId(), clientPlayer);
+
+        Server.getLogger().info("Password required: " + server.getSettingsManager().getSettings().isPasswordRequiredForLogin());
+
         if(server.getSettingsManager().getSettings().isPasswordRequiredForLogin()) {
             boolean authenticated = AuthenticationManager.authenticate(clientPlayer);
             if(!authenticated) {
-                clientPlayer.sendObject(new MessagePacket("Incorrect password"));
+                clientPlayer.sendObject(new MessagePacket("Unable to authenticate"));
                 clientPlayer.close();
                 return;
             }
@@ -197,7 +198,7 @@ public class EventListener {
     }
 
     private void disconnectIllegalName(ConnectedPacket packet,String message) {
-        Server.getLogger().info(clientPlayer + " was disconnected for illegal name. Name: " + packet.getName() + " Reason: " + message);
+        Server.getLogger().info(clientPlayer + " was disconnected for illegal name. Name: " + packet.getName() + " Reason: " + message + " ID " + clientPlayer.getId());
         clientPlayer.sendObject(new IllegalConnection("You have been disconnected for illegal name. Name: " + packet.getName() + " Reason: " + message),false);
         clientPlayer.close();
     }

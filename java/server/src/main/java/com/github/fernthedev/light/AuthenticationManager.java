@@ -45,7 +45,8 @@ public class AuthenticationManager extends Command implements Listener {
         }
     }
 
-    public static synchronized boolean authenticate(CommandSender sender) {
+    public static boolean authenticate(CommandSender sender) {
+        Server.getLogger().info("If sender " + (sender instanceof ClientPlayer));
         if (sender instanceof Console) {
             return true;
         }
@@ -56,10 +57,14 @@ public class AuthenticationManager extends Command implements Listener {
             checking.put(sender, playerInfo);
         }
 
+
+
         if (sender instanceof ClientPlayer) {
             playerInfo.mode = Mode.AUTHENTICATE;
+            Server.getLogger().info("Sending fill password");
+            ClientPlayer clientPlayer = (ClientPlayer) sender;
+            clientPlayer.sendObject(new FillPasswordPacket(),false);
             sender.sendMessage("Type in password:");
-            sender.sendPacket(new FillPasswordPacket());
         }
 
         while (checking.containsKey(sender)) {

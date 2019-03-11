@@ -1,7 +1,7 @@
 package com.github.fernthedev.server;
 
-import com.github.fernthedev.packets.MessagePacket;
 import com.github.fernthedev.packets.Packet;
+import com.github.fernthedev.packets.TimedOutRegistration;
 import com.github.fernthedev.packets.latency.PingPacket;
 import io.netty.channel.Channel;
 
@@ -120,8 +120,9 @@ public class ServerThread implements Runnable {
             }else registerTimeout = 0;
 
 
-            if(registerTimeout > 10) {
-                clientPlayer.sendObject(new MessagePacket("Timed out"),false);
+            if(registerTimeout > 20) {
+                clientPlayer.sendObject(new TimedOutRegistration(),false);
+
                 clientPlayer.close();
             }
 
@@ -138,9 +139,9 @@ public class ServerThread implements Runnable {
         }
     }
 
-    ClientPlayer getPlayer(String adress) {
+    ClientPlayer getPlayer(String address) {
         for(ClientPlayer clientPlayerThing : socketList) {
-            if(clientPlayerThing.getAdress().equals(adress)) return clientPlayerThing;
+            if(clientPlayerThing.getAdress().equals(address)) return clientPlayerThing;
         }
 
         return null;

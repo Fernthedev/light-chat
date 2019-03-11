@@ -17,7 +17,7 @@ public class Client {
     public boolean running = false;
 
 
-    protected static Logger logger;
+    private static Logger logger;
 
     public int port;
     public String host;
@@ -83,7 +83,7 @@ public class Client {
     }
 
     public void initialize() {
-        logger.info("Initializing");
+        getLogger().info("Initializing");
         name = null;
         clientThread.connected = false;
         clientThread.connectToServer = true;
@@ -95,7 +95,7 @@ public class Client {
 
     }
 
-    private void registerLogger() {
+    protected void registerLogger() {
         logger = Logger.getLogger(Client.class.getName());
         cLogger = new CLogger(logger);
     }
@@ -104,7 +104,7 @@ public class Client {
         return System.getProperty("os.name");
     }
 
-    public static synchronized CLogger getLogger() {
+    public ILogManager getLogger() {
         return cLogger;
     }
 

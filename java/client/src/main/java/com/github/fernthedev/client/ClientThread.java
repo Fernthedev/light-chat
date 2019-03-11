@@ -12,6 +12,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 import lombok.Getter;
 
 import javax.crypto.SealedObject;
@@ -74,61 +75,63 @@ public class ClientThread implements Runnable {
     }
 
     public void connect() {
-        Client.getLogger().info("Connecting to server.");
+        client.getLogger().info("Connecting to server.");
 
-
+        Bootstrap b = new Bootstrap();
         workerGroup = new NioEventLoopGroup();
 
         try {
-            Bootstrap b = new Bootstrap();
             b.group(workerGroup);
             b.channel(NioSocketChannel.class);
             b.option(ChannelOption.SO_KEEPALIVE, true);
             b.option(ChannelOption.TCP_NODELAY,true);
+
+            b.option(ChannelOption.SO_TIMEOUT,2000);
 
             b.handler(new ChannelInitializer<Channel>() {
 
                 @Override
                 public void initChannel(Channel ch)
                         throws Exception {
+                    ch.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(15));
                     ch.pipeline().addLast(new ObjectEncoder(),
                             new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
                             clientHandler);
                 }
             });
 
-            future = b.connect(client.host, client.port).await();
+            future = b.connect(client.host, client.port).await().sync();
             channel = future.channel();
 
         } catch (InterruptedException e) {
-            Client.getLogger().logError(e.getMessage(),e.getCause());
+            client.getLogger().logError(e.getMessage(),e.getCause());
         }
 
 
 
         if (future.isSuccess() && future.channel().isActive()) {
-            Client.getLogger().info("CONNECTED!");
+            client.getLogger().info("CONNECTED!");
             connected = true;
 
 
-            if (!Client.currentThread.isAlive()) {
+            if (!Client.currentThread.isAlive() && runThread) {
                 running = true;
 
                 Client.currentThread.start();
             }
 
-            if(!WaitForCommand.running) {
+            if(!WaitForCommand.running && runThread) {
                 client.running = true;
                // client.getLogger().info("NEW WAIT FOR COMMAND THREAD");
                 Client.waitThread = new Thread(Client.waitForCommand,"CommandThread");
                 Client.waitThread.start();
-                Client.getLogger().info("Command thread started");
+                client.getLogger().info("Command thread started");
             }
 
         }
     }
 
-
+    protected boolean runThread = true;
 
     public void sendObject(Packet packet,boolean encrypt) {
         if (packet != null) {
@@ -143,7 +146,7 @@ public class ClientThread implements Runnable {
             }
 
         } else {
-            Client.getLogger().info("not packet");
+            client.getLogger().info("not packet");
         }
     }
 
@@ -152,59 +155,56 @@ public class ClientThread implements Runnable {
     }
 
     public void disconnect() {
-        Client.getLogger().info("Disconnecting from server");
+        client.getLogger().info("Disconnecting from server");
         running = false;
+
         try {
-
             future.channel().closeFuture().sync();
-            workerGroup.shutdownGracefully();
-
-            Client.getLogger().info("Disconnected");
         } catch (InterruptedException e) {
-            Client.getLogger().logError(e.getMessage(),e.getCause());
+            e.printStackTrace();
         }
+
+        workerGroup.shutdownGracefully();
+
+        client.getLogger().info("Disconnected");
     }
 
     public void close() {
-        try {
-            Client.getLogger().info("Closing connection.");
-            running = false;
+        client.getLogger().info("Closing connection.");
+        running = false;
 
-            if(channel != null) {
-                //DISCONNECT FROM SERVER
+        if(channel != null) {
+            //DISCONNECT FROM SERVER
+            if (channel.isActive()) {
+                if (StaticHandler.isDebug) {
+                    try {
+                        throw new DebugException();
+                    } catch (DebugException e) {
+                        client.getLogger().logError(e.getMessage(),e.getCause());
+                    }
+                }
+
                 if (channel.isActive()) {
-                    if (StaticHandler.isDebug) {
-                        try {
-                            throw new DebugException();
-                        } catch (DebugException e) {
-                            Client.getLogger().logError(e.getMessage(),e.getCause());
-                        }
-                    }
 
-                    if (channel.isActive()) {
-
-                        channel.closeFuture().sync();
-                        Client.getLogger().info("Closed connection.");
-                    }
+                    channel.closeFuture();
+                    client.getLogger().info("Closed connection.");
                 }
             }
-
-            Client.getLogger().log("Closing client!");
-
-            new Thread(() -> {
-                List<Thread> threads = new ArrayList<>(Thread.getAllStackTraces().keySet());
-                threads.remove(Thread.currentThread());
-                for (Thread thread : threads) {
-                    try {
-                        thread.join();
-                    } catch (InterruptedException e) {
-                        Client.getLogger().logError(e.getMessage(),e.getCause());
-                    }
-                }
-            },"QuitThread").start();
-        } catch (InterruptedException e) {
-            Client.getLogger().logError(e.getMessage(),e.getCause());
         }
+
+        client.getLogger().log("Closing client!");
+
+        new Thread(() -> {
+            List<Thread> threads = new ArrayList<>(Thread.getAllStackTraces().keySet());
+            threads.remove(Thread.currentThread());
+            for (Thread thread : threads) {
+                try {
+                    thread.join();
+                } catch (InterruptedException e) {
+                    client.getLogger().logError(e.getMessage(),e.getCause());
+                }
+            }
+        },"QuitThread").start();
 
 
     }
@@ -212,7 +212,7 @@ public class ClientThread implements Runnable {
     public void run() {
         //client.print(running);
        // client.print("Checking for " + client.host + ":" + client.port + " socket " + channel);
-        while (running & client.isCloseConsole()) {
+        while (running && client.isCloseConsole()) {
             if (System.console() == null && !StaticHandler.isDebug) close();
         }
 

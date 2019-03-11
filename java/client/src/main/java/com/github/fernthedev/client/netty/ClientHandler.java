@@ -92,9 +92,11 @@ public class ClientHandler extends ChannelHandlerAdapter {
         return encryptedText;
     }
 
+
+
     @Override
     public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-        Client.getLogger().info("Lost connection to server.");
+        client.getLogger().info("Lost connection to server.");
         client.getClientThread().close();
     }
 }
