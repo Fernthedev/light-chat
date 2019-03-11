@@ -1,6 +1,5 @@
 package com.github.fernthedev.light.exceptions;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

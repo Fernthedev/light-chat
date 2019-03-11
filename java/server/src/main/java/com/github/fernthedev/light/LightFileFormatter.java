@@ -135,7 +135,7 @@ public class LightFileFormatter {
                         if(line.contains("//")) {
                             index = line.indexOf("//");
                         }else{
-                            index = line.indexOf("#");
+                            index = line.indexOf('#');
                         }
 
                         line = line.substring(index);
@@ -206,7 +206,7 @@ public class LightFileFormatter {
                                     throw new LightFileParseException(lightLine,"The pin attempted to access has not been registered. Try restarting the server. The registered pin list is: " + pinDataMap.keySet());
                                 }
 
-                                output = getDataFromInt(pinInt).getOutput();
+                                output = pinDataMap.get(pin).getOutput();
 
 
                                 String newPar = args[1];
