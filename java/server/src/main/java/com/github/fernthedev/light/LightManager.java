@@ -85,13 +85,16 @@ public class LightManager implements Runnable{
                                 if(args.length > 1) {
                                     String path = args[1];
 
+                                    File file = new File(path);
+
                                     if(path.startsWith("./")) {
-                                        path = System.getProperty("user.dir") + path.substring(path.indexOf("./") + 1);
+                                        file = new File(System.getProperty("user.dir"),path);
+                                        path = path.substring(path.indexOf("./") + 1);
                                         sender.sendMessage("Reading folder " + path);
                                     }
 
                                     try {
-                                        fileFormatter.readDirectory(new File(path));
+                                        fileFormatter.readDirectory(file);
                                     } catch (FileNotFoundException e) {
                                         e.printStackTrace();
                                     }
@@ -103,7 +106,15 @@ public class LightManager implements Runnable{
                                 if(args.length > 1) {
                                     String path = args[1];
 
-                                    fileFormatter.readFormatFile(new File(path));
+                                    File file = new File(path);
+
+                                    if(path.startsWith("./")) {
+                                        file = new File(System.getProperty("user.dir"),path);
+                                        path = path.substring(path.indexOf("./") + 1);
+                                        sender.sendMessage("Reading file " + path);
+                                    }
+
+                                    fileFormatter.readFormatFile(file);
 
                                 }
                                 break;
@@ -114,7 +125,7 @@ public class LightManager implements Runnable{
                         sender.sendMessage("Unable to authorize command.");
                     }
                 }else{
-                    sender.sendMessage("Incorrect usage. Arguments: off,on");
+                    sender.sendMessage("Incorrect usage. Arguments: off,on, readfile, readfolder");
                 }
             }
         });
