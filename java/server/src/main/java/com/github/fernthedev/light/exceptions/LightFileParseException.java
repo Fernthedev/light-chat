@@ -1,5 +1,6 @@
 package com.github.fernthedev.light.exceptions;
 
+import com.github.fernthedev.light.api.lines.LightLine;
 import lombok.Getter;
 
 public class LightFileParseException extends RuntimeException {

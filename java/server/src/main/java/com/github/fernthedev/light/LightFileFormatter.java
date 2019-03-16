@@ -1,7 +1,7 @@
 package com.github.fernthedev.light;
 
 import com.github.fernthedev.light.exceptions.LightFileParseException;
-import com.github.fernthedev.light.exceptions.LightLine;
+import com.github.fernthedev.light.api.lines.LightLine;
 import com.github.fernthedev.server.Server;
 import com.pi4j.io.gpio.*;
 import com.pi4j.io.gpio.exception.GpioPinExistsException;
@@ -238,7 +238,7 @@ public class LightFileFormatter {
 
                 }
             } catch (FileNotFoundException | InterruptedException e) {
-                Server.getLogger().error(e.getMessage(),e.getCause());
+                Server.getLogger().error(e.getMessage(),e);
             } catch (Exception e) {
                 if(lightLine != null)
                 throw new LightFileParseException(lightLine,e);
