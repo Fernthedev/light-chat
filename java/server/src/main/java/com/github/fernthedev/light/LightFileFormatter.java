@@ -177,7 +177,6 @@ public class LightFileFormatter {
                     if(line.equalsIgnoreCase("pin") && args.length > 1) {
                         if(args[0].equalsIgnoreCase("all")) {
                             for(GpioPinData pin : pinDataMap.values()) {
-                                Server.getLogger().info("Checking pin " + pin.getPin().getAddress());
 
                                 output = pin.getOutput();
 
@@ -196,8 +195,6 @@ public class LightFileFormatter {
                             int pinInt = Integer.parseInt(args[0]);
 
                             Pin pin = getPinFromInt(pinInt);
-
-                            Server.getLogger().info("Checking pin " + pinInt);
 
                             if(pin == null) {
                                 throw new LightFileParseException(lightLine,"Pin could not be found. The pins found are: " + pins.length + " " + Arrays.toString(pins));

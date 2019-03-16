@@ -9,5 +9,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class Properties implements Serializable {
     private int fps;
+    private MainGUI.BoardType boardType;
 
 }

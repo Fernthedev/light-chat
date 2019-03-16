@@ -1,5 +1,6 @@
 package com.github.fernthedev.gui;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,6 +29,7 @@ public class PinData {
 
     @Setter
     @Getter
+    @Data
     public static class FrameData implements Serializable{
 
         private static final long serialVersionUID = -5821701319155768090L;
