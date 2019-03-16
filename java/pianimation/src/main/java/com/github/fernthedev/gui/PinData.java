@@ -1,9 +1,15 @@
 package com.github.fernthedev.gui;
 
+import lombok.Getter;
+import lombok.Setter;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PinData {
+
+
     private int id;
     private List<FrameData> frameDatas = new ArrayList<>();
 
@@ -20,36 +26,45 @@ public class PinData {
     }
 
 
-    public static class FrameData {
-        private int frame;
-        private Pinmode pinmode;
+    @Setter
+    @Getter
+    public static class FrameData implements Serializable{
 
-        public FrameData(int frame, Pinmode pinm) {
+        private static final long serialVersionUID = -5821701319155768090L;
+
+        private final int frame;
+        private PinMode pinMode;
+
+        private boolean allPins = false;
+
+        public FrameData(int frame, PinMode pinm) {
             this.frame = frame;
-            this.pinmode = pinm;
+            this.pinMode = pinm;
 
         }
 
-        public Pinmode GetPinmode()
-        {
-            return pinmode;
-        }
+
 
         public int getFrame()
         {
             return frame;
         }
 
-        public void setPinMode(Pinmode pinmode)
-        {
-            this.pinmode = pinmode;
-        }
+
     }
 
 
-    public enum Pinmode
+    public enum PinMode
     {
         ON,
-        OFF
+        OFF;
+
+        public static PinMode fromBoolean(boolean mode) {
+            if(mode) return ON; else return OFF;
+        }
+
+        public boolean toBoolean() {
+            return this == ON;
+        }
     }
 }

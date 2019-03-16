@@ -13,15 +13,12 @@ public class LightLine {
     @NonNull
     private final String line;
 
-    @NonNull
     private final int lineNumber;
 
     public LightLine(LightLine lightLine) {
         this.line = lightLine.getLine();
         this.lineNumber = lightLine.getLineNumber();
     }
-
-
 
 
 }

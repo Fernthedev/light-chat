@@ -6,9 +6,8 @@ import com.github.fernthedev.light.api.lines.LightPrintLine;
 import com.github.fernthedev.light.api.lines.LightSleepLine;
 import com.github.fernthedev.light.exceptions.LightFileParseException;
 import com.github.fernthedev.server.Server;
-import com.pi4j.io.gpio.*;
-import com.pi4j.io.gpio.exception.GpioPinExistsException;
-import com.pi4j.system.SystemInfo;
+import com.pi4j.io.gpio.GpioPinDigitalOutput;
+import com.pi4j.io.gpio.Pin;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
@@ -17,46 +16,33 @@ import org.apache.commons.io.FilenameUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Scanner;
 
 public class LightParser {
 
-    private Pin[] pins;
 
-    private Map<@NonNull Pin,@NonNull GpioPinData> pinDataMap = new HashMap<>();
-
-
-    private GpioController gpio;
-
-    {
-        try {
-            pins = RaspiPin.allPins(SystemInfo.getBoardType());
-        } catch (IOException | InterruptedException e) {
-            Server.getLogger().error(e.getMessage(),e);
+    public static void saveFile(@NonNull LightFile lightFile,File path) throws IOException {
+        File file = new File(lightFile.getFile().getPath());
+        if(!file.exists()) {
+            file.createNewFile();
         }
 
+        lightFile.setFile(Files.write(lightFile.getFile().toPath(),lightFile.toStringList(), Charset.forName("UTF-8")).toFile());
     }
 
-    public LightParser(GpioController gpio) {
-        this.gpio = gpio;
-
-        try {
-            pins = RaspiPin.allPins(SystemInfo.getBoardType());
-        } catch (IOException | InterruptedException e) {
-            Server.getLogger().error(e.getMessage(),e);
-        }
-
-        try {
-            for (Pin pin : pins) {
-
-                pinDataMap.put(pin,new GpioPinData(gpio.provisionDigitalOutputPin(pin, "FileReaderOutput", PinState.HIGH), pin, pin.getAddress()));
-            }
-        } catch (GpioPinExistsException e) {
-            Server.getLogger().info("Unable to check " + e.getMessage());
+    public static void saveFolder(@NonNull List<LightFile> files,File path) throws IOException {
+        for(LightFile lightFile : files) {
+            saveFile(lightFile,path);
         }
     }
 
-    public LightFile readFormatFile(File file) {
+
+    public static LightFile parseFile(@NonNull File file) {
         List<LightLine> lightLines = new ArrayList<>();
 
         GpioPinDigitalOutput output;
@@ -174,54 +160,40 @@ public class LightParser {
 
                 if (line.equalsIgnoreCase("pin") && args.length > 1) {
                     if (args[0].equalsIgnoreCase("all")) {
-                        for (GpioPinData pin : pinDataMap.values()) {
-                            Server.getLogger().info("Checking pin " + pin.getPin().getAddress());
 
 
-                            String newPar = args[1];
+                        String newPar = args[1];
 
-                            boolean toggle;
+                        boolean toggle;
 
-                            if (newPar.equalsIgnoreCase("on")) {
-                                toggle = true;
-                            } else if (newPar.equalsIgnoreCase("off")) {
-                                toggle = false;
-                            } else {
-                                throw new LightFileParseException(lightLine, "Could not find parameter " + newPar);
-                            }
-
-                            lightLines.add(new LightPinLine(lightLine, pin.getPin(), toggle));
-
-
+                        if (newPar.equalsIgnoreCase("on")) {
+                            toggle = true;
+                        } else if (newPar.equalsIgnoreCase("off")) {
+                            toggle = false;
+                        } else {
+                            throw new LightFileParseException(lightLine, "Could not find parameter " + newPar);
                         }
+
+                        lightLines.add(new LightPinLine(lightLine, true, toggle));
+
+
                     } else if (args[0].matches("[0-9]+")) {
                         int pinInt = Integer.parseInt(args[0]);
 
-                        Pin pin = getPinFromInt(pinInt);
 
-                        if (pin == null) {
-                            throw new LightFileParseException(lightLine, "Pin could not be found. The pins found are: " + pins.length + " " + Arrays.toString(pins));
+                        String newPar = args[1];
+                        boolean toggle;
+
+                        if (newPar.equalsIgnoreCase("on")) {
+                            toggle = true;
+                        } else if (newPar.equalsIgnoreCase("off")) {
+                            toggle = false;
                         } else {
-                            if (getDataFromInt(pinInt) == null) {
-                                throw new LightFileParseException(lightLine, "The pin attempted to access has not been registered. Try restarting the server. The registered pin list is: " + pinDataMap.keySet());
-                            }
-
-
-                            String newPar = args[1];
-                            boolean toggle;
-
-                            if (newPar.equalsIgnoreCase("on")) {
-                                toggle = true;
-                            } else if (newPar.equalsIgnoreCase("off")) {
-                                toggle = false;
-                            } else {
-                                throw new LightFileParseException(lightLine, "Could not find parameter " + newPar);
-                            }
-
-                            lightLines.add(new LightPinLine(lightLine, pin, toggle));
-
-
+                            throw new LightFileParseException(lightLine, "Could not find parameter " + newPar);
                         }
+
+                        lightLines.add(new LightPinLine(lightLine, pinInt, toggle));
+
 
                     } else {
                         throw new LightFileParseException(lightLine, "Argument " + args[0] + " can only be numerical.");
@@ -255,46 +227,23 @@ public class LightParser {
      * @param path The folder directory
      * @throws FileNotFoundException When path is non-existent or not folder
      */
-    public void readDirectory(File path) throws FileNotFoundException {
+    public static List<LightFile> parseFolder(@NonNull File path) throws FileNotFoundException {
         File[] files = path.listFiles();
+
+        List<LightFile> lightFiles = new ArrayList<>();
 
         if(!path.exists() || files == null) throw new FileNotFoundException("The folder specified, " + path.getAbsolutePath() + " is either not a folder or does not exist");
 
         for(File file : files) {
 
             if(FilenameUtils.getExtension(file.getName()).equals("pia")) {
-                readFormatFile(file);
+                lightFiles.add(parseFile(file));
             }
 
         }
+        return lightFiles;
     }
 
-    /**
-     * Gets pin from int
-     * @param pin The pin int
-     * @return The pin instance, null if none found (different raspberry pies have different amount of pins)
-     */
-    private Pin getPinFromInt(int pin) {
-        for(int i =0; i < pins.length;i++) {
-            if(pin == i) {
-                return pins[i];
-            }
-        }
-        return null;
-    }
-
-    private GpioPinData getDataFromInt(int pinInt) {
-        Pin pin = getPinFromInt(pinInt);
-
-        if(pinDataMap.get(pin) == null) {
-            pinDataMap.put(pin,new GpioPinData(gpio.provisionDigitalOutputPin(pin, "FileReaderOutput", PinState.HIGH), pin, pin.getAddress()));
-        }
-
-        // Server.getLogger().info("CHecked " + pinDataMap.get(pin));
-        //  Server.getLogger().info("List: " + pinDataMap.keySet().toString());
-
-        return pinDataMap.get(pin);
-    }
 
     @Data
     @AllArgsConstructor

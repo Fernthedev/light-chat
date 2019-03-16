@@ -6,6 +6,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -17,5 +18,15 @@ public class LightFile {
 
     @NonNull
     private List<LightLine> lineList;
+
+    public List<String> toStringList() {
+        List<String> lines = new ArrayList<>();
+
+        for(LightLine line : lineList) {
+            lines.add(line.getLine());
+        }
+
+        return lines;
+    }
 
 }

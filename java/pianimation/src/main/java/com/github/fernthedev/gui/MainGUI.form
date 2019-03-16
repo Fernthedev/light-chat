@@ -7,10 +7,10 @@
     </constraints>
     <properties>
       <minimumSize width="816" height="489"/>
-      <name value="Panel"/>
+      <name resource-bundle="strings" key="windowTitle"/>
       <preferredSize width="816" height="489"/>
     </properties>
-    <border type="none" title="LightAnimation4PI"/>
+    <border type="none" title-resource-bundle="strings" title-key="windowTitle"/>
     <children>
       <hspacer id="6bbcd">
         <constraints>
@@ -50,7 +50,7 @@
           <grid row="1" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <name value="Selected Pin"/>
+          <name resource-bundle="strings" key="selected.pin"/>
         </properties>
       </component>
       <component id="c5236" class="javax.swing.JSpinner" binding="selectedFrame">
@@ -58,7 +58,7 @@
           <grid row="3" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <name value="Selected Frame"/>
+          <name resource-bundle="strings" key="selected.frame"/>
         </properties>
       </component>
       <component id="f7dc7" class="javax.swing.JSpinner" binding="fps">
@@ -66,8 +66,8 @@
           <grid row="5" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <name value="FPS"/>
-          <toolTipText value="FPS"/>
+          <name resource-bundle="strings" key="fps"/>
+          <toolTipText resource-bundle="strings" key="fps"/>
         </properties>
       </component>
       <component id="3a171" class="javax.swing.JComboBox" binding="whichpi">
@@ -75,7 +75,7 @@
           <grid row="9" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <name value="Pi Preset"/>
+          <name resource-bundle="strings" key="pi.preset"/>
         </properties>
       </component>
       <component id="e359d" class="javax.swing.JTextField" binding="saveOpenPath">
@@ -117,7 +117,8 @@
           <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Selected Pin"/>
+          <labelFor value="d811f"/>
+          <text resource-bundle="strings" key="selected.pin"/>
         </properties>
       </component>
       <component id="ee367" class="javax.swing.JLabel">
@@ -125,7 +126,8 @@
           <grid row="2" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Selected Frame"/>
+          <labelFor value="c5236"/>
+          <text resource-bundle="strings" key="selected.frame"/>
         </properties>
       </component>
       <component id="7c93" class="javax.swing.JLabel">
@@ -133,7 +135,8 @@
           <grid row="4" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="FPS"/>
+          <labelFor value="f7dc7"/>
+          <text resource-bundle="strings" key="fps"/>
         </properties>
       </component>
       <component id="fc719" class="javax.swing.JLabel">
@@ -141,7 +144,8 @@
           <grid row="8" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Pi Preset"/>
+          <labelFor value="3a171"/>
+          <text resource-bundle="strings" key="pi.preset"/>
         </properties>
       </component>
       <component id="c9467" class="javax.swing.JLabel">
@@ -149,7 +153,8 @@
           <grid row="11" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Path"/>
+          <labelFor value="e359d"/>
+          <text resource-bundle="strings" key="path"/>
         </properties>
       </component>
       <component id="c545c" class="javax.swing.JLabel" binding="statusText">
@@ -157,7 +162,16 @@
           <grid row="15" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <labelFor value="9a17d"/>
           <text value=""/>
+        </properties>
+      </component>
+      <component id="86e36" class="javax.swing.JCheckBox" binding="allPinsCheck">
+        <constraints>
+          <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="strings" key="all.pins"/>
         </properties>
       </component>
     </children>

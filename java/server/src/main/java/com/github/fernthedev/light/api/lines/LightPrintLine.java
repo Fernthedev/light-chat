@@ -9,7 +9,7 @@ import lombok.NonNull;
 public class LightPrintLine extends LightLine {
     private String print;
 
-    public LightPrintLine(@NonNull String line, @NonNull int lineNumber,@NonNull String print) {
+    public LightPrintLine(@NonNull String line, int lineNumber,@NonNull String print) {
         super(line, lineNumber);
         this.print = print;
     }
