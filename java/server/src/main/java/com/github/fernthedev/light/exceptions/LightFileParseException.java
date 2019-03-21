@@ -16,13 +16,12 @@ public class LightFileParseException extends RuntimeException {
     }
 
 
-
     public LightFileParseException(LightLine lightLine, Exception exception) {
         super(formatErrorMessage(lightLine),exception);
         handleLightLine(lightLine);
     }
 
-    public LightFileParseException( LightLine lightLine,String message, Exception exception) {
+    public LightFileParseException(LightLine lightLine,String message, Exception exception) {
         super(formatErrorMessage(lightLine,message),exception);
         handleLightLine(lightLine);
     }

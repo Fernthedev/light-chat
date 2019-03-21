@@ -6,6 +6,7 @@ import com.github.fernthedev.light.api.lines.LightLine;
 import com.github.fernthedev.light.api.lines.LightPinLine;
 import com.github.fernthedev.light.api.lines.LightSleepLine;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
@@ -43,6 +44,10 @@ public class MainGUI extends JFrame implements Serializable {
     private JLabel statusText;
     private JCheckBox allPinsCheck;
 
+    private Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+    private Map<String, PinData.FrameData> frameDataLogMap = new HashMap<>();
+
     private List<LightFile> lightFolder;
 
     private PinData[] pinDatas = new PinData[32];
@@ -54,7 +59,6 @@ public class MainGUI extends JFrame implements Serializable {
 
     private List<String> actionLog = new ArrayList<>();
 
-    private List<String> logs = new ArrayList<>();
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("MainGUI");
@@ -209,7 +213,9 @@ public class MainGUI extends JFrame implements Serializable {
                         LightParser.saveFolder(lightFolder, getSelectedPath());
                         List<String> strings = new ArrayList<>();
 
-                        strings.add(new Gson().toJson(new Properties((Integer) fps.getValue())));
+                        BoardType selectedPi = BoardType.valueOf(Objects.requireNonNull(whichpi.getSelectedItem()).toString());
+
+                        strings.add(gson.toJson(new Properties((Integer) fps.getValue(), selectedPi)));
 
                         Files.write(new File(getSelectedPath(), "config.properties").toPath(), strings, Charset.forName("UTF-8")).toFile();
 
@@ -249,9 +255,10 @@ public class MainGUI extends JFrame implements Serializable {
                     }
                     try {
                         FileReader reader = new FileReader(new File(getSelectedPath(), "config.properties"));
-                        Properties properties = new Gson().fromJson(reader, Properties.class);
+                        Properties properties = gson.fromJson(reader, Properties.class);
                         reader.close();
-                        fps.setValue(properties.getFps());
+
+                        handleProperties(properties);
                     } catch (FileNotFoundException e1) {
                         //custom title, error icon
                         JOptionPane.showMessageDialog(panel,
@@ -269,7 +276,7 @@ public class MainGUI extends JFrame implements Serializable {
                         PinData.FrameData lastFrame = null;
 
                         for (int ii = 0; ii < lightFile.getLineList().size(); ii++) {
-                            LightLine lightLine = lightFile.getLineList().get(i);
+                            LightLine lightLine = lightFile.getLineList().get(ii);
 
                             if (lightLine instanceof LightPinLine) {
                                 LightPinLine lightPinLine = (LightPinLine) lightLine;
@@ -425,6 +432,11 @@ public class MainGUI extends JFrame implements Serializable {
         }
     }
 
+    private void handleProperties(Properties properties) {
+        fps.setValue(properties.getFps());
+        whichpi.setSelectedItem(properties.getBoardType().toString());
+    }
+
     private void checkButton(PinData.FrameData frameData) {
         String statusNow = onButton.getText();
 
@@ -444,13 +456,28 @@ public class MainGUI extends JFrame implements Serializable {
     }
 
     private void updateFrame(PinData.FrameData frameData, boolean status) {
+        PinData.PinMode mode;
         if (status) {
-            frameData.setPinMode(PinData.PinMode.ON);
+            mode = PinData.PinMode.ON;
         } else {
-            frameData.setPinMode(PinData.PinMode.OFF);
+            mode = PinData.PinMode.OFF;
         }
+        if (actionList.getSelectedValuesList() != null && !actionList.getSelectedValuesList().isEmpty() && actionList.getSelectedValue().length() > 1) {
+            List<PinData.FrameData> frameDataList = new ArrayList<>();
+            for (String string : actionList.getSelectedValuesList()) {
+                frameDataLogMap.get(string).setPinMode(mode);
+                frameDataList.add(frameDataLogMap.get(string));
+            }
 
-        updateFrame(frameData);
+            updateFrame(frameDataList.toArray(new PinData.FrameData[0]));
+        } else if (actionList.getSelectedValue() != null) {
+            PinData.FrameData selectedFrameData = frameDataLogMap.get(actionList.getSelectedValue());
+            selectedFrameData.setPinMode(mode);
+            updateFrame(selectedFrameData);
+        } else {
+            frameData.setPinMode(mode);
+            updateFrame(frameData);
+        }
 
     }
 
@@ -472,13 +499,24 @@ public class MainGUI extends JFrame implements Serializable {
         updateLog();
     }
 
+    private void updateFrame(PinData.FrameData... frameDatas) {
+        List<PinData.FrameData> frameDataList = new ArrayList<>(Arrays.asList(frameDatas));
+
+        for (PinData.FrameData frameData : frameDataList) {
+            updateFrame(frameData);
+        }
+    }
+
     private void updateLog() {
         actionList.setListData(new String[0]);
         actionLog.clear();
+        frameDataLogMap.clear();
 
         for (int i = 0; i < selectedPinData.getFrames().size(); i++) {
             PinData.FrameData frameData = selectedPinData.getFrames().get(i);
-            actionLog.add("Frame" + frameData.getFrame() + " is " + frameData.getPinMode().toString());
+            String log = "Frame" + frameData.getFrame() + " is " + frameData.getPinMode().toString();
+            actionLog.add(log);
+            frameDataLogMap.put(log, frameData);
         }
         actionList.setListData(actionLog.toArray(new String[0]));
     }
