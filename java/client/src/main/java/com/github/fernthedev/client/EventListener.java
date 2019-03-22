@@ -18,8 +18,6 @@ public class EventListener {
     }
 
     public void received(Packet p) {
-
-
         if(p instanceof TestConnectPacket) {
             TestConnectPacket packet = (TestConnectPacket) p;
             client.getLogger().info("Connected packet: " + packet.getMessage());
@@ -59,6 +57,7 @@ public class EventListener {
             String privateKey = EncryptionHandler.encrypt(pass,packet.getKey());
 
             client.setPrivateKey(pass);
+            client.getClientThread().setDecryptCipher(client.getClientThread().registerDecryptCipher(client.getPrivateKey()));
 
             client.registered = true;
 

@@ -169,7 +169,7 @@ public class ServerBackground implements Runnable {
                     sender.sendMessage("Players: (" + (PlayerHandler.players.size() ) + ")");
 
                     for (ClientPlayer clientPlayer : new HashMap<>(Server.socketList).values()) {
-                        sender.sendMessage(clientPlayer.getDeviceName() + " :" + clientPlayer.getId() + " { " + clientPlayer.getAdress() + "} Ping:" + clientPlayer.delayTime + "ms");
+                        sender.sendMessage(clientPlayer.getDeviceName() + " :" + clientPlayer.getId() + " { " + clientPlayer.getAdress() + "} Ping:" + clientPlayer.getDelayTime() + "ms");
                     }
                 }
 
@@ -179,7 +179,7 @@ public class ServerBackground implements Runnable {
                     for (ClientPlayer clientPlayer : new HashMap<>(Server.socketList).values()) {
                         if (clientPlayer == null) continue;
 
-                        sender.sendMessage(clientPlayer.getDeviceName() + " :" + clientPlayer.getId() + " Ping:" + clientPlayer.delayTime + "ms");
+                        sender.sendMessage(clientPlayer.getDeviceName() + " :" + clientPlayer.getId() + " Ping:" + clientPlayer.getDelayTime() + "ms");
                     }
                 }
             }

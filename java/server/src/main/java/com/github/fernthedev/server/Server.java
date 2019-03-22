@@ -15,12 +15,17 @@ import com.github.fernthedev.server.plugin.PluginManager;
 import com.github.fernthedev.universal.StaticHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
+import io.netty.channel.epoll.EpollEventLoopGroup;
+import io.netty.channel.epoll.EpollServerSocketChannel;
+import io.netty.channel.kqueue.KQueueEventLoopGroup;
+import io.netty.channel.kqueue.KQueueServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 import lombok.Getter;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -151,73 +156,10 @@ public class Server implements Runnable {
     public void run() {
 
         thread = Thread.currentThread();
+
         bossGroup = new NioEventLoopGroup();
         processingHandler = new ProcessingHandler(this);
         workerGroup = new NioEventLoopGroup();
-
-        ServerBootstrap bootstrap = new ServerBootstrap();
-
-        bootstrap.group(bossGroup, workerGroup)
-                .channel(NioServerSocketChannel.class)
-                .childHandler(new ChannelInitializer<Channel>() {
-                    @Override
-                    public void initChannel(Channel ch) {
-
-                        ch.pipeline().addLast(new ObjectEncoder(),
-                                new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
-                                processingHandler);
-                    }
-                }).option(ChannelOption.SO_BACKLOG, 128)
-                .childOption(ChannelOption.SO_KEEPALIVE, true)
-                .childOption(ChannelOption.TCP_NODELAY,true)
-        .childOption(ChannelOption.SO_TIMEOUT,5000);
-
-
-        running = true;
-        logger.info("Server socket registered");
-        ServerBackground serverBackground = new ServerBackground(this);
-        new Thread(serverBackground,"ServerBackgroundThread").start();
-        //Timer pingPongTimer = new Timer("pingpong");
-
-
-        //await();
-        try {
-            future = bootstrap.bind(port).sync();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-
-
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            for (ServerThread serverThread : Server.serverThreads) {
-                if (serverThread.clientPlayer.channel.isOpen()) {
-                    Server.getLogger().info("Gracefully shutting down/");
-                    Server.sendObjectToAllPlayers(new LostServerConnectionPacket());
-                    serverThread.clientPlayer.close();
-                }
-            }
-        }));
-
-        try {
-            logger.info("Server started successfully at localhost (Connect with " + InetAddress.getLocalHost().getHostAddress() + ") using port " + port);
-        } catch (UnknownHostException e) {
-            logger.error(e.getMessage(),e);
-        }
-
-        if (!future.isSuccess()) {
-            logger.info("Failed to bind port");
-        }else{
-            logger.info("Binded port on " + future.channel().localAddress());
-        }
-
-        /*
-        try {
-            new MulticastServer("Multicast",this).start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
 
         settingsManager = new SettingsManager(server,new File(SettingsManager.getCurrentPath(),"settings.json"));
         settingsManager.setup();
@@ -291,6 +233,88 @@ public class Server implements Runnable {
                 }
             }
         });
+
+        Class channelClass = NioServerSocketChannel.class;
+
+        if(settingsManager.getSettings().isUseNativeTransport()) {
+            if(SystemUtils.IS_OS_LINUX) {
+                bossGroup = new EpollEventLoopGroup();
+                workerGroup = new EpollEventLoopGroup();
+
+                channelClass = EpollServerSocketChannel.class;
+            }
+
+            if(SystemUtils.IS_OS_MAC_OSX) {
+                bossGroup = new KQueueEventLoopGroup();
+                workerGroup = new  KQueueEventLoopGroup();
+
+                channelClass = KQueueServerSocketChannel.class;
+            }
+        }
+
+        ServerBootstrap bootstrap = new ServerBootstrap();
+
+        bootstrap.group(bossGroup, workerGroup)
+                .channel(channelClass)
+                .childHandler(new ChannelInitializer<Channel>() {
+                    @Override
+                    public void initChannel(Channel ch) {
+
+                        ch.pipeline().addLast(new ObjectEncoder(),
+                                new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
+                                processingHandler);
+                    }
+                }).option(ChannelOption.SO_BACKLOG, 128)
+                .childOption(ChannelOption.SO_KEEPALIVE, true)
+                .childOption(ChannelOption.TCP_NODELAY,true)
+        .childOption(ChannelOption.SO_TIMEOUT,5000);
+
+
+        running = true;
+        logger.info("Server socket registered");
+        ServerBackground serverBackground = new ServerBackground(this);
+        new Thread(serverBackground,"ServerBackgroundThread").start();
+        //Timer pingPongTimer = new Timer("pingpong");
+
+
+        //await();
+        try {
+            future = bootstrap.bind(port).sync();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            for (ServerThread serverThread : Server.serverThreads) {
+                if (serverThread.clientPlayer.channel.isOpen()) {
+                    Server.getLogger().info("Gracefully shutting down/");
+                    Server.sendObjectToAllPlayers(new LostServerConnectionPacket());
+                    serverThread.clientPlayer.close();
+                }
+            }
+        }));
+
+        try {
+            logger.info("Server started successfully at localhost (Connect with " + InetAddress.getLocalHost().getHostAddress() + ") using port " + port);
+        } catch (UnknownHostException e) {
+            logger.error(e.getMessage(),e);
+        }
+
+        if (!future.isSuccess()) {
+            logger.info("Failed to bind port");
+        }else{
+            logger.info("Binded port on " + future.channel().localAddress());
+        }
+
+        /*
+        try {
+            new MulticastServer("Multicast",this).start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
 
         if(settingsManager.getSettings().isUseMulticast()) {
             try {

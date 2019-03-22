@@ -7,6 +7,10 @@ import com.github.fernthedev.universal.EncryptionHandler;
 import com.github.fernthedev.universal.StaticHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
+import io.netty.channel.epoll.EpollEventLoopGroup;
+import io.netty.channel.epoll.EpollSocketChannel;
+import io.netty.channel.kqueue.KQueueEventLoopGroup;
+import io.netty.channel.kqueue.KQueueSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
@@ -14,8 +18,17 @@ import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.SystemUtils;
 
-import javax.crypto.SealedObject;
+import javax.crypto.*;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -47,6 +60,39 @@ public class ClientThread implements Runnable {
     protected Channel channel;
 
     protected EventLoopGroup workerGroup;
+
+    @Getter
+    @Setter
+    private Cipher decryptCipher;
+
+    public Object decryptObject(SealedObject sealedObject) {
+        if (decryptCipher == null)
+            throw new IllegalArgumentException("Register cipher with registerDecryptCipher() first");
+        try {
+            return sealedObject.getObject(decryptCipher);
+        } catch (IOException | ClassNotFoundException | IllegalBlockSizeException | BadPaddingException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Cipher registerDecryptCipher(String key) {
+        try {
+            byte[] salt = new byte[16];
+
+            SecretKeyFactory factory = SecretKeyFactory.getInstance(StaticHandler.getKeyFactoryString());
+            KeySpec spec = new PBEKeySpec(key.toCharArray(), salt, 65536, 256);
+            SecretKey tmp = factory.generateSecret(spec);
+            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKeySpecTransformation());
+            Cipher cipher = Cipher.getInstance(StaticHandler.getObjecrCipherTrans());
+
+            cipher.init(Cipher.DECRYPT_MODE, secret);
+            return cipher;
+        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | InvalidKeySpecException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     /**
      * PingPong delay
@@ -80,13 +126,28 @@ public class ClientThread implements Runnable {
         Bootstrap b = new Bootstrap();
         workerGroup = new NioEventLoopGroup();
 
+        Class channelClass = NioSocketChannel.class;
+
+        if (SystemUtils.IS_OS_LINUX) {
+            workerGroup = new EpollEventLoopGroup();
+
+            channelClass = EpollSocketChannel.class;
+        }
+
+        if (SystemUtils.IS_OS_MAC_OSX) {
+            workerGroup = new KQueueEventLoopGroup();
+
+            channelClass = KQueueSocketChannel.class;
+        }
+
+
         try {
             b.group(workerGroup);
-            b.channel(NioSocketChannel.class);
+            b.channel(channelClass);
             b.option(ChannelOption.SO_KEEPALIVE, true);
-            b.option(ChannelOption.TCP_NODELAY,true);
+            b.option(ChannelOption.TCP_NODELAY, true);
 
-            b.option(ChannelOption.SO_TIMEOUT,2000);
+            b.option(ChannelOption.SO_TIMEOUT, 2000);
 
             b.handler(new ChannelInitializer<Channel>() {
 
@@ -104,9 +165,8 @@ public class ClientThread implements Runnable {
             channel = future.channel();
 
         } catch (InterruptedException e) {
-            client.getLogger().logError(e.getMessage(),e.getCause());
+            client.getLogger().logError(e.getMessage(), e.getCause());
         }
-
 
 
         if (future.isSuccess() && future.channel().isActive()) {
@@ -120,10 +180,10 @@ public class ClientThread implements Runnable {
                 Client.currentThread.start();
             }
 
-            if(!WaitForCommand.running && runThread) {
+            if (!WaitForCommand.running && runThread) {
                 client.running = true;
-               // client.getLogger().info("NEW WAIT FOR COMMAND THREAD");
-                Client.waitThread = new Thread(Client.waitForCommand,"CommandThread");
+                // client.getLogger().info("NEW WAIT FOR COMMAND THREAD");
+                Client.waitThread = new Thread(Client.waitForCommand, "CommandThread");
                 Client.waitThread.start();
                 client.getLogger().info("Command thread started");
             }

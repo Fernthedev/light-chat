@@ -4,7 +4,6 @@ import com.github.fernthedev.light.AuthenticationManager;
 import com.github.fernthedev.packets.*;
 import com.github.fernthedev.packets.latency.PongPacket;
 import com.github.fernthedev.server.event.chat.ChatEvent;
-import com.github.fernthedev.universal.EncryptionHandler;
 import com.github.fernthedev.universal.StaticHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -31,8 +30,10 @@ public class EventListener {
         this.clientPlayer = clientPlayer;
     }
     
-    public void received(SealedObject pe) {
-        Packet p = (Packet) EncryptionHandler.decrypt(pe, clientPlayer.getServerKey());
+    public void received(Packet p) {
+
+        //Packet p = (Packet) EncryptionHandler.decrypt(pe, clientPlayer.getServerKey());
+
 
         // Server.getLogger().info(clientPlayer + " is the sender of packet");
 
@@ -43,9 +44,9 @@ public class EventListener {
 
             clientPlayer.endTime = System.nanoTime();
 
-            clientPlayer.delayTime = TimeUnit.NANOSECONDS.toMillis(clientPlayer.endTime - clientPlayer.startTime);
+            clientPlayer.setDelayTime(TimeUnit.NANOSECONDS.toMillis(clientPlayer.endTime - clientPlayer.startTime));
 
-
+            Server.getLogger().info("Pong received and time was " + clientPlayer.getDelayTime());
 
         } else if (p instanceof MessagePacket) {
             MessagePacket messagePacket = (MessagePacket) p;
@@ -116,6 +117,7 @@ public class EventListener {
                 }
             }
         }
+
     }
 
     private Object decrypt(SealedObject sealedObject) throws IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {

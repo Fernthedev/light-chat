@@ -4,13 +4,17 @@ import com.github.fernthedev.packets.MessagePacket;
 import com.github.fernthedev.packets.Packet;
 import com.github.fernthedev.packets.latency.PingPacket;
 import com.github.fernthedev.universal.EncryptionHandler;
+import com.github.fernthedev.universal.StaticHandler;
 import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
-import javax.crypto.SealedObject;
+import javax.crypto.*;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.net.InetSocketAddress;
+import java.security.spec.KeySpec;
 import java.util.UUID;
 
 import static com.github.fernthedev.server.Server.socketList;
@@ -58,7 +62,13 @@ public class ClientPlayer implements CommandSender {
     @Setter
     private int id = -1;
 
-    public long delayTime;
+    @Setter
+    @Getter
+    private long delayTime = -1;
+
+    @Getter
+    @Setter
+    private Cipher decryptCipher;
 
     public String getDeviceName() {
         return deviceName;
@@ -78,6 +88,7 @@ public class ClientPlayer implements CommandSender {
         this.uuid = uuid;
 
         serverKey = EncryptionHandler.makeSHA256Hash(uuid.toString());
+        decryptCipher = registerDecryptCipher(serverKey);
 
     }
 
@@ -101,7 +112,6 @@ public class ClientPlayer implements CommandSender {
             Cipher cipher = Cipher.getInstance(StaticHandler.getCipherTransformation());
             cipher.init(Cipher.ENCRYPT_MODE, sks);*/
 
-            Server.getLogger().info("Sending {" + packet + "} encryption: " + encrypt);
         if (encrypt) {
             SealedObject sealedObject = EncryptionHandler.encrypt(packet, clientKey);
 
@@ -109,8 +119,37 @@ public class ClientPlayer implements CommandSender {
             channel.writeAndFlush(sealedObject);
         } else {
             channel.writeAndFlush(packet);
-            Server.getLogger().info("Sent {" + packet + "} encryption: " + encrypt + "\n");
         }
+    }
+
+    public Cipher registerDecryptCipher(String key) {
+        try {
+            byte[] salt = new byte[16];
+
+            SecretKeyFactory factory = SecretKeyFactory.getInstance(StaticHandler.getKeyFactoryString());
+            KeySpec spec = new PBEKeySpec(key.toCharArray(), salt, 65536, 256);
+            SecretKey tmp = factory.generateSecret(spec);
+            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKeySpecTransformation());
+            Cipher cipher = Cipher.getInstance(StaticHandler.getObjecrCipherTrans());
+
+            cipher.init(Cipher.DECRYPT_MODE, secret);
+            decryptCipher = cipher;
+            return cipher;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Object decryptObject(SealedObject sealedObject) {
+        try {
+            if (decryptCipher == null)
+                throw new IllegalArgumentException("Register cipher with registerDecryptCipher() first");
+            return sealedObject.getObject(decryptCipher);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 

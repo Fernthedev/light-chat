@@ -4,11 +4,10 @@ import com.github.fernthedev.client.Client;
 import com.github.fernthedev.client.EventListener;
 import com.github.fernthedev.packets.ConnectedPacket;
 import com.github.fernthedev.packets.Packet;
-import com.github.fernthedev.universal.EncryptionHandler;
 import com.github.fernthedev.universal.StaticHandler;
 import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.Getter;
 
 import javax.crypto.Cipher;
@@ -18,7 +17,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 
 @ChannelHandler.Sharable
-public class ClientHandler extends ChannelHandlerAdapter {
+public class ClientHandler extends ChannelInboundHandlerAdapter {
 
     protected EventListener listener;
 
@@ -51,15 +50,14 @@ public class ClientHandler extends ChannelHandlerAdapter {
 
             SealedObject ob = (SealedObject) msg;
 
-            packet = (Packet) EncryptionHandler.decrypt(ob, client.getPrivateKey());
+            //packet = (Packet) EncryptionHandler.decrypt(ob, client.getPrivateKey());
+            packet = (Packet) client.getClientThread().decryptObject(ob);
 
             listener.received(packet);
-            ctx.flush();
         }else if (msg instanceof Packet){
             packet = (Packet) msg;
 
             listener.received(packet);
-            ctx.flush();
         }
 
 

@@ -70,7 +70,7 @@
           <toolTipText resource-bundle="strings" key="fps"/>
         </properties>
       </component>
-      <component id="3a171" class="javax.swing.JComboBox" binding="whichpi">
+      <component id="3a171" class="javax.swing.JComboBox" binding="whichPi">
         <constraints>
           <grid row="9" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>

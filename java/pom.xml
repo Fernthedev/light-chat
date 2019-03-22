@@ -11,6 +11,7 @@
     <packaging>pom</packaging>
     <properties>
         <project.buildVer>2.0-RELEASE</project.buildVer>
+        <project.nettyver>4.1.34.Final</project.nettyver>
     </properties>
 
     <build>
@@ -80,6 +81,13 @@
                 </executions>
             </plugin>
         </plugins>
+        <extensions>
+            <extension>
+                <groupId>kr.motd.maven</groupId>
+                <artifactId>os-maven-plugin</artifactId>
+                <version>1.5.0.Final</version>
+            </extension>
+        </extensions>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -122,9 +130,17 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
-            <version>5.0.0.Alpha2</version>
+            <version>${project.nettyver}</version>
             <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-native-epoll</artifactId>
+            <version>${project.nettyver}</version>
+            <classifier>linux-x86_64</classifier>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>

@@ -1,20 +1,24 @@
 package com.github.fernthedev.server.netty;
 
 import com.github.fernthedev.packets.ConnectedPacket;
+import com.github.fernthedev.packets.Packet;
 import com.github.fernthedev.packets.RequestInfoPacket;
 import com.github.fernthedev.server.*;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.util.ReferenceCountUtil;
 
 import javax.crypto.SealedObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @ChannelHandler.Sharable
-public class ProcessingHandler extends ChannelHandlerAdapter {
+public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 
 
 
@@ -42,31 +46,44 @@ public class ProcessingHandler extends ChannelHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg)
             throws Exception {
 
+        try {
             EventListener eventListener = new EventListener(server, Server.socketList.get(ctx.channel()));
 
-            if (msg instanceof SealedObject) {
-                SealedObject requestData = (SealedObject) msg;
+            if (!Server.socketList.containsKey(ctx.channel())) {
+                // Discard the received data silently.
+                ((ByteBuf) msg).release();
+            } else {
+                if (msg instanceof SealedObject) {
+                    SealedObject requestData = (SealedObject) msg;
 
 
-                if (Server.socketList.containsKey(ctx.channel())) {
+                    //new Thread(() -> eventListener.received(requestData)).start();
+                    long startTime = System.nanoTime();
+                    long startTimeDecryption = System.nanoTime();
 
-                    new Thread(() -> eventListener.received(requestData)).start();
+                    Packet packet = (Packet) Server.socketList.get(ctx.channel()).decryptObject(requestData);
+                    Server.getLogger().info("Time to decrypt data was " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTimeDecryption) + "ms");
 
-                    ctx.flush();
-                    Thread.currentThread().interrupt();
-                }
-            } else if (msg instanceof ConnectedPacket) {
-                if (Server.socketList.containsKey(ctx.channel())) {
-                    new Thread(() -> eventListener.handleConnect((ConnectedPacket) msg)).start();
 
-                    ctx.flush();
-                    Thread.currentThread().interrupt();
+                    eventListener.received(packet);
+                    Server.getLogger().info("Time to handle data was " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime) + "ms");
+
+                } else if (msg instanceof ConnectedPacket) {
+
+                    //new Thread(() -> eventListener.handleConnect((ConnectedPacket) msg)).start();
+                    eventListener.handleConnect((ConnectedPacket) msg);
+
+                } else if (msg instanceof Packet) {
+                    long startTime = System.nanoTime();
+
+                    eventListener.received((Packet) msg);
+
+                    Server.getLogger().info("Time to handle data was " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime) + "ms");
                 }
             }
-
-
-
-
+        } finally {
+            ReferenceCountUtil.release(msg);
+        }
     }
 
     @Override

@@ -25,7 +25,7 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.*;
 
-public class MainGUI extends JFrame implements Serializable {
+public class MainGUI extends JFrame {
 
 
     private static final long serialVersionUID = 9179852473314806222L;
@@ -35,7 +35,7 @@ public class MainGUI extends JFrame implements Serializable {
     private JSpinner pin;
     private JSpinner selectedFrame;
     private JSpinner fps;
-    private JComboBox<String> whichpi;
+    private JComboBox<String> whichPi;
     private JTextField saveOpenPath;
     private JPanel panel;
     private JButton saveButton;
@@ -77,7 +77,7 @@ public class MainGUI extends JFrame implements Serializable {
     }
 
     private MainGUI() {
-        whichpi.addActionListener(new ActionListener() {
+        whichPi.addActionListener(new ActionListener() {
             /**
              * Invoked when an action occurs.
              *
@@ -85,7 +85,7 @@ public class MainGUI extends JFrame implements Serializable {
              */
             @Override
             public void actionPerformed(ActionEvent e) {
-                BoardType selectedPi = BoardType.valueOf(Objects.requireNonNull(whichpi.getSelectedItem()).toString());
+                BoardType selectedPi = BoardType.valueOf(Objects.requireNonNull(whichPi.getSelectedItem()).toString());
 
                 pinMax = allPins(selectedPi);
             }
@@ -94,10 +94,10 @@ public class MainGUI extends JFrame implements Serializable {
         List<BoardType> boardTypes = Arrays.asList(BoardType.values());
         System.out.println(boardTypes);
         for (BoardType boardType : boardTypes) {
-            whichpi.addItem(boardType.toString());
+            whichPi.addItem(boardType.toString());
         }
 
-        whichpi.setSelectedIndex(0);
+        whichPi.setSelectedIndex(0);
 
         for (int i = 0; i < pinDatas.length; i++) {
             PinData pinData = new PinData(i);
@@ -213,7 +213,7 @@ public class MainGUI extends JFrame implements Serializable {
                         LightParser.saveFolder(lightFolder, getSelectedPath());
                         List<String> strings = new ArrayList<>();
 
-                        BoardType selectedPi = BoardType.valueOf(Objects.requireNonNull(whichpi.getSelectedItem()).toString());
+                        BoardType selectedPi = BoardType.valueOf(Objects.requireNonNull(whichPi.getSelectedItem()).toString());
 
                         strings.add(gson.toJson(new Properties((Integer) fps.getValue(), selectedPi)));
 
@@ -434,7 +434,7 @@ public class MainGUI extends JFrame implements Serializable {
 
     private void handleProperties(Properties properties) {
         fps.setValue(properties.getFps());
-        whichpi.setSelectedItem(properties.getBoardType().toString());
+        whichPi.setSelectedItem(properties.getBoardType().toString());
     }
 
     private void checkButton(PinData.FrameData frameData) {
@@ -597,8 +597,8 @@ public class MainGUI extends JFrame implements Serializable {
         panel.add(spacer2, new GridConstraints(14, 1, 3, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         scrollPane = new JScrollPane();
         panel.add(scrollPane, new GridConstraints(0, 0, 14, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
-        actionList = new JList();
-        final DefaultListModel defaultListModel1 = new DefaultListModel();
+        actionList = new JList<>();
+        final DefaultListModel<String> defaultListModel1 = new DefaultListModel<String>();
         actionList.setModel(defaultListModel1);
         scrollPane.setViewportView(actionList);
         onButton = new JButton();
@@ -614,9 +614,9 @@ public class MainGUI extends JFrame implements Serializable {
         fps.setName(ResourceBundle.getBundle("strings").getString("fps"));
         fps.setToolTipText(ResourceBundle.getBundle("strings").getString("fps"));
         panel.add(fps, new GridConstraints(5, 4, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        whichpi = new JComboBox();
-        whichpi.setName(ResourceBundle.getBundle("strings").getString("pi.preset"));
-        panel.add(whichpi, new GridConstraints(9, 4, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        whichPi = new JComboBox<>();
+        whichPi.setName(ResourceBundle.getBundle("strings").getString("pi.preset"));
+        panel.add(whichPi, new GridConstraints(9, 4, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         saveOpenPath = new JTextField();
         panel.add(saveOpenPath, new GridConstraints(12, 4, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         saveButton = new JButton();
@@ -653,7 +653,7 @@ public class MainGUI extends JFrame implements Serializable {
         label1.setLabelFor(pin);
         label2.setLabelFor(selectedFrame);
         label3.setLabelFor(fps);
-        label4.setLabelFor(whichpi);
+        label4.setLabelFor(whichPi);
         label5.setLabelFor(saveOpenPath);
         statusText.setLabelFor(scrollPane);
     }

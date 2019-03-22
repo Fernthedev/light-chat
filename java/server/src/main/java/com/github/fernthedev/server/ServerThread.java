@@ -119,11 +119,17 @@ public class ServerThread implements Runnable {
                 registerTimeout++;
             }else registerTimeout = 0;
 
+            if(!clientPlayer.channel.isRegistered()) {
+                clientPlayer.close();
+                Server.closeThread(Thread.currentThread());
+            }
 
-            if(registerTimeout > 20) {
+
+            if(registerTimeout > 30) {
                 clientPlayer.sendObject(new TimedOutRegistration(),false);
 
                 clientPlayer.close();
+                Server.closeThread(Thread.currentThread());
             }
 
             if(secondsPassed >= 5) {
