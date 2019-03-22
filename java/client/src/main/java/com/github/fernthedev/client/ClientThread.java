@@ -147,7 +147,7 @@ public class ClientThread implements Runnable {
             b.option(ChannelOption.SO_KEEPALIVE, true);
             b.option(ChannelOption.TCP_NODELAY, true);
 
-            b.option(ChannelOption.SO_TIMEOUT, 2000);
+            b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 2000);
 
             b.handler(new ChannelInitializer<Channel>() {
 
@@ -274,6 +274,11 @@ public class ClientThread implements Runnable {
        // client.print("Checking for " + client.host + ":" + client.port + " socket " + channel);
         while (running && client.isCloseConsole()) {
             if (System.console() == null && !StaticHandler.isDebug) close();
+            try {
+                Thread.sleep(15);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
     }

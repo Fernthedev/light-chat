@@ -39,7 +39,11 @@ public class EventListener {
 
         } else if (p instanceof MessagePacket) {
             MessagePacket messagePacket = (MessagePacket) p;
-            client.getLogger().info(messagePacket.getMessage());
+
+            for(String s : messagePacket.getMessage()) {
+                client.getLogger().info(s.replaceAll("\n",""));
+            }
+
         } else if (p instanceof IllegalConnection) {
             client.getLogger().info(((IllegalConnection) p).getMessage());
         } else if (p instanceof RegisterPacket) {

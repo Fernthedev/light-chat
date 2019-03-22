@@ -4,6 +4,7 @@ import com.github.fernthedev.server.ClientPlayer;
 import com.github.fernthedev.server.Server;
 import com.github.fernthedev.universal.StaticHandler;
 import com.google.gson.Gson;
+import lombok.NonNull;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -19,8 +20,12 @@ public class BanManager {
 
     private List<BannedData> banned = new ArrayList<>();
 
-    public boolean isBanned(ClientPlayer clientPlayer) {
+    public boolean isBanned(@NonNull ClientPlayer clientPlayer) {
+        Server.getLogger().info("Checking ban for " + clientPlayer);
+        if(banned.isEmpty()) load();
+
         for(BannedData bannedData : banned) {
+            Server.getLogger().info("Checking " + clientPlayer.getAdress() + " data "+ bannedData);
             if(bannedData.getIp().equals(clientPlayer.getAdress())) {
                 Server.getLogger().info("Found banned " + bannedData.getIp());
                 return true;
@@ -43,14 +48,13 @@ public class BanManager {
     }
 
     public void addBan(ClientPlayer clientPlayer,BannedData bannedData) {
-        try {
-            FileWriter writer = new FileWriter(bansFile);
+        try(FileWriter writer = new FileWriter(bansFile)) {
+
             banned.add(bannedData);
 
             BannedData[] bannedList = banned.toArray(new BannedData[0]);
 
             writer.write(new Gson().toJson(bannedList));
-            writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

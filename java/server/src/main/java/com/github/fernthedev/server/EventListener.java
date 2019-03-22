@@ -6,7 +6,6 @@ import com.github.fernthedev.packets.latency.PongPacket;
 import com.github.fernthedev.server.event.chat.ChatEvent;
 import com.github.fernthedev.universal.StaticHandler;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
@@ -15,9 +14,8 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import static com.github.fernthedev.server.CommandHandler.commandList;
+import static com.github.fernthedev.server.CommandWorkerThread.commandList;
 
 public class EventListener {
 
@@ -41,22 +39,24 @@ public class EventListener {
             TestConnectPacket packet = (TestConnectPacket) p;
             Server.getLogger().info("Connected packet: " + packet.getMessage());
         } else if(p instanceof PongPacket) {
-
             clientPlayer.endTime = System.nanoTime();
 
-            clientPlayer.setDelayTime(TimeUnit.NANOSECONDS.toMillis(clientPlayer.endTime - clientPlayer.startTime));
-
-            Server.getLogger().info("Pong received and time was " + clientPlayer.getDelayTime());
+            clientPlayer.setDelayTime((clientPlayer.endTime - clientPlayer.startTime) / 1000000);
 
         } else if (p instanceof MessagePacket) {
             MessagePacket messagePacket = (MessagePacket) p;
 
+            StringBuilder message = new StringBuilder();
 
-            ChatEvent chatEvent = new ChatEvent(clientPlayer,messagePacket.getMessage(),false,true);
+            for(String s : messagePacket.getMessage()) {
+                message.append("\n").append(s);
+            }
+
+            ChatEvent chatEvent = new ChatEvent(clientPlayer, message.toString(),false,true);
             Server.getInstance().getPluginManager().callEvent(chatEvent);
 
             if(!chatEvent.isCancelled()) {
-                Server.sendMessage("[" + clientPlayer.getDeviceName() + "] :" + messagePacket.getMessage());
+                Server.sendMessage("[" + clientPlayer.getDeviceName() + "] :" + messagePacket.listToString());
             }
         } else if (p instanceof CommandPacket) {
 
@@ -107,7 +107,7 @@ public class EventListener {
 
 
                             if(!chatEvent.isCancelled()) {
-                                new Thread(new CommandHandler(clientPlayer, serverCommand, args)).start();
+                                new Thread(new CommandWorkerThread(clientPlayer, serverCommand, args),"CommandThread").start();
                             }
                             break;
                         }
@@ -138,8 +138,17 @@ public class EventListener {
         int id = 1;
 
         if(PlayerHandler.players.size() > 0) {
-            while(id < PlayerHandler.players.size()) {
+            /*while(id < PlayerHandler.players.size()) {
                 id++;
+            }*/
+            int lastId = 0;
+
+            for(int i = 0; i < PlayerHandler.players.size();i++) {
+                if(PlayerHandler.players.get(i) == null) {
+                    id = lastId+1;
+                }else{
+                    lastId = PlayerHandler.players.get(i).getId();
+                }
             }
         }
 
@@ -148,6 +157,7 @@ public class EventListener {
             return;
         }
 
+
         for(ClientPlayer player : PlayerHandler.players.values()) {
             if(player.getDeviceName().equalsIgnoreCase(packet.getName())) {
                 disconnectIllegalName(packet,"Name already in use");
@@ -155,11 +165,16 @@ public class EventListener {
             }
         }
 
+
+        /*
+        Server.getLogger().debug(server.getBanManager() + " is result");
+
         if(server.getBanManager().isBanned(clientPlayer)) {
+            Server.getLogger().debug("Player is banned " + clientPlayer.channel.remoteAddress());
             clientPlayer.sendObject(new MessagePacket("Your have been banned."),false);
             clientPlayer.close();
             return;
-        }
+        }*/
 
         clientPlayer.setClientUUID(packet.getUuid(),packet.getPrivateKey());
 
@@ -171,9 +186,10 @@ public class EventListener {
         clientPlayer.setId(id);
         clientPlayer.os = packet.getOS();
 
+
         PlayerHandler.players.put(clientPlayer.getId(), clientPlayer);
 
-        Server.getLogger().info("Password required: " + server.getSettingsManager().getSettings().isPasswordRequiredForLogin());
+      //  Server.getLogger().info("Password required: " + server.getSettingsManager().getSettings().isPasswordRequiredForLogin());
 
         if(server.getSettingsManager().getSettings().isPasswordRequiredForLogin()) {
             boolean authenticated = AuthenticationManager.authenticate(clientPlayer);
@@ -182,8 +198,6 @@ public class EventListener {
                 clientPlayer.close();
                 return;
             }
-
-            Validate.notNull(clientPlayer);
         }
 
         clientPlayer.registered = true;

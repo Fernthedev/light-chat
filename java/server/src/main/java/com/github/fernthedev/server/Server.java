@@ -25,6 +25,7 @@ import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 import lombok.Getter;
+import lombok.NonNull;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -34,17 +35,19 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
-import static com.github.fernthedev.server.CommandHandler.commandList;
+import static com.github.fernthedev.server.CommandWorkerThread.commandList;
 
 
 public class Server implements Runnable {
 
     private int port;
+
     private boolean running = false;
+
     private static Thread thread;
 
     private Console console;
@@ -58,9 +61,7 @@ public class Server implements Runnable {
         return console;
     }
 
-    public static Map<Channel,ClientPlayer> socketList = new HashMap<>();
-    public static Map<Channel,Server> channelServerHashMap = new HashMap<>();
-    private static List<ServerThread> serverThreads = new ArrayList<>();
+    public static ConcurrentMap<Channel,ClientPlayer> socketList = new ConcurrentHashMap<>();
     static List<Thread> serverInstanceThreads = new ArrayList<>();
 
     private static final Logger logger = Logger.getLogger(Server.class);
@@ -85,7 +86,6 @@ public class Server implements Runnable {
 
 
     private void await() {
-        Server server = this;
         new Thread(() -> {
             while (running) {
                 try {
@@ -93,10 +93,6 @@ public class Server implements Runnable {
 
                     future.channel().closeFuture().sync();
 
-
-                    if (future.channel().isActive() && future.channel().isRegistered()) {
-                        channelServerHashMap.put(future.channel(), server);
-                    }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -104,34 +100,27 @@ public class Server implements Runnable {
         },"AwaitThread");
     }
 
-    static synchronized void sendObjectToAllPlayers(Packet packet) {
-        for(Channel channel : socketList.keySet()) {
+    private static synchronized void sendObjectToAllPlayers(@NonNull Packet packet) {
+        new Thread(() -> {
+            for(ClientPlayer clientPlayer : socketList.values()) {
 
-            ClientPlayer clientPlayer = socketList.get(channel);
-
-            if (packet != null) {
-                if (clientPlayer.channel.isActive()) {
-                    clientPlayer.sendObject(packet);
+                if (packet != null) {
+                    if (clientPlayer.channel.isActive()) {
+                        clientPlayer.sendObject(packet);
+                    }
+                    clientPlayer.setLastPacket(packet);
+                } else {
+                    logger.info("not packet");
                 }
-                clientPlayer.setLastPacket(packet);
-            } else {
-                logger.info("not packet");
             }
-        }
+        }).start();
+
     }
 
 
     synchronized void shutdownServer() {
         running = false;
-        for (ServerThread thread : serverThreads) {
-            try {
-                Thread threadThing = thread.close(true);
 
-                if(threadThing != Thread.currentThread()) threadThing.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
         workerGroup.shutdownGracefully();
         bossGroup.shutdownGracefully();
         System.exit(0);
@@ -161,16 +150,16 @@ public class Server implements Runnable {
         processingHandler = new ProcessingHandler(this);
         workerGroup = new NioEventLoopGroup();
 
-        settingsManager = new SettingsManager(server,new File(SettingsManager.getCurrentPath(),"settings.json"));
+        settingsManager = new SettingsManager(server, new File(SettingsManager.getCurrentPath(), "settings.json"));
         settingsManager.setup();
 
         server.registerCommand(new Command("settings") {
             @Override
             public void onCommand(CommandSender sender, String[] args) {
 
-                if(args.length == 0) {
+                if (args.length == 0) {
                     sender.sendMessage("Possible args: set,get,reload,save");
-                }else {
+                } else {
                     boolean authenticated = AuthenticationManager.authenticate(sender);
                     if (authenticated) {
                         long timeStart;
@@ -236,17 +225,17 @@ public class Server implements Runnable {
 
         Class channelClass = NioServerSocketChannel.class;
 
-        if(settingsManager.getSettings().isUseNativeTransport()) {
-            if(SystemUtils.IS_OS_LINUX) {
+        if (settingsManager.getSettings().isUseNativeTransport()) {
+            if (SystemUtils.IS_OS_LINUX) {
                 bossGroup = new EpollEventLoopGroup();
                 workerGroup = new EpollEventLoopGroup();
 
                 channelClass = EpollServerSocketChannel.class;
             }
 
-            if(SystemUtils.IS_OS_MAC_OSX) {
+            if (SystemUtils.IS_OS_MAC_OSX) {
                 bossGroup = new KQueueEventLoopGroup();
-                workerGroup = new  KQueueEventLoopGroup();
+                workerGroup = new KQueueEventLoopGroup();
 
                 channelClass = KQueueServerSocketChannel.class;
             }
@@ -266,14 +255,16 @@ public class Server implements Runnable {
                     }
                 }).option(ChannelOption.SO_BACKLOG, 128)
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
-                .childOption(ChannelOption.TCP_NODELAY,true)
-        .childOption(ChannelOption.SO_TIMEOUT,5000);
+                .childOption(ChannelOption.TCP_NODELAY, true)
+                .childOption(ChannelOption.SO_TIMEOUT, 5000);
 
 
         running = true;
         logger.info("Server socket registered");
-        ServerBackground serverBackground = new ServerBackground(this);
-        new Thread(serverBackground,"ServerBackgroundThread").start();
+        ServerCommandHandler serverCommandHandler = new ServerCommandHandler(this);
+        new Thread(serverCommandHandler, "ServerBackgroundThread").start();
+
+        new Thread(new PlayerHandler(this),"PlayerHandlerThread").start();
         //Timer pingPongTimer = new Timer("pingpong");
 
 
@@ -285,14 +276,12 @@ public class Server implements Runnable {
         }
 
 
-
-
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            for (ServerThread serverThread : Server.serverThreads) {
-                if (serverThread.clientPlayer.channel.isOpen()) {
-                    Server.getLogger().info("Gracefully shutting down/");
+            for (ClientPlayer clientPlayer : socketList.values()) {
+                if (clientPlayer.channel.isOpen()) {
+                    Server.getLogger().info("Gracefully shutting down");
                     Server.sendObjectToAllPlayers(new LostServerConnectionPacket());
-                    serverThread.clientPlayer.close();
+                    clientPlayer.close();
                 }
             }
         }));
@@ -300,12 +289,12 @@ public class Server implements Runnable {
         try {
             logger.info("Server started successfully at localhost (Connect with " + InetAddress.getLocalHost().getHostAddress() + ") using port " + port);
         } catch (UnknownHostException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
 
         if (!future.isSuccess()) {
             logger.info("Failed to bind port");
-        }else{
+        } else {
             logger.info("Binded port on " + future.channel().localAddress());
         }
 
@@ -316,9 +305,9 @@ public class Server implements Runnable {
             e.printStackTrace();
         }*/
 
-        if(settingsManager.getSettings().isUseMulticast()) {
+        if (settingsManager.getSettings().isUseMulticast()) {
             try {
-                MulticastServer multicastServer = new MulticastServer("Multicast Thread",this);
+                MulticastServer multicastServer = new MulticastServer("Multicast Thread", this);
                 multicastServer.start();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -327,31 +316,30 @@ public class Server implements Runnable {
 
         pluginManager = new PluginManager();
 
-        AuthenticationManager authenticationManager = new AuthenticationManager("changepassword",settingsManager);
+        AuthenticationManager authenticationManager = new AuthenticationManager("changepassword", settingsManager);
         server.registerCommand(authenticationManager);
         server.getPluginManager().registerEvents(authenticationManager, new ServerPlugin());
 
         LoggerManager loggerManager = new LoggerManager();
 
 
-        banManager = new BanManager();
-        pluginManager.registerEvents(loggerManager,new ServerPlugin());
+        pluginManager.registerEvents(loggerManager, new ServerPlugin());
 
         logger.info("Running on [" + StaticHandler.os + "]");
 
-        if(StaticHandler.os.equalsIgnoreCase("Linux") || StaticHandler.os.contains("Linux") || StaticHandler.isLight) {
+        if (StaticHandler.os.equalsIgnoreCase("Linux") || StaticHandler.os.contains("Linux") || StaticHandler.isLight) {
             logger.info("Running LightManager (Note this is for raspberry pies only)");
-            Thread thread4 = new Thread(new LightManager(this,settingsManager),"LightManagerThread");
+            Thread thread4 = new Thread(new LightManager(this, settingsManager), "LightManagerThread");
             thread4.start();
-        }else{
+        } else {
             logger.info("Detected system is not linux. LightManager will not run (manual run with -lightmanager arg)");
         }
 
 
         await();
-        while(running) {
-            tick();
-        }
+
+        tick();
+
     }
 
 
@@ -380,7 +368,7 @@ public class Server implements Runnable {
         return port;
     }
 
-    public synchronized static Logger getLogger() {
+    public static synchronized Logger getLogger() {
         return logger;
     }
 
@@ -394,7 +382,9 @@ public class Server implements Runnable {
         return command;
     }
 
-    public BanManager getBanManager() {
+    public synchronized BanManager getBanManager() {
+        if(banManager == null) banManager = new BanManager();
+
         return banManager;
     }
 

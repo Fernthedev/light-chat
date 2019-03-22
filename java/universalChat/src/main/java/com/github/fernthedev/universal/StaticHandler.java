@@ -5,9 +5,7 @@ import com.google.gson.Gson;
 import lombok.Getter;
 import org.json.simple.JSONObject;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.Scanner;
@@ -46,6 +44,21 @@ public class StaticHandler {
         version = translateData.getVersion();
 
 
+    }
+
+    public static String readLine(String format)  {
+        if (System.console() != null) {
+            return System.console().readLine(format);
+        }
+        System.out.print(format);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(
+                System.in));
+        try {
+            return reader.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private class TranslateData {

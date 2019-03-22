@@ -8,6 +8,7 @@ import com.github.fernthedev.universal.StaticHandler;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.timeout.ReadTimeoutException;
 import lombok.Getter;
 
 import javax.crypto.Cipher;
@@ -46,12 +47,17 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
         Packet packet;
 
+      //  client.getLogger().info("Received " + msg);
+
         if(msg instanceof SealedObject) {
 
             SealedObject ob = (SealedObject) msg;
 
             //packet = (Packet) EncryptionHandler.decrypt(ob, client.getPrivateKey());
+            long startTime = System.nanoTime();
             packet = (Packet) client.getClientThread().decryptObject(ob);
+
+          //  client.getLogger().info("Decrypted object is " + packet + " took " + (System.nanoTime() - startTime) / 1000000 + "ms");
 
             listener.received(packet);
         }else if (msg instanceof Packet){
@@ -96,5 +102,16 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
         client.getLogger().info("Lost connection to server.");
         client.getClientThread().close();
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
+            throws Exception {
+        if(cause instanceof ReadTimeoutException) {
+            client.getLogger().info("Timed out connection");
+            client.getClientThread().close();
+        }else{
+            cause.printStackTrace();
+        }
     }
 }

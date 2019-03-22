@@ -6,7 +6,7 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.AlgorithmParameters;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -47,7 +47,7 @@ public class EncryptionHandler {
             cipher.init(Cipher.ENCRYPT_MODE, secret);
             AlgorithmParameters params = cipher.getParameters();
             byte[] iv = params.getParameterSpec(IvParameterSpec.class).getIV();
-            byte[] encryptedText = cipher.doFinal(plainText.getBytes("UTF-8"));
+            byte[] encryptedText = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
 
             // concatenate salt + iv + ciphertext
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -117,7 +117,7 @@ public class EncryptionHandler {
             byte[] plaintext = cipher.doFinal(ct);
 
             //logDecrypt(password, encryptedText);
-            return new String(plaintext, "UTF-8");
+            return new String(plaintext, StandardCharsets.UTF_8);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -167,31 +167,31 @@ public class EncryptionHandler {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             md.reset();
-            byte[] buffer = input.getBytes("UTF-8");
+            byte[] buffer = input.getBytes(StandardCharsets.UTF_8);
             md.update(buffer);
             byte[] digest = md.digest();
 
             StringBuilder hexStr = new StringBuilder();
-            for (int i = 0; i < digest.length; i++) {
-                hexStr.append(Integer.toString((digest[i] & 0xff) + 0x100, 16).substring(1));
+            for (byte b : digest) {
+                hexStr.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
             }
             return hexStr.toString();
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+        } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
         return null;
     }
 
     private static class DatatypeConverter {
-        public static String printBase64Binary(byte[] val) {
+        static String printBase64Binary(byte[] val) {
             return _printBase64Binary(val);
         }
 
-        public static String _printBase64Binary(byte[] input) {
+        static String _printBase64Binary(byte[] input) {
             return _printBase64Binary(input, 0, input.length);
         }
 
-        public static String _printBase64Binary(byte[] input, int offset, int len) {
+        static String _printBase64Binary(byte[] input, int offset, int len) {
             char[] buf = new char[((len + 2) / 3) * 4];
             int ptr = _printBase64Binary(input, offset, len, buf, 0);
             assert ptr == buf.length;
@@ -208,7 +208,7 @@ public class EncryptionHandler {
          *      the value of {@code ptr+((len+2)/3)*4}, which is the new offset
          *      in the output buffer where the further bytes should be placed.
          */
-        public static int _printBase64Binary(byte[] input, int offset, int len, char[] buf, int ptr) {
+        static int _printBase64Binary(byte[] input, int offset, int len, char[] buf, int ptr) {
             // encode elements until only 1 or 2 elements are left to encode
             int remaining = len;
             int i;
@@ -240,7 +240,7 @@ public class EncryptionHandler {
             return ptr;
         }
 
-        public static char encode(int i) {
+        static char encode(int i) {
             return encodeMap[i & 0x3F];
         }
 
@@ -264,7 +264,7 @@ public class EncryptionHandler {
             return map;
         }
 
-        public static byte[] parseBase64Binary(String lexicalXSDBase64Binary) {
+        static byte[] parseBase64Binary(String lexicalXSDBase64Binary) {
             return _parseBase64Binary(lexicalXSDBase64Binary);
         }
 
@@ -278,7 +278,7 @@ public class EncryptionHandler {
          *      A benchmark showed that taking {@link String} is faster, presumably
          *      because JIT can inline a lot of string access (with data of 1K chars, it was twice as fast)
          */
-        public static byte[] _parseBase64Binary(String text) {
+        static byte[] _parseBase64Binary(String text) {
             final int buflen = guessLength(text);
             final byte[] out = new byte[buflen];
             int o = 0;

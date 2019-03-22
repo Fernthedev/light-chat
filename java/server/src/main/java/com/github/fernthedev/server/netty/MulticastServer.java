@@ -45,6 +45,11 @@ public class MulticastServer  extends QuoteServerThread {
                 e.printStackTrace();
                 moreQuotes = false;
             }
+            try {
+                Thread.sleep(15);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         socket.close();
     }

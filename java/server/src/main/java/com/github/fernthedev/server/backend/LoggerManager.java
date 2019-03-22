@@ -62,6 +62,11 @@ public class LoggerManager implements Listener {
                     } catch (IOException e){
                         Server.getLogger().error(e.getMessage(),e.getCause());
                     }
+                    try {
+                        Thread.sleep(5);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }).start();
 

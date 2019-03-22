@@ -3,7 +3,7 @@ package com.github.fernthedev.server;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommandHandler implements Runnable {
+public class CommandWorkerThread implements Runnable {
 
     private final Command serverCommand;
     private final String[] args;
@@ -11,7 +11,7 @@ public class CommandHandler implements Runnable {
 
     static List<Command> commandList = new ArrayList<>();
 
-    public CommandHandler(CommandSender commandSender,Command command, String[] args) {
+    public CommandWorkerThread(CommandSender commandSender, Command command, String[] args) {
         this.serverCommand = command;
         this.args = args;
         this.commandSender = commandSender;

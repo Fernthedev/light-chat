@@ -8,14 +8,15 @@ import io.netty.channel.Channel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ServerThread implements Runnable {
+@Deprecated
+public class ServerThread {
 
 
     private boolean running;
 
     private boolean isConnected;
 
-    static List<ClientPlayer> socketList = new ArrayList<ClientPlayer>();
+    static List<ClientPlayer> socketList = new ArrayList<>();
 
     private Object lastPacket;
 
@@ -111,6 +112,7 @@ public class ServerThread implements Runnable {
 
     private int secondsPassed;
 
+    @Deprecated
     public void run() {
         int registerTimeout = 0;
         while (running) {

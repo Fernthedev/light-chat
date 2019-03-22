@@ -3,7 +3,10 @@ package com.github.fernthedev.server.netty;
 import com.github.fernthedev.packets.ConnectedPacket;
 import com.github.fernthedev.packets.Packet;
 import com.github.fernthedev.packets.RequestInfoPacket;
-import com.github.fernthedev.server.*;
+import com.github.fernthedev.server.ClientPlayer;
+import com.github.fernthedev.server.EventListener;
+import com.github.fernthedev.server.PlayerHandler;
+import com.github.fernthedev.server.Server;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
@@ -15,7 +18,6 @@ import javax.crypto.SealedObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @ChannelHandler.Sharable
 public class ProcessingHandler extends ChannelInboundHandlerAdapter {
@@ -29,10 +31,10 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
     public ProcessingHandler(Server server) {this.server = server;}
 
     @Override
-    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         ClientPlayer clientPlayer = Server.socketList.get(ctx.channel());
 
-        if(PlayerHandler.players.containsValue(clientPlayer)) {
+        if(PlayerHandler.players.containsValue(clientPlayer) && ctx.isRemoved()) {
 
 
             PlayerHandler.players.remove(clientPlayer.getId());
@@ -47,40 +49,28 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
             throws Exception {
 
         try {
-            EventListener eventListener = new EventListener(server, Server.socketList.get(ctx.channel()));
 
-            if (!Server.socketList.containsKey(ctx.channel())) {
-                // Discard the received data silently.
-                ((ByteBuf) msg).release();
-            } else {
-                if (msg instanceof SealedObject) {
+            EventListener eventListener = Server.socketList.get(ctx.channel()).getEventListener();
+
+            if(msg instanceof ConnectedPacket) {
+                eventListener.handleConnect((ConnectedPacket) msg);
+            }else {
+                if (!Server.socketList.containsKey(ctx.channel())) {
+                    // Discard the received data silently.
+                    ((ByteBuf) msg).release();
+                }else if (msg instanceof SealedObject) {
                     SealedObject requestData = (SealedObject) msg;
 
-
-                    //new Thread(() -> eventListener.received(requestData)).start();
-                    long startTime = System.nanoTime();
-                    long startTimeDecryption = System.nanoTime();
-
                     Packet packet = (Packet) Server.socketList.get(ctx.channel()).decryptObject(requestData);
-                    Server.getLogger().info("Time to decrypt data was " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTimeDecryption) + "ms");
-
 
                     eventListener.received(packet);
-                    Server.getLogger().info("Time to handle data was " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime) + "ms");
 
-                } else if (msg instanceof ConnectedPacket) {
-
-                    //new Thread(() -> eventListener.handleConnect((ConnectedPacket) msg)).start();
-                    eventListener.handleConnect((ConnectedPacket) msg);
 
                 } else if (msg instanceof Packet) {
-                    long startTime = System.nanoTime();
-
                     eventListener.received((Packet) msg);
-
-                    Server.getLogger().info("Time to handle data was " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime) + "ms");
                 }
             }
+
         } finally {
             ReferenceCountUtil.release(msg);
         }
@@ -112,30 +102,12 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         }
 
         if (channel != null) {
-            Server server = Server.channelServerHashMap.get(ctx.channel());
-
-            ClientPlayer clientPlayer = new ClientPlayer(channel,UUID.randomUUID());
+            ClientPlayer clientPlayer = new ClientPlayer(server,channel,UUID.randomUUID());
 
             //Server.getLogger().info("Registering " + clientPlayer.getNameAddress());
 
 
             Server.socketList.put(channel,clientPlayer);
-
-
-
-            EventListener listener = new EventListener(server, clientPlayer);
-
-
-            // And From your main() method or any other method
-            Thread runningFernThread;
-
-
-            ServerThread serverThread = new ServerThread(server, channel, clientPlayer, listener);
-
-            runningFernThread = new Thread(serverThread);
-            clientPlayer.setThread(serverThread);
-
-            runningFernThread.start();
 
             ctx.writeAndFlush(new RequestInfoPacket(clientPlayer.getServerKey()));
 

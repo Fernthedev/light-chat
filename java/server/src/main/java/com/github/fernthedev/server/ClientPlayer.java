@@ -1,5 +1,6 @@
 package com.github.fernthedev.server;
 
+import com.github.fernthedev.exceptions.DebugException;
 import com.github.fernthedev.packets.MessagePacket;
 import com.github.fernthedev.packets.Packet;
 import com.github.fernthedev.packets.latency.PingPacket;
@@ -10,7 +11,10 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
-import javax.crypto.*;
+import javax.crypto.Cipher;
+import javax.crypto.SealedObject;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.net.InetSocketAddress;
@@ -20,12 +24,12 @@ import java.util.UUID;
 import static com.github.fernthedev.server.Server.socketList;
 
 public class ClientPlayer implements CommandSender {
-
-    private ServerThread thread;
-
     private boolean connected;
 
     public boolean registered = false;
+
+    @Getter
+    private EventListener eventListener;
 
     public String os;
 
@@ -74,22 +78,18 @@ public class ClientPlayer implements CommandSender {
         return deviceName;
     }
 
-
-    public void setThread(ServerThread thread) {
-        this.thread = thread;
-    }
-
     public boolean isConnected() {
         return connected;
     }
 
-    public ClientPlayer(Channel channel,UUID uuid) {
+    public ClientPlayer(Server server,Channel channel, UUID uuid) {
         this.channel = channel;
         this.uuid = uuid;
 
         serverKey = EncryptionHandler.makeSHA256Hash(uuid.toString());
         decryptCipher = registerDecryptCipher(serverKey);
 
+        eventListener = new EventListener(server, this);
     }
 
     /**
@@ -158,6 +158,8 @@ public class ClientPlayer implements CommandSender {
     }
 
     public void close() {
+        new DebugException().printStackTrace();
+
         //DISCONNECT FROM SERVER
         Server.getLogger().info("Closing player " + this.toString());
 
@@ -167,13 +169,9 @@ public class ClientPlayer implements CommandSender {
 
 
             socketList.remove(channel);
-            Server.channelServerHashMap.remove(channel);
         }
 
         connected = false;
-        Thread threadThing = thread.shutdown();
-
-        Server.closeThread(threadThing);
         PlayerHandler.players.remove(getId());
 
         //serverSocket.close();

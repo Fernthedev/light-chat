@@ -2,6 +2,7 @@ package com.github.fernthedev.client;
 
 import com.github.fernthedev.packets.CommandPacket;
 import com.github.fernthedev.packets.MessagePacket;
+import com.github.fernthedev.universal.StaticHandler;
 
 import java.util.Scanner;
 
@@ -42,8 +43,14 @@ public class WaitForCommand implements Runnable {
             //  if (client.registered) {
 
             if (scanner.hasNextLine()) {
-                String message = scanner.nextLine();
+                String message = StaticHandler.readLine("> ");
                 sendMessage(message);
+            }
+
+            try {
+                Thread.sleep(15);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
             //   }
         }

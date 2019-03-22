@@ -74,14 +74,12 @@ artifacts/
 _Chutzpah*
 
 # Visual C++ cache files
-ipch/
 *.aps
 *.ncb
 *.opendb
 *.opensdf
 *.sdf
 *.cachefile
-*.VC.db
 *.VC.VC.opendb
 
 # Visual Studio profiler
@@ -259,3 +257,32 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+settings.json
+banned.json
+cpp/cpp.sln
+cpp/cpp/cpp.vcxproj
+cpp/cpp/libblink.so
+cpp/cpp/main.cpp
+cpp/cpp/main.h
+client-1.0-SNAPSHOT.jar
+java/client/src/main/resources/
+java/client/src/test/
+java/light-chat.iml
+java/pianimation/dependency-reduced-pom.xml
+java/pianimation/src/main/resources/
+java/pianimation/src/test/
+java/pianimation/target/
+java/server/src/main/resources/
+java/server/src/test/
+java/src/main/java/
+java/src/test/
+java/target/light-chat-1.0-SNAPSHOT-shaded.pom
+java/universalChat/dependency-reduced-pom.xml
+java/universalChat/src/test/
+java/universalChat/target/
+logs/
+server-1.0-SNAPSHOT.jar
+/java/client/dependency-reduced-pom.xml
+/java/client/target/
+/java/server/target/
+/java/server/dependency-reduced-pom.xml

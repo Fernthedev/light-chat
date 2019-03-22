@@ -4,22 +4,23 @@ package com.github.fernthedev.server;
 import com.github.fernthedev.packets.MessagePacket;
 import com.github.fernthedev.server.backend.BannedData;
 import com.github.fernthedev.server.event.chat.ChatEvent;
+import com.github.fernthedev.universal.StaticHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
-import static com.github.fernthedev.server.CommandHandler.commandList;
+import static com.github.fernthedev.server.CommandWorkerThread.commandList;
 
-public class ServerBackground implements Runnable {
+public class ServerCommandHandler implements Runnable {
 
     private Server server;
     private Scanner scanner;
 
     private boolean checked;
 
-    ServerBackground(Server server) {
+    ServerCommandHandler(Server server) {
         this.server = server;
         this.scanner = Main.scanner;
         checked = false;
@@ -37,7 +38,7 @@ public class ServerBackground implements Runnable {
                 Server.getLogger().info("Type Command: (try help)");
                 checked = true;
             }
-            String command = scanner.nextLine();
+            String command = StaticHandler.readLine(">");
 
             String[] checkmessage = command.split(" ", 2);
             List<String> messageword = new ArrayList<>();
@@ -86,7 +87,7 @@ public class ServerBackground implements Runnable {
 
                             if(!chatEvent.isCancelled()) {
 
-                                new Thread(new CommandHandler(server.getConsole(), serverCommand, args)).start();
+                                new Thread(new CommandWorkerThread(server.getConsole(), serverCommand, args)).start();
                             }
                             break;
                         }
@@ -140,7 +141,7 @@ public class ServerBackground implements Runnable {
 
                         String message = argString.toString();
 
-                        Server.sendMessage(message);
+                        Server.sendMessage("[Server] :" + message);
                     } else {
                         sender.sendMessage("No message?");
                     }
@@ -174,13 +175,17 @@ public class ServerBackground implements Runnable {
                 }
 
                 if (sender instanceof ClientPlayer) {
-                    sender.sendMessage("Players: (" + (PlayerHandler.players.size() - 1) + ")");
+                    String message = "Players: (" + (PlayerHandler.players.size() - 1) + ")";
 
                     for (ClientPlayer clientPlayer : new HashMap<>(Server.socketList).values()) {
                         if (clientPlayer == null) continue;
 
-                        sender.sendMessage(clientPlayer.getDeviceName() + " :" + clientPlayer.getId() + " Ping:" + clientPlayer.getDelayTime() + "ms");
+                        message = "\n" + clientPlayer.getDeviceName() + " :" + clientPlayer.getId() + " Ping:" + clientPlayer.getDelayTime() + "ms";
+
+                       // sender.sendMessage(clientPlayer.getDeviceName() + " :" + clientPlayer.getId() + " Ping:" + clientPlayer.getDelayTime() + "ms");
                     }
+
+                    sender.sendMessage(message);
                 }
             }
 
@@ -295,7 +300,9 @@ public class ServerBackground implements Runnable {
         }).setUsage("Shows list of commands or usage of a command");
 
 
+
     }
+
     
     
 }
