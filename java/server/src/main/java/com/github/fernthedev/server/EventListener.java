@@ -46,17 +46,13 @@ public class EventListener {
         } else if (p instanceof MessagePacket) {
             MessagePacket messagePacket = (MessagePacket) p;
 
-            StringBuilder message = new StringBuilder();
 
-            for(String s : messagePacket.getMessage()) {
-                message.append("\n").append(s);
-            }
 
-            ChatEvent chatEvent = new ChatEvent(clientPlayer, message.toString(),false,true);
+            ChatEvent chatEvent = new ChatEvent(clientPlayer, messagePacket.getMessage(),false,true);
             Server.getInstance().getPluginManager().callEvent(chatEvent);
 
             if(!chatEvent.isCancelled()) {
-                Server.sendMessage("[" + clientPlayer.getDeviceName() + "] :" + messagePacket.listToString());
+                Server.sendMessage("[" + clientPlayer.getDeviceName() + "] :" + messagePacket.getMessage());
             }
         } else if (p instanceof CommandPacket) {
 
