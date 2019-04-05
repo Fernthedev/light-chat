@@ -121,6 +121,7 @@ public class ClientThread implements Runnable {
     }
 
     public void connect() {
+        IOSCheck osCheck = client.getOsCheck();
         client.getLogger().info("Connecting to server.");
 
         Bootstrap b = new Bootstrap();
@@ -128,13 +129,13 @@ public class ClientThread implements Runnable {
 
         Class channelClass = NioSocketChannel.class;
 
-        if (SystemUtils.IS_OS_LINUX) {
+        if (SystemUtils.IS_OS_LINUX && osCheck.runNatives()) {
             workerGroup = new EpollEventLoopGroup();
 
             channelClass = EpollSocketChannel.class;
         }
 
-        if (SystemUtils.IS_OS_MAC_OSX) {
+        if (SystemUtils.IS_OS_MAC_OSX && osCheck.runNatives()) {
             workerGroup = new KQueueEventLoopGroup();
 
             channelClass = KQueueSocketChannel.class;

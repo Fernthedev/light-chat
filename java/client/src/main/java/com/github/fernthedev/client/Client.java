@@ -19,6 +19,9 @@ public class Client {
 
     private static Logger logger;
 
+    @Getter
+    protected IOSCheck osCheck;
+
     public int port;
     public String host;
 
@@ -58,6 +61,7 @@ public class Client {
         this.host = host;
         this.scanner = Main.scanner;
 
+        registerOSCheck();
         registerLogger();
 
 
@@ -75,7 +79,6 @@ public class Client {
 
 
         currentThread = new Thread(clientThread,"MainThread");
-
     }
 
     protected void getProperties() {
@@ -93,6 +96,10 @@ public class Client {
 
         clientThread.connect();
 
+    }
+
+    protected void registerOSCheck() {
+        osCheck = new DesktopOSCheck();
     }
 
     protected void registerLogger() {
