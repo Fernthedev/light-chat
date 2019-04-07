@@ -1,6 +1,7 @@
 package com.github.fernthedev.server;
 
 import com.github.fernthedev.packets.Packet;
+import com.github.fernthedev.server.command.CommandSender;
 
 import java.io.Serializable;
 

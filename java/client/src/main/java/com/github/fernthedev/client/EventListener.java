@@ -1,13 +1,13 @@
 package com.github.fernthedev.client;
 
+import com.github.fernthedev.AutoCompletePacket;
+import com.github.fernthedev.client.backend.AutoCompleteHandler;
 import com.github.fernthedev.packets.*;
 import com.github.fernthedev.packets.latency.PingPacket;
 import com.github.fernthedev.packets.latency.PingReceive;
 import com.github.fernthedev.packets.latency.PongPacket;
 import com.github.fernthedev.universal.EncryptionHandler;
 import org.apache.commons.lang3.Validate;
-
-import java.util.concurrent.TimeUnit;
 
 public class EventListener {
 
@@ -35,7 +35,7 @@ public class EventListener {
 
             ClientThread.miliPingDelay = ClientThread.endTime - ClientThread.startTime;
 
-            client.getLogger().debug("Ping: " + TimeUnit.NANOSECONDS.toMillis(ClientThread.miliPingDelay) + "ms");
+            client.getLogger().debug("Ping: " +(ClientThread.miliPingDelay / 1000000) + "ms");
 
         } else if (p instanceof MessagePacket) {
             MessagePacket messagePacket = (MessagePacket) p;
@@ -51,6 +51,7 @@ public class EventListener {
             RequestInfoPacket packet = (RequestInfoPacket) p;
 
             client.setServerKey(packet.getKey());
+            client.getClientThread().setEncryptCipher(client.getClientThread().registerEncryptCipher(client.getServerKey()));
 
             String pass = EncryptionHandler.makeSHA256Hash(client.getUuid().toString());
 
@@ -78,6 +79,9 @@ public class EventListener {
         }else if(p instanceof TimedOutRegistration) {
             client.getLogger().info("Timed out on registering.");
             client.getClientThread().close();
+        } else if(p instanceof AutoCompletePacket) {
+            AutoCompletePacket packet = (AutoCompletePacket) p;
+            AutoCompleteHandler.addCandidates(packet.getCandidateList());
         }
     }
 

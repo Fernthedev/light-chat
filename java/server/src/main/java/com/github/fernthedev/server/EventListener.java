@@ -1,11 +1,14 @@
 package com.github.fernthedev.server;
 
+import com.github.fernthedev.AutoCompletePacket;
 import com.github.fernthedev.light.AuthenticationManager;
 import com.github.fernthedev.packets.*;
 import com.github.fernthedev.packets.latency.PongPacket;
+import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.event.chat.ChatEvent;
 import com.github.fernthedev.universal.StaticHandler;
 import org.apache.commons.lang3.StringUtils;
+import org.jline.reader.Candidate;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
@@ -112,6 +115,11 @@ public class EventListener {
                     Server.getLogger().error(e.getMessage(),e.getCause());
                 }
             }
+        }else if (p instanceof AutoCompletePacket) {
+            AutoCompletePacket packet = (AutoCompletePacket) p;
+            List<Candidate> candidates = server.getAutoCompleteHandler().handleLine(packet.getLine());
+            packet.setCandidateList(candidates);
+            clientPlayer.sendObject(packet);
         }
 
     }

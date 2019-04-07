@@ -1,11 +1,19 @@
 package com.github.fernthedev.light;
 
 import com.github.fernthedev.server.*;
+import com.github.fernthedev.server.command.Command;
+import com.github.fernthedev.server.command.CommandSender;
 import com.pi4j.io.gpio.*;
-import com.pi4j.util.CommandArgumentParser;
+import com.pi4j.io.gpio.exception.GpioPinExistsException;
+import com.pi4j.system.SystemInfo;
+import lombok.Getter;
+import lombok.NonNull;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LightManager implements Runnable{
 
@@ -13,9 +21,12 @@ public class LightManager implements Runnable{
     private GpioPinDigitalOutput output;
 
     private GpioController gpio;
-    private RunLight runLight;
 
+    @Getter
+    private Map<@NonNull Pin,@NonNull GpioPinData> pinDataMap = new HashMap<>();
 
+    @Getter
+    private Pin[] pins;
 
     private Settings settings;
     private SettingsManager settingsManager;
@@ -24,6 +35,25 @@ public class LightManager implements Runnable{
     public LightManager(Server server,SettingsManager settingsManager) {
         this.server = server;
         this.settingsManager = settingsManager;
+
+        gpio = GpioFactory.getInstance();
+
+        try {
+            pins = RaspiPin.allPins(SystemInfo.getBoardType());
+        } catch (IOException | InterruptedException e) {
+            Server.getLogger().error(e.getMessage(),e);
+        }
+
+        try {
+            if (pins != null) {
+                for (Pin pin : pins) {
+
+                    pinDataMap.put(pin,new GpioPinData(gpio.provisionDigitalOutputPin(pin, "LightManager"+pin.getName(), PinState.HIGH), pin, pin.getAddress()));
+                }
+            }
+        } catch (GpioPinExistsException e) {
+            Server.getLogger().info("Unable to check " + e.getMessage());
+        }
     }
 
     @Override
@@ -31,26 +61,10 @@ public class LightManager implements Runnable{
         try {
         // create gpio controller
             Server.getLogger().info("Loading pi4j java");
-            gpio = GpioFactory.getInstance();
-            // lookup the pin by address
-            Pin pin = CommandArgumentParser.getPin(
-                    RaspiPin.class,    // pin provider class to obtain pin instance from
-                    RaspiPin.GPIO_06);             // argument array to search in
-            // We are using PIN 06 as per the attached diagram
-            output = gpio.provisionDigitalOutputPin(pin, "My Output", PinState.HIGH);
-            // switch ON
-            output.high();
-            // switch OFF
-            output.low();
 
-            runLight = value -> {
-                if(value) {
-                    output.high();
-                }
-                if(!value) {
-                    output.low();
-                }
-            };
+
+
+
         } catch (UnsatisfiedLinkError | Exception e) {
             Server.getLogger().error(e.getMessage(), e.getCause());
         }
@@ -72,15 +86,16 @@ public class LightManager implements Runnable{
                     if (authenticated) {
                         String arg = args[0];
 
-                        switch (arg.toLowerCase()) {
-                            case "off":
-                                setOff();
-                                sender.sendMessage("Set light to off");
-                                break;
-                            case "on":
-                                setOn();
-                                sender.sendMessage("Set light to on");
-                                break;
+                        if(arg.matches("[0-9]+")) {
+                            int pinInt = Integer.parseInt(arg);
+
+                            if(args.length < 1) {
+                                return;
+                            }
+
+
+
+                        }else switch (arg.toLowerCase()) {
                             case "readfolder":
                                 if(args.length > 1) {
                                     String path = args[1];
@@ -145,14 +160,39 @@ public class LightManager implements Runnable{
         return settings;
     }
 
-    public void setOn() {
-        runLight.setLightValue(true);
+    public GpioPinData getDataFromInt(int pinInt) {
+
+        @NonNull Pin pin = getPinFromInt(pinInt);
+
+
+        Server.getLogger().info(pin);
+
+        if(getPinDataMap().get(pin) == null) {
+            getPinDataMap().put(pin,new GpioPinData(gpio.provisionDigitalOutputPin(pin, "GPIOData"+pinInt, PinState.HIGH), pin, pinInt));
+        }
+
+
+        // Server.getLogger().info("CHecked " + lightManager.getPinDataMap().get(pin));
+        //  Server.getLogger().info("List: " + lightManager.getPinDataMap().keySet().toString());
+
+        return getPinDataMap().get(pin);
     }
 
-    public void setOff() {
-        runLight.setLightValue(false);
+    /**
+     * Gets pin from int
+     * @param pin The pin int
+     * @return The pin instance, null if none found (different raspberry pies have different amount of pins)
+     */
+    private Pin getPinFromInt(int pin) {
+        return RaspiPin.getPinByAddress(pin);
+        /*
+        for(int i =0; i < pins.length;i++) {
+            if(pin == i) {
+                return pins[i];
+            }
+        }*/
+
+        //return null;
     }
-
-
 
 }

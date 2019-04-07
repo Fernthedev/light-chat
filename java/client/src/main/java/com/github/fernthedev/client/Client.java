@@ -1,5 +1,7 @@
 package com.github.fernthedev.client;
 
+import com.github.fernthedev.client.backend.AutoCompleteHandler;
+import com.github.fernthedev.universal.StaticHandler;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -63,6 +65,8 @@ public class Client {
 
         registerOSCheck();
         registerLogger();
+
+        StaticHandler.setupTerminal(new AutoCompleteHandler(this),logger);
 
 
         try {

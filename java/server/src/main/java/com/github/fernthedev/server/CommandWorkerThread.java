@@ -1,5 +1,8 @@
 package com.github.fernthedev.server;
 
+import com.github.fernthedev.server.command.Command;
+import com.github.fernthedev.server.command.CommandSender;
+
 import java.util.ArrayList;
 import java.util.List;
 

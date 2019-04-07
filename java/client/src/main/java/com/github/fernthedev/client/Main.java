@@ -156,6 +156,8 @@ public class Main {
     }
 
     private static String readLine(String message) {
+        //return StaticHandler.readLine(message);
+
         if (!(message == null || message.equals(""))) {
             System.out.println(message);
         }
@@ -165,6 +167,15 @@ public class Main {
     }
 
     private static int readInt(String message) {
+        /*String v = StaticHandler.readLine(message);
+
+        if(v.matches("[0-9]+")) {
+            return Integer.parseInt(v);
+        }else{
+            System.err.println("Not a number");
+            return readInt(message);
+        }*/
+
         if (!(message == null || message.equals(""))) {
             System.out.println(message);
         }

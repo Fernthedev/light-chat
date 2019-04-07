@@ -4,6 +4,8 @@ import com.github.fernthedev.packets.FillPasswordPacket;
 import com.github.fernthedev.server.*;
 import com.github.fernthedev.server.backend.BannedData;
 import com.github.fernthedev.server.backend.LoggerManager;
+import com.github.fernthedev.server.command.Command;
+import com.github.fernthedev.server.command.CommandSender;
 import com.github.fernthedev.server.event.EventHandler;
 import com.github.fernthedev.server.event.Listener;
 import com.github.fernthedev.server.event.chat.ChatEvent;

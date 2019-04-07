@@ -1,6 +1,6 @@
 package com.github.fernthedev.server.event.chat;
 
-import com.github.fernthedev.server.CommandSender;
+import com.github.fernthedev.server.command.CommandSender;
 import com.github.fernthedev.server.event.Cancellable;
 import com.github.fernthedev.server.event.Event;
 import com.github.fernthedev.server.event.HandlerList;

@@ -1,6 +1,6 @@
 package com.github.fernthedev.light;
 
-import com.github.fernthedev.server.CommandSender;
+import com.github.fernthedev.server.command.CommandSender;
 
 public class PlayerInfo {
 

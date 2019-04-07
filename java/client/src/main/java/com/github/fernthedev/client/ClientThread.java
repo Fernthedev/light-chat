@@ -3,7 +3,6 @@ package com.github.fernthedev.client;
 import com.github.fernthedev.client.netty.ClientHandler;
 import com.github.fernthedev.exceptions.DebugException;
 import com.github.fernthedev.packets.Packet;
-import com.github.fernthedev.universal.EncryptionHandler;
 import com.github.fernthedev.universal.StaticHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -25,6 +24,7 @@ import javax.crypto.*;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
+import java.io.Serializable;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -65,6 +65,10 @@ public class ClientThread implements Runnable {
     @Setter
     private Cipher decryptCipher;
 
+    @Getter
+    @Setter
+    private Cipher encryptCipher;
+
     public Object decryptObject(SealedObject sealedObject) {
         if (decryptCipher == null)
             throw new IllegalArgumentException("Register cipher with registerDecryptCipher() first");
@@ -89,6 +93,36 @@ public class ClientThread implements Runnable {
             cipher.init(Cipher.DECRYPT_MODE, secret);
             return cipher;
         } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | InvalidKeySpecException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public SealedObject encryptObject(Serializable object) {
+        try {
+            if (encryptCipher == null)
+                throw new IllegalArgumentException("Register cipher with registerEncryptCipher() first");
+
+            return new SealedObject(object, encryptCipher);
+        } catch (IOException | IllegalBlockSizeException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Cipher registerEncryptCipher(String password) {
+        try {
+            byte[] salt = new byte[16];
+
+            SecretKeyFactory factory = SecretKeyFactory.getInstance(StaticHandler.getKeyFactoryString());
+            KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 256);
+            SecretKey tmp = factory.generateSecret(spec);
+            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKeySpecTransformation());
+
+            Cipher cipher = Cipher.getInstance(StaticHandler.getObjecrCipherTrans());
+            cipher.init(Cipher.ENCRYPT_MODE, secret);
+            return cipher;
+        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException e) {
             e.printStackTrace();
         }
         return null;
@@ -198,13 +232,14 @@ public class ClientThread implements Runnable {
         if (packet != null) {
 
             if (encrypt) {
-                SealedObject sealedObject = EncryptionHandler.encrypt(packet, client.getServerKey());
+                SealedObject sealedObject = encryptObject(packet);
 
                 channel.writeAndFlush(sealedObject);
-
             } else {
                 channel.writeAndFlush(packet);
             }
+
+
 
         } else {
             client.getLogger().info("not packet");

@@ -62,6 +62,10 @@ public class LightParser {
 
         LightLine lightLine = null;
 
+        if(file.isDirectory()) {
+            return null;
+        }
+
         try (Source fileSource = Okio.source(file);
              BufferedSource bufferedSource = Okio.buffer(fileSource)) {
             while (true) {

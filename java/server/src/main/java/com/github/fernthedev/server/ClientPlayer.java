@@ -1,9 +1,9 @@
 package com.github.fernthedev.server;
 
-import com.github.fernthedev.exceptions.DebugException;
 import com.github.fernthedev.packets.MessagePacket;
 import com.github.fernthedev.packets.Packet;
 import com.github.fernthedev.packets.latency.PingPacket;
+import com.github.fernthedev.server.command.CommandSender;
 import com.github.fernthedev.universal.EncryptionHandler;
 import com.github.fernthedev.universal.StaticHandler;
 import io.netty.channel.Channel;
@@ -11,13 +11,15 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
-import javax.crypto.Cipher;
-import javax.crypto.SealedObject;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
+import javax.crypto.*;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.IOException;
+import java.io.Serializable;
 import java.net.InetSocketAddress;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.UUID;
 
@@ -50,6 +52,7 @@ public class ClientPlayer implements CommandSender {
         this.clientUUID = uuid;
 
         this.clientKey = EncryptionHandler.decrypt(privateKey,serverKey);
+        encryptCipher = registerEncryptCipher(clientKey);
     }
 
 
@@ -69,6 +72,10 @@ public class ClientPlayer implements CommandSender {
     @Setter
     @Getter
     private long delayTime = -1;
+
+    @Getter
+    @Setter
+    private Cipher encryptCipher;
 
     @Getter
     @Setter
@@ -111,15 +118,15 @@ public class ClientPlayer implements CommandSender {
             // Create cipher
             Cipher cipher = Cipher.getInstance(StaticHandler.getCipherTransformation());
             cipher.init(Cipher.ENCRYPT_MODE, sks);*/
-
         if (encrypt) {
-            SealedObject sealedObject = EncryptionHandler.encrypt(packet, clientKey);
-
+            SealedObject sealedObject = encryptObject(packet);
 
             channel.writeAndFlush(sealedObject);
         } else {
             channel.writeAndFlush(packet);
         }
+
+
     }
 
     public Cipher registerDecryptCipher(String key) {
@@ -136,6 +143,36 @@ public class ClientPlayer implements CommandSender {
             decryptCipher = cipher;
             return cipher;
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Cipher registerEncryptCipher(String password) {
+        try {
+            byte[] salt = new byte[16];
+
+            SecretKeyFactory factory = SecretKeyFactory.getInstance(StaticHandler.getKeyFactoryString());
+            KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 256);
+            SecretKey tmp = factory.generateSecret(spec);
+            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKeySpecTransformation());
+
+            Cipher cipher = Cipher.getInstance(StaticHandler.getObjecrCipherTrans());
+            cipher.init(Cipher.ENCRYPT_MODE, secret);
+            return cipher;
+        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public SealedObject encryptObject(Serializable object) {
+        try {
+            if (encryptCipher == null)
+                throw new IllegalArgumentException("Register cipher with registerEncryptCipher() first");
+
+            return new SealedObject(object, encryptCipher);
+        } catch (IOException | IllegalBlockSizeException e) {
             e.printStackTrace();
         }
         return null;
@@ -158,7 +195,6 @@ public class ClientPlayer implements CommandSender {
     }
 
     public void close() {
-        new DebugException().printStackTrace();
 
         //DISCONNECT FROM SERVER
         Server.getLogger().info("Closing player " + this.toString());

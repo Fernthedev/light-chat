@@ -5,14 +5,11 @@ import com.github.fernthedev.light.api.LightParser;
 import com.github.fernthedev.light.api.lines.LightPinLine;
 import com.github.fernthedev.light.api.lines.LightPrintLine;
 import com.github.fernthedev.light.api.lines.LightSleepLine;
-import com.github.fernthedev.light.exceptions.LightFileParseException;
 import com.github.fernthedev.light.api.lines.LightLine;
 import com.github.fernthedev.server.Server;
 import com.pi4j.io.gpio.*;
 import com.pi4j.io.gpio.exception.GpioPinExistsException;
 import com.pi4j.system.SystemInfo;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NonNull;
 import org.apache.commons.io.FilenameUtils;
 
@@ -20,46 +17,27 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class LightFileFormatter {
 
     private LightManager lightManager;
 
-    private Pin[] pins;
 
-    private Map<@NonNull Pin,@NonNull GpioPinData> pinDataMap = new HashMap<>();
+
+
 
 
     private GpioController gpio;
 
-    {
-        try {
-            pins = RaspiPin.allPins(SystemInfo.getBoardType());
-        } catch (IOException | InterruptedException e) {
-            Server.getLogger().error(e.getMessage(),e);
-        }
 
-    }
 
     public LightFileFormatter(LightManager lightManager, GpioController gpio) {
         this.lightManager = lightManager;
         this.gpio = gpio;
 
-        try {
-            pins = RaspiPin.allPins(SystemInfo.getBoardType());
-        } catch (IOException | InterruptedException e) {
-            Server.getLogger().error(e.getMessage(),e);
-        }
 
-        try {
-            for (Pin pin : pins) {
 
-                pinDataMap.put(pin,new GpioPinData(gpio.provisionDigitalOutputPin(pin, "FileReaderOutput", PinState.HIGH), pin, pin.getAddress()));
-            }
-        } catch (GpioPinExistsException e) {
-            Server.getLogger().info("Unable to check " + e.getMessage());
-        }
+
     }
 
     public void readFormatFile(File file) {
@@ -67,6 +45,11 @@ public class LightFileFormatter {
             GpioPinDigitalOutput output;
 
             LightFile lightFile = LightParser.parseFile(file);
+
+            if(lightFile == null) {
+                Server.getLogger().info("That is a direcotry, use readfolder");
+                return;
+            }
 
             for(LightLine curLine : lightFile.getLineList()) {
                 if (curLine instanceof LightPrintLine) {
@@ -86,7 +69,7 @@ public class LightFileFormatter {
                 if (curLine instanceof LightPinLine) {
                     LightPinLine pinLine = (LightPinLine) curLine;
                     if (pinLine.isAllPins()) {
-                        for (GpioPinData pin : pinDataMap.values()) {
+                        for (GpioPinData pin : lightManager.getPinDataMap().values()) {
 
                             output = pin.getOutput();
 
@@ -98,7 +81,10 @@ public class LightFileFormatter {
                             }
                         }
                     }else{
-                        output = getDataFromInt(pinLine.getPin()).getOutput();
+                        output = lightManager.getDataFromInt(pinLine.getPin()).getOutput();
+
+                        Server.getLogger().info(lightManager.getDataFromInt(pinLine.getPin()).getPin().getName() + ":" + pinLine.isToggle());
+                        Server.getLogger().info(output.getPin().getName() + " is the pin");
 
                         if (pinLine.isToggle()) {
                             output.high();
@@ -132,40 +118,8 @@ public class LightFileFormatter {
         }
     }
 
-    /**
-     * Gets pin from int
-     * @param pin The pin int
-     * @return The pin instance, null if none found (different raspberry pies have different amount of pins)
-     */
-    private Pin getPinFromInt(int pin) {
-        for(int i =0; i < pins.length;i++) {
-            if(pin == i) {
-                return pins[i];
-            }
-        }
-        return null;
-    }
 
-    private GpioPinData getDataFromInt(int pinInt) {
-        Pin pin = getPinFromInt(pinInt);
 
-        if(pinDataMap.get(pin) == null) {
-            pinDataMap.put(pin,new GpioPinData(gpio.provisionDigitalOutputPin(pin, "FileReaderOutput", PinState.HIGH), pin, pin.getAddress()));
-        }
 
-       // Server.getLogger().info("CHecked " + pinDataMap.get(pin));
-      //  Server.getLogger().info("List: " + pinDataMap.keySet().toString());
 
-        return pinDataMap.get(pin);
-    }
-
-    @Data
-    @AllArgsConstructor
-    private class GpioPinData {
-        @NonNull
-        private GpioPinDigitalOutput output;
-        private Pin pin;
-
-        private int pinInt;
-    }
 }

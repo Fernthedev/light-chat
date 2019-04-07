@@ -6,8 +6,11 @@ import com.github.fernthedev.light.SettingsManager;
 import com.github.fernthedev.packets.LostServerConnectionPacket;
 import com.github.fernthedev.packets.MessagePacket;
 import com.github.fernthedev.packets.Packet;
+import com.github.fernthedev.server.backend.AutoCompleteHandler;
 import com.github.fernthedev.server.backend.BanManager;
 import com.github.fernthedev.server.backend.LoggerManager;
+import com.github.fernthedev.server.command.Command;
+import com.github.fernthedev.server.command.CommandSender;
 import com.github.fernthedev.server.event.chat.ServerPlugin;
 import com.github.fernthedev.server.netty.MulticastServer;
 import com.github.fernthedev.server.netty.ProcessingHandler;
@@ -24,6 +27,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.SystemUtils;
@@ -57,6 +61,9 @@ public class Server implements Runnable {
     @Getter
     private SettingsManager settingsManager;
 
+    @Getter(AccessLevel.PACKAGE)
+    private AutoCompleteHandler autoCompleteHandler;
+
     public Console getConsole() {
         return console;
     }
@@ -77,6 +84,8 @@ public class Server implements Runnable {
         this.port = port;
         console = new Console();
         this.server = this;
+        autoCompleteHandler = new AutoCompleteHandler(this);
+        StaticHandler.setupTerminal(autoCompleteHandler,logger);
     }
 
     public static Server getInstance() {
@@ -261,6 +270,8 @@ public class Server implements Runnable {
 
         running = true;
         logger.info("Server socket registered");
+
+
         ServerCommandHandler serverCommandHandler = new ServerCommandHandler(this);
         new Thread(serverCommandHandler, "ServerBackgroundThread").start();
 
@@ -386,6 +397,10 @@ public class Server implements Runnable {
         if(banManager == null) banManager = new BanManager();
 
         return banManager;
+    }
+
+    public List<Command> getCommands() {
+        return commandList;
     }
 
     public PluginManager getPluginManager() {

@@ -3,8 +3,12 @@ package com.github.fernthedev.server;
 
 import com.github.fernthedev.packets.MessagePacket;
 import com.github.fernthedev.server.backend.BannedData;
+import com.github.fernthedev.server.command.Command;
+import com.github.fernthedev.server.command.CommandSender;
+import com.github.fernthedev.server.command.commands.KickCommand;
 import com.github.fernthedev.server.event.chat.ChatEvent;
 import com.github.fernthedev.universal.StaticHandler;
+import org.jline.reader.UserInterruptException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,12 +22,15 @@ public class ServerCommandHandler implements Runnable {
     private Server server;
     private Scanner scanner;
 
+
+
     private boolean checked;
 
     ServerCommandHandler(Server server) {
         this.server = server;
         this.scanner = Main.scanner;
         checked = false;
+
         Server.getLogger().info("Wait for command thread created");
     }
 
@@ -31,75 +38,77 @@ public class ServerCommandHandler implements Runnable {
     public void run() {
         registerCommands();
 
-        while (server.isRunning()) {
-            boolean scannerChecked = false;
-            //if (scanner.hasNextLine()) {
-            if (!checked) {
-                Server.getLogger().info("Type Command: (try help)");
-                checked = true;
-            }
-            String command = StaticHandler.readLine(">");
-
-            String[] checkmessage = command.split(" ", 2);
-            List<String> messageword = new ArrayList<>();
-
-
-            if (checkmessage.length > 1) {
-                String [] messagewordCheck = command.split(" ");
-
-                int index = 0;
-
-
-
-                for(String message : messagewordCheck) {
-                    if(message == null) continue;
-
-                    message = message.replaceAll(" {2}"," ");
-
-                    index++;
-                    if(index == 1 || message.equals("")) continue;
-
-
-                    messageword.add(message);
+        try {
+            while (server.isRunning()) {
+                boolean scannerChecked = false;
+                //if (scanner.hasNextLine()) {
+                if (!checked) {
+                    Server.getLogger().info("Type Command: (try help)");
+                    checked = true;
                 }
-            }
+                String command = StaticHandler.readLine(">");
 
-            command = checkmessage[0];
-
-            boolean found = false;
-
+                String[] checkmessage = command.split(" ", 2);
+                List<String> messageword = new ArrayList<>();
 
 
-            command = command.replaceAll(" {2}"," ");
+                if (checkmessage.length > 1) {
+                    String[] messagewordCheck = command.split(" ");
 
-            if(!command.equals("")) {
-                try {
-                    ChatEvent chatEvent = new ChatEvent(Server.getInstance().getConsole(),command,true,true);
-                    Server.getInstance().getPluginManager().callEvent(chatEvent);
-                    if(chatEvent.isCancelled()) found = true;
-
-                    for (Command serverCommand : commandList) {
-                        if (serverCommand.getCommandName().equalsIgnoreCase(command)) {
-                            found = true;
-                            String[] args = new String[messageword.size()];
-                            args = messageword.toArray(args);
+                    int index = 0;
 
 
-                            if(!chatEvent.isCancelled()) {
+                    for (String message : messagewordCheck) {
+                        if (message == null) continue;
 
-                                new Thread(new CommandWorkerThread(server.getConsole(), serverCommand, args)).start();
-                            }
-                            break;
-                        }
+                        message = message.replaceAll(" {2}", " ");
+
+                        index++;
+                        if (index == 1 || message.equals("")) continue;
+
+
+                        messageword.add(message);
                     }
-                } catch (Exception e) {
-                    Server.getLogger().error(e.getMessage(),e.getCause());
                 }
 
-                if (!found) {
-                    Server.getLogger().info("No such command found");
+                command = checkmessage[0];
+
+                boolean found = false;
+
+
+                command = command.replaceAll(" {2}", " ");
+
+                if (!command.equals("")) {
+                    try {
+                        ChatEvent chatEvent = new ChatEvent(Server.getInstance().getConsole(), command, true, true);
+                        Server.getInstance().getPluginManager().callEvent(chatEvent);
+                        if (chatEvent.isCancelled()) found = true;
+
+                        for (Command serverCommand : commandList) {
+                            if (serverCommand.getCommandName().equalsIgnoreCase(command)) {
+                                found = true;
+                                String[] args = new String[messageword.size()];
+                                args = messageword.toArray(args);
+
+
+                                if (!chatEvent.isCancelled()) {
+
+                                    new Thread(new CommandWorkerThread(server.getConsole(), serverCommand, args)).start();
+                                }
+                                break;
+                            }
+                        }
+                    } catch (Exception e) {
+                        Server.getLogger().error(e.getMessage(), e.getCause());
+                    }
+
+                    if (!found) {
+                        Server.getLogger().info("No such command found");
+                    }
                 }
             }
+        } catch (UserInterruptException e) {
+            server.shutdownServer();
         }
     }
 
@@ -107,7 +116,7 @@ public class ServerCommandHandler implements Runnable {
     private void registerCommands() {
         server.registerCommand(new Command("exit") {
             @Override
-            public void onCommand(CommandSender sender,String[] args) {
+            public void onCommand(CommandSender sender, String[] args) {
                 if(sender instanceof Console) {
                     sender.sendMessage("Exiting");
                     server.shutdownServer();
@@ -191,45 +200,7 @@ public class ServerCommandHandler implements Runnable {
 
         }).setUsage("Lists all players with ip, id and name");
 
-        server.registerCommand(new Command("kick") {
-            @Override
-            public void onCommand(CommandSender sender,String[] args) {
-                if (sender instanceof Console) {
-                    if (args.length == 0) {
-                        sender.sendMessage("No player to kick?");
-                    } else {
-                        for (ClientPlayer clientPlayer : new HashMap<>(Server.socketList).values())
-
-                            if (args[0].matches("[0-9]+")) {
-                                try {
-                                    int id = Integer.parseInt(args[0]);
-                                    if (id == clientPlayer.getId()) {
-                                        if (args.length == 1) {
-                                            clientPlayer.sendObject(new MessagePacket("You have been kicked."));
-                                        } else {
-                                            StringBuilder message = new StringBuilder();
-
-                                            int index = 0;
-
-                                            for (String messageCheck : args) {
-                                                index++;
-                                                if (index <= 1) {
-                                                    message.append(messageCheck);
-                                                }
-                                            }
-
-                                            clientPlayer.sendObject(new MessagePacket("Kicked: " + message));
-                                        }
-                                        clientPlayer.close();
-                                    }
-                                } catch (NumberFormatException e) {
-                                    sender.sendMessage("Not able to parse number.");
-                                }
-                            }
-                    }
-                }else sender.sendMessage("You don't have permission for this");
-            }
-        }).setUsage("Used to kick players using id");
+        server.registerCommand(new KickCommand("kick"));
 
         server.registerCommand(new Command("ban") {
             @Override
