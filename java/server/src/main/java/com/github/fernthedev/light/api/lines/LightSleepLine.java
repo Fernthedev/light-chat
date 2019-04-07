@@ -8,16 +8,16 @@ import lombok.NonNull;
 @Data
 public class LightSleepLine extends LightLine {
 
-    private double sleepInt;
+    private double sleepDouble;
 
-    public LightSleepLine(@NonNull String line, int lineNumber, double sleepInt) {
+    public LightSleepLine(@NonNull String line, int lineNumber, double sleepDouble) {
         super(line, lineNumber);
-        this.sleepInt = sleepInt;
+        this.sleepDouble = sleepDouble;
     }
 
-    public LightSleepLine(LightLine lightLine, double sleepInt) {
+    public LightSleepLine(LightLine lightLine, double sleepDouble) {
         super(lightLine);
-        this.sleepInt = sleepInt;
+        this.sleepDouble = sleepDouble;
     }
 
     public static String formatString(double sleep) {

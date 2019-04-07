@@ -11,6 +11,7 @@ import com.pi4j.io.gpio.Pin;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
+import okio.*;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -31,8 +32,15 @@ public class LightParser {
         if(!file.exists()) {
             file.createNewFile();
         }
+        try (Sink fileSink = Okio.sink(file);
+             BufferedSink bufferedSink = Okio.buffer(fileSink)) {
 
-        lightFile.setFile(Files.write(lightFile.getFile().toPath(),lightFile.toStringList(), Charset.forName("UTF-8")).toFile());
+            for(String s : lightFile.toStringList()) {
+                bufferedSink.writeUtf8(s).writeUtf8(System.lineSeparator());
+            }
+        }
+
+        //lightFile.setFile(Files.write(lightFile.getFile().toPath(),lightFile.toStringList(), Charset.forName("UTF-8")).toFile());
     }
 
     public static void saveFolder(@NonNull List<LightFile> files,File path) throws IOException {
@@ -54,9 +62,12 @@ public class LightParser {
 
         LightLine lightLine = null;
 
-        try (Scanner scanner = new Scanner(Objects.requireNonNull(file))) {
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
+        try (Source fileSource = Okio.source(file);
+             BufferedSource bufferedSource = Okio.buffer(fileSource)) {
+            while (true) {
+                String line = bufferedSource.readUtf8Line();
+                if (line == null) break;
+
                 lineNumber++;
 
                 String[] checkMessage = line.split(" ", 2);

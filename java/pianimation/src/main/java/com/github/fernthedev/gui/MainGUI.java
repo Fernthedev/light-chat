@@ -293,7 +293,7 @@ public class MainGUI extends JFrame {
                             if (lightLine instanceof LightSleepLine) {
 
                                 LightSleepLine lightSleepLine = (LightSleepLine) lightLine;
-                                int times = (int) ((int) fps.getValue() * lightSleepLine.getSleepInt());
+                                int times = (int) ((int) fps.getValue() * lightSleepLine.getSleepDouble());
                                 for (int te = 0; te < times; te++) {
                                     if (lastFrame != null) {
                                         PinData.FrameData newFrame = new PinData.FrameData(lightFile.getLineList().size(), lastFrame.getPinMode());
