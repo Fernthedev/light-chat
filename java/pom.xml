@@ -191,13 +191,14 @@
             <version>1.23</version>
         </dependency>
         <dependency>
-            <groupId>net.java.dev.jna</groupId>
-            <artifactId>jna</artifactId>
-            <version>5.2.0</version>
+            <groupId>org.fusesource.jansi</groupId>
+            <artifactId>jansi</artifactId>
+            <version>1.18</version>
         </dependency>
+
         <dependency>
             <groupId>org.jline</groupId>
-            <artifactId>jline-terminal-jna</artifactId>
+            <artifactId>jline-terminal-jansi</artifactId>
             <version>3.11.0</version>
         </dependency>
 
