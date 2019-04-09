@@ -7,6 +7,7 @@ import org.apache.commons.lang3.SystemUtils;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
+import org.fusesource.jansi.AnsiConsole;
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
@@ -87,6 +88,7 @@ public class StaticHandler {
     private static Terminal terminal;
 
     public static void setupTerminal(Completer completer, Logger logger) {
+        AnsiConsole.systemInstall();
         try {
             terminal = TerminalBuilder.builder()
                     .build();
