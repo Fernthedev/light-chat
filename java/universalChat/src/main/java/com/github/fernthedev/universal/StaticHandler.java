@@ -195,7 +195,6 @@ public class StaticHandler {
          */
         @Override
         protected void append(LoggingEvent event) {
-            System.out.println("Logged");
             if (lineReader.isReading()) {
                 lineReader.callWidget(LineReader.CLEAR);
                 lineReader.callWidget(LineReader.REDRAW_LINE);

@@ -10,7 +10,7 @@
 
     <packaging>pom</packaging>
     <properties>
-        <project.buildVer>2.0-RELEASE</project.buildVer>
+        <project.buildVer>2.1-RELEASE</project.buildVer>
         <project.nettyver>4.1.34.Final</project.nettyver>
     </properties>
 
@@ -70,6 +70,31 @@
                                 <include>**</include>
                             </includes>
                         </filter>
+                        <filter>
+                            <artifact>org.fusesource.jansi:jansi</artifact>
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                        </filter>
+                        <filter>
+                            <artifact>org.jline:jline-terminal-jansi</artifact>
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                        </filter>
+                        <filter>
+                            <artifact>net.java.dev.jna:jna</artifact>
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                        </filter>
+                        <filter>
+                            <artifact>org.jline:jline-terminal-jna</artifact>
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                        </filter>
+
                     </filters>
                     <!-- put your configurations here -->
                 </configuration>
@@ -165,13 +190,24 @@
             <artifactId>snakeyaml</artifactId>
             <version>1.23</version>
         </dependency>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
+            <version>5.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jline</groupId>
+            <artifactId>jline-terminal-jna</artifactId>
+            <version>3.11.0</version>
+        </dependency>
 
 
-       <!-- <dependency>
-            <groupId>com.nativelibs4java</groupId>
-            <artifactId>bridj</artifactId>
-            <version>0.7.0</version>
-        </dependency>-->
+
+        <!-- <dependency>
+             <groupId>com.nativelibs4java</groupId>
+             <artifactId>bridj</artifactId>
+             <version>0.7.0</version>
+         </dependency>-->
 
 
 
