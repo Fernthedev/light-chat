@@ -1,6 +1,6 @@
 package com.github.fernthedev.client.backend;
 
-import com.github.fernthedev.AutoCompletePacket;
+import com.github.fernthedev.packets.AutoCompletePacket;
 import com.github.fernthedev.client.Client;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

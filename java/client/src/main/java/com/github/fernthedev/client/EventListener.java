@@ -1,6 +1,6 @@
 package com.github.fernthedev.client;
 
-import com.github.fernthedev.AutoCompletePacket;
+import com.github.fernthedev.packets.AutoCompletePacket;
 import com.github.fernthedev.client.backend.AutoCompleteHandler;
 import com.github.fernthedev.packets.*;
 import com.github.fernthedev.packets.latency.PingPacket;

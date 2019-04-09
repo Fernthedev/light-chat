@@ -1,7 +1,9 @@
-package com.github.fernthedev;
+package com.github.fernthedev.packets;
 
-import com.github.fernthedev.packets.Packet;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.jline.reader.Candidate;
 import org.jline.reader.ParsedLine;
 

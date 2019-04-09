@@ -1,6 +1,6 @@
 package com.github.fernthedev.server;
 
-import com.github.fernthedev.AutoCompletePacket;
+import com.github.fernthedev.packets.AutoCompletePacket;
 import com.github.fernthedev.light.AuthenticationManager;
 import com.github.fernthedev.packets.*;
 import com.github.fernthedev.packets.latency.PongPacket;
