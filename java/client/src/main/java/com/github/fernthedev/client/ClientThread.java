@@ -296,14 +296,8 @@ public class ClientThread implements Runnable {
     public void run() {
         //client.print(running);
        // client.print("Checking for " + client.host + ":" + client.port + " socket " + channel);
-        while (running && client.isCloseConsole()) {
             if (System.console() == null && !StaticHandler.isDebug) close();
-            try {
-                Thread.sleep(15);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+
 
     }
 }
