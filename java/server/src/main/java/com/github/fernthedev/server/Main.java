@@ -55,6 +55,8 @@ public class Main {
         if(StaticHandler.isDebug) level = Level.DEBUG;
          else level = Level.INFO;
 
+
+
         LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
         Configuration config = ctx.getConfiguration();
         LoggerConfig loggerConfig = config.getLoggerConfig(Server.getLogger().getName());

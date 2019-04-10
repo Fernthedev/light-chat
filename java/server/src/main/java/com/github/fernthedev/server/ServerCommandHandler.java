@@ -46,7 +46,7 @@ public class ServerCommandHandler implements Runnable {
                     Server.getLogger().info("Type Command: (try help)");
                     checked = true;
                 }
-                String command = StaticHandler.readLine(">");
+                String command = StaticHandler.readLine("> ");
 
                 String[] checkmessage = command.split(" ", 2);
                 List<String> messageword = new ArrayList<>();

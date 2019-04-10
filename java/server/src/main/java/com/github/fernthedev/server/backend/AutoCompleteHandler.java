@@ -22,16 +22,16 @@ public class AutoCompleteHandler implements Completer {
         this.server = server;
     }
 
-    public List<Candidate> handleLine(ParsedLine line) {
+    public List<Candidate> handleLine(List<String> words) {
         List<Candidate> candidates = new ArrayList<>();
 
-        if(line.words().size() == 1) {
+        if(words.size() == 1) {
             for (Command command : server.getCommands()) {
                 String string = command.getCommandName();
                 candidates.add(new Candidate(AttributedString.stripAnsi(string), string, null, null, null, null, true));
             }
         }else{
-            String c = line.words().get(0);
+            String c = words.get(0);
             Command curCommand = null;
 
             for(Command command : server.getCommands()) {
@@ -44,7 +44,7 @@ public class AutoCompleteHandler implements Completer {
             if(curCommand instanceof TabExecutor) {
                 TabExecutor tabExecutor = (TabExecutor) curCommand;
 
-                List<String> args = new ArrayList<>(line.words());
+                List<String> args = new ArrayList<>(words);
 
                 if(args.isEmpty()) return candidates;
 
@@ -64,7 +64,7 @@ public class AutoCompleteHandler implements Completer {
 
     @Override
     public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
-        List<Candidate> candidateList = handleLine(line);
+        List<Candidate> candidateList = handleLine(line.words());
 
         if(!candidateList.isEmpty())
         candidates.addAll(candidateList);

@@ -29,8 +29,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public class ClientThread implements Runnable {
@@ -290,17 +288,7 @@ public class ClientThread implements Runnable {
 
         client.getLogger().log("Closing client!");
 
-        new Thread(() -> {
-            List<Thread> threads = new ArrayList<>(Thread.getAllStackTraces().keySet());
-            threads.remove(Thread.currentThread());
-            for (Thread thread : threads) {
-                try {
-                    thread.join();
-                } catch (InterruptedException e) {
-                    client.getLogger().logError(e.getMessage(),e.getCause());
-                }
-            }
-        },"QuitThread").start();
+        System.exit(0);
 
 
     }

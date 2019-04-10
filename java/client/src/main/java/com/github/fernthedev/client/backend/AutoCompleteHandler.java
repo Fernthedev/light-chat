@@ -45,7 +45,7 @@ public class AutoCompleteHandler implements Completer {
         candidateList.clear();
 
         candidateList = candidates;
-        AutoCompletePacket autoCompletePacket = new AutoCompletePacket(line);
+        AutoCompletePacket autoCompletePacket = new AutoCompletePacket(line.words());
         client.getClientThread().sendObject(autoCompletePacket);
     }
 }

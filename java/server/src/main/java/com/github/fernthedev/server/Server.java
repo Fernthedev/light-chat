@@ -72,7 +72,7 @@ public class Server implements Runnable {
     public static ConcurrentMap<Channel,ClientPlayer> socketList = new ConcurrentHashMap<>();
     static List<Thread> serverInstanceThreads = new ArrayList<>();
 
-    private static final Logger logger = LogManager.getLogger(Server.class);
+    private static Logger logger;
 
     private ChannelFuture future;
     private EventLoopGroup bossGroup,workerGroup;
@@ -380,7 +380,12 @@ public class Server implements Runnable {
     }
 
     public static synchronized Logger getLogger() {
+        if(logger == null) registerLogger();
         return logger;
+    }
+
+    public static void registerLogger() {
+        logger = LogManager.getLogger(Server.class);
     }
 
     /**

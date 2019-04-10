@@ -117,7 +117,7 @@ public class EventListener {
             }
         }else if (p instanceof AutoCompletePacket) {
             AutoCompletePacket packet = (AutoCompletePacket) p;
-            List<Candidate> candidates = server.getAutoCompleteHandler().handleLine(packet.getLine());
+            List<Candidate> candidates = server.getAutoCompleteHandler().handleLine(packet.getWords());
             packet.setCandidateList(candidates);
             clientPlayer.sendObject(packet);
         }
