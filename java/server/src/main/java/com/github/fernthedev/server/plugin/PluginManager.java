@@ -4,7 +4,7 @@ import com.github.fernthedev.server.Server;
 import com.github.fernthedev.server.event.*;
 import com.github.fernthedev.server.plugin.exception.IllegalPluginAccessException;
 import org.apache.commons.lang3.Validate;
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.Level;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

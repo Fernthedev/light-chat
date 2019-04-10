@@ -5,7 +5,8 @@ import com.github.fernthedev.universal.StaticHandler;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -66,7 +67,7 @@ public class Client {
         registerOSCheck();
         registerLogger();
 
-        StaticHandler.setupTerminal(new AutoCompleteHandler(this),logger);
+        StaticHandler.setupTerminal(new AutoCompleteHandler(this));
 
 
         try {
@@ -107,7 +108,7 @@ public class Client {
     }
 
     protected void registerLogger() {
-        logger = Logger.getLogger(Client.class.getName());
+        logger = LogManager.getLogger(Client.class.getName());
         cLogger = new CLogger(logger);
     }
 

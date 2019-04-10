@@ -2,6 +2,7 @@ package com.github.fernthedev.client;
 
 import com.github.fernthedev.client.netty.MulticastClient;
 import com.github.fernthedev.universal.StaticHandler;
+import org.fusesource.jansi.AnsiConsole;
 
 import java.io.IOException;
 import java.util.*;
@@ -20,8 +21,10 @@ public class Main {
     private int port = -1;
 
     private Main(String[] args) {
+        AnsiConsole.systemInstall();
         new StaticHandler();
         Logger.getLogger("io.netty").setLevel(Level.OFF);
+        StaticHandler.setupLoggers();
 
         scanner = new Scanner(System.in);
 

@@ -31,7 +31,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.SystemUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -71,7 +72,7 @@ public class Server implements Runnable {
     public static ConcurrentMap<Channel,ClientPlayer> socketList = new ConcurrentHashMap<>();
     static List<Thread> serverInstanceThreads = new ArrayList<>();
 
-    private static final Logger logger = Logger.getLogger(Server.class);
+    private static final Logger logger = LogManager.getLogger(Server.class);
 
     private ChannelFuture future;
     private EventLoopGroup bossGroup,workerGroup;
@@ -83,9 +84,8 @@ public class Server implements Runnable {
     Server(int port) {
         this.port = port;
         console = new Console();
-        this.server = this;
+        server = this;
         autoCompleteHandler = new AutoCompleteHandler(this);
-        StaticHandler.setupTerminal(autoCompleteHandler,logger);
     }
 
     public static Server getInstance() {
@@ -152,7 +152,7 @@ public class Server implements Runnable {
      */
     @Override
     public void run() {
-
+        StaticHandler.setupTerminal(autoCompleteHandler);
         thread = Thread.currentThread();
 
         bossGroup = new NioEventLoopGroup();

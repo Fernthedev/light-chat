@@ -3,16 +3,13 @@ package com.github.fernthedev.universal;
 import com.google.common.io.Resources;
 import com.google.gson.Gson;
 import lombok.Getter;
+import net.minecrell.terminalconsole.TerminalConsoleAppender;
 import org.apache.commons.lang3.SystemUtils;
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
-import org.fusesource.jansi.AnsiConsole;
+import org.apache.logging.log4j.util.PropertiesUtil;
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
 import org.json.simple.JSONObject;
 
 import java.io.File;
@@ -20,6 +17,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.*;
+
+// Import log4j classes.
 
 public class StaticHandler {
     public static String address = "230.0.0.0";
@@ -85,38 +84,37 @@ public class StaticHandler {
     private static LineReader lineReader;
 
 
-    private static Terminal terminal;
+    public static void setupLoggers() {
+        System.setProperty("log4j.configurationFile","log4j2.xml");
+        System.setProperty("log4j2.contextSelector","org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
+        System.setProperty("terminal.jline", String.valueOf(true));
+        //Logger logger = LogManager.getRootLogger();
 
-    public static void setupTerminal(Completer completer, Logger logger) {
-        AnsiConsole.systemInstall();
-        try {
-            terminal = TerminalBuilder.builder()
-                    .build();
+        //Logger nettyLogger = LoggerFactory.getLogger("io.netty");
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    }
+
+    public static void setupTerminal(Completer completer) {
+        final Terminal terminal = TerminalConsoleAppender.getTerminal();
+
+        if(terminal == null) return;
 
         lineReader = LineReaderBuilder.builder()
                 .terminal(terminal)
                 .completer(completer)
                 .build();
 
-        lineReader.option(LineReader.Option.AUTO_FRESH_LINE,true);
-        logger.addAppender(new LogAppender());
+        lineReader.setOpt(LineReader.Option.DISABLE_EVENT_EXPANSION);
+        lineReader.setOpt(LineReader.Option.INSERT_TAB);
+
+        TerminalConsoleAppender.setReader(lineReader);
+
+       // lineReader.option(LineReader.Option.AUTO_FRESH_LINE,true);
 
     }
 
     public static synchronized String readLine(String format) {
-
-        new Thread(() -> {
-            while(lineReader.isReading()) {
-
-            }
-        }).start();
-
-        String l = lineReader.readLine(format);
-        return l;
+        return lineReader.readLine(format);
 
 
         /*
@@ -165,7 +163,7 @@ public class StaticHandler {
         StringBuilder result = new StringBuilder();
 
         //Get file from resources folder
-        ClassLoader classLoader = StaticHandler.class.getClassLoader();
+        //ClassLoader classLoader = StaticHandler.class.getClassLoader();
 
         try (Scanner scanner = new Scanner(Objects.requireNonNull(file))) {
             while(scanner.hasNextLine()) {
@@ -180,66 +178,24 @@ public class StaticHandler {
 
     }
 
-    public static String readResource(final String fileName, Charset charset) throws IOException {
-        return Resources.toString(Resources.getResource(fileName), charset);
+
+    private static Boolean getOptionalBooleanProperty(String name) {
+        String value = PropertiesUtil.getProperties().getStringProperty(name);
+        if (value == null) {
+            return null;
+        }
+
+        if (value.equalsIgnoreCase("true")) {
+            return Boolean.TRUE;
+        } else if (value.equalsIgnoreCase("false"))  {
+            return Boolean.FALSE;
+        } else {
+            return null;
+        }
     }
 
-    private static class LogAppender extends AppenderSkeleton {
-
-
-        /**
-         * Subclasses of <code>AppenderSkeleton</code> should implement this
-         * method to perform actual logging. See also {@link #doAppend
-         * AppenderSkeleton.doAppend} method.
-         *
-         * @param event
-         * @since 0.9.0
-         */
-        @Override
-        protected void append(LoggingEvent event) {
-            if (lineReader.isReading()) {
-                lineReader.callWidget(LineReader.CLEAR);
-                lineReader.callWidget(LineReader.REDRAW_LINE);
-                lineReader.callWidget(LineReader.REDISPLAY);
-                lineReader.getTerminal().writer().flush();
-            }
-
-
-        }
-
-        /**
-         * Release any resources allocated within the appender such as file
-         * handles, network connections, etc.
-         *
-         * <p>It is a programming error to append to a closed appender.
-         *
-         * @since 0.8.4
-         */
-        @Override
-        public void close() {
-
-        }
-
-        /**
-         * Configurators call this method to determine if the appender
-         * requires a layout. If this method returns <code>true</code>,
-         * meaning that layout is required, then the configurator will
-         * configure an layout using the configuration information at its
-         * disposal.  If this method returns <code>false</code>, meaning that
-         * a layout is not required, then layout configuration will be
-         * skipped even if there is available layout configuration
-         * information at the disposal of the configurator..
-         *
-         * <p>In the rather exceptional case, where the appender
-         * implementation admits a layout but can also work without it, then
-         * the appender should return <code>true</code>.
-         *
-         * @since 0.8.4
-         */
-        @Override
-        public boolean requiresLayout() {
-            return false;
-        }
+    public static String readResource(final String fileName, Charset charset) throws IOException {
+        return Resources.toString(Resources.getResource(fileName), charset);
     }
 
 }

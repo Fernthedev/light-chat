@@ -53,6 +53,25 @@
                             </includes>
                         </filter>
                         <filter>
+                            <artifact>org.apache.logging.log4j:log4j-core</artifact>
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                        </filter>
+                        <filter>
+                            <artifact>org.apache.logging.log4j:log4j-slf4j-impl</artifact>
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                        </filter>
+                        <filter>
+                            <artifact>org.slf4j:slf4j-api</artifact>
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                        </filter>
+
+                        <filter>
                             <artifact>com.github.fernthedev:universalChat</artifact>
                             <includes>
                                 <include>**</include>
@@ -94,6 +113,12 @@
                                 <include>**</include>
                             </includes>
                         </filter>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>**/Log4j2Plugins.dat</exclude>
+                            </excludes>
+                        </filter>
 
                     </filters>
                     <!-- put your configurations here -->
@@ -123,6 +148,7 @@
         </resources>
 
 </build>
+
     <modules>
         <module>server</module>
         <module>client</module>
@@ -173,6 +199,11 @@
             <artifactId>jline</artifactId>
             <version>3.9.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.lmax</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>3.4.2</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -201,6 +232,8 @@
             <artifactId>jline-terminal-jansi</artifactId>
             <version>3.11.0</version>
         </dependency>
+
+
 
 
 

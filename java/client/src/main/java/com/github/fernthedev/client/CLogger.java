@@ -3,7 +3,7 @@ package com.github.fernthedev.client;
 import com.github.fernthedev.universal.StaticHandler;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 @RequiredArgsConstructor
 public class CLogger implements ILogManager {

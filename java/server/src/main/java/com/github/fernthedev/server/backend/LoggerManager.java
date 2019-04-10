@@ -4,11 +4,6 @@ import com.github.fernthedev.server.Server;
 import com.github.fernthedev.server.event.EventHandler;
 import com.github.fernthedev.server.event.Listener;
 import com.github.fernthedev.server.event.chat.ChatEvent;
-import org.apache.log4j.Appender;
-import org.apache.log4j.Level;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.WriterAppender;
-import org.apache.log4j.varia.LevelRangeFilter;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -35,18 +30,6 @@ public class LoggerManager implements Listener {
             PipedInputStream in = new PipedInputStream();
             PipedOutputStream out = new PipedOutputStream(in);
 
-// create custom l4j appender
-            Appender customAppender = new WriterAppender(
-                    new PatternLayout("%-5p %d [%t][%F:%L] : %m%n"), out);
-
-            LevelRangeFilter levelRangeFilter = new LevelRangeFilter();
-            levelRangeFilter.setLevelMin(Level.DEBUG);
-            levelRangeFilter.setLevelMax(Level.ERROR);
-            customAppender.addFilter(levelRangeFilter);
-
-//use any loggerManager:
-            Server.getLogger().addAppender(customAppender);
-//or the root loggerManager: LoggerManager.getRootLogger().addAppender(customAppender);
 
 
 // printing entries in piped input stream
