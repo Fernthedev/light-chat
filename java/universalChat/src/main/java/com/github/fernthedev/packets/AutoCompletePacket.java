@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.jline.reader.Candidate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +13,7 @@ import java.util.List;
 @Data
 public class AutoCompletePacket extends Packet {
 
-    private List<Candidate> candidateList = new ArrayList<>();
+    private List<LightCandidate> candidateList = new ArrayList<>();
 
     @NonNull
     private List<String> words;

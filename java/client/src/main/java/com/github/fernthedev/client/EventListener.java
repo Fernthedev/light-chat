@@ -1,7 +1,5 @@
 package com.github.fernthedev.client;
 
-import com.github.fernthedev.packets.AutoCompletePacket;
-import com.github.fernthedev.client.backend.AutoCompleteHandler;
 import com.github.fernthedev.packets.*;
 import com.github.fernthedev.packets.latency.PingPacket;
 import com.github.fernthedev.packets.latency.PingReceive;
@@ -81,7 +79,7 @@ public class EventListener {
             client.getClientThread().close();
         } else if(p instanceof AutoCompletePacket) {
             AutoCompletePacket packet = (AutoCompletePacket) p;
-            AutoCompleteHandler.addCandidates(packet.getCandidateList());
+            client.getCompleteHandler().addCandidates(packet.getCandidateList());
         }
     }
 

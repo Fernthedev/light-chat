@@ -1,5 +1,6 @@
 package com.github.fernthedev.server.backend;
 
+import com.github.fernthedev.packets.LightCandidate;
 import com.github.fernthedev.server.Server;
 import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.command.TabExecutor;
@@ -22,13 +23,17 @@ public class AutoCompleteHandler implements Completer {
         this.server = server;
     }
 
-    public List<Candidate> handleLine(List<String> words) {
-        List<Candidate> candidates = new ArrayList<>();
+    public List<LightCandidate> handleLine(List<String> words) {
+        List<LightCandidate> candidates = new ArrayList<>();
+
+
+
+        Server.getLogger().info("Handled line");
 
         if(words.size() == 1) {
             for (Command command : server.getCommands()) {
                 String string = command.getCommandName();
-                candidates.add(new Candidate(AttributedString.stripAnsi(string), string, null, null, null, null, true));
+                candidates.add(new LightCandidate(AttributedString.stripAnsi(string), string, null, null, null, null, true));
             }
         }else{
             String c = words.get(0);
@@ -53,7 +58,7 @@ public class AutoCompleteHandler implements Completer {
                 @NonNull List<String> completions = tabExecutor.getCompletions(args.toArray(new String[0]));
 
                 for (String string : completions) {
-                    candidates.add(new Candidate(AttributedString.stripAnsi(string), string, null, null, null, null, true));
+                    candidates.add(new LightCandidate(AttributedString.stripAnsi(string), string, null, null, null, null, true));
                 }
             }
         }
@@ -64,9 +69,18 @@ public class AutoCompleteHandler implements Completer {
 
     @Override
     public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
-        List<Candidate> candidateList = handleLine(line.words());
 
-        if(!candidateList.isEmpty())
-        candidates.addAll(candidateList);
+
+        List<LightCandidate> candidateList = handleLine(line.words());
+
+        List<Candidate> candidateList1 = new ArrayList<>();
+
+        for(LightCandidate lightCandidate : candidateList) {
+            candidateList1.add(lightCandidate.toCandidate());
+        }
+
+        if(!candidateList.isEmpty()) {
+            candidates.addAll(candidateList1);
+        }
     }
 }

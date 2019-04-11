@@ -12,7 +12,7 @@ public class CommandWorkerThread implements Runnable {
     private final String[] args;
     private final CommandSender commandSender;
 
-    static List<Command> commandList = new ArrayList<>();
+    public static List<Command> commandList = new ArrayList<>();
 
     public CommandWorkerThread(CommandSender commandSender, Command command, String[] args) {
         this.serverCommand = command;

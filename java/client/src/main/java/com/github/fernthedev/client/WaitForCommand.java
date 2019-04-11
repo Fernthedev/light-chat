@@ -5,13 +5,10 @@ import com.github.fernthedev.packets.MessagePacket;
 import com.github.fernthedev.universal.StaticHandler;
 import org.jline.reader.UserInterruptException;
 
-import java.util.Scanner;
-
 public class WaitForCommand implements Runnable {
 
     static boolean running;
 
-    protected Scanner scanner;
     protected Client client;
     protected boolean checked;
 
@@ -19,10 +16,6 @@ public class WaitForCommand implements Runnable {
         running = false;
         this.client = client;
         checked = false;
-    }
-
-    protected void setScanner() {
-        this.scanner = Main.scanner;
     }
 
     public void sendMessage(String message) {
@@ -38,27 +31,22 @@ public class WaitForCommand implements Runnable {
 
     public void run() {
         running = true;
-        setScanner();
+
         // client.getLogger().info("Starting the runnable for wait for command ;) " + client.running );
-        while (client.running && scanner.hasNextLine()) {
+        while (client.running) {
             //  if (client.registered) {
 
-            if (scanner.hasNextLine()) {
-                try {
-                    String message = StaticHandler.readLine("> ");
-                    sendMessage(message);
-                } catch (UserInterruptException e) {
-                    client.getClientThread().close();
-                    System.exit(0);
-                }
-
-            }
-
             try {
-                Thread.sleep(15);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                String message = StaticHandler.readLine("> ");
+
+                if (message.equals("")) continue;
+
+                sendMessage(message);
+            } catch (UserInterruptException e) {
+                client.getClientThread().close();
+                System.exit(0);
             }
+
             //   }
         }
     }

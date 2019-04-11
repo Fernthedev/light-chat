@@ -203,7 +203,6 @@ public class ClientThread implements Runnable {
 
 
         if (future.isSuccess() && future.channel().isActive()) {
-            client.getLogger().info("CONNECTED!");
             connected = true;
 
 
@@ -287,8 +286,6 @@ public class ClientThread implements Runnable {
         }
 
         client.getLogger().log("Closing client!");
-
-        System.exit(0);
 
 
     }

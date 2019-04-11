@@ -1,24 +1,18 @@
 package com.github.fernthedev.server;
 
-import com.github.fernthedev.packets.AutoCompletePacket;
 import com.github.fernthedev.light.AuthenticationManager;
 import com.github.fernthedev.packets.*;
 import com.github.fernthedev.packets.latency.PongPacket;
-import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.event.chat.ChatEvent;
 import com.github.fernthedev.universal.StaticHandler;
 import org.apache.commons.lang3.StringUtils;
-import org.jline.reader.Candidate;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.List;
-
-import static com.github.fernthedev.server.CommandWorkerThread.commandList;
 
 public class EventListener {
 
@@ -54,15 +48,19 @@ public class EventListener {
             ChatEvent chatEvent = new ChatEvent(clientPlayer, messagePacket.getMessage(),false,true);
             Server.getInstance().getPluginManager().callEvent(chatEvent);
 
-            if(!chatEvent.isCancelled()) {
+            /*if(!chatEvent.isCancelled()) {
                 Server.sendMessage("[" + clientPlayer.getDeviceName() + "] :" + messagePacket.getMessage());
-            }
+            }*/
         } else if (p instanceof CommandPacket) {
 
             CommandPacket packet = (CommandPacket) p;
 
             String command = packet.getMessage();
 
+            ChatEvent chatEvent = new ChatEvent(clientPlayer,command,true,true);
+            Server.getInstance().getPluginManager().callEvent(chatEvent);
+
+            /*
             String[] checkmessage = command.split(" ", 2);
             List<String> messageword = new ArrayList<>();
 
@@ -114,10 +112,11 @@ public class EventListener {
                 } catch (Exception e) {
                     Server.getLogger().error(e.getMessage(),e.getCause());
                 }
-            }
+            }*/
         }else if (p instanceof AutoCompletePacket) {
             AutoCompletePacket packet = (AutoCompletePacket) p;
-            List<Candidate> candidates = server.getAutoCompleteHandler().handleLine(packet.getWords());
+            List<LightCandidate> candidates = server.getAutoCompleteHandler().handleLine(packet.getWords());
+
             packet.setCandidateList(candidates);
             clientPlayer.sendObject(packet);
         }

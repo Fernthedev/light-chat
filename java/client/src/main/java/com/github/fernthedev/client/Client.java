@@ -58,6 +58,9 @@ public class Client {
         return closeConsole;
     }
 
+    @Getter
+    private AutoCompleteHandler completeHandler;
+
 
     public Client(String host, int port) {
         this.port = port;
@@ -67,7 +70,8 @@ public class Client {
         registerOSCheck();
         registerLogger();
 
-        StaticHandler.setupTerminal(new AutoCompleteHandler(this));
+        completeHandler = new AutoCompleteHandler(this);
+        StaticHandler.setupTerminal(completeHandler);
 
 
         try {

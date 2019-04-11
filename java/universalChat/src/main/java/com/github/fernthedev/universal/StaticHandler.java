@@ -3,6 +3,7 @@ package com.github.fernthedev.universal;
 import com.google.common.io.Resources;
 import com.google.gson.Gson;
 import lombok.Getter;
+import lombok.NonNull;
 import net.minecrell.terminalconsole.TerminalConsoleAppender;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.util.PropertiesUtil;
@@ -94,7 +95,7 @@ public class StaticHandler {
 
     }
 
-    public static void setupTerminal(Completer completer) {
+    public static void setupTerminal(@NonNull Completer completer) {
         final Terminal terminal = TerminalConsoleAppender.getTerminal();
 
         if(terminal == null) return;
@@ -105,7 +106,7 @@ public class StaticHandler {
                 .build();
 
         lineReader.setOpt(LineReader.Option.DISABLE_EVENT_EXPANSION);
-        lineReader.setOpt(LineReader.Option.INSERT_TAB);
+       // lineReader.unsetOpt(LineReader.Option.INSERT_TAB);
 
         TerminalConsoleAppender.setReader(lineReader);
 
@@ -113,7 +114,7 @@ public class StaticHandler {
 
     }
 
-    public static synchronized String readLine(String format) {
+    public static String readLine(String format) {
         return lineReader.readLine(format);
 
 

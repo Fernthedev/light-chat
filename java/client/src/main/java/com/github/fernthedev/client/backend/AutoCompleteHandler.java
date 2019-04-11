@@ -1,7 +1,8 @@
 package com.github.fernthedev.client.backend;
 
-import com.github.fernthedev.packets.AutoCompletePacket;
 import com.github.fernthedev.client.Client;
+import com.github.fernthedev.packets.AutoCompletePacket;
+import com.github.fernthedev.packets.LightCandidate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.jline.reader.Candidate;
@@ -9,6 +10,7 @@ import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -17,12 +19,19 @@ public class AutoCompleteHandler implements Completer {
     @NonNull
     private Client client;
 
-    private static List<Candidate> candidateList;
+    private List<Candidate> candidateList = new ArrayList<>();
 
-    public static void addCandidates(List<Candidate> candidates) {
+    private boolean keepCheck;
+
+    public void addCandidates(List<LightCandidate> candidates) {
         if(candidateList != null) {
-            candidateList.addAll(candidates);
+            List<Candidate> candidateList1 = new ArrayList<>();
+            for(LightCandidate lightCandidate : candidates) {
+                candidateList1.add(lightCandidate.toCandidate());
+            }
+            candidateList.addAll(candidateList1);
         }
+        keepCheck = false;
     }
 
     /**
@@ -41,11 +50,24 @@ public class AutoCompleteHandler implements Completer {
      */
     @Override
     public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
-        if(candidateList != null)
-        candidateList.clear();
+        if(candidateList != null) {
+            candidateList.clear();
+        }
 
-        candidateList = candidates;
         AutoCompletePacket autoCompletePacket = new AutoCompletePacket(line.words());
         client.getClientThread().sendObject(autoCompletePacket);
+
+        keepCheck = true;
+        while (keepCheck) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        candidates.addAll(candidateList);
+
+
     }
 }

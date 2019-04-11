@@ -10,102 +10,33 @@ import com.github.fernthedev.server.event.chat.ChatEvent;
 import com.github.fernthedev.universal.StaticHandler;
 import org.jline.reader.UserInterruptException;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
 
 import static com.github.fernthedev.server.CommandWorkerThread.commandList;
 
 public class ServerCommandHandler implements Runnable {
 
     private Server server;
-    private Scanner scanner;
 
-
-
-    private boolean checked;
 
     ServerCommandHandler(Server server) {
         this.server = server;
-        this.scanner = Main.scanner;
-        checked = false;
 
         Server.getLogger().info("Wait for command thread created");
+        registerCommands();
     }
 
 
     public void run() {
-        registerCommands();
-
         try {
+            Server.getLogger().info("Type Command: (try help)");
             while (server.isRunning()) {
-                boolean scannerChecked = false;
-                //if (scanner.hasNextLine()) {
-                if (!checked) {
-                    Server.getLogger().info("Type Command: (try help)");
-                    checked = true;
-                }
+
                 String command = StaticHandler.readLine("> ");
 
-                String[] checkmessage = command.split(" ", 2);
-                List<String> messageword = new ArrayList<>();
+                new Thread(() -> server.getPluginManager().callEvent(new ChatEvent(server.getConsole(),command,true,true))).start();
 
 
-                if (checkmessage.length > 1) {
-                    String[] messagewordCheck = command.split(" ");
-
-                    int index = 0;
-
-
-                    for (String message : messagewordCheck) {
-                        if (message == null) continue;
-
-                        message = message.replaceAll(" {2}", " ");
-
-                        index++;
-                        if (index == 1 || message.equals("")) continue;
-
-
-                        messageword.add(message);
-                    }
-                }
-
-                command = checkmessage[0];
-
-                boolean found = false;
-
-
-                command = command.replaceAll(" {2}", " ");
-
-                if (!command.equals("")) {
-                    try {
-                        ChatEvent chatEvent = new ChatEvent(Server.getInstance().getConsole(), command, true, true);
-                        Server.getInstance().getPluginManager().callEvent(chatEvent);
-                        if (chatEvent.isCancelled()) found = true;
-
-                        for (Command serverCommand : commandList) {
-                            if (serverCommand.getCommandName().equalsIgnoreCase(command)) {
-                                found = true;
-                                String[] args = new String[messageword.size()];
-                                args = messageword.toArray(args);
-
-
-                                if (!chatEvent.isCancelled()) {
-
-                                    new Thread(new CommandWorkerThread(server.getConsole(), serverCommand, args)).start();
-                                }
-                                break;
-                            }
-                        }
-                    } catch (Exception e) {
-                        Server.getLogger().error(e.getMessage(), e.getCause());
-                    }
-
-                    if (!found) {
-                        Server.getLogger().info("No such command found");
-                    }
-                }
             }
         } catch (UserInterruptException e) {
             server.shutdownServer();

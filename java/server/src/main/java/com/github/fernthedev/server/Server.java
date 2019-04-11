@@ -8,6 +8,7 @@ import com.github.fernthedev.packets.MessagePacket;
 import com.github.fernthedev.packets.Packet;
 import com.github.fernthedev.server.backend.AutoCompleteHandler;
 import com.github.fernthedev.server.backend.BanManager;
+import com.github.fernthedev.server.backend.CommandMessageParser;
 import com.github.fernthedev.server.backend.LoggerManager;
 import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.command.CommandSender;
@@ -64,6 +65,8 @@ public class Server implements Runnable {
 
     @Getter(AccessLevel.PACKAGE)
     private AutoCompleteHandler autoCompleteHandler;
+    @Getter
+    private CommandMessageParser commandMessageParser;
 
     public Console getConsole() {
         return console;
@@ -82,10 +85,22 @@ public class Server implements Runnable {
 
 
     Server(int port) {
+        getLogger();
+        running = true;
         this.port = port;
         console = new Console();
         server = this;
         autoCompleteHandler = new AutoCompleteHandler(this);
+        StaticHandler.setupTerminal(server.getAutoCompleteHandler());
+
+
+        pluginManager = new PluginManager();
+
+        ServerCommandHandler serverCommandHandler = new ServerCommandHandler(this);
+        commandMessageParser = new CommandMessageParser(this);
+        getPluginManager().registerEvents(commandMessageParser, new ServerPlugin());
+
+        new Thread(serverCommandHandler, "ServerBackgroundThread").start();
     }
 
     public static Server getInstance() {
@@ -152,7 +167,6 @@ public class Server implements Runnable {
      */
     @Override
     public void run() {
-        StaticHandler.setupTerminal(autoCompleteHandler);
         thread = Thread.currentThread();
 
         bossGroup = new NioEventLoopGroup();
@@ -268,12 +282,7 @@ public class Server implements Runnable {
                 .childOption(ChannelOption.SO_TIMEOUT, 5000);
 
 
-        running = true;
         logger.info("Server socket registered");
-
-
-        ServerCommandHandler serverCommandHandler = new ServerCommandHandler(this);
-        new Thread(serverCommandHandler, "ServerBackgroundThread").start();
 
         new Thread(new PlayerHandler(this),"PlayerHandlerThread").start();
         //Timer pingPongTimer = new Timer("pingpong");
@@ -325,7 +334,7 @@ public class Server implements Runnable {
             }
         }
 
-        pluginManager = new PluginManager();
+
 
         AuthenticationManager authenticationManager = new AuthenticationManager("changepassword", settingsManager);
         server.registerCommand(authenticationManager);
