@@ -5,6 +5,7 @@ import com.github.fernthedev.server.Server;
 import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.command.TabExecutor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.jline.reader.Candidate;
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
@@ -15,20 +16,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+@RequiredArgsConstructor
 public class AutoCompleteHandler implements Completer {
+    @NonNull
     private Server server;
 
-
-    public AutoCompleteHandler(Server server) {
-        this.server = server;
-    }
 
     public List<LightCandidate> handleLine(List<String> words) {
         List<LightCandidate> candidates = new ArrayList<>();
 
 
-
-        Server.getLogger().info("Handled line");
 
         if(words.size() == 1) {
             for (Command command : server.getCommands()) {
@@ -69,6 +66,7 @@ public class AutoCompleteHandler implements Completer {
 
     @Override
     public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
+        Server.getLogger().info("Handled line");
 
 
         List<LightCandidate> candidateList = handleLine(line.words());

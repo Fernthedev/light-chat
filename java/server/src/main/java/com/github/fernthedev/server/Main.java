@@ -48,12 +48,12 @@ public class Main {
 
         if (port == -1) port = 2000;
 
-        if(System.console() == null && !StaticHandler.isDebug) {
+        if (System.console() == null && !StaticHandler.isDebug) {
 
             String filename = Main.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6);
-            Server.getLogger().info("No console found. Try using -debug arg");
+            System.out.println("No console found");
 
-            String[] newArgs = new String[]{"cmd","/c","start","cmd","/c","java -jar -Xmx2G -Xms2G \"" + filename + "\""};
+            String[] newArgs = new String[]{"cmd", "/c", "start", "cmd", "/c", "java -jar -Xmx2G -Xms2G \"" + filename + "\""};
 
             List<String> launchArgs = new ArrayList<>(Arrays.asList(newArgs));
             launchArgs.addAll(Arrays.asList(args));

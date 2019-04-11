@@ -388,7 +388,7 @@ public class Server implements Runnable {
         return port;
     }
 
-    public static synchronized Logger getLogger() {
+    public static Logger getLogger() {
         if(logger == null) registerLogger();
         return logger;
     }

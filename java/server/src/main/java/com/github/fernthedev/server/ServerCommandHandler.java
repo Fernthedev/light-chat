@@ -34,7 +34,13 @@ public class ServerCommandHandler implements Runnable {
 
                 String command = StaticHandler.readLine("> ");
 
-                new Thread(() -> server.getPluginManager().callEvent(new ChatEvent(server.getConsole(),command,true,true))).start();
+                command = command.replaceAll(" {2}", "");
+
+                if (command.equals("") || command.equals(" ")) continue;
+
+                String finalCommand = command;
+
+                new Thread(() -> server.getPluginManager().callEvent(new ChatEvent(server.getConsole(), finalCommand,true,true))).start();
 
 
             }
