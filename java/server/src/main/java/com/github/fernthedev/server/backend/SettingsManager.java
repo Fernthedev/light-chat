@@ -1,4 +1,4 @@
-package com.github.fernthedev.light;
+package com.github.fernthedev.server.backend;
 
 import com.github.fernthedev.server.Server;
 import com.github.fernthedev.universal.StaticHandler;

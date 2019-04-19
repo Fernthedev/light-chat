@@ -1,0 +1,13 @@
+syntax = "proto2";
+package lightclient.packets;
+
+option java_package = "com.github.fernthedev.packets";
+option java_multiple_files = true;
+option java_outer_classname = "CommandPacketClass";
+
+option optimize_for = SPEED;
+
+message CommandPacket {
+    required string message = 1;
+
+}

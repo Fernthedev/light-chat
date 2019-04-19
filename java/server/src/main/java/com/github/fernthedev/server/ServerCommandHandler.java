@@ -1,8 +1,9 @@
 package com.github.fernthedev.server;
 
 
-import com.github.fernthedev.packets.MessagePacket;
+import com.github.fernthedev.packets.message.MessagePacket;
 import com.github.fernthedev.server.backend.BannedData;
+import com.github.fernthedev.server.backend.CommandMessageParser;
 import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.command.CommandSender;
 import com.github.fernthedev.server.command.commands.KickCommand;
@@ -35,12 +36,13 @@ public class ServerCommandHandler implements Runnable {
                 String command = StaticHandler.readLine("> ");
 
                 command = command.replaceAll(" {2}", "");
+                command = command.trim();
 
                 if (command.equals("") || command.equals(" ")) continue;
 
                 String finalCommand = command;
 
-                new Thread(() -> server.getPluginManager().callEvent(new ChatEvent(server.getConsole(), finalCommand,true,true))).start();
+                new Thread(() -> CommandMessageParser.handleEvent(new ChatEvent(server.getConsole(), finalCommand,true,false))).start();
 
 
             }

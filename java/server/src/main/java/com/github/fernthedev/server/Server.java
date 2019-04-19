@@ -1,18 +1,14 @@
 package com.github.fernthedev.server;
 
-import com.github.fernthedev.light.AuthenticationManager;
 import com.github.fernthedev.light.LightManager;
-import com.github.fernthedev.light.SettingsManager;
 import com.github.fernthedev.packets.LostServerConnectionPacket;
-import com.github.fernthedev.packets.MessagePacket;
 import com.github.fernthedev.packets.Packet;
-import com.github.fernthedev.server.backend.AutoCompleteHandler;
-import com.github.fernthedev.server.backend.BanManager;
-import com.github.fernthedev.server.backend.CommandMessageParser;
-import com.github.fernthedev.server.backend.LoggerManager;
+import com.github.fernthedev.packets.message.MessagePacket;
+import com.github.fernthedev.server.backend.*;
+import com.github.fernthedev.server.backend.auth.AuthenticationManager;
 import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.command.CommandSender;
-import com.github.fernthedev.server.event.chat.ServerPlugin;
+import com.github.fernthedev.server.event.ServerPlugin;
 import com.github.fernthedev.server.netty.MulticastServer;
 import com.github.fernthedev.server.netty.ProcessingHandler;
 import com.github.fernthedev.server.plugin.PluginManager;

@@ -1,4 +1,4 @@
-package com.github.fernthedev.server.event.chat;
+package com.github.fernthedev.server.event;
 
 import com.github.fernthedev.server.plugin.Plugin;
 

@@ -1,11 +1,11 @@
 package com.github.fernthedev.server.netty;
 
 
+import com.alibaba.fastjson.JSON;
 import com.github.fernthedev.server.PlayerHandler;
 import com.github.fernthedev.server.Server;
 import com.github.fernthedev.universal.MulticastData;
 import com.github.fernthedev.universal.StaticHandler;
-import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -29,7 +29,8 @@ public class MulticastServer  extends QuoteServerThread {
 
                 MulticastData dataSend = new MulticastData(server.getPort(), StaticHandler.getVersion(), PlayerHandler.players.size());
 
-                buf = new Gson().toJson(dataSend).getBytes();
+                buf = JSON.toJSONString(dataSend).getBytes();
+
 
                 InetAddress group = InetAddress.getByName(StaticHandler.address);
                 DatagramPacket packet;

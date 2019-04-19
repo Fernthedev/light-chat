@@ -1,8 +1,10 @@
 package com.github.fernthedev.server;
 
-import com.github.fernthedev.light.AuthenticationManager;
+import com.github.fernthedev.server.backend.auth.AuthenticationManager;
 import com.github.fernthedev.packets.*;
 import com.github.fernthedev.packets.latency.PongPacket;
+import com.github.fernthedev.packets.message.MessagePacket;
+import com.github.fernthedev.server.backend.CommandMessageParser;
 import com.github.fernthedev.server.event.chat.ChatEvent;
 import com.github.fernthedev.universal.StaticHandler;
 import org.apache.commons.lang3.StringUtils;
@@ -19,12 +21,12 @@ public class EventListener {
     private Server server;
 
     private ClientPlayer clientPlayer;
-    
+
     public EventListener(Server server, ClientPlayer clientPlayer) {
         this.server = server;
         this.clientPlayer = clientPlayer;
     }
-    
+
     public void received(Packet p) {
 
         //Packet p = (Packet) EncryptionHandler.decrypt(pe, clientPlayer.getServerKey());
@@ -32,10 +34,10 @@ public class EventListener {
 
         // Server.getLogger().info(clientPlayer + " is the sender of packet");
 
-        if(p instanceof TestConnectPacket) {
+        if (p instanceof TestConnectPacket) {
             TestConnectPacket packet = (TestConnectPacket) p;
             Server.getLogger().info("Connected packet: " + packet.getMessage());
-        } else if(p instanceof PongPacket) {
+        } else if (p instanceof PongPacket) {
             clientPlayer.endTime = System.nanoTime();
 
             clientPlayer.setDelayTime((clientPlayer.endTime - clientPlayer.startTime) / 1000000);
@@ -43,77 +45,13 @@ public class EventListener {
         } else if (p instanceof MessagePacket) {
             MessagePacket messagePacket = (MessagePacket) p;
 
-
-
-            ChatEvent chatEvent = new ChatEvent(clientPlayer, messagePacket.getMessage(),false,true);
-            Server.getInstance().getPluginManager().callEvent(chatEvent);
+            ChatEvent chatEvent = new ChatEvent(clientPlayer, messagePacket.getMessage(), messagePacket.isCommand(), true);
+            CommandMessageParser.handleEvent(chatEvent);
 
             /*if(!chatEvent.isCancelled()) {
                 Server.sendMessage("[" + clientPlayer.getDeviceName() + "] :" + messagePacket.getMessage());
             }*/
-        } else if (p instanceof CommandPacket) {
-
-            CommandPacket packet = (CommandPacket) p;
-
-            String command = packet.getMessage();
-
-            ChatEvent chatEvent = new ChatEvent(clientPlayer,command,true,true);
-            Server.getInstance().getPluginManager().callEvent(chatEvent);
-
-            /*
-            String[] checkmessage = command.split(" ", 2);
-            List<String> messageword = new ArrayList<>();
-
-            if (checkmessage.length > 1) {
-                String [] messagewordCheck = command.split(" ");
-
-                int index = 0;
-
-                for(String message : messagewordCheck) {
-                    if(message == null) continue;
-
-                    message = message.replaceAll(" {2}"," ");
-
-                    index++;
-                    if(index == 1 || message.equals("")) continue;
-
-
-                    messageword.add(message);
-                }
-            }
-
-            command = checkmessage[0];
-
-
-            command = command.replaceAll(" {2}"," ");
-
-            if(!command.equals("")) {
-                try {
-                    ChatEvent chatEvent = new ChatEvent(clientPlayer,command,true,true);
-                    Server.getInstance().getPluginManager().callEvent(chatEvent);
-                    if(chatEvent.isCancelled()) {
-                        return;
-                    }
-
-                    for (Command serverCommand : commandList) {
-                        if (serverCommand.getCommandName().equalsIgnoreCase(command)) {
-                            String[] args = new String[messageword.size()];
-                            args = messageword.toArray(args);
-
-                            // Server.getLogger().info("Executing " + command);
-
-
-                            if(!chatEvent.isCancelled()) {
-                                new Thread(new CommandWorkerThread(clientPlayer, serverCommand, args),"CommandThread").start();
-                            }
-                            break;
-                        }
-                    }
-                } catch (Exception e) {
-                    Server.getLogger().error(e.getMessage(),e.getCause());
-                }
-            }*/
-        }else if (p instanceof AutoCompletePacket) {
+        } else if (p instanceof AutoCompletePacket) {
             AutoCompletePacket packet = (AutoCompletePacket) p;
             List<LightCandidate> candidates = server.getAutoCompleteHandler().handleLine(packet.getWords());
 
@@ -140,30 +78,30 @@ public class EventListener {
         //Server.getLogger().info("Connected packet received from " + clientPlayer.getAdress());
         int id = 1;
 
-        if(PlayerHandler.players.size() > 0) {
+        if (PlayerHandler.players.size() > 0) {
             /*while(id < PlayerHandler.players.size()) {
                 id++;
             }*/
             int lastId = 0;
 
-            for(int i = 0; i < PlayerHandler.players.size();i++) {
-                if(PlayerHandler.players.get(i) == null) {
-                    id = lastId+1;
-                }else{
+            for (int i = 0; i < PlayerHandler.players.size(); i++) {
+                if (PlayerHandler.players.get(i) == null) {
+                    id = lastId + 1;
+                } else {
                     lastId = PlayerHandler.players.get(i).getId();
                 }
             }
         }
 
-        if(!isAlphaNumeric(packet.getName())) {
-            disconnectIllegalName(packet,"Name requires alphanumeric characters only");
+        if (!isAlphaNumeric(packet.getName())) {
+            disconnectIllegalName(packet, "Name requires alphanumeric characters only");
             return;
         }
 
 
-        for(ClientPlayer player : PlayerHandler.players.values()) {
-            if(player.getDeviceName().equalsIgnoreCase(packet.getName())) {
-                disconnectIllegalName(packet,"Name already in use");
+        for (ClientPlayer player : PlayerHandler.players.values()) {
+            if (player.getDeviceName().equalsIgnoreCase(packet.getName())) {
+                disconnectIllegalName(packet, "Name already in use");
                 return;
             }
         }
@@ -179,7 +117,7 @@ public class EventListener {
             return;
         }*/
 
-        clientPlayer.setClientUUID(packet.getUuid(),packet.getPrivateKey());
+        clientPlayer.setClientUUID(packet.getUuid(), packet.getPrivateKey());
 
 
         //Server.getLogger().info("Players: " + PlayerHandler.players.size());
@@ -192,11 +130,11 @@ public class EventListener {
 
         PlayerHandler.players.put(clientPlayer.getId(), clientPlayer);
 
-      //  Server.getLogger().info("Password required: " + server.getSettingsManager().getSettings().isPasswordRequiredForLogin());
+        //  Server.getLogger().info("Password required: " + server.getSettingsManager().getSettings().isPasswordRequiredForLogin());
 
-        if(server.getSettingsManager().getSettings().isPasswordRequiredForLogin()) {
+        if (server.getSettingsManager().getSettings().isPasswordRequiredForLogin()) {
             boolean authenticated = AuthenticationManager.authenticate(clientPlayer);
-            if(!authenticated) {
+            if (!authenticated) {
                 clientPlayer.sendObject(new MessagePacket("Unable to authenticate"));
                 clientPlayer.close();
                 return;
@@ -205,7 +143,7 @@ public class EventListener {
 
         clientPlayer.registered = true;
 
-        Server.getLogger().info(clientPlayer.getDeviceName() + " has connected to the server [" + clientPlayer.os+"]");
+        Server.getLogger().info(clientPlayer.getDeviceName() + " has connected to the server [" + clientPlayer.os + "]");
         clientPlayer.sendObject(new RegisterPacket());
         Server.getLogger().debug("NAME:ID " + clientPlayer.getDeviceName() + ":" + clientPlayer.getId());
         Server.getLogger().debug(PlayerHandler.players.get(clientPlayer.getId()).getDeviceName() + " the name." + PlayerHandler.players.get(clientPlayer.getId()).getId() + " the id");
@@ -213,12 +151,12 @@ public class EventListener {
     }
 
     public boolean isAlphaNumeric(String name) {
-        return StringUtils.isAlphanumericSpace(name.replace('-',' '));
+        return StringUtils.isAlphanumericSpace(name.replace('-', ' '));
     }
 
-    private void disconnectIllegalName(ConnectedPacket packet,String message) {
+    private void disconnectIllegalName(ConnectedPacket packet, String message) {
         Server.getLogger().info(clientPlayer + " was disconnected for illegal name. Name: " + packet.getName() + " Reason: " + message + " ID " + clientPlayer.getId());
-        clientPlayer.sendObject(new IllegalConnection("You have been disconnected for illegal name. Name: " + packet.getName() + " Reason: " + message),false);
+        clientPlayer.sendObject(new IllegalConnection("You have been disconnected for illegal name. Name: " + packet.getName() + " Reason: " + message), false);
         clientPlayer.close();
     }
 }

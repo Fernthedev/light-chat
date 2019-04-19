@@ -5,7 +5,6 @@ import com.github.fernthedev.server.Console;
 import com.github.fernthedev.server.Server;
 import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.command.CommandSender;
-import com.github.fernthedev.server.event.EventHandler;
 import com.github.fernthedev.server.event.Listener;
 import com.github.fernthedev.server.event.chat.ChatEvent;
 import lombok.NonNull;
@@ -22,9 +21,10 @@ public class CommandMessageParser implements Listener {
     @NonNull
     private Server server;
 
-    @EventHandler
-    private void onChatEvent(ChatEvent e) {
+    public static void handleEvent(ChatEvent e) {
         CommandSender sender = e.getSender();
+
+        Server.getInstance().getPluginManager().callEvent(e);
 
         if(e.isCancelled()) return;
 
@@ -47,13 +47,13 @@ public class CommandMessageParser implements Listener {
             runnable.run();
         }
 
+
     }
 
-    private void handleCommand(CommandSender sender,String messageM) {
+    private static void handleCommand(CommandSender sender,String messageM) {
         String command = messageM;
         String[] checkmessage = command.split(" ", 2);
         List<String> messageword = new ArrayList<>();
-
 
         if (checkmessage.length > 1) {
             String[] messagewordCheck = command.split(" ");
@@ -91,7 +91,7 @@ public class CommandMessageParser implements Listener {
                         args = messageword.toArray(args);
 
 
-                        new CommandWorkerThread(server.getConsole(), serverCommand, args).run();
+                        new CommandWorkerThread(sender, serverCommand, args).run();
 
                         break;
                     }
@@ -106,7 +106,7 @@ public class CommandMessageParser implements Listener {
         }
     }
 
-    private void handleMessage(CommandSender sender, String message) {
+    private static void handleMessage(CommandSender sender, String message) {
         Server.sendMessage("[" + sender.getName() + "] :" + message);
     }
 

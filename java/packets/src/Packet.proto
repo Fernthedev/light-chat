@@ -1,0 +1,101 @@
+syntax = "proto2";
+package lightclient.packets;
+
+option java_package = "com.github.fernthedev.packets";
+option java_multiple_files = true;
+//option java_outer_classname = "Packet";
+
+import "LightCandidate.proto";
+
+option optimize_for = SPEED;
+
+
+
+
+message Packet {
+
+    extensions 1 to max;
+
+}
+
+
+message MessagePacket {
+    extend Packet {
+        optional Packet packetType = 100;
+    }
+    required string message = 1;
+}
+
+message AutoCompletePacket {
+    extend Packet {
+        optional Packet packetType = 101;
+    }
+
+    repeated LightCandidateData candidateList = 2;
+
+    repeated string wordsListJson = 3;
+}
+
+message ConnectedPacket {
+
+    required string name = 4;
+
+    required string os = 5;
+
+    required string uuid = 6;
+
+    required string privateKey = 7;
+    extend Packet {
+        optional Packet packetType = 102;
+    }
+}
+
+enum SelfMessageType {
+    FillPasswordPacket = 0;
+    LostServerConnectionPacket = 1;
+    RegisterPacket = 2;
+    TimedOutRegistrationPacket = 3;
+    PongPacket = 4;
+    PingReceive = 5;
+    PingPacket = 6;
+    AuthenticateMessage = 7;
+}
+
+message IllegalConnectionPacket {
+    extend Packet {
+        optional Packet packetType = 103;
+    }
+
+    required string message = 8;
+}
+
+message RequestInfoPacket {
+    extend Packet {
+        optional Packet packetType = 104;
+    }
+
+    required string encryptionKey = 9;
+}
+
+message SelfMessagePacket {
+    extend Packet {
+        optional Packet packetType = 105;
+    }
+
+    required SelfMessageType messageType = 10;
+}
+
+
+/*
+oneof packetVar {
+    CommandPacket commandPacket = 10;
+    AutoCompletePacket completePacket = 11;
+    ConnectedPacket connectedPacket = 12;
+    IllegalConnectionPacket connection = 13;
+    RegisterPacket registerPacket = 14;
+    RequestInfoPacket infoPacket = 15;
+    TimedOutRegistrationPacket timeoutPacket = 16;
+    PongPacket pongPacket = 17;
+    PingReceivePacket pingReceivePacket = 18;
+    PingPacket pingPacket = 19;
+}*/

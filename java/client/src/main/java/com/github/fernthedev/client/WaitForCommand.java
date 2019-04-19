@@ -1,7 +1,6 @@
 package com.github.fernthedev.client;
 
-import com.github.fernthedev.packets.CommandPacket;
-import com.github.fernthedev.packets.MessagePacket;
+import com.github.fernthedev.packets.message.MessagePacket;
 import com.github.fernthedev.universal.StaticHandler;
 import org.jline.reader.UserInterruptException;
 
@@ -22,10 +21,16 @@ public class WaitForCommand implements Runnable {
         message = message.replaceAll(" {2}", " ");
         if (!message.equals("") && !message.equals(" ")) {
 
+            if(client.getClientThread().isAuthenticatePassword()) {
+                client.getClientThread().sendObject(new MessagePacket(message,false));
+                client.getClientThread().setAuthenticatePassword(false);
+                return;
+            }
+
             if (message.startsWith("/")) {
-                client.getClientThread().sendObject(new CommandPacket(message.substring(1)));
+                client.getClientThread().sendObject(new MessagePacket(message.substring(1),true));
             } else
-                client.getClientThread().sendObject(new MessagePacket(message));
+                client.getClientThread().sendObject(new MessagePacket(message,false));
         }
     }
 

@@ -1,0 +1,9 @@
+syntax = "proto3";
+package lightclient.packets;
+
+option java_package = "com.github.fernthedev.packets.latency";
+option java_multiple_files = true;
+option java_outer_classname = "PingPacketClass";
+
+option optimize_for = SPEED;
+

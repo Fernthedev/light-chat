@@ -1,4 +1,4 @@
-package com.github.fernthedev.light;
+package com.github.fernthedev.server.backend.auth;
 
 import com.github.fernthedev.server.command.CommandSender;
 

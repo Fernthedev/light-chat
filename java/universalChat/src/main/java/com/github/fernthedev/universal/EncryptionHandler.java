@@ -1,5 +1,7 @@
 package com.github.fernthedev.universal;
 
+import lombok.NonNull;
+
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
@@ -163,7 +165,7 @@ public class EncryptionHandler {
      * @param input String to be hashed
      * @return The hashed string
      */
-    public static String makeSHA256Hash(String input) {
+    public static String makeSHA256Hash(@NonNull String input) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             md.reset();

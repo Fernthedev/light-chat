@@ -42,6 +42,9 @@ public class ClientThread implements Runnable {
 
     public boolean connected;
 
+    @Getter
+    @Setter
+    private boolean authenticatePassword;
 
     protected EventListener listener;
     protected Client client;

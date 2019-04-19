@@ -23,11 +23,7 @@
             <artifactId>pi4j-core</artifactId>
             <version>1.2-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>com.squareup.okio</groupId>
-            <artifactId>okio</artifactId>
-            <version>2.2.2</version>
-        </dependency>
+
     </dependencies>
 
     <build>

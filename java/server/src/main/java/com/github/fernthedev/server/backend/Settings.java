@@ -1,4 +1,4 @@
-package com.github.fernthedev.light;
+package com.github.fernthedev.server.backend;
 
 import lombok.Data;
 import lombok.Getter;

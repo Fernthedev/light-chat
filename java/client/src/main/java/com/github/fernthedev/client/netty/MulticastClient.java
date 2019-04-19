@@ -1,11 +1,11 @@
 package com.github.fernthedev.client.netty;
 
 
+import com.alibaba.fastjson.JSON;
 import com.github.fernthedev.client.ServerAddress;
 import com.github.fernthedev.exceptions.DebugChainedException;
 import com.github.fernthedev.universal.MulticastData;
 import com.github.fernthedev.universal.StaticHandler;
-import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 
 import java.io.IOException;
@@ -46,14 +46,14 @@ public class MulticastClient {
                     continue;
                 }
 
-                received = received.replaceAll(" ","");
+                //received = received.replaceAll(" ","");
 
                 try {
                     JsonReader reader = new JsonReader(new StringReader(received));
 
                     reader.setLenient(true);
 
-                    MulticastData data = new Gson().fromJson(reader, MulticastData.class);
+                    MulticastData data = JSON.parseObject(received, MulticastData.class);
 
                     String address = (packet.getAddress()).getHostAddress();
 

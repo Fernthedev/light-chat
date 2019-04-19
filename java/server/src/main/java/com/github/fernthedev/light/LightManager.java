@@ -1,6 +1,9 @@
 package com.github.fernthedev.light;
 
 import com.github.fernthedev.server.*;
+import com.github.fernthedev.server.backend.auth.AuthenticationManager;
+import com.github.fernthedev.server.backend.Settings;
+import com.github.fernthedev.server.backend.SettingsManager;
 import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.command.CommandSender;
 import com.pi4j.io.gpio.*;

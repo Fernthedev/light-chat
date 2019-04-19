@@ -1,0 +1,16 @@
+syntax = "proto2";
+package lightclient.packets;
+
+option java_package = "com.github.fernthedev.data";
+
+option optimize_for = SPEED;
+
+message LightCandidateData {
+    required string value = 1;
+    required string displ =2;
+    required string group =3;
+    required string descr =4 ;
+    required string suffix =5;
+    required string key =6 ;
+    required bool complete= 7;
+}

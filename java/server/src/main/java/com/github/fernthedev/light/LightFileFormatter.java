@@ -2,41 +2,27 @@ package com.github.fernthedev.light;
 
 import com.github.fernthedev.light.api.LightFile;
 import com.github.fernthedev.light.api.LightParser;
+import com.github.fernthedev.light.api.lines.LightLine;
 import com.github.fernthedev.light.api.lines.LightPinLine;
 import com.github.fernthedev.light.api.lines.LightPrintLine;
 import com.github.fernthedev.light.api.lines.LightSleepLine;
-import com.github.fernthedev.light.api.lines.LightLine;
 import com.github.fernthedev.server.Server;
-import com.pi4j.io.gpio.*;
-import com.pi4j.io.gpio.exception.GpioPinExistsException;
-import com.pi4j.system.SystemInfo;
-import lombok.NonNull;
+import com.pi4j.io.gpio.GpioController;
+import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.*;
 
 public class LightFileFormatter {
 
     private LightManager lightManager;
 
-
-
-
-
-
     private GpioController gpio;
-
-
 
     public LightFileFormatter(LightManager lightManager, GpioController gpio) {
         this.lightManager = lightManager;
         this.gpio = gpio;
-
-
-
 
     }
 

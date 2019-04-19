@@ -1,0 +1,9 @@
+syntax = "proto3";
+package lightclient.packets;
+
+option java_package = "com.github.fernthedev.packets";
+option java_multiple_files = true;
+option java_outer_classname = "TimedOutRegistrationPacketClass";
+
+option optimize_for = SPEED;
+

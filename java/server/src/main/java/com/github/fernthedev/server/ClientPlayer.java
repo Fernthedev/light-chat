@@ -1,8 +1,8 @@
 package com.github.fernthedev.server;
 
-import com.github.fernthedev.packets.MessagePacket;
 import com.github.fernthedev.packets.Packet;
 import com.github.fernthedev.packets.latency.PingPacket;
+import com.github.fernthedev.packets.message.MessagePacket;
 import com.github.fernthedev.server.command.CommandSender;
 import com.github.fernthedev.universal.EncryptionHandler;
 import com.github.fernthedev.universal.StaticHandler;
