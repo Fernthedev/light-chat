@@ -35,10 +35,12 @@ public class ServerCommandHandler implements Runnable {
 
                 String command = StaticHandler.readLine("> ");
 
+                if (command.equals("")) continue;
+
                 command = command.replaceAll(" {2}", "");
                 command = command.trim();
 
-                if (command.equals("") || command.equals(" ")) continue;
+
 
                 String finalCommand = command;
 
@@ -148,7 +150,8 @@ public class ServerCommandHandler implements Runnable {
 
                     if (args.length == 0) {
                         sender.sendMessage("No player to kick or type? (ban {type} {player}) \n types: name,ip");
-                    } else {
+                    }
+                    if (args.length == 1){
                         String player = args[0];
 
                         for (ClientPlayer clientPlayer : new HashMap<>(Server.socketList).values()) {

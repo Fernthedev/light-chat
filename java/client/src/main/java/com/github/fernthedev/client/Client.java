@@ -3,7 +3,6 @@ package com.github.fernthedev.client;
 import com.github.fernthedev.client.backend.AutoCompleteHandler;
 import com.github.fernthedev.universal.StaticHandler;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,12 +29,10 @@ public class Client {
 
     @Getter
     @Setter
-    @NonNull
     protected String serverKey;
 
     @Getter
     @Setter
-    @NonNull
     protected String privateKey;
 
 

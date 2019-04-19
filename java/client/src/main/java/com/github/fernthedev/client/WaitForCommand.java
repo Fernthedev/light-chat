@@ -21,11 +21,12 @@ public class WaitForCommand implements Runnable {
         message = message.replaceAll(" {2}", " ");
         if (!message.equals("") && !message.equals(" ")) {
 
+            /*
             if(client.getClientThread().isAuthenticatePassword()) {
                 client.getClientThread().sendObject(new MessagePacket(message,false));
                 client.getClientThread().setAuthenticatePassword(false);
                 return;
-            }
+            }*/
 
             if (message.startsWith("/")) {
                 client.getClientThread().sendObject(new MessagePacket(message.substring(1),true));

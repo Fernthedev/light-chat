@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import net.minecrell.terminalconsole.TerminalConsoleAppender;
 import org.apache.commons.lang3.SystemUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.util.PropertiesUtil;
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
@@ -88,7 +89,7 @@ public class StaticHandler {
     public static void setupLoggers() {
         System.setProperty("log4j.configurationFile","log4j2.xml");
         System.setProperty("log4j2.contextSelector","org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
-        System.setProperty("terminal.jline", String.valueOf(true));
+        //System.setProperty("terminal.jline", String.valueOf(true));
         //Logger logger = LogManager.getRootLogger();
 
         //Logger nettyLogger = LoggerFactory.getLogger("io.netty");
@@ -98,7 +99,7 @@ public class StaticHandler {
     public static void setupTerminal(@NonNull Completer completer) {
         final Terminal terminal = TerminalConsoleAppender.getTerminal();
 
-        if(terminal == null) return;
+        Validate.notNull(terminal);
 
         lineReader = LineReaderBuilder.builder()
                 .terminal(terminal)
@@ -106,7 +107,7 @@ public class StaticHandler {
                 .build();
 
         lineReader.setOpt(LineReader.Option.DISABLE_EVENT_EXPANSION);
-       // lineReader.unsetOpt(LineReader.Option.INSERT_TAB);
+        lineReader.unsetOpt(LineReader.Option.INSERT_TAB);
 
         TerminalConsoleAppender.setReader(lineReader);
 

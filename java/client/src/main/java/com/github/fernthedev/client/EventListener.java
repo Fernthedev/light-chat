@@ -4,7 +4,6 @@ import com.github.fernthedev.packets.*;
 import com.github.fernthedev.packets.latency.PingPacket;
 import com.github.fernthedev.packets.latency.PingReceive;
 import com.github.fernthedev.packets.latency.PongPacket;
-import com.github.fernthedev.packets.message.AuthenticateMessagePacket;
 import com.github.fernthedev.packets.message.MessagePacket;
 import com.github.fernthedev.universal.EncryptionHandler;
 import org.apache.commons.lang3.Validate;
@@ -82,8 +81,6 @@ public class EventListener {
         } else if(p instanceof AutoCompletePacket) {
             AutoCompletePacket packet = (AutoCompletePacket) p;
             client.getCompleteHandler().addCandidates(packet.getCandidateList());
-        } else if (p instanceof AuthenticateMessagePacket) {
-            client.getClientThread().setAuthenticatePassword(true);
         }
     }
 

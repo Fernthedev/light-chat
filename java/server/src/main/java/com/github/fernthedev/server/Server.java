@@ -86,8 +86,10 @@ public class Server implements Runnable {
         this.port = port;
         console = new Console();
         server = this;
+
         autoCompleteHandler = new AutoCompleteHandler(this);
-        StaticHandler.setupTerminal(server.getAutoCompleteHandler());
+
+        StaticHandler.setupTerminal(autoCompleteHandler);
 
 
         pluginManager = new PluginManager();

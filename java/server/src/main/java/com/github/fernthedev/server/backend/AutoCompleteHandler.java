@@ -30,10 +30,13 @@ public class AutoCompleteHandler implements Completer {
         if(words.size() == 1) {
             for (Command command : server.getCommands()) {
                 String string = command.getCommandName();
+                if(string.startsWith("/")) string = string.substring(1);
+
                 candidates.add(new LightCandidate(AttributedString.stripAnsi(string), string, null, null, null, null, true));
             }
         }else{
             String c = words.get(0);
+
             Command curCommand = null;
 
             for(Command command : server.getCommands()) {
@@ -66,8 +69,6 @@ public class AutoCompleteHandler implements Completer {
 
     @Override
     public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
-        Server.getLogger().info("Handled line");
-
 
         List<LightCandidate> candidateList = handleLine(line.words());
 
