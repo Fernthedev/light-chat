@@ -30,7 +30,6 @@ import lombok.NonNull;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -395,7 +394,7 @@ public class Server implements Runnable {
      * @param command Command to be registered
      * @return Returns the instance to use it's usage method
      */
-    public Command registerCommand(@NotNull Command command) {
+    public Command registerCommand(@NonNull Command command) {
         commandList.add(command);
         return command;
     }

@@ -5,6 +5,9 @@ import com.google.gson.Gson;
 import lombok.Getter;
 import lombok.NonNull;
 import net.minecrell.terminalconsole.TerminalConsoleAppender;
+import okio.BufferedSource;
+import okio.Okio;
+import okio.Source;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.util.PropertiesUtil;
@@ -15,10 +18,13 @@ import org.jline.terminal.Terminal;
 import org.json.simple.JSONObject;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 // Import log4j classes.
 
@@ -148,12 +154,18 @@ public class StaticHandler {
 
         //Get file from resources folder
         ClassLoader classLoader = StaticHandler.class.getClassLoader();
+        InputStream string = classLoader.getResourceAsStream(fileName);
 
-        try (Scanner scanner = new Scanner(Objects.requireNonNull(classLoader.getResourceAsStream(fileName)))) {
-            while(scanner.hasNextLine()) {
-                String line = scanner.nextLine();
+        try (Source fileSource = Okio.source(Objects.requireNonNull(string));
+             BufferedSource bufferedSource = Okio.buffer(fileSource)) {
+            while(true) {
+                String line = bufferedSource.readUtf8Line();
+                if(line == null) break;
+
                 result.append(line).append("\n");
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         return result.toString();
@@ -167,12 +179,16 @@ public class StaticHandler {
         //Get file from resources folder
         //ClassLoader classLoader = StaticHandler.class.getClassLoader();
 
-        try (Scanner scanner = new Scanner(Objects.requireNonNull(file))) {
-            while(scanner.hasNextLine()) {
-                String line = scanner.nextLine();
+        try (Source fileSource = Okio.source(file);
+             BufferedSource bufferedSource = Okio.buffer(fileSource)) {
+
+            while(true) {
+                String line = bufferedSource.readUtf8Line();
+                if(line == null) break;
+
                 result.append(line).append("\n");
             }
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
