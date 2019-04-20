@@ -61,17 +61,21 @@ public class KickCommand extends Command implements TabExecutor {
 
     @Override
     public List<String> getCompletions(String[] args) {
+        if(args.length == 1) {
+            String curArg = args[args.length - 1];
 
-        String curArg = args[args.length - 1];
-        List<ClientPlayer> completions = PlayerHandler.players.values().stream().filter(
-                item -> item.getName().startsWith(curArg)).collect(Collectors.toList());
+            List<ClientPlayer> completions = PlayerHandler.players.values().stream().filter(
+                    item -> item.getName().startsWith(curArg)).collect(Collectors.toList());
 
-        List<String> strings = new ArrayList<>();
-        for (ClientPlayer clientPlayer : completions) {
-            strings.add(clientPlayer.getName());
+            List<String> strings = new ArrayList<>();
+            for (ClientPlayer clientPlayer : completions) {
+                strings.add(clientPlayer.getName());
+            }
+
+            return strings;
         }
 
-        return strings;
+        return new ArrayList<>();
 
     }
 }

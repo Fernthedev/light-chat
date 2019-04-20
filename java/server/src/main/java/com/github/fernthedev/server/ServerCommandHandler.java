@@ -150,8 +150,7 @@ public class ServerCommandHandler implements Runnable {
 
                     if (args.length == 0) {
                         sender.sendMessage("No player to kick or type? (ban {type} {player}) \n types: name,ip");
-                    }
-                    if (args.length == 1){
+                    }else {
                         String player = args[0];
 
                         for (ClientPlayer clientPlayer : new HashMap<>(Server.socketList).values()) {

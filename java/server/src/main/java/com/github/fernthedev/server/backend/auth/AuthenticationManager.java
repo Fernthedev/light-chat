@@ -4,7 +4,6 @@ import com.github.fernthedev.packets.FillPasswordPacket;
 import com.github.fernthedev.server.ClientPlayer;
 import com.github.fernthedev.server.Console;
 import com.github.fernthedev.server.Server;
-import com.github.fernthedev.server.backend.LoggerManager;
 import com.github.fernthedev.server.backend.SettingsManager;
 import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.command.CommandSender;
@@ -131,7 +130,7 @@ public class AuthenticationManager extends Command implements Listener {
                             event.getSender().sendMessage("Incorrect password");
                             playerInfo.tries++;
                         }else{
-                            LoggerManager.getInstance().log(event.getSender().getName() + ":" + clientPlayer.getAdress() + " tried to authenticate but failed 2 times");
+                            //LogFileManager.log(event.getSender().getName() + ":" + clientPlayer.getAdress() + " tried to authenticate but failed 2 times");
                             checking.remove(event.getSender());
                         }
                     }

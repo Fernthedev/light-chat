@@ -338,11 +338,6 @@ public class Server implements Runnable {
         server.registerCommand(authenticationManager);
         server.getPluginManager().registerEvents(authenticationManager, new ServerPlugin());
 
-        LoggerManager loggerManager = new LoggerManager();
-
-
-        pluginManager.registerEvents(loggerManager, new ServerPlugin());
-
         logger.info("Running on [" + StaticHandler.os + "]");
 
         if (StaticHandler.os.equalsIgnoreCase("Linux") || StaticHandler.os.contains("Linux") || StaticHandler.isLight) {

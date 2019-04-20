@@ -14,6 +14,7 @@ import org.jline.utils.AttributedString;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RequiredArgsConstructor
@@ -28,16 +29,35 @@ public class AutoCompleteHandler implements Completer {
 
 
         if(words.size() == 1) {
-            for (Command command : server.getCommands()) {
-                String string = command.getCommandName();
-                if(string.startsWith("/")) string = string.substring(1);
+            String c = words.get(0);
+            String prefix = "";
+            if(c.startsWith("/")) {
+                prefix = "/";
+                c = c.substring(1);
+            }
 
-                candidates.add(new LightCandidate(AttributedString.stripAnsi(string), string, null, null, null, null, true));
+            final String finishString = c;
+
+
+            List<Command> completions = server.getCommands().stream().filter(
+                    item -> item.getCommandName().startsWith(finishString)).collect(Collectors.toList());
+
+
+            for (Command command : completions) {
+                String commandName = command.getCommandName();
+
+                String newString = prefix + commandName;
+
+                candidates.add(new LightCandidate(AttributedString.stripAnsi(newString), newString, null, null, null, null, true));
             }
         }else{
             String c = words.get(0);
 
             Command curCommand = null;
+
+            if(c.startsWith("/")) {
+                c = c.substring(1);
+            }
 
             for(Command command : server.getCommands()) {
                 if(command.getCommandName().equalsIgnoreCase(c)) {
@@ -60,6 +80,8 @@ public class AutoCompleteHandler implements Completer {
                 for (String string : completions) {
                     candidates.add(new LightCandidate(AttributedString.stripAnsi(string), string, null, null, null, null, true));
                 }
+            }else{
+                return new ArrayList<>();
             }
         }
 

@@ -44,7 +44,6 @@ public class EventListener {
         } else if (p instanceof IllegalConnection) {
             client.getLogger().info(((IllegalConnection) p).getMessage());
         } else if (p instanceof RegisterPacket) {
-            client.registered = true;
             client.getLogger().info("Successfully connected to server");
         }else if(p instanceof RequestInfoPacket) {
             RequestInfoPacket packet = (RequestInfoPacket) p;

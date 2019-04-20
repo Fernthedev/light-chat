@@ -55,18 +55,20 @@ public class AutoCompleteHandler implements Completer {
         }
 
         AutoCompletePacket autoCompletePacket = new AutoCompletePacket(line.words());
-        client.getClientThread().sendObject(autoCompletePacket);
+        if(client.registered) {
+            client.getClientThread().sendObject(autoCompletePacket);
 
-        keepCheck = true;
-        while (keepCheck) {
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            keepCheck = true;
+            while (keepCheck) {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
-        }
 
-        candidates.addAll(candidateList);
+            candidates.addAll(candidateList);
+        }
 
 
     }

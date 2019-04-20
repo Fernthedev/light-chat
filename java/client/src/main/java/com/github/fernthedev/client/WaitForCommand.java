@@ -29,9 +29,9 @@ public class WaitForCommand implements Runnable {
             }*/
 
             if (message.startsWith("/")) {
-                client.getClientThread().sendObject(new MessagePacket(message.substring(1),true));
+                client.getClientThread().sendObject(new MessagePacket(message.substring(1), true));
             } else
-                client.getClientThread().sendObject(new MessagePacket(message,false));
+                client.getClientThread().sendObject(new MessagePacket(message, false));
         }
     }
 
