@@ -103,5 +103,11 @@
             <artifactId>snakeyaml</artifactId>
             <version>1.23</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>3.8.0-rc-1</version>
+        </dependency>
+
     </dependencies>
 </project>

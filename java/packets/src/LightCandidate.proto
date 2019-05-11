@@ -1,16 +1,17 @@
-syntax = "proto2";
+syntax = "proto3";
 package lightclient.packets;
 
 option java_package = "com.github.fernthedev.data";
+option java_multiple_files = true;
 
 option optimize_for = SPEED;
 
 message LightCandidateData {
-    required string value = 1;
-    required string displ =2;
-    required string group =3;
-    required string descr =4 ;
-    required string suffix =5;
-    required string key =6 ;
-    required bool complete= 7;
+    string value = 1;
+    string displ =2;
+    string group =3;
+    string descr =4 ;
+    string suffix =5;
+    string key =6 ;
+    bool complete= 7;
 }

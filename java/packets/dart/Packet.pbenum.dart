@@ -17,6 +17,7 @@ class SelfMessageType extends $pb.ProtobufEnum {
   static const SelfMessageType PingReceive = SelfMessageType._(5, 'PingReceive');
   static const SelfMessageType PingPacket = SelfMessageType._(6, 'PingPacket');
   static const SelfMessageType AuthenticateMessage = SelfMessageType._(7, 'AuthenticateMessage');
+  static const SelfMessageType DisconnectPacket = SelfMessageType._(8, 'DisconnectPacket');
 
   static const $core.List<SelfMessageType> values = <SelfMessageType> [
     FillPasswordPacket,
@@ -27,6 +28,7 @@ class SelfMessageType extends $pb.ProtobufEnum {
     PingReceive,
     PingPacket,
     AuthenticateMessage,
+    DisconnectPacket,
   ];
 
   static final $core.Map<$core.int, SelfMessageType> _byValue = $pb.ProtobufEnum.initByValue(values);

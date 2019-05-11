@@ -2,8 +2,11 @@ package com.github.fernthedev.client;
 
 import com.github.fernthedev.client.netty.ClientHandler;
 import com.github.fernthedev.exceptions.DebugException;
-import com.github.fernthedev.packets.Packet;
+import com.github.fernthedev.universal.MultiplePacketDecoder;
+import com.github.fernthedev.universal.PacketHandler;
+import com.github.fernthedev.universal.SinglePacketDecoder;
 import com.github.fernthedev.universal.StaticHandler;
+import com.google.protobuf.GeneratedMessageV3;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollEventLoopGroup;
@@ -12,10 +15,10 @@ import io.netty.channel.kqueue.KQueueEventLoopGroup;
 import io.netty.channel.kqueue.KQueueSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.serialization.ClassResolvers;
-import io.netty.handler.codec.serialization.ObjectDecoder;
-import io.netty.handler.codec.serialization.ObjectEncoder;
-import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.handler.codec.protobuf.ProtobufEncoder;
+import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
+import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
+import io.netty.util.concurrent.BlockingOperationException;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.SystemUtils;
@@ -29,6 +32,8 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class ClientThread implements Runnable {
@@ -183,17 +188,35 @@ public class ClientThread implements Runnable {
             b.option(ChannelOption.SO_KEEPALIVE, true);
             b.option(ChannelOption.TCP_NODELAY, true);
 
-            b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 2000);
+            // Configure SSL.
+
+            b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 20000);
 
             b.handler(new ChannelInitializer<Channel>() {
 
                 @Override
                 public void initChannel(Channel ch)
                         throws Exception {
-                    ch.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(15));
-                    ch.pipeline().addLast(new ObjectEncoder(),
-                            new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
-                            clientHandler);
+                    //ch.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(15));
+                    ChannelPipeline p = ch.pipeline();
+
+                    //p.addLast(sslCtx.newHandler(ch.alloc(),client.host,client.port));
+
+                    p.addLast(new ProtobufVarint32FrameDecoder());
+
+                    List<SinglePacketDecoder> decoders = new ArrayList<>();
+
+                    for(GeneratedMessageV3 messageV3 : PacketHandler.getPacketInstances()) {
+                        decoders.add(new SinglePacketDecoder(messageV3));
+                    }
+
+                    p.addLast(new MultiplePacketDecoder(decoders));
+
+
+
+                    p.addLast(new ProtobufVarint32LengthFieldPrepender());
+                    p.addLast(new ProtobufEncoder());
+                    p.addLast(clientHandler);
                 }
             });
 
@@ -228,16 +251,18 @@ public class ClientThread implements Runnable {
 
     protected boolean runThread = true;
 
-    public void sendObject(Packet packet,boolean encrypt) {
+    public void sendObject(GeneratedMessageV3 packet,boolean encrypt) {
         if (packet != null) {
+            channel.writeAndFlush(packet);
 
+            /*
             if (encrypt) {
                 SealedObject sealedObject = encryptObject(packet);
 
                 channel.writeAndFlush(sealedObject);
             } else {
                 channel.writeAndFlush(packet);
-            }
+            }*/
 
 
 
@@ -246,7 +271,7 @@ public class ClientThread implements Runnable {
         }
     }
 
-    public void sendObject(Packet packet) {
+    public void sendObject(GeneratedMessageV3 packet) {
         sendObject(packet,true);
     }
 
@@ -254,10 +279,12 @@ public class ClientThread implements Runnable {
         client.getLogger().info("Disconnecting from server");
         running = false;
 
+
         try {
             future.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
+        } catch (BlockingOperationException ignored) {
         }
 
         workerGroup.shutdownGracefully();

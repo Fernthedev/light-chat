@@ -14,29 +14,12 @@ import 'Packet.pbenum.dart';
 
 export 'Packet.pbenum.dart';
 
-class Packet extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo('Packet', package: const $pb.PackageName('lightclient.packets'))
-    ..hasExtensions = true
-  ;
-
-  Packet() : super();
-  Packet.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) : super.fromBuffer(i, r);
-  Packet.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) : super.fromJson(i, r);
-  Packet clone() => Packet()..mergeFromMessage(this);
-  Packet copyWith(void Function(Packet) updates) => super.copyWith((message) => updates(message as Packet));
-  $pb.BuilderInfo get info_ => _i;
-  static Packet create() => Packet();
-  Packet createEmptyInstance() => create();
-  static $pb.PbList<Packet> createRepeated() => $pb.PbList<Packet>();
-  static Packet getDefault() => _defaultInstance ??= create()..freeze();
-  static Packet _defaultInstance;
-}
-
 class MessagePacket extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo('MessagePacket', package: const $pb.PackageName('lightclient.packets'))
-    ..aQS(1, 'message')
+    ..aOS(1, 'message')
+    ..aOB(2, 'command')
+    ..hasRequiredFields = false
   ;
-  static final $pb.Extension packetType = $pb.Extension<Packet>('lightclient.packets.Packet', 'packetType', 100, $pb.PbFieldType.OM, Packet.getDefault, Packet.create);
 
   MessagePacket() : super();
   MessagePacket.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) : super.fromBuffer(i, r);
@@ -54,14 +37,19 @@ class MessagePacket extends $pb.GeneratedMessage {
   set message($core.String v) { $_setString(0, v); }
   $core.bool hasMessage() => $_has(0);
   void clearMessage() => clearField(1);
+
+  $core.bool get command => $_get(1, false);
+  set command($core.bool v) { $_setBool(1, v); }
+  $core.bool hasCommand() => $_has(1);
+  void clearCommand() => clearField(2);
 }
 
 class AutoCompletePacket extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo('AutoCompletePacket', package: const $pb.PackageName('lightclient.packets'))
     ..pc<$0.LightCandidateData>(2, 'candidateList', $pb.PbFieldType.PM,$0.LightCandidateData.create)
     ..pPS(3, 'wordsListJson')
+    ..hasRequiredFields = false
   ;
-  static final $pb.Extension packetType = $pb.Extension<Packet>('lightclient.packets.Packet', 'packetType', 101, $pb.PbFieldType.OM, Packet.getDefault, Packet.create);
 
   AutoCompletePacket() : super();
   AutoCompletePacket.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) : super.fromBuffer(i, r);
@@ -82,12 +70,12 @@ class AutoCompletePacket extends $pb.GeneratedMessage {
 
 class ConnectedPacket extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo('ConnectedPacket', package: const $pb.PackageName('lightclient.packets'))
-    ..aQS(4, 'name')
-    ..aQS(5, 'os')
-    ..aQS(6, 'uuid')
-    ..aQS(7, 'privateKey')
+    ..aOS(4, 'name')
+    ..aOS(5, 'os')
+    ..aOS(6, 'uuid')
+    ..aOS(7, 'privateKey')
+    ..hasRequiredFields = false
   ;
-  static final $pb.Extension packetType = $pb.Extension<Packet>('lightclient.packets.Packet', 'packetType', 102, $pb.PbFieldType.OM, Packet.getDefault, Packet.create);
 
   ConnectedPacket() : super();
   ConnectedPacket.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) : super.fromBuffer(i, r);
@@ -124,9 +112,9 @@ class ConnectedPacket extends $pb.GeneratedMessage {
 
 class IllegalConnectionPacket extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo('IllegalConnectionPacket', package: const $pb.PackageName('lightclient.packets'))
-    ..aQS(8, 'message')
+    ..aOS(8, 'message')
+    ..hasRequiredFields = false
   ;
-  static final $pb.Extension packetType = $pb.Extension<Packet>('lightclient.packets.Packet', 'packetType', 103, $pb.PbFieldType.OM, Packet.getDefault, Packet.create);
 
   IllegalConnectionPacket() : super();
   IllegalConnectionPacket.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) : super.fromBuffer(i, r);
@@ -148,9 +136,9 @@ class IllegalConnectionPacket extends $pb.GeneratedMessage {
 
 class RequestInfoPacket extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo('RequestInfoPacket', package: const $pb.PackageName('lightclient.packets'))
-    ..aQS(9, 'encryptionKey')
+    ..aOS(9, 'encryptionKey')
+    ..hasRequiredFields = false
   ;
-  static final $pb.Extension packetType = $pb.Extension<Packet>('lightclient.packets.Packet', 'packetType', 104, $pb.PbFieldType.OM, Packet.getDefault, Packet.create);
 
   RequestInfoPacket() : super();
   RequestInfoPacket.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) : super.fromBuffer(i, r);
@@ -172,9 +160,9 @@ class RequestInfoPacket extends $pb.GeneratedMessage {
 
 class SelfMessagePacket extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo('SelfMessagePacket', package: const $pb.PackageName('lightclient.packets'))
-    ..e<SelfMessageType>(10, 'messageType', $pb.PbFieldType.QE, SelfMessageType.FillPasswordPacket, SelfMessageType.valueOf, SelfMessageType.values)
+    ..e<SelfMessageType>(10, 'messageType', $pb.PbFieldType.OE, SelfMessageType.FillPasswordPacket, SelfMessageType.valueOf, SelfMessageType.values)
+    ..hasRequiredFields = false
   ;
-  static final $pb.Extension packetType = $pb.Extension<Packet>('lightclient.packets.Packet', 'packetType', 105, $pb.PbFieldType.OM, Packet.getDefault, Packet.create);
 
   SelfMessagePacket() : super();
   SelfMessagePacket.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) : super.fromBuffer(i, r);

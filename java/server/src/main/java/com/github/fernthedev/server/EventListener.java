@@ -1,12 +1,12 @@
 package com.github.fernthedev.server;
 
-import com.github.fernthedev.server.backend.auth.AuthenticationManager;
+import com.github.fernthedev.data.LightCandidateData;
 import com.github.fernthedev.packets.*;
-import com.github.fernthedev.packets.latency.PongPacket;
-import com.github.fernthedev.packets.message.MessagePacket;
 import com.github.fernthedev.server.backend.CommandMessageParser;
+import com.github.fernthedev.server.backend.auth.AuthenticationManager;
 import com.github.fernthedev.server.event.chat.ChatEvent;
 import com.github.fernthedev.universal.StaticHandler;
+import com.google.protobuf.GeneratedMessageV3;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.*;
@@ -27,25 +27,26 @@ public class EventListener {
         this.clientPlayer = clientPlayer;
     }
 
-    public void received(Packet p) {
+    public void received(GeneratedMessageV3 p) {
 
         //Packet p = (Packet) EncryptionHandler.decrypt(pe, clientPlayer.getServerKey());
 
 
         // Server.getLogger().info(clientPlayer + " is the sender of packet");
 
-        if (p instanceof TestConnectPacket) {
-            TestConnectPacket packet = (TestConnectPacket) p;
-            Server.getLogger().info("Connected packet: " + packet.getMessage());
-        } else if (p instanceof PongPacket) {
-            clientPlayer.endTime = System.nanoTime();
+        if(p instanceof SelfMessagePacket) {
+            SelfMessagePacket packet = (SelfMessagePacket) p;
+            switch (packet.getMessageType()) {
+                case PongPacket:
+                    clientPlayer.endTime = System.nanoTime();
 
-            clientPlayer.setDelayTime((clientPlayer.endTime - clientPlayer.startTime) / 1000000);
-
+                    clientPlayer.setDelayTime((clientPlayer.endTime - clientPlayer.startTime) / 1000000);
+                    break;
+            }
         } else if (p instanceof MessagePacket) {
             MessagePacket messagePacket = (MessagePacket) p;
 
-            ChatEvent chatEvent = new ChatEvent(clientPlayer, messagePacket.getMessage(), messagePacket.isCommand(), true);
+            ChatEvent chatEvent = new ChatEvent(clientPlayer, messagePacket.getMessage(), messagePacket.getCommand(), true);
             CommandMessageParser.handleEvent(chatEvent);
 
             /*if(!chatEvent.isCancelled()) {
@@ -53,9 +54,10 @@ public class EventListener {
             }*/
         } else if (p instanceof AutoCompletePacket) {
             AutoCompletePacket packet = (AutoCompletePacket) p;
-            List<LightCandidate> candidates = server.getAutoCompleteHandler().handleLine(packet.getWords());
 
-            packet.setCandidateList(candidates);
+            List<LightCandidateData> candidates = server.getAutoCompleteHandler().handleLine(packet.getWordsListJsonList());
+
+            packet.toBuilder().addAllCandidateList(candidates);
             clientPlayer.sendObject(packet);
         }
 
@@ -112,7 +114,7 @@ public class EventListener {
 
         if(server.getBanManager().isBanned(clientPlayer)) {
             Server.getLogger().debug("Player is banned " + clientPlayer.channel.remoteAddress());
-            clientPlayer.sendObject(new MessagePacket("Your have been banned."),false);
+            clientPlayer.sendObject(MessagePacket.newBuilder().setMessage("Your have been banned."),false);
             clientPlayer.close();
             return;
         }*/
@@ -125,7 +127,7 @@ public class EventListener {
 
         clientPlayer.setDeviceName(packet.getName());
         clientPlayer.setId(id);
-        clientPlayer.os = packet.getOS();
+        clientPlayer.os = packet.getOs();
 
 
         PlayerHandler.players.put(clientPlayer.getId(), clientPlayer);
@@ -135,7 +137,7 @@ public class EventListener {
         if (server.getSettingsManager().getSettings().isPasswordRequiredForLogin()) {
             boolean authenticated = AuthenticationManager.authenticate(clientPlayer);
             if (!authenticated) {
-                clientPlayer.sendObject(new MessagePacket("Unable to authenticate"));
+                clientPlayer.sendObject(MessagePacket.newBuilder().setMessage("Unable to authenticate").build());
                 clientPlayer.close();
                 return;
             }
@@ -144,7 +146,7 @@ public class EventListener {
         clientPlayer.registered = true;
 
         Server.getLogger().info(clientPlayer.getDeviceName() + " has connected to the server [" + clientPlayer.os + "]");
-        clientPlayer.sendObject(new RegisterPacket());
+        clientPlayer.sendObject(SelfMessagePacket.newBuilder().setMessageType(SelfMessageType.RegisterPacket).build());
         Server.getLogger().debug("NAME:ID " + clientPlayer.getDeviceName() + ":" + clientPlayer.getId());
         Server.getLogger().debug(PlayerHandler.players.get(clientPlayer.getId()).getDeviceName() + " the name." + PlayerHandler.players.get(clientPlayer.getId()).getId() + " the id");
 
@@ -156,7 +158,7 @@ public class EventListener {
 
     private void disconnectIllegalName(ConnectedPacket packet, String message) {
         Server.getLogger().info(clientPlayer + " was disconnected for illegal name. Name: " + packet.getName() + " Reason: " + message + " ID " + clientPlayer.getId());
-        clientPlayer.sendObject(new IllegalConnection("You have been disconnected for illegal name. Name: " + packet.getName() + " Reason: " + message), false);
+        clientPlayer.sendObject(MessagePacket.newBuilder().setMessage("You have been disconnected for illegal name. Name: " + packet.getName() + " Reason: " + message).build(), false);
         clientPlayer.close();
     }
 }

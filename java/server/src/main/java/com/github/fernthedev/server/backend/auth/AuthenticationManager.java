@@ -1,6 +1,8 @@
 package com.github.fernthedev.server.backend.auth;
 
-import com.github.fernthedev.packets.FillPasswordPacket;
+
+import com.github.fernthedev.packets.SelfMessagePacket;
+import com.github.fernthedev.packets.SelfMessageType;
 import com.github.fernthedev.server.ClientPlayer;
 import com.github.fernthedev.server.Console;
 import com.github.fernthedev.server.Server;
@@ -10,9 +12,9 @@ import com.github.fernthedev.server.command.CommandSender;
 import com.github.fernthedev.server.event.EventHandler;
 import com.github.fernthedev.server.event.Listener;
 import com.github.fernthedev.server.event.chat.ChatEvent;
+import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -26,7 +28,7 @@ public class AuthenticationManager extends Command implements Listener {
 
     private static SettingsManager settingsManager;
 
-    public AuthenticationManager(@NotNull String command, SettingsManager settingsManager) {
+    public AuthenticationManager(@NonNull String command, SettingsManager settingsManager) {
         super(command);
         AuthenticationManager.settingsManager = settingsManager;
     }
@@ -60,7 +62,7 @@ public class AuthenticationManager extends Command implements Listener {
         if (sender instanceof ClientPlayer) {
             playerInfo.mode = Mode.AUTHENTICATE;
             ClientPlayer clientPlayer = (ClientPlayer) sender;
-            clientPlayer.sendObject(new FillPasswordPacket(),false);
+            clientPlayer.sendObject(SelfMessagePacket.newBuilder().setMessageType(SelfMessageType.FillPasswordPacket).build(),false);
             sender.sendMessage("Type in password:");
         }
 

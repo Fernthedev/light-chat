@@ -10,7 +10,7 @@
 
     <packaging>pom</packaging>
     <properties>
-        <project.buildVer>3.0-RELEASE</project.buildVer>
+        <project.buildVer>3.1-RELEASE</project.buildVer>
         <project.nettyver>4.1.35.Final</project.nettyver>
     </properties>
 

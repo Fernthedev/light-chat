@@ -1,7 +1,8 @@
 package com.github.fernthedev.server;
 
 
-import com.github.fernthedev.packets.message.MessagePacket;
+
+import com.github.fernthedev.packets.MessagePacket;
 import com.github.fernthedev.server.backend.BannedData;
 import com.github.fernthedev.server.backend.CommandMessageParser;
 import com.github.fernthedev.server.command.Command;
@@ -171,7 +172,7 @@ public class ServerCommandHandler implements Runnable {
 
                                     Server.getInstance().getBanManager().addBan(clientPlayer,new BannedData(clientPlayer.getAdress()));
 
-                                    clientPlayer.sendObject(new MessagePacket("Banned: " + message));
+                                    clientPlayer.sendObject(MessagePacket.newBuilder().setMessage("Banned: " + message).setCommand(false).build());
                                     clientPlayer.close();
                                     break;
                                 }

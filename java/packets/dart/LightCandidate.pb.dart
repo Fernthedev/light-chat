@@ -10,13 +10,14 @@ import 'package:protobuf/protobuf.dart' as $pb;
 
 class LightCandidateData extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo('LightCandidateData', package: const $pb.PackageName('lightclient.packets'))
-    ..aQS(1, 'value')
-    ..aQS(2, 'displ')
-    ..aQS(3, 'group')
-    ..aQS(4, 'descr')
-    ..aQS(5, 'suffix')
-    ..aQS(6, 'key')
-    ..a<$core.bool>(7, 'complete', $pb.PbFieldType.QB)
+    ..aOS(1, 'value')
+    ..aOS(2, 'displ')
+    ..aOS(3, 'group')
+    ..aOS(4, 'descr')
+    ..aOS(5, 'suffix')
+    ..aOS(6, 'key')
+    ..aOB(7, 'complete')
+    ..hasRequiredFields = false
   ;
 
   LightCandidateData() : super();

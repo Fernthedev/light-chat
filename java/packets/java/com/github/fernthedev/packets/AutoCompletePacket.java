@@ -46,20 +46,20 @@ private static final long serialVersionUID = 0L;
             break;
           case 18: {
             if (!((mutable_bitField0_ & 0x00000001) != 0)) {
-              candidateList_ = new java.util.ArrayList<com.github.fernthedev.data.LightCandidate.LightCandidateData>();
+              candidateList_ = new java.util.ArrayList<com.github.fernthedev.data.LightCandidateData>();
               mutable_bitField0_ |= 0x00000001;
             }
             candidateList_.add(
-                input.readMessage(com.github.fernthedev.data.LightCandidate.LightCandidateData.PARSER, extensionRegistry));
+                input.readMessage(com.github.fernthedev.data.LightCandidateData.parser(), extensionRegistry));
             break;
           }
           case 26: {
-            com.google.protobuf.ByteString bs = input.readBytes();
+            java.lang.String s = input.readStringRequireUtf8();
             if (!((mutable_bitField0_ & 0x00000002) != 0)) {
               wordsListJson_ = new com.google.protobuf.LazyStringArrayList();
               mutable_bitField0_ |= 0x00000002;
             }
-            wordsListJson_.add(bs);
+            wordsListJson_.add(s);
             break;
           }
           default: {
@@ -89,29 +89,29 @@ private static final long serialVersionUID = 0L;
   }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return com.github.fernthedev.packets.PacketOuterClass.internal_static_lightclient_packets_AutoCompletePacket_descriptor;
+    return com.github.fernthedev.packets.Packet.internal_static_lightclient_packets_AutoCompletePacket_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return com.github.fernthedev.packets.PacketOuterClass.internal_static_lightclient_packets_AutoCompletePacket_fieldAccessorTable
+    return com.github.fernthedev.packets.Packet.internal_static_lightclient_packets_AutoCompletePacket_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             com.github.fernthedev.packets.AutoCompletePacket.class, com.github.fernthedev.packets.AutoCompletePacket.Builder.class);
   }
 
   public static final int CANDIDATELIST_FIELD_NUMBER = 2;
-  private java.util.List<com.github.fernthedev.data.LightCandidate.LightCandidateData> candidateList_;
+  private java.util.List<com.github.fernthedev.data.LightCandidateData> candidateList_;
   /**
    * <code>repeated .lightclient.packets.LightCandidateData candidateList = 2;</code>
    */
-  public java.util.List<com.github.fernthedev.data.LightCandidate.LightCandidateData> getCandidateListList() {
+  public java.util.List<com.github.fernthedev.data.LightCandidateData> getCandidateListList() {
     return candidateList_;
   }
   /**
    * <code>repeated .lightclient.packets.LightCandidateData candidateList = 2;</code>
    */
-  public java.util.List<? extends com.github.fernthedev.data.LightCandidate.LightCandidateDataOrBuilder> 
+  public java.util.List<? extends com.github.fernthedev.data.LightCandidateDataOrBuilder> 
       getCandidateListOrBuilderList() {
     return candidateList_;
   }
@@ -124,13 +124,13 @@ private static final long serialVersionUID = 0L;
   /**
    * <code>repeated .lightclient.packets.LightCandidateData candidateList = 2;</code>
    */
-  public com.github.fernthedev.data.LightCandidate.LightCandidateData getCandidateList(int index) {
+  public com.github.fernthedev.data.LightCandidateData getCandidateList(int index) {
     return candidateList_.get(index);
   }
   /**
    * <code>repeated .lightclient.packets.LightCandidateData candidateList = 2;</code>
    */
-  public com.github.fernthedev.data.LightCandidate.LightCandidateDataOrBuilder getCandidateListOrBuilder(
+  public com.github.fernthedev.data.LightCandidateDataOrBuilder getCandidateListOrBuilder(
       int index) {
     return candidateList_.get(index);
   }
@@ -171,12 +171,6 @@ private static final long serialVersionUID = 0L;
     if (isInitialized == 1) return true;
     if (isInitialized == 0) return false;
 
-    for (int i = 0; i < getCandidateListCount(); i++) {
-      if (!getCandidateList(i).isInitialized()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-    }
     memoizedIsInitialized = 1;
     return true;
   }
@@ -353,13 +347,13 @@ private static final long serialVersionUID = 0L;
       com.github.fernthedev.packets.AutoCompletePacketOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return com.github.fernthedev.packets.PacketOuterClass.internal_static_lightclient_packets_AutoCompletePacket_descriptor;
+      return com.github.fernthedev.packets.Packet.internal_static_lightclient_packets_AutoCompletePacket_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return com.github.fernthedev.packets.PacketOuterClass.internal_static_lightclient_packets_AutoCompletePacket_fieldAccessorTable
+      return com.github.fernthedev.packets.Packet.internal_static_lightclient_packets_AutoCompletePacket_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               com.github.fernthedev.packets.AutoCompletePacket.class, com.github.fernthedev.packets.AutoCompletePacket.Builder.class);
     }
@@ -397,7 +391,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return com.github.fernthedev.packets.PacketOuterClass.internal_static_lightclient_packets_AutoCompletePacket_descriptor;
+      return com.github.fernthedev.packets.Packet.internal_static_lightclient_packets_AutoCompletePacket_descriptor;
     }
 
     @java.lang.Override
@@ -523,11 +517,6 @@ private static final long serialVersionUID = 0L;
 
     @java.lang.Override
     public final boolean isInitialized() {
-      for (int i = 0; i < getCandidateListCount(); i++) {
-        if (!getCandidateList(i).isInitialized()) {
-          return false;
-        }
-      }
       return true;
     }
 
@@ -551,22 +540,22 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private java.util.List<com.github.fernthedev.data.LightCandidate.LightCandidateData> candidateList_ =
+    private java.util.List<com.github.fernthedev.data.LightCandidateData> candidateList_ =
       java.util.Collections.emptyList();
     private void ensureCandidateListIsMutable() {
       if (!((bitField0_ & 0x00000001) != 0)) {
-        candidateList_ = new java.util.ArrayList<com.github.fernthedev.data.LightCandidate.LightCandidateData>(candidateList_);
+        candidateList_ = new java.util.ArrayList<com.github.fernthedev.data.LightCandidateData>(candidateList_);
         bitField0_ |= 0x00000001;
        }
     }
 
     private com.google.protobuf.RepeatedFieldBuilderV3<
-        com.github.fernthedev.data.LightCandidate.LightCandidateData, com.github.fernthedev.data.LightCandidate.LightCandidateData.Builder, com.github.fernthedev.data.LightCandidate.LightCandidateDataOrBuilder> candidateListBuilder_;
+        com.github.fernthedev.data.LightCandidateData, com.github.fernthedev.data.LightCandidateData.Builder, com.github.fernthedev.data.LightCandidateDataOrBuilder> candidateListBuilder_;
 
     /**
      * <code>repeated .lightclient.packets.LightCandidateData candidateList = 2;</code>
      */
-    public java.util.List<com.github.fernthedev.data.LightCandidate.LightCandidateData> getCandidateListList() {
+    public java.util.List<com.github.fernthedev.data.LightCandidateData> getCandidateListList() {
       if (candidateListBuilder_ == null) {
         return java.util.Collections.unmodifiableList(candidateList_);
       } else {
@@ -586,7 +575,7 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>repeated .lightclient.packets.LightCandidateData candidateList = 2;</code>
      */
-    public com.github.fernthedev.data.LightCandidate.LightCandidateData getCandidateList(int index) {
+    public com.github.fernthedev.data.LightCandidateData getCandidateList(int index) {
       if (candidateListBuilder_ == null) {
         return candidateList_.get(index);
       } else {
@@ -597,7 +586,7 @@ private static final long serialVersionUID = 0L;
      * <code>repeated .lightclient.packets.LightCandidateData candidateList = 2;</code>
      */
     public Builder setCandidateList(
-        int index, com.github.fernthedev.data.LightCandidate.LightCandidateData value) {
+        int index, com.github.fernthedev.data.LightCandidateData value) {
       if (candidateListBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -614,7 +603,7 @@ private static final long serialVersionUID = 0L;
      * <code>repeated .lightclient.packets.LightCandidateData candidateList = 2;</code>
      */
     public Builder setCandidateList(
-        int index, com.github.fernthedev.data.LightCandidate.LightCandidateData.Builder builderForValue) {
+        int index, com.github.fernthedev.data.LightCandidateData.Builder builderForValue) {
       if (candidateListBuilder_ == null) {
         ensureCandidateListIsMutable();
         candidateList_.set(index, builderForValue.build());
@@ -627,7 +616,7 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>repeated .lightclient.packets.LightCandidateData candidateList = 2;</code>
      */
-    public Builder addCandidateList(com.github.fernthedev.data.LightCandidate.LightCandidateData value) {
+    public Builder addCandidateList(com.github.fernthedev.data.LightCandidateData value) {
       if (candidateListBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -644,7 +633,7 @@ private static final long serialVersionUID = 0L;
      * <code>repeated .lightclient.packets.LightCandidateData candidateList = 2;</code>
      */
     public Builder addCandidateList(
-        int index, com.github.fernthedev.data.LightCandidate.LightCandidateData value) {
+        int index, com.github.fernthedev.data.LightCandidateData value) {
       if (candidateListBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -661,7 +650,7 @@ private static final long serialVersionUID = 0L;
      * <code>repeated .lightclient.packets.LightCandidateData candidateList = 2;</code>
      */
     public Builder addCandidateList(
-        com.github.fernthedev.data.LightCandidate.LightCandidateData.Builder builderForValue) {
+        com.github.fernthedev.data.LightCandidateData.Builder builderForValue) {
       if (candidateListBuilder_ == null) {
         ensureCandidateListIsMutable();
         candidateList_.add(builderForValue.build());
@@ -675,7 +664,7 @@ private static final long serialVersionUID = 0L;
      * <code>repeated .lightclient.packets.LightCandidateData candidateList = 2;</code>
      */
     public Builder addCandidateList(
-        int index, com.github.fernthedev.data.LightCandidate.LightCandidateData.Builder builderForValue) {
+        int index, com.github.fernthedev.data.LightCandidateData.Builder builderForValue) {
       if (candidateListBuilder_ == null) {
         ensureCandidateListIsMutable();
         candidateList_.add(index, builderForValue.build());
@@ -689,7 +678,7 @@ private static final long serialVersionUID = 0L;
      * <code>repeated .lightclient.packets.LightCandidateData candidateList = 2;</code>
      */
     public Builder addAllCandidateList(
-        java.lang.Iterable<? extends com.github.fernthedev.data.LightCandidate.LightCandidateData> values) {
+        java.lang.Iterable<? extends com.github.fernthedev.data.LightCandidateData> values) {
       if (candidateListBuilder_ == null) {
         ensureCandidateListIsMutable();
         com.google.protobuf.AbstractMessageLite.Builder.addAll(
@@ -729,14 +718,14 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>repeated .lightclient.packets.LightCandidateData candidateList = 2;</code>
      */
-    public com.github.fernthedev.data.LightCandidate.LightCandidateData.Builder getCandidateListBuilder(
+    public com.github.fernthedev.data.LightCandidateData.Builder getCandidateListBuilder(
         int index) {
       return getCandidateListFieldBuilder().getBuilder(index);
     }
     /**
      * <code>repeated .lightclient.packets.LightCandidateData candidateList = 2;</code>
      */
-    public com.github.fernthedev.data.LightCandidate.LightCandidateDataOrBuilder getCandidateListOrBuilder(
+    public com.github.fernthedev.data.LightCandidateDataOrBuilder getCandidateListOrBuilder(
         int index) {
       if (candidateListBuilder_ == null) {
         return candidateList_.get(index);  } else {
@@ -746,7 +735,7 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>repeated .lightclient.packets.LightCandidateData candidateList = 2;</code>
      */
-    public java.util.List<? extends com.github.fernthedev.data.LightCandidate.LightCandidateDataOrBuilder> 
+    public java.util.List<? extends com.github.fernthedev.data.LightCandidateDataOrBuilder> 
          getCandidateListOrBuilderList() {
       if (candidateListBuilder_ != null) {
         return candidateListBuilder_.getMessageOrBuilderList();
@@ -757,31 +746,31 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>repeated .lightclient.packets.LightCandidateData candidateList = 2;</code>
      */
-    public com.github.fernthedev.data.LightCandidate.LightCandidateData.Builder addCandidateListBuilder() {
+    public com.github.fernthedev.data.LightCandidateData.Builder addCandidateListBuilder() {
       return getCandidateListFieldBuilder().addBuilder(
-          com.github.fernthedev.data.LightCandidate.LightCandidateData.getDefaultInstance());
+          com.github.fernthedev.data.LightCandidateData.getDefaultInstance());
     }
     /**
      * <code>repeated .lightclient.packets.LightCandidateData candidateList = 2;</code>
      */
-    public com.github.fernthedev.data.LightCandidate.LightCandidateData.Builder addCandidateListBuilder(
+    public com.github.fernthedev.data.LightCandidateData.Builder addCandidateListBuilder(
         int index) {
       return getCandidateListFieldBuilder().addBuilder(
-          index, com.github.fernthedev.data.LightCandidate.LightCandidateData.getDefaultInstance());
+          index, com.github.fernthedev.data.LightCandidateData.getDefaultInstance());
     }
     /**
      * <code>repeated .lightclient.packets.LightCandidateData candidateList = 2;</code>
      */
-    public java.util.List<com.github.fernthedev.data.LightCandidate.LightCandidateData.Builder> 
+    public java.util.List<com.github.fernthedev.data.LightCandidateData.Builder> 
          getCandidateListBuilderList() {
       return getCandidateListFieldBuilder().getBuilderList();
     }
     private com.google.protobuf.RepeatedFieldBuilderV3<
-        com.github.fernthedev.data.LightCandidate.LightCandidateData, com.github.fernthedev.data.LightCandidate.LightCandidateData.Builder, com.github.fernthedev.data.LightCandidate.LightCandidateDataOrBuilder> 
+        com.github.fernthedev.data.LightCandidateData, com.github.fernthedev.data.LightCandidateData.Builder, com.github.fernthedev.data.LightCandidateDataOrBuilder> 
         getCandidateListFieldBuilder() {
       if (candidateListBuilder_ == null) {
         candidateListBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
-            com.github.fernthedev.data.LightCandidate.LightCandidateData, com.github.fernthedev.data.LightCandidate.LightCandidateData.Builder, com.github.fernthedev.data.LightCandidate.LightCandidateDataOrBuilder>(
+            com.github.fernthedev.data.LightCandidateData, com.github.fernthedev.data.LightCandidateData.Builder, com.github.fernthedev.data.LightCandidateDataOrBuilder>(
                 candidateList_,
                 ((bitField0_ & 0x00000001) != 0),
                 getParentForChildren(),
@@ -878,7 +867,8 @@ private static final long serialVersionUID = 0L;
       if (value == null) {
     throw new NullPointerException();
   }
-  ensureWordsListJsonIsMutable();
+  checkByteStringIsUtf8(value);
+      ensureWordsListJsonIsMutable();
       wordsListJson_.add(value);
       onChanged();
       return this;
@@ -909,7 +899,7 @@ private static final long serialVersionUID = 0L;
     return DEFAULT_INSTANCE;
   }
 
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<AutoCompletePacket>
+  private static final com.google.protobuf.Parser<AutoCompletePacket>
       PARSER = new com.google.protobuf.AbstractParser<AutoCompletePacket>() {
     @java.lang.Override
     public AutoCompletePacket parsePartialFrom(
@@ -934,18 +924,5 @@ private static final long serialVersionUID = 0L;
     return DEFAULT_INSTANCE;
   }
 
-  public static final int PACKETTYPE_FIELD_NUMBER = 101;
-  /**
-   * <code>extend .lightclient.packets.Packet { ... }</code>
-   */
-  public static final
-    com.google.protobuf.GeneratedMessage.GeneratedExtension<
-      com.github.fernthedev.packets.Packet,
-      com.github.fernthedev.packets.Packet> packetType = com.google.protobuf.GeneratedMessage
-          .newMessageScopedGeneratedExtension(
-        com.github.fernthedev.packets.AutoCompletePacket.getDefaultInstance(),
-        0,
-        com.github.fernthedev.packets.Packet.class,
-        com.github.fernthedev.packets.Packet.getDefaultInstance());
 }
 

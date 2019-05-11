@@ -23,6 +23,6 @@ protoc -I=%protopath%\ --java_out=java --dart_out=dart %%i
 
 @echo Moving to java folder
 REM protoc -I=%protopath%\ --java_out=java --dart_out=dart %protopath%\*
-REM @echo %cd%\java eeeeeeeeeee %mainfolder%\universalChat\src\main\java\com\github\fernthedev\packets
+REM @echo %cd%\java eeeeeeeeeee %mainfolder%\universalChat\src\main\java\com\github\fernthedev\packets 
 xcopy /s /Y %cd%\java %mainfolder%\universalChat\src\main\java\ 
 pause

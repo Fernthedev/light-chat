@@ -1,11 +1,11 @@
 package com.github.fernthedev.server.command;
 
-import com.github.fernthedev.packets.Packet;
+import com.google.protobuf.GeneratedMessageV3;
 
 public interface CommandSender {
 
 
-    void sendPacket(Packet packet);
+    void sendPacket(GeneratedMessageV3 packet);
 
     void sendMessage(String message);
 

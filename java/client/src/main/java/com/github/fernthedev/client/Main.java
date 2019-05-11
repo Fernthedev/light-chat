@@ -47,7 +47,6 @@ public class Main {
                     host = null;
                 }
             }
-
             if (arg.equalsIgnoreCase("-debug")) {
                 StaticHandler.isDebug = true;
             }

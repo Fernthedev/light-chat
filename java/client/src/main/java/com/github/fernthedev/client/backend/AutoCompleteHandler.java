@@ -1,8 +1,8 @@
 package com.github.fernthedev.client.backend;
 
 import com.github.fernthedev.client.Client;
+import com.github.fernthedev.data.LightCandidateData;
 import com.github.fernthedev.packets.AutoCompletePacket;
-import com.github.fernthedev.packets.LightCandidate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.jline.reader.Candidate;
@@ -23,11 +23,19 @@ public class AutoCompleteHandler implements Completer {
 
     private boolean keepCheck;
 
-    public void addCandidates(List<LightCandidate> candidates) {
+    public void addCandidates(List<LightCandidateData> candidates) {
         if(candidateList != null) {
             List<Candidate> candidateList1 = new ArrayList<>();
-            for(LightCandidate lightCandidate : candidates) {
-                candidateList1.add(lightCandidate.toCandidate());
+            for(LightCandidateData lightCandidate : candidates) {
+                candidateList1.add(
+                        new Candidate(
+                                lightCandidate.getValue(),
+                                lightCandidate.getDispl(),
+                                lightCandidate.getGroup(),
+                                lightCandidate.getDescr(),
+                                lightCandidate.getSuffix(),
+                                lightCandidate.getKey(),
+                                lightCandidate.getComplete()));
             }
             candidateList.addAll(candidateList1);
         }
@@ -54,9 +62,10 @@ public class AutoCompleteHandler implements Completer {
             candidateList.clear();
         }
 
-        AutoCompletePacket autoCompletePacket = new AutoCompletePacket(line.words());
+        AutoCompletePacket.Builder autoCompletePacket = AutoCompletePacket.newBuilder();
+        autoCompletePacket.addAllWordsListJson(line.words());
         if(client.registered) {
-            client.getClientThread().sendObject(autoCompletePacket);
+            client.getClientThread().sendObject(autoCompletePacket.build());
 
             keepCheck = true;
             while (keepCheck) {

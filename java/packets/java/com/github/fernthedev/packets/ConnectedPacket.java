@@ -47,27 +47,27 @@ private static final long serialVersionUID = 0L;
             done = true;
             break;
           case 34: {
-            com.google.protobuf.ByteString bs = input.readBytes();
-            bitField0_ |= 0x00000001;
-            name_ = bs;
+            java.lang.String s = input.readStringRequireUtf8();
+
+            name_ = s;
             break;
           }
           case 42: {
-            com.google.protobuf.ByteString bs = input.readBytes();
-            bitField0_ |= 0x00000002;
-            os_ = bs;
+            java.lang.String s = input.readStringRequireUtf8();
+
+            os_ = s;
             break;
           }
           case 50: {
-            com.google.protobuf.ByteString bs = input.readBytes();
-            bitField0_ |= 0x00000004;
-            uuid_ = bs;
+            java.lang.String s = input.readStringRequireUtf8();
+
+            uuid_ = s;
             break;
           }
           case 58: {
-            com.google.protobuf.ByteString bs = input.readBytes();
-            bitField0_ |= 0x00000008;
-            privateKey_ = bs;
+            java.lang.String s = input.readStringRequireUtf8();
+
+            privateKey_ = s;
             break;
           }
           default: {
@@ -91,28 +91,21 @@ private static final long serialVersionUID = 0L;
   }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return com.github.fernthedev.packets.PacketOuterClass.internal_static_lightclient_packets_ConnectedPacket_descriptor;
+    return com.github.fernthedev.packets.Packet.internal_static_lightclient_packets_ConnectedPacket_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return com.github.fernthedev.packets.PacketOuterClass.internal_static_lightclient_packets_ConnectedPacket_fieldAccessorTable
+    return com.github.fernthedev.packets.Packet.internal_static_lightclient_packets_ConnectedPacket_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             com.github.fernthedev.packets.ConnectedPacket.class, com.github.fernthedev.packets.ConnectedPacket.Builder.class);
   }
 
-  private int bitField0_;
   public static final int NAME_FIELD_NUMBER = 4;
   private volatile java.lang.Object name_;
   /**
-   * <code>required string name = 4;</code>
-   */
-  public boolean hasName() {
-    return ((bitField0_ & 0x00000001) != 0);
-  }
-  /**
-   * <code>required string name = 4;</code>
+   * <code>string name = 4;</code>
    */
   public java.lang.String getName() {
     java.lang.Object ref = name_;
@@ -122,14 +115,12 @@ private static final long serialVersionUID = 0L;
       com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
-      if (bs.isValidUtf8()) {
-        name_ = s;
-      }
+      name_ = s;
       return s;
     }
   }
   /**
-   * <code>required string name = 4;</code>
+   * <code>string name = 4;</code>
    */
   public com.google.protobuf.ByteString
       getNameBytes() {
@@ -148,13 +139,7 @@ private static final long serialVersionUID = 0L;
   public static final int OS_FIELD_NUMBER = 5;
   private volatile java.lang.Object os_;
   /**
-   * <code>required string os = 5;</code>
-   */
-  public boolean hasOs() {
-    return ((bitField0_ & 0x00000002) != 0);
-  }
-  /**
-   * <code>required string os = 5;</code>
+   * <code>string os = 5;</code>
    */
   public java.lang.String getOs() {
     java.lang.Object ref = os_;
@@ -164,14 +149,12 @@ private static final long serialVersionUID = 0L;
       com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
-      if (bs.isValidUtf8()) {
-        os_ = s;
-      }
+      os_ = s;
       return s;
     }
   }
   /**
-   * <code>required string os = 5;</code>
+   * <code>string os = 5;</code>
    */
   public com.google.protobuf.ByteString
       getOsBytes() {
@@ -190,13 +173,7 @@ private static final long serialVersionUID = 0L;
   public static final int UUID_FIELD_NUMBER = 6;
   private volatile java.lang.Object uuid_;
   /**
-   * <code>required string uuid = 6;</code>
-   */
-  public boolean hasUuid() {
-    return ((bitField0_ & 0x00000004) != 0);
-  }
-  /**
-   * <code>required string uuid = 6;</code>
+   * <code>string uuid = 6;</code>
    */
   public java.lang.String getUuid() {
     java.lang.Object ref = uuid_;
@@ -206,14 +183,12 @@ private static final long serialVersionUID = 0L;
       com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
-      if (bs.isValidUtf8()) {
-        uuid_ = s;
-      }
+      uuid_ = s;
       return s;
     }
   }
   /**
-   * <code>required string uuid = 6;</code>
+   * <code>string uuid = 6;</code>
    */
   public com.google.protobuf.ByteString
       getUuidBytes() {
@@ -232,13 +207,7 @@ private static final long serialVersionUID = 0L;
   public static final int PRIVATEKEY_FIELD_NUMBER = 7;
   private volatile java.lang.Object privateKey_;
   /**
-   * <code>required string privateKey = 7;</code>
-   */
-  public boolean hasPrivateKey() {
-    return ((bitField0_ & 0x00000008) != 0);
-  }
-  /**
-   * <code>required string privateKey = 7;</code>
+   * <code>string privateKey = 7;</code>
    */
   public java.lang.String getPrivateKey() {
     java.lang.Object ref = privateKey_;
@@ -248,14 +217,12 @@ private static final long serialVersionUID = 0L;
       com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
-      if (bs.isValidUtf8()) {
-        privateKey_ = s;
-      }
+      privateKey_ = s;
       return s;
     }
   }
   /**
-   * <code>required string privateKey = 7;</code>
+   * <code>string privateKey = 7;</code>
    */
   public com.google.protobuf.ByteString
       getPrivateKeyBytes() {
@@ -278,22 +245,6 @@ private static final long serialVersionUID = 0L;
     if (isInitialized == 1) return true;
     if (isInitialized == 0) return false;
 
-    if (!hasName()) {
-      memoizedIsInitialized = 0;
-      return false;
-    }
-    if (!hasOs()) {
-      memoizedIsInitialized = 0;
-      return false;
-    }
-    if (!hasUuid()) {
-      memoizedIsInitialized = 0;
-      return false;
-    }
-    if (!hasPrivateKey()) {
-      memoizedIsInitialized = 0;
-      return false;
-    }
     memoizedIsInitialized = 1;
     return true;
   }
@@ -301,16 +252,16 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (((bitField0_ & 0x00000001) != 0)) {
+    if (!getNameBytes().isEmpty()) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 4, name_);
     }
-    if (((bitField0_ & 0x00000002) != 0)) {
+    if (!getOsBytes().isEmpty()) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 5, os_);
     }
-    if (((bitField0_ & 0x00000004) != 0)) {
+    if (!getUuidBytes().isEmpty()) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 6, uuid_);
     }
-    if (((bitField0_ & 0x00000008) != 0)) {
+    if (!getPrivateKeyBytes().isEmpty()) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 7, privateKey_);
     }
     unknownFields.writeTo(output);
@@ -322,16 +273,16 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (((bitField0_ & 0x00000001) != 0)) {
+    if (!getNameBytes().isEmpty()) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, name_);
     }
-    if (((bitField0_ & 0x00000002) != 0)) {
+    if (!getOsBytes().isEmpty()) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, os_);
     }
-    if (((bitField0_ & 0x00000004) != 0)) {
+    if (!getUuidBytes().isEmpty()) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, uuid_);
     }
-    if (((bitField0_ & 0x00000008) != 0)) {
+    if (!getPrivateKeyBytes().isEmpty()) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(7, privateKey_);
     }
     size += unknownFields.getSerializedSize();
@@ -349,26 +300,14 @@ private static final long serialVersionUID = 0L;
     }
     com.github.fernthedev.packets.ConnectedPacket other = (com.github.fernthedev.packets.ConnectedPacket) obj;
 
-    if (hasName() != other.hasName()) return false;
-    if (hasName()) {
-      if (!getName()
-          .equals(other.getName())) return false;
-    }
-    if (hasOs() != other.hasOs()) return false;
-    if (hasOs()) {
-      if (!getOs()
-          .equals(other.getOs())) return false;
-    }
-    if (hasUuid() != other.hasUuid()) return false;
-    if (hasUuid()) {
-      if (!getUuid()
-          .equals(other.getUuid())) return false;
-    }
-    if (hasPrivateKey() != other.hasPrivateKey()) return false;
-    if (hasPrivateKey()) {
-      if (!getPrivateKey()
-          .equals(other.getPrivateKey())) return false;
-    }
+    if (!getName()
+        .equals(other.getName())) return false;
+    if (!getOs()
+        .equals(other.getOs())) return false;
+    if (!getUuid()
+        .equals(other.getUuid())) return false;
+    if (!getPrivateKey()
+        .equals(other.getPrivateKey())) return false;
     if (!unknownFields.equals(other.unknownFields)) return false;
     return true;
   }
@@ -380,22 +319,14 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    if (hasName()) {
-      hash = (37 * hash) + NAME_FIELD_NUMBER;
-      hash = (53 * hash) + getName().hashCode();
-    }
-    if (hasOs()) {
-      hash = (37 * hash) + OS_FIELD_NUMBER;
-      hash = (53 * hash) + getOs().hashCode();
-    }
-    if (hasUuid()) {
-      hash = (37 * hash) + UUID_FIELD_NUMBER;
-      hash = (53 * hash) + getUuid().hashCode();
-    }
-    if (hasPrivateKey()) {
-      hash = (37 * hash) + PRIVATEKEY_FIELD_NUMBER;
-      hash = (53 * hash) + getPrivateKey().hashCode();
-    }
+    hash = (37 * hash) + NAME_FIELD_NUMBER;
+    hash = (53 * hash) + getName().hashCode();
+    hash = (37 * hash) + OS_FIELD_NUMBER;
+    hash = (53 * hash) + getOs().hashCode();
+    hash = (37 * hash) + UUID_FIELD_NUMBER;
+    hash = (53 * hash) + getUuid().hashCode();
+    hash = (37 * hash) + PRIVATEKEY_FIELD_NUMBER;
+    hash = (53 * hash) + getPrivateKey().hashCode();
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -500,13 +431,13 @@ private static final long serialVersionUID = 0L;
       com.github.fernthedev.packets.ConnectedPacketOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return com.github.fernthedev.packets.PacketOuterClass.internal_static_lightclient_packets_ConnectedPacket_descriptor;
+      return com.github.fernthedev.packets.Packet.internal_static_lightclient_packets_ConnectedPacket_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return com.github.fernthedev.packets.PacketOuterClass.internal_static_lightclient_packets_ConnectedPacket_fieldAccessorTable
+      return com.github.fernthedev.packets.Packet.internal_static_lightclient_packets_ConnectedPacket_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               com.github.fernthedev.packets.ConnectedPacket.class, com.github.fernthedev.packets.ConnectedPacket.Builder.class);
     }
@@ -530,20 +461,20 @@ private static final long serialVersionUID = 0L;
     public Builder clear() {
       super.clear();
       name_ = "";
-      bitField0_ = (bitField0_ & ~0x00000001);
+
       os_ = "";
-      bitField0_ = (bitField0_ & ~0x00000002);
+
       uuid_ = "";
-      bitField0_ = (bitField0_ & ~0x00000004);
+
       privateKey_ = "";
-      bitField0_ = (bitField0_ & ~0x00000008);
+
       return this;
     }
 
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return com.github.fernthedev.packets.PacketOuterClass.internal_static_lightclient_packets_ConnectedPacket_descriptor;
+      return com.github.fernthedev.packets.Packet.internal_static_lightclient_packets_ConnectedPacket_descriptor;
     }
 
     @java.lang.Override
@@ -563,25 +494,10 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.github.fernthedev.packets.ConnectedPacket buildPartial() {
       com.github.fernthedev.packets.ConnectedPacket result = new com.github.fernthedev.packets.ConnectedPacket(this);
-      int from_bitField0_ = bitField0_;
-      int to_bitField0_ = 0;
-      if (((from_bitField0_ & 0x00000001) != 0)) {
-        to_bitField0_ |= 0x00000001;
-      }
       result.name_ = name_;
-      if (((from_bitField0_ & 0x00000002) != 0)) {
-        to_bitField0_ |= 0x00000002;
-      }
       result.os_ = os_;
-      if (((from_bitField0_ & 0x00000004) != 0)) {
-        to_bitField0_ |= 0x00000004;
-      }
       result.uuid_ = uuid_;
-      if (((from_bitField0_ & 0x00000008) != 0)) {
-        to_bitField0_ |= 0x00000008;
-      }
       result.privateKey_ = privateKey_;
-      result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
     }
@@ -630,23 +546,19 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(com.github.fernthedev.packets.ConnectedPacket other) {
       if (other == com.github.fernthedev.packets.ConnectedPacket.getDefaultInstance()) return this;
-      if (other.hasName()) {
-        bitField0_ |= 0x00000001;
+      if (!other.getName().isEmpty()) {
         name_ = other.name_;
         onChanged();
       }
-      if (other.hasOs()) {
-        bitField0_ |= 0x00000002;
+      if (!other.getOs().isEmpty()) {
         os_ = other.os_;
         onChanged();
       }
-      if (other.hasUuid()) {
-        bitField0_ |= 0x00000004;
+      if (!other.getUuid().isEmpty()) {
         uuid_ = other.uuid_;
         onChanged();
       }
-      if (other.hasPrivateKey()) {
-        bitField0_ |= 0x00000008;
+      if (!other.getPrivateKey().isEmpty()) {
         privateKey_ = other.privateKey_;
         onChanged();
       }
@@ -657,18 +569,6 @@ private static final long serialVersionUID = 0L;
 
     @java.lang.Override
     public final boolean isInitialized() {
-      if (!hasName()) {
-        return false;
-      }
-      if (!hasOs()) {
-        return false;
-      }
-      if (!hasUuid()) {
-        return false;
-      }
-      if (!hasPrivateKey()) {
-        return false;
-      }
       return true;
     }
 
@@ -690,17 +590,10 @@ private static final long serialVersionUID = 0L;
       }
       return this;
     }
-    private int bitField0_;
 
     private java.lang.Object name_ = "";
     /**
-     * <code>required string name = 4;</code>
-     */
-    public boolean hasName() {
-      return ((bitField0_ & 0x00000001) != 0);
-    }
-    /**
-     * <code>required string name = 4;</code>
+     * <code>string name = 4;</code>
      */
     public java.lang.String getName() {
       java.lang.Object ref = name_;
@@ -708,16 +601,14 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          name_ = s;
-        }
+        name_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
       }
     }
     /**
-     * <code>required string name = 4;</code>
+     * <code>string name = 4;</code>
      */
     public com.google.protobuf.ByteString
         getNameBytes() {
@@ -733,36 +624,37 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>required string name = 4;</code>
+     * <code>string name = 4;</code>
      */
     public Builder setName(
         java.lang.String value) {
       if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000001;
+  
       name_ = value;
       onChanged();
       return this;
     }
     /**
-     * <code>required string name = 4;</code>
+     * <code>string name = 4;</code>
      */
     public Builder clearName() {
-      bitField0_ = (bitField0_ & ~0x00000001);
+      
       name_ = getDefaultInstance().getName();
       onChanged();
       return this;
     }
     /**
-     * <code>required string name = 4;</code>
+     * <code>string name = 4;</code>
      */
     public Builder setNameBytes(
         com.google.protobuf.ByteString value) {
       if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000001;
+  checkByteStringIsUtf8(value);
+      
       name_ = value;
       onChanged();
       return this;
@@ -770,13 +662,7 @@ private static final long serialVersionUID = 0L;
 
     private java.lang.Object os_ = "";
     /**
-     * <code>required string os = 5;</code>
-     */
-    public boolean hasOs() {
-      return ((bitField0_ & 0x00000002) != 0);
-    }
-    /**
-     * <code>required string os = 5;</code>
+     * <code>string os = 5;</code>
      */
     public java.lang.String getOs() {
       java.lang.Object ref = os_;
@@ -784,16 +670,14 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          os_ = s;
-        }
+        os_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
       }
     }
     /**
-     * <code>required string os = 5;</code>
+     * <code>string os = 5;</code>
      */
     public com.google.protobuf.ByteString
         getOsBytes() {
@@ -809,36 +693,37 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>required string os = 5;</code>
+     * <code>string os = 5;</code>
      */
     public Builder setOs(
         java.lang.String value) {
       if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000002;
+  
       os_ = value;
       onChanged();
       return this;
     }
     /**
-     * <code>required string os = 5;</code>
+     * <code>string os = 5;</code>
      */
     public Builder clearOs() {
-      bitField0_ = (bitField0_ & ~0x00000002);
+      
       os_ = getDefaultInstance().getOs();
       onChanged();
       return this;
     }
     /**
-     * <code>required string os = 5;</code>
+     * <code>string os = 5;</code>
      */
     public Builder setOsBytes(
         com.google.protobuf.ByteString value) {
       if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000002;
+  checkByteStringIsUtf8(value);
+      
       os_ = value;
       onChanged();
       return this;
@@ -846,13 +731,7 @@ private static final long serialVersionUID = 0L;
 
     private java.lang.Object uuid_ = "";
     /**
-     * <code>required string uuid = 6;</code>
-     */
-    public boolean hasUuid() {
-      return ((bitField0_ & 0x00000004) != 0);
-    }
-    /**
-     * <code>required string uuid = 6;</code>
+     * <code>string uuid = 6;</code>
      */
     public java.lang.String getUuid() {
       java.lang.Object ref = uuid_;
@@ -860,16 +739,14 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          uuid_ = s;
-        }
+        uuid_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
       }
     }
     /**
-     * <code>required string uuid = 6;</code>
+     * <code>string uuid = 6;</code>
      */
     public com.google.protobuf.ByteString
         getUuidBytes() {
@@ -885,36 +762,37 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>required string uuid = 6;</code>
+     * <code>string uuid = 6;</code>
      */
     public Builder setUuid(
         java.lang.String value) {
       if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000004;
+  
       uuid_ = value;
       onChanged();
       return this;
     }
     /**
-     * <code>required string uuid = 6;</code>
+     * <code>string uuid = 6;</code>
      */
     public Builder clearUuid() {
-      bitField0_ = (bitField0_ & ~0x00000004);
+      
       uuid_ = getDefaultInstance().getUuid();
       onChanged();
       return this;
     }
     /**
-     * <code>required string uuid = 6;</code>
+     * <code>string uuid = 6;</code>
      */
     public Builder setUuidBytes(
         com.google.protobuf.ByteString value) {
       if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000004;
+  checkByteStringIsUtf8(value);
+      
       uuid_ = value;
       onChanged();
       return this;
@@ -922,13 +800,7 @@ private static final long serialVersionUID = 0L;
 
     private java.lang.Object privateKey_ = "";
     /**
-     * <code>required string privateKey = 7;</code>
-     */
-    public boolean hasPrivateKey() {
-      return ((bitField0_ & 0x00000008) != 0);
-    }
-    /**
-     * <code>required string privateKey = 7;</code>
+     * <code>string privateKey = 7;</code>
      */
     public java.lang.String getPrivateKey() {
       java.lang.Object ref = privateKey_;
@@ -936,16 +808,14 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          privateKey_ = s;
-        }
+        privateKey_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
       }
     }
     /**
-     * <code>required string privateKey = 7;</code>
+     * <code>string privateKey = 7;</code>
      */
     public com.google.protobuf.ByteString
         getPrivateKeyBytes() {
@@ -961,36 +831,37 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>required string privateKey = 7;</code>
+     * <code>string privateKey = 7;</code>
      */
     public Builder setPrivateKey(
         java.lang.String value) {
       if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000008;
+  
       privateKey_ = value;
       onChanged();
       return this;
     }
     /**
-     * <code>required string privateKey = 7;</code>
+     * <code>string privateKey = 7;</code>
      */
     public Builder clearPrivateKey() {
-      bitField0_ = (bitField0_ & ~0x00000008);
+      
       privateKey_ = getDefaultInstance().getPrivateKey();
       onChanged();
       return this;
     }
     /**
-     * <code>required string privateKey = 7;</code>
+     * <code>string privateKey = 7;</code>
      */
     public Builder setPrivateKeyBytes(
         com.google.protobuf.ByteString value) {
       if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000008;
+  checkByteStringIsUtf8(value);
+      
       privateKey_ = value;
       onChanged();
       return this;
@@ -1021,7 +892,7 @@ private static final long serialVersionUID = 0L;
     return DEFAULT_INSTANCE;
   }
 
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<ConnectedPacket>
+  private static final com.google.protobuf.Parser<ConnectedPacket>
       PARSER = new com.google.protobuf.AbstractParser<ConnectedPacket>() {
     @java.lang.Override
     public ConnectedPacket parsePartialFrom(
@@ -1046,18 +917,5 @@ private static final long serialVersionUID = 0L;
     return DEFAULT_INSTANCE;
   }
 
-  public static final int PACKETTYPE_FIELD_NUMBER = 102;
-  /**
-   * <code>extend .lightclient.packets.Packet { ... }</code>
-   */
-  public static final
-    com.google.protobuf.GeneratedMessage.GeneratedExtension<
-      com.github.fernthedev.packets.Packet,
-      com.github.fernthedev.packets.Packet> packetType = com.google.protobuf.GeneratedMessage
-          .newMessageScopedGeneratedExtension(
-        com.github.fernthedev.packets.ConnectedPacket.getDefaultInstance(),
-        0,
-        com.github.fernthedev.packets.Packet.class,
-        com.github.fernthedev.packets.Packet.getDefaultInstance());
 }
 

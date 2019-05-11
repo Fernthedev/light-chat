@@ -44,9 +44,9 @@ private static final long serialVersionUID = 0L;
             done = true;
             break;
           case 74: {
-            com.google.protobuf.ByteString bs = input.readBytes();
-            bitField0_ |= 0x00000001;
-            encryptionKey_ = bs;
+            java.lang.String s = input.readStringRequireUtf8();
+
+            encryptionKey_ = s;
             break;
           }
           default: {
@@ -70,28 +70,21 @@ private static final long serialVersionUID = 0L;
   }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return com.github.fernthedev.packets.PacketOuterClass.internal_static_lightclient_packets_RequestInfoPacket_descriptor;
+    return com.github.fernthedev.packets.Packet.internal_static_lightclient_packets_RequestInfoPacket_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return com.github.fernthedev.packets.PacketOuterClass.internal_static_lightclient_packets_RequestInfoPacket_fieldAccessorTable
+    return com.github.fernthedev.packets.Packet.internal_static_lightclient_packets_RequestInfoPacket_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             com.github.fernthedev.packets.RequestInfoPacket.class, com.github.fernthedev.packets.RequestInfoPacket.Builder.class);
   }
 
-  private int bitField0_;
   public static final int ENCRYPTIONKEY_FIELD_NUMBER = 9;
   private volatile java.lang.Object encryptionKey_;
   /**
-   * <code>required string encryptionKey = 9;</code>
-   */
-  public boolean hasEncryptionKey() {
-    return ((bitField0_ & 0x00000001) != 0);
-  }
-  /**
-   * <code>required string encryptionKey = 9;</code>
+   * <code>string encryptionKey = 9;</code>
    */
   public java.lang.String getEncryptionKey() {
     java.lang.Object ref = encryptionKey_;
@@ -101,14 +94,12 @@ private static final long serialVersionUID = 0L;
       com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
-      if (bs.isValidUtf8()) {
-        encryptionKey_ = s;
-      }
+      encryptionKey_ = s;
       return s;
     }
   }
   /**
-   * <code>required string encryptionKey = 9;</code>
+   * <code>string encryptionKey = 9;</code>
    */
   public com.google.protobuf.ByteString
       getEncryptionKeyBytes() {
@@ -131,10 +122,6 @@ private static final long serialVersionUID = 0L;
     if (isInitialized == 1) return true;
     if (isInitialized == 0) return false;
 
-    if (!hasEncryptionKey()) {
-      memoizedIsInitialized = 0;
-      return false;
-    }
     memoizedIsInitialized = 1;
     return true;
   }
@@ -142,7 +129,7 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (((bitField0_ & 0x00000001) != 0)) {
+    if (!getEncryptionKeyBytes().isEmpty()) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 9, encryptionKey_);
     }
     unknownFields.writeTo(output);
@@ -154,7 +141,7 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (((bitField0_ & 0x00000001) != 0)) {
+    if (!getEncryptionKeyBytes().isEmpty()) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(9, encryptionKey_);
     }
     size += unknownFields.getSerializedSize();
@@ -172,11 +159,8 @@ private static final long serialVersionUID = 0L;
     }
     com.github.fernthedev.packets.RequestInfoPacket other = (com.github.fernthedev.packets.RequestInfoPacket) obj;
 
-    if (hasEncryptionKey() != other.hasEncryptionKey()) return false;
-    if (hasEncryptionKey()) {
-      if (!getEncryptionKey()
-          .equals(other.getEncryptionKey())) return false;
-    }
+    if (!getEncryptionKey()
+        .equals(other.getEncryptionKey())) return false;
     if (!unknownFields.equals(other.unknownFields)) return false;
     return true;
   }
@@ -188,10 +172,8 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    if (hasEncryptionKey()) {
-      hash = (37 * hash) + ENCRYPTIONKEY_FIELD_NUMBER;
-      hash = (53 * hash) + getEncryptionKey().hashCode();
-    }
+    hash = (37 * hash) + ENCRYPTIONKEY_FIELD_NUMBER;
+    hash = (53 * hash) + getEncryptionKey().hashCode();
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -296,13 +278,13 @@ private static final long serialVersionUID = 0L;
       com.github.fernthedev.packets.RequestInfoPacketOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return com.github.fernthedev.packets.PacketOuterClass.internal_static_lightclient_packets_RequestInfoPacket_descriptor;
+      return com.github.fernthedev.packets.Packet.internal_static_lightclient_packets_RequestInfoPacket_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return com.github.fernthedev.packets.PacketOuterClass.internal_static_lightclient_packets_RequestInfoPacket_fieldAccessorTable
+      return com.github.fernthedev.packets.Packet.internal_static_lightclient_packets_RequestInfoPacket_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               com.github.fernthedev.packets.RequestInfoPacket.class, com.github.fernthedev.packets.RequestInfoPacket.Builder.class);
     }
@@ -326,14 +308,14 @@ private static final long serialVersionUID = 0L;
     public Builder clear() {
       super.clear();
       encryptionKey_ = "";
-      bitField0_ = (bitField0_ & ~0x00000001);
+
       return this;
     }
 
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return com.github.fernthedev.packets.PacketOuterClass.internal_static_lightclient_packets_RequestInfoPacket_descriptor;
+      return com.github.fernthedev.packets.Packet.internal_static_lightclient_packets_RequestInfoPacket_descriptor;
     }
 
     @java.lang.Override
@@ -353,13 +335,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.github.fernthedev.packets.RequestInfoPacket buildPartial() {
       com.github.fernthedev.packets.RequestInfoPacket result = new com.github.fernthedev.packets.RequestInfoPacket(this);
-      int from_bitField0_ = bitField0_;
-      int to_bitField0_ = 0;
-      if (((from_bitField0_ & 0x00000001) != 0)) {
-        to_bitField0_ |= 0x00000001;
-      }
       result.encryptionKey_ = encryptionKey_;
-      result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
     }
@@ -408,8 +384,7 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(com.github.fernthedev.packets.RequestInfoPacket other) {
       if (other == com.github.fernthedev.packets.RequestInfoPacket.getDefaultInstance()) return this;
-      if (other.hasEncryptionKey()) {
-        bitField0_ |= 0x00000001;
+      if (!other.getEncryptionKey().isEmpty()) {
         encryptionKey_ = other.encryptionKey_;
         onChanged();
       }
@@ -420,9 +395,6 @@ private static final long serialVersionUID = 0L;
 
     @java.lang.Override
     public final boolean isInitialized() {
-      if (!hasEncryptionKey()) {
-        return false;
-      }
       return true;
     }
 
@@ -444,17 +416,10 @@ private static final long serialVersionUID = 0L;
       }
       return this;
     }
-    private int bitField0_;
 
     private java.lang.Object encryptionKey_ = "";
     /**
-     * <code>required string encryptionKey = 9;</code>
-     */
-    public boolean hasEncryptionKey() {
-      return ((bitField0_ & 0x00000001) != 0);
-    }
-    /**
-     * <code>required string encryptionKey = 9;</code>
+     * <code>string encryptionKey = 9;</code>
      */
     public java.lang.String getEncryptionKey() {
       java.lang.Object ref = encryptionKey_;
@@ -462,16 +427,14 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          encryptionKey_ = s;
-        }
+        encryptionKey_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
       }
     }
     /**
-     * <code>required string encryptionKey = 9;</code>
+     * <code>string encryptionKey = 9;</code>
      */
     public com.google.protobuf.ByteString
         getEncryptionKeyBytes() {
@@ -487,36 +450,37 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>required string encryptionKey = 9;</code>
+     * <code>string encryptionKey = 9;</code>
      */
     public Builder setEncryptionKey(
         java.lang.String value) {
       if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000001;
+  
       encryptionKey_ = value;
       onChanged();
       return this;
     }
     /**
-     * <code>required string encryptionKey = 9;</code>
+     * <code>string encryptionKey = 9;</code>
      */
     public Builder clearEncryptionKey() {
-      bitField0_ = (bitField0_ & ~0x00000001);
+      
       encryptionKey_ = getDefaultInstance().getEncryptionKey();
       onChanged();
       return this;
     }
     /**
-     * <code>required string encryptionKey = 9;</code>
+     * <code>string encryptionKey = 9;</code>
      */
     public Builder setEncryptionKeyBytes(
         com.google.protobuf.ByteString value) {
       if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000001;
+  checkByteStringIsUtf8(value);
+      
       encryptionKey_ = value;
       onChanged();
       return this;
@@ -547,7 +511,7 @@ private static final long serialVersionUID = 0L;
     return DEFAULT_INSTANCE;
   }
 
-  @java.lang.Deprecated public static final com.google.protobuf.Parser<RequestInfoPacket>
+  private static final com.google.protobuf.Parser<RequestInfoPacket>
       PARSER = new com.google.protobuf.AbstractParser<RequestInfoPacket>() {
     @java.lang.Override
     public RequestInfoPacket parsePartialFrom(
@@ -572,18 +536,5 @@ private static final long serialVersionUID = 0L;
     return DEFAULT_INSTANCE;
   }
 
-  public static final int PACKETTYPE_FIELD_NUMBER = 104;
-  /**
-   * <code>extend .lightclient.packets.Packet { ... }</code>
-   */
-  public static final
-    com.google.protobuf.GeneratedMessage.GeneratedExtension<
-      com.github.fernthedev.packets.Packet,
-      com.github.fernthedev.packets.Packet> packetType = com.google.protobuf.GeneratedMessage
-          .newMessageScopedGeneratedExtension(
-        com.github.fernthedev.packets.RequestInfoPacket.getDefaultInstance(),
-        0,
-        com.github.fernthedev.packets.Packet.class,
-        com.github.fernthedev.packets.Packet.getDefaultInstance());
 }
 

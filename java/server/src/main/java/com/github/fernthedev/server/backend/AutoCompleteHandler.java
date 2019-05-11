@@ -1,6 +1,6 @@
 package com.github.fernthedev.server.backend;
 
-import com.github.fernthedev.packets.LightCandidate;
+import com.github.fernthedev.data.LightCandidateData;
 import com.github.fernthedev.server.Server;
 import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.command.TabExecutor;
@@ -23,8 +23,8 @@ public class AutoCompleteHandler implements Completer {
     private Server server;
 
 
-    public List<LightCandidate> handleLine(List<String> words) {
-        List<LightCandidate> candidates = new ArrayList<>();
+    public List<LightCandidateData> handleLine(List<String> words) {
+        List<LightCandidateData> candidates = new ArrayList<>();
 
 
 
@@ -48,7 +48,17 @@ public class AutoCompleteHandler implements Completer {
 
                 String newString = prefix + commandName;
 
-                candidates.add(new LightCandidate(AttributedString.stripAnsi(newString), newString, null, null, null, null, true));
+                LightCandidateData.Builder candidate = LightCandidateData.newBuilder();
+
+                candidate.setValue(AttributedString.stripAnsi(newString));
+                candidate.setDispl(newString);
+                candidate.setGroup("");
+                candidate.setDescr("");
+                candidate.setSuffix("");
+                candidate.setKey("");
+                candidate.setComplete(true);
+
+                candidates.add(candidate.build());
             }
         }else{
             String c = words.get(0);
@@ -78,7 +88,17 @@ public class AutoCompleteHandler implements Completer {
                 @NonNull List<String> completions = tabExecutor.getCompletions(args.toArray(new String[0]));
 
                 for (String string : completions) {
-                    candidates.add(new LightCandidate(AttributedString.stripAnsi(string), string, null, null, null, null, true));
+                    LightCandidateData.Builder candidate = LightCandidateData.newBuilder();
+
+                    candidate.setValue(AttributedString.stripAnsi(string));
+                    candidate.setDispl(string);
+                    candidate.setGroup("");
+                    candidate.setDescr("");
+                    candidate.setSuffix("");
+                    candidate.setKey("");
+                    candidate.setComplete(true);
+
+                    candidates.add(candidate.build());
                 }
             }else{
                 return new ArrayList<>();
@@ -92,12 +112,20 @@ public class AutoCompleteHandler implements Completer {
     @Override
     public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
 
-        List<LightCandidate> candidateList = handleLine(line.words());
+        List<LightCandidateData> candidateList = handleLine(line.words());
 
         List<Candidate> candidateList1 = new ArrayList<>();
 
-        for(LightCandidate lightCandidate : candidateList) {
-            candidateList1.add(lightCandidate.toCandidate());
+        for(LightCandidateData lightCandidate : candidateList) {
+            candidateList1.add(
+                    new Candidate(
+                            lightCandidate.getValue(),
+                            lightCandidate.getDispl(),
+                            lightCandidate.getGroup(),
+                            lightCandidate.getDescr(),
+                            lightCandidate.getSuffix(),
+                            lightCandidate.getKey(),
+                            lightCandidate.getComplete()));
         }
 
         if(!candidateList.isEmpty()) {

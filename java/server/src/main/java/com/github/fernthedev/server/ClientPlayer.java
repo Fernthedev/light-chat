@@ -1,11 +1,12 @@
 package com.github.fernthedev.server;
 
-import com.github.fernthedev.packets.Packet;
-import com.github.fernthedev.packets.latency.PingPacket;
-import com.github.fernthedev.packets.message.MessagePacket;
+import com.github.fernthedev.packets.MessagePacket;
+import com.github.fernthedev.packets.SelfMessagePacket;
+import com.github.fernthedev.packets.SelfMessageType;
 import com.github.fernthedev.server.command.CommandSender;
 import com.github.fernthedev.universal.EncryptionHandler;
 import com.github.fernthedev.universal.StaticHandler;
+import com.google.protobuf.GeneratedMessageV3;
 import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -39,7 +40,7 @@ public class ClientPlayer implements CommandSender {
     private UUID uuid;
 
     @Getter
-    private UUID clientUUID;
+    private String clientUUID;
 
     @Getter
     private String clientKey;
@@ -48,11 +49,13 @@ public class ClientPlayer implements CommandSender {
     @Setter
     private String serverKey;
 
-    public void setClientUUID(UUID uuid,String privateKey) {
+    public void setClientUUID(String uuid,String privateKey) {
         this.clientUUID = uuid;
 
         this.clientKey = EncryptionHandler.decrypt(privateKey,serverKey);
-        encryptCipher = registerEncryptCipher(clientKey);
+        if (clientKey != null) {
+            encryptCipher = registerEncryptCipher(clientKey);
+        }
     }
 
 
@@ -105,12 +108,7 @@ public class ClientPlayer implements CommandSender {
     public long startTime;
     public long endTime;
 
-    void setLastPacket(Object packet) {
-        if (packet instanceof Packet) {
-        }
-    }
-
-    public synchronized void sendObject(@NonNull Packet packet, boolean encrypt) {
+    public synchronized void sendObject(@NonNull GeneratedMessageV3 packet, boolean encrypt) {
             /*
             // Length is 16 byte
             SecretKeySpec sks = new SecretKeySpec(serverKey.getBytes(), StaticHandler.getCipherTransformation());
@@ -118,13 +116,15 @@ public class ClientPlayer implements CommandSender {
             // Create cipher
             Cipher cipher = Cipher.getInstance(StaticHandler.getCipherTransformation());
             cipher.init(Cipher.ENCRYPT_MODE, sks);*/
+            channel.writeAndFlush(packet);
+            /*
         if (encrypt) {
             SealedObject sealedObject = encryptObject(packet);
 
             channel.writeAndFlush(sealedObject);
         } else {
             channel.writeAndFlush(packet);
-        }
+        }*/
 
 
     }
@@ -148,7 +148,7 @@ public class ClientPlayer implements CommandSender {
         return null;
     }
 
-    public Cipher registerEncryptCipher(String password) {
+    public Cipher registerEncryptCipher(@NonNull String password) {
         try {
             byte[] salt = new byte[16];
 
@@ -190,7 +190,7 @@ public class ClientPlayer implements CommandSender {
     }
 
 
-    public void sendObject(Packet packet) {
+    public void sendObject(GeneratedMessageV3 packet) {
         sendObject(packet,true);
     }
 
@@ -200,6 +200,9 @@ public class ClientPlayer implements CommandSender {
         Server.getLogger().info("Closing player " + this.toString());
 
         if (channel != null) {
+            if(channel.isWritable()) {
+                channel.writeAndFlush(SelfMessagePacket.newBuilder().setMessageType(SelfMessageType.DisconnectPacket).build());
+            }
 
             channel.close();
 
@@ -234,7 +237,7 @@ public class ClientPlayer implements CommandSender {
 
     public void ping() {
         startTime = System.nanoTime();
-        sendObject(new PingPacket(),false);
+        sendObject(SelfMessagePacket.newBuilder().setMessageType(SelfMessageType.PingPacket).build(),false);
     }
 
     public static void pingAll() {
@@ -244,13 +247,13 @@ public class ClientPlayer implements CommandSender {
     }
 
     @Override
-    public void sendPacket(Packet packet) {
+    public void sendPacket(GeneratedMessageV3 packet) {
         sendObject(packet);
     }
 
     @Override
     public void sendMessage(String message) {
-        sendPacket(new MessagePacket(message));
+        sendPacket(MessagePacket.newBuilder().setMessage(message).setCommand(false).build());
     }
 
     @Override

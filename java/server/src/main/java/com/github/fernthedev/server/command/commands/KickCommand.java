@@ -1,6 +1,6 @@
 package com.github.fernthedev.server.command.commands;
 
-import com.github.fernthedev.packets.message.MessagePacket;
+import com.github.fernthedev.packets.MessagePacket;
 import com.github.fernthedev.server.ClientPlayer;
 import com.github.fernthedev.server.Console;
 import com.github.fernthedev.server.PlayerHandler;
@@ -8,7 +8,7 @@ import com.github.fernthedev.server.Server;
 import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.command.CommandSender;
 import com.github.fernthedev.server.command.TabExecutor;
-import org.jetbrains.annotations.NotNull;
+import lombok.NonNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class KickCommand extends Command implements TabExecutor {
-    public KickCommand(@NotNull String command) {
+    public KickCommand(@NonNull String command) {
         super(command);
         setUsage("Used to kick players using id");
     }
@@ -34,7 +34,7 @@ public class KickCommand extends Command implements TabExecutor {
                             int id = Integer.parseInt(args[0]);
                             if (id == clientPlayer.getId()) {
                                 if (args.length == 1) {
-                                    clientPlayer.sendObject(new MessagePacket("You have been kicked."));
+                                    clientPlayer.sendObject(MessagePacket.newBuilder().setMessage("You have been kicked.").setCommand(false).build());
                                 } else {
                                     StringBuilder message = new StringBuilder();
 
@@ -47,7 +47,7 @@ public class KickCommand extends Command implements TabExecutor {
                                         }
                                     }
 
-                                    clientPlayer.sendObject(new MessagePacket("Kicked: " + message));
+                                    clientPlayer.sendObject(MessagePacket.newBuilder().setMessage("Kicked: " + message).setCommand(false).build());
                                 }
                                 clientPlayer.close();
                             }
