@@ -1,4 +1,4 @@
-package com.github.fernthedev.server.netty;
+package com.github.fernthedev.server.backend.netty;
 
 import java.io.BufferedReader;
 import java.io.IOException;

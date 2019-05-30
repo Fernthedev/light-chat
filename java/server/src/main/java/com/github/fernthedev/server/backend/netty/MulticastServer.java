@@ -1,4 +1,4 @@
-package com.github.fernthedev.server.netty;
+package com.github.fernthedev.server.backend.netty;
 
 
 import com.github.fernthedev.server.PlayerHandler;
