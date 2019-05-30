@@ -63,7 +63,7 @@ public class PlayerHandler implements Runnable {
                 }
 
                 if (timeoutData.secondsPassed >= 5) {
-                     clientPlayer.ping();
+                     //clientPlayer.ping();
                     timeoutData.secondsPassed = 0;
                 }
 
