@@ -3,9 +3,9 @@ package com.github.fernthedev.server;
 import com.github.fernthedev.light.AuthenticationManager;
 import com.github.fernthedev.light.LightManager;
 import com.github.fernthedev.light.SettingsManager;
-import com.github.fernthedev.packets.LostServerConnectionPacket;
 import com.github.fernthedev.packets.MessagePacket;
 import com.github.fernthedev.packets.Packet;
+import com.github.fernthedev.packets.SelfMessagePacket;
 import com.github.fernthedev.server.backend.AutoCompleteHandler;
 import com.github.fernthedev.server.backend.BanManager;
 import com.github.fernthedev.server.backend.CommandMessageParser;
@@ -300,7 +300,7 @@ public class Server implements Runnable {
             for (ClientPlayer clientPlayer : socketList.values()) {
                 if (clientPlayer.channel.isOpen()) {
                     Server.getLogger().info("Gracefully shutting down");
-                    Server.sendObjectToAllPlayers(new LostServerConnectionPacket());
+                    Server.sendObjectToAllPlayers(new SelfMessagePacket(SelfMessagePacket.MessageType.LOST_SERVER_CONNECTION));
                     clientPlayer.close();
                 }
             }

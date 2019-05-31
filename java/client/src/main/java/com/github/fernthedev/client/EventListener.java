@@ -19,11 +19,7 @@ public class EventListener {
         if(p instanceof TestConnectPacket) {
             TestConnectPacket packet = (TestConnectPacket) p;
             client.getLogger().info("Connected packet: " + packet.getMessage());
-        } else if(p instanceof LostServerConnectionPacket) {
-            LostServerConnectionPacket packet = (LostServerConnectionPacket)p;
-            client.getLogger().info("Lost connection to server! Must have shutdown!");
-            client.getClientThread().disconnect();
-        }else if(p instanceof PingPacket) {
+        } else if(p instanceof PingPacket) {
             ClientThread.startTime = System.nanoTime();
 
             client.getClientThread().sendObject(new PongPacket(),false);
@@ -42,10 +38,7 @@ public class EventListener {
 
         } else if (p instanceof IllegalConnection) {
             client.getLogger().info(((IllegalConnection) p).getMessage());
-        } else if (p instanceof RegisterPacket) {
-            client.registered = true;
-            client.getLogger().info("Successfully connected to server");
-        }else if(p instanceof RequestInfoPacket) {
+        } else if(p instanceof RequestInfoPacket) {
             RequestInfoPacket packet = (RequestInfoPacket) p;
 
             client.setServerKey(packet.getKey());
@@ -74,9 +67,24 @@ public class EventListener {
 
             client.getLogger().debug("Sent connect packet for request");
 
-        }else if(p instanceof TimedOutRegistration) {
-            client.getLogger().info("Timed out on registering.");
-            client.getClientThread().close();
+        }else if(p instanceof SelfMessagePacket) {
+            switch (((SelfMessagePacket) p).getType()) {
+                case TIMED_OUT_REGISTRATION:
+                    client.getLogger().info("Timed out on registering.");
+                    client.getClientThread().close();
+                    break;
+
+                case REGISTER_PACKET:
+                    client.registered = true;
+                    client.getLogger().info("Successfully connected to server");
+                    break;
+
+                case LOST_SERVER_CONNECTION:
+                    client.getLogger().info("Lost connection to server! Must have shutdown!");
+                    client.getClientThread().disconnect();
+                    break;
+            }
+
         } else if(p instanceof AutoCompletePacket) {
             AutoCompletePacket packet = (AutoCompletePacket) p;
             client.getCompleteHandler().addCandidates(packet.getCandidateList());

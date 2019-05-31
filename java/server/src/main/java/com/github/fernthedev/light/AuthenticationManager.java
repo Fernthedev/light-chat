@@ -1,6 +1,6 @@
 package com.github.fernthedev.light;
 
-import com.github.fernthedev.packets.FillPasswordPacket;
+import com.github.fernthedev.packets.SelfMessagePacket;
 import com.github.fernthedev.server.*;
 import com.github.fernthedev.server.backend.BannedData;
 import com.github.fernthedev.server.backend.LoggerManager;
@@ -40,7 +40,7 @@ public class AuthenticationManager extends Command implements Listener {
         if(sender instanceof ClientPlayer) {
             playerInfo.mode = Mode.OLD_PASSWORD;
             sender.sendMessage("Type in old password:");
-            sender.sendPacket(new FillPasswordPacket());
+            sender.sendPacket(new SelfMessagePacket(SelfMessagePacket.MessageType.FILL_PASSWORD));
         }else if(sender instanceof Console) {
             sender.sendMessage("Type in new password");
             playerInfo.mode = Mode.NEW_PASSWORD;
@@ -65,7 +65,7 @@ public class AuthenticationManager extends Command implements Listener {
             playerInfo.mode = Mode.AUTHENTICATE;
             Server.getLogger().info("Sending fill password");
             ClientPlayer clientPlayer = (ClientPlayer) sender;
-            clientPlayer.sendObject(new FillPasswordPacket(),false);
+            clientPlayer.sendObject(new SelfMessagePacket(SelfMessagePacket.MessageType.FILL_PASSWORD),false);
             sender.sendMessage("Type in password:");
         }
 

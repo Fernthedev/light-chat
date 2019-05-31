@@ -206,7 +206,7 @@ public class EventListener {
         clientPlayer.registered = true;
 
         Server.getLogger().info(clientPlayer.getDeviceName() + " has connected to the server [" + clientPlayer.os+"]");
-        clientPlayer.sendObject(new RegisterPacket());
+        clientPlayer.sendObject(new SelfMessagePacket(SelfMessagePacket.MessageType.REGISTER_PACKET));
         Server.getLogger().debug("NAME:ID " + clientPlayer.getDeviceName() + ":" + clientPlayer.getId());
         Server.getLogger().debug(PlayerHandler.players.get(clientPlayer.getId()).getDeviceName() + " the name." + PlayerHandler.players.get(clientPlayer.getId()).getId() + " the id");
 

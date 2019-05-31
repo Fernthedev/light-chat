@@ -1,6 +1,6 @@
 package com.github.fernthedev.server;
 
-import com.github.fernthedev.packets.TimedOutRegistration;
+import com.github.fernthedev.packets.SelfMessagePacket;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
@@ -55,7 +55,7 @@ public class PlayerHandler implements Runnable {
 
 
                 if (timeoutData.registerTimeout > 30 && !clientPlayer.registered) {
-                    clientPlayer.sendObject(new TimedOutRegistration(), false);
+                    clientPlayer.sendObject(new SelfMessagePacket(SelfMessagePacket.MessageType.TIMED_OUT_REGISTRATION), false);
 
                     clientPlayer.close();
                 }
