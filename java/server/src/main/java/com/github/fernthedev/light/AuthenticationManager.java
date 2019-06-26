@@ -1,7 +1,9 @@
 package com.github.fernthedev.light;
 
 import com.github.fernthedev.packets.SelfMessagePacket;
-import com.github.fernthedev.server.*;
+import com.github.fernthedev.server.ClientPlayer;
+import com.github.fernthedev.server.Console;
+import com.github.fernthedev.server.Server;
 import com.github.fernthedev.server.backend.BannedData;
 import com.github.fernthedev.server.backend.LoggerManager;
 import com.github.fernthedev.server.command.Command;
@@ -9,8 +11,8 @@ import com.github.fernthedev.server.command.CommandSender;
 import com.github.fernthedev.server.event.EventHandler;
 import com.github.fernthedev.server.event.Listener;
 import com.github.fernthedev.server.event.chat.ChatEvent;
+import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +25,7 @@ public class AuthenticationManager extends Command implements Listener {
 
     private static SettingsManager settingsManager;
 
-    public AuthenticationManager(@NotNull String command, SettingsManager settingsManager) {
+    public AuthenticationManager(@NonNull String command, SettingsManager settingsManager) {
         super(command);
         AuthenticationManager.settingsManager = settingsManager;
     }

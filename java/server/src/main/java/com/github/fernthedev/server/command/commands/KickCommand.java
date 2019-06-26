@@ -8,7 +8,7 @@ import com.github.fernthedev.server.Server;
 import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.command.CommandSender;
 import com.github.fernthedev.server.command.TabExecutor;
-import org.jetbrains.annotations.NotNull;
+import lombok.NonNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class KickCommand extends Command implements TabExecutor {
-    public KickCommand(@NotNull String command) {
+    public KickCommand(@NonNull String command) {
         super(command);
         setUsage("Used to kick players using id");
     }

@@ -1,6 +1,6 @@
 package com.github.fernthedev.server.command;
 
-import org.jetbrains.annotations.NotNull;
+import lombok.NonNull;
 
 public abstract class Command {
     private String command;
@@ -19,7 +19,7 @@ public abstract class Command {
         this.usage = usage;
     }
 
-    public Command(@NotNull String command) {
+    public Command(@NonNull String command) {
         this.command = command;
     }
 

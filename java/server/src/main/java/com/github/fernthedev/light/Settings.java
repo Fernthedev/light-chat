@@ -2,9 +2,9 @@ package com.github.fernthedev.light;
 
 import lombok.Data;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 
 @Getter
 @Setter
@@ -16,7 +16,7 @@ public class Settings {
     private boolean passwordRequiredForLogin = false;
     private boolean useNativeTransport;
 
-    public void setNewValue(@NotNull String oldValue,@NotNull String newValue) {
+    public void setNewValue(@NonNull String oldValue, @NonNull String newValue) {
 
         Object value = newValue;
 
@@ -52,7 +52,7 @@ public class Settings {
 
     }
 
-    public Object getValue(@NotNull String key) {
+    public Object getValue(@NonNull String key) {
         switch (key.toLowerCase()) {
             case "password":
                 return getPassword();
