@@ -10,6 +10,7 @@ import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import lombok.Getter;
 import lombok.NonNull;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class SinglePacketDecoder extends ProtobufDecoder {
@@ -51,7 +52,7 @@ public class SinglePacketDecoder extends ProtobufDecoder {
         super(prototype, extensionRegistry);
         thisPrototype = prototype;
     }
-    public void decode(MultiplePacketDecoder multiplePacketDecoder, ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
+    public void decode(@Nullable MultiplePacketDecoder multiplePacketDecoder, ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
         decode(ctx,msg,out);
     }
 }

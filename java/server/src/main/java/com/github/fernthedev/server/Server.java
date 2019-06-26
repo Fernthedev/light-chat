@@ -1,22 +1,22 @@
 package com.github.fernthedev.server;
 
-import com.github.fernthedev.light.AuthenticationManager;
 import com.github.fernthedev.light.LightManager;
-import com.github.fernthedev.light.SettingsManager;
-import com.github.fernthedev.packets.LostServerConnectionPacket;
 import com.github.fernthedev.packets.MessagePacket;
-import com.github.fernthedev.packets.Packet;
-import com.github.fernthedev.server.backend.AutoCompleteHandler;
-import com.github.fernthedev.server.backend.BanManager;
-import com.github.fernthedev.server.backend.CommandMessageParser;
-import com.github.fernthedev.server.backend.LoggerManager;
+import com.github.fernthedev.packets.SelfMessagePacket;
+import com.github.fernthedev.packets.SelfMessageType;
+import com.github.fernthedev.server.backend.*;
+import com.github.fernthedev.server.backend.auth.AuthenticationManager;
 import com.github.fernthedev.server.backend.netty.MulticastServer;
 import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.command.CommandSender;
-import com.github.fernthedev.server.event.chat.ServerPlugin;
+import com.github.fernthedev.server.event.ServerPlugin;
 import com.github.fernthedev.server.netty.ProcessingHandler;
 import com.github.fernthedev.server.plugin.PluginManager;
+import com.github.fernthedev.universal.MultiplePacketDecoder;
+import com.github.fernthedev.universal.PacketHandler;
+import com.github.fernthedev.universal.SinglePacketDecoder;
 import com.github.fernthedev.universal.StaticHandler;
+import com.google.protobuf.GeneratedMessageV3;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollEventLoopGroup;
@@ -25,16 +25,15 @@ import io.netty.channel.kqueue.KQueueEventLoopGroup;
 import io.netty.channel.kqueue.KQueueServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.serialization.ClassResolvers;
-import io.netty.handler.codec.serialization.ObjectDecoder;
-import io.netty.handler.codec.serialization.ObjectEncoder;
+import io.netty.handler.codec.protobuf.ProtobufEncoder;
+import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
+import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -124,7 +123,7 @@ public class Server implements Runnable {
         },"AwaitThread");
     }
 
-    private static synchronized void sendObjectToAllPlayers(@NonNull Packet packet) {
+    private static synchronized void sendObjectToAllPlayers(@NonNull GeneratedMessageV3 packet) {
         new Thread(() -> {
             for(ClientPlayer clientPlayer : socketList.values()) {
 
@@ -132,7 +131,6 @@ public class Server implements Runnable {
                     if (clientPlayer.channel.isActive()) {
                         clientPlayer.sendObject(packet);
                     }
-                    clientPlayer.setLastPacket(packet);
                 } else {
                     logger.info("not packet");
                 }
@@ -272,9 +270,32 @@ public class Server implements Runnable {
                     @Override
                     public void initChannel(Channel ch) {
 
-                        ch.pipeline().addLast(new ObjectEncoder(),
-                                new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
-                                processingHandler);
+                        ChannelPipeline p = ch.pipeline();
+
+                        //p.addLast(finalSslCtx.newHandler(ch.alloc()));
+                        p.addLast(new ProtobufVarint32FrameDecoder());
+
+
+                        List<SinglePacketDecoder> decoders = new ArrayList<>();
+
+                        for(GeneratedMessageV3 messageV3 : PacketHandler.getPacketInstances()) {
+                            decoders.add(new SinglePacketDecoder(messageV3));
+                        }
+
+                        p.addLast(new MultiplePacketDecoder(decoders));
+
+                        p.addLast(new ProtobufVarint32LengthFieldPrepender());
+                        p.addLast(new ProtobufEncoder());
+                        p.addLast(processingHandler);
+
+                        /*ch.pipeline().addLast(new ProtobufVarint32LengthFieldPrepender(),
+                                new ProtobufEncoder(),
+                                new ProtobufVarint32FrameDecoder(),
+                                processingHandler);*/
+
+
+
+
                     }
                 }).option(ChannelOption.SO_BACKLOG, 128)
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
@@ -300,7 +321,7 @@ public class Server implements Runnable {
             for (ClientPlayer clientPlayer : socketList.values()) {
                 if (clientPlayer.channel.isOpen()) {
                     Server.getLogger().info("Gracefully shutting down");
-                    Server.sendObjectToAllPlayers(new LostServerConnectionPacket());
+                    Server.sendObjectToAllPlayers(SelfMessagePacket.newBuilder().setMessageType(SelfMessageType.LostServerConnectionPacket).build());
                     clientPlayer.close();
                 }
             }
@@ -381,7 +402,7 @@ public class Server implements Runnable {
 
     public static void sendMessage(String message) {
         Server.getLogger().info(message);
-        Server.sendObjectToAllPlayers(new MessagePacket(message));
+        Server.sendObjectToAllPlayers(MessagePacket.newBuilder().setMessage(message).setCommand(false).build());
     }
 
     public int getPort() {
@@ -402,7 +423,7 @@ public class Server implements Runnable {
      * @param command Command to be registered
      * @return Returns the instance to use it's usage method
      */
-    public Command registerCommand(@NotNull Command command) {
+    public Command registerCommand(@NonNull Command command) {
         commandList.add(command);
         return command;
     }
