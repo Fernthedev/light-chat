@@ -3,6 +3,7 @@ package com.github.fernthedev.server;
 import com.github.fernthedev.light.AuthenticationManager;
 import com.github.fernthedev.packets.*;
 import com.github.fernthedev.packets.latency.PongPacket;
+import com.github.fernthedev.server.backend.CommandMessageParser;
 import com.github.fernthedev.server.event.chat.ChatEvent;
 import com.github.fernthedev.universal.StaticHandler;
 import org.apache.commons.lang3.StringUtils;
@@ -44,9 +45,11 @@ public class EventListener {
             MessagePacket messagePacket = (MessagePacket) p;
 
 
-
             ChatEvent chatEvent = new ChatEvent(clientPlayer, messagePacket.getMessage(),false,true);
+
             Server.getInstance().getPluginManager().callEvent(chatEvent);
+
+            CommandMessageParser.onCommand(chatEvent);
 
             /*if(!chatEvent.isCancelled()) {
                 Server.sendMessage("[" + clientPlayer.getDeviceName() + "] :" + messagePacket.getMessage());
@@ -59,6 +62,8 @@ public class EventListener {
 
             ChatEvent chatEvent = new ChatEvent(clientPlayer,command,true,true);
             Server.getInstance().getPluginManager().callEvent(chatEvent);
+
+            CommandMessageParser.onCommand(chatEvent);
 
             /*
             String[] checkmessage = command.split(" ", 2);
@@ -194,7 +199,7 @@ public class EventListener {
 
       //  Server.getLogger().info("Password required: " + server.getSettingsManager().getSettings().isPasswordRequiredForLogin());
 
-        if(server.getSettingsManager().getSettings().isPasswordRequiredForLogin()) {
+        if(server.getSettingsManager().getConfigData().isPasswordRequiredForLogin()) {
             boolean authenticated = AuthenticationManager.authenticate(clientPlayer);
             if(!authenticated) {
                 clientPlayer.sendObject(new MessagePacket("Unable to authenticate"));

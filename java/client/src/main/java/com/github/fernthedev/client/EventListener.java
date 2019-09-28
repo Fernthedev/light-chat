@@ -20,16 +20,16 @@ public class EventListener {
             TestConnectPacket packet = (TestConnectPacket) p;
             client.getLogger().info("Connected packet: " + packet.getMessage());
         } else if(p instanceof PingPacket) {
-            ClientThread.startTime = System.nanoTime();
+            Client.startTime = System.nanoTime();
 
-            client.getClientThread().sendObject(new PongPacket(),false);
+            client.sendObject(new PongPacket(),false);
         } else if(p instanceof PingReceive) {
 
-            ClientThread.endTime = System.nanoTime();
+            Client.endTime = System.nanoTime();
 
-            ClientThread.miliPingDelay = ClientThread.endTime - ClientThread.startTime;
+            Client.miliPingDelay = Client.endTime - Client.startTime;
 
-            client.getLogger().debug("Ping: " +(ClientThread.miliPingDelay / 1000000) + "ms");
+            client.getLogger().debug("Ping: " + (Client.miliPingDelay / 1000000) + "ms");
 
         } else if (p instanceof MessagePacket) {
             MessagePacket messagePacket = (MessagePacket) p;
@@ -42,36 +42,36 @@ public class EventListener {
             RequestInfoPacket packet = (RequestInfoPacket) p;
 
             client.setServerKey(packet.getKey());
-            client.getClientThread().setEncryptCipher(client.getClientThread().registerEncryptCipher(client.getServerKey()));
+            client.setEncryptCipher(client.registerEncryptCipher(client.getServerKey()));
 
             String pass = EncryptionHandler.makeSHA256Hash(client.getUuid().toString());
 
             Validate.notNull(pass);
 
-            String privateKey = EncryptionHandler.encrypt(pass,packet.getKey());
+            String privateKey = EncryptionHandler.encrypt(pass, packet.getKey());
 
             client.setPrivateKey(pass);
-            client.getClientThread().setDecryptCipher(client.getClientThread().registerDecryptCipher(client.getPrivateKey()));
+            client.setDecryptCipher(client.registerDecryptCipher(client.getPrivateKey()));
 
             client.registered = true;
 
-            ConnectedPacket connectedPacket = client.getClientThread().getClientHandler().getConnectedPacket();
+            ConnectedPacket connectedPacket = client.getClientHandler().getConnectedPacket();
 
             connectedPacket.setPrivateKey(privateKey);
 
-            client.getClientThread().sendObject(connectedPacket,false);
+            client.sendObject(connectedPacket,false);
 
-            //client.getClientThread().sendObject(connectedPacket);
+            //client.sendObject(connectedPacket);
 
 
 
-            client.getLogger().debug("Sent connect packet for request");
+            client.getLogger().info("Sent connect packet for request");
 
         }else if(p instanceof SelfMessagePacket) {
             switch (((SelfMessagePacket) p).getType()) {
                 case TIMED_OUT_REGISTRATION:
                     client.getLogger().info("Timed out on registering.");
-                    client.getClientThread().close();
+                    client.close();
                     break;
 
                 case REGISTER_PACKET:
@@ -81,7 +81,7 @@ public class EventListener {
 
                 case LOST_SERVER_CONNECTION:
                     client.getLogger().info("Lost connection to server! Must have shutdown!");
-                    client.getClientThread().disconnect();
+                    client.disconnect();
                     break;
             }
 

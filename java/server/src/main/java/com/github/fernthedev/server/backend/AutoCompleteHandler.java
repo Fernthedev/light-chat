@@ -29,7 +29,7 @@ public class AutoCompleteHandler implements Completer {
 
         if(words.size() == 1) {
             for (Command command : server.getCommands()) {
-                String string = command.getCommandName();
+                String string = command.getName();
                 candidates.add(new LightCandidate(AttributedString.stripAnsi(string), string, null, null, null, null, true));
             }
         }else{
@@ -37,7 +37,7 @@ public class AutoCompleteHandler implements Completer {
             Command curCommand = null;
 
             for(Command command : server.getCommands()) {
-                if(command.getCommandName().equalsIgnoreCase(c)) {
+                if(command.getName().equalsIgnoreCase(c)) {
                     curCommand = command;
                     break;
                 }
@@ -66,19 +66,19 @@ public class AutoCompleteHandler implements Completer {
 
     @Override
     public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
-        Server.getLogger().info("Handled line");
+//        Server.getLogger().info("Handled line");
 
 
         List<LightCandidate> candidateList = handleLine(line.words());
 
-        List<Candidate> candidateList1 = new ArrayList<>();
+        List<Candidate> convertedCandidate = new ArrayList<>();
 
         for(LightCandidate lightCandidate : candidateList) {
-            candidateList1.add(lightCandidate.toCandidate());
+            convertedCandidate.add(lightCandidate.toCandidate());
         }
 
         if(!candidateList.isEmpty()) {
-            candidates.addAll(candidateList1);
+            candidates.addAll(convertedCandidate);
         }
     }
 }

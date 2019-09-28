@@ -9,4 +9,6 @@ public interface ILogManager {
     public void info(String s);
 
     public void debug(String s);
+
+    void error(String s);
 }

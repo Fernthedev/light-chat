@@ -3,16 +3,19 @@ package com.github.fernthedev.server;
 
 import com.github.fernthedev.packets.MessagePacket;
 import com.github.fernthedev.server.backend.BannedData;
+import com.github.fernthedev.server.backend.CommandMessageParser;
 import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.command.CommandSender;
-import com.github.fernthedev.server.command.commands.KickCommand;
+import com.github.fernthedev.server.command.KickCommand;
 import com.github.fernthedev.server.event.chat.ChatEvent;
 import com.github.fernthedev.universal.StaticHandler;
+import lombok.NonNull;
 import org.jline.reader.UserInterruptException;
 
 import java.util.HashMap;
 
 import static com.github.fernthedev.server.CommandWorkerThread.commandList;
+
 
 public class ServerCommandHandler implements Runnable {
 
@@ -22,11 +25,12 @@ public class ServerCommandHandler implements Runnable {
     ServerCommandHandler(Server server) {
         this.server = server;
 
-        Server.getLogger().info("Wait for command thread created");
+        Server.getLogger().info("CommandHandler created");
         registerCommands();
     }
 
 
+    @Deprecated
     public void run() {
         try {
             Server.getLogger().info("Type Command: (try help)");
@@ -34,19 +38,41 @@ public class ServerCommandHandler implements Runnable {
 
                 String command = StaticHandler.readLine("> ");
 
-                command = command.replaceAll(" {2}", "");
+                command = command.replaceAll(" {2}", "").trim();
 
                 if (command.equals("") || command.equals(" ")) continue;
 
-                String finalCommand = command;
-
-                new Thread(() -> server.getPluginManager().callEvent(new ChatEvent(server.getConsole(), finalCommand,true,true))).start();
-
-
+                dispatchCommand(command);
             }
         } catch (UserInterruptException e) {
             server.shutdownServer();
         }
+    }
+
+    public void dispatchCommand(@NonNull String command) {
+        command = command.replaceAll(" {2}", "").trim();
+        String finalCommand = command;
+
+        if (command.equals("") || command.equals(" ")) throw new IllegalArgumentException("Command cannot be \"\"");
+
+        new Thread(() -> {
+            ChatEvent chatEvent = new ChatEvent(server.getConsole(), finalCommand,true,true);
+            server.getPluginManager().callEvent(chatEvent);
+            CommandMessageParser.onCommand(chatEvent);
+        }, "ConsoleChatEvent").start();
+    }
+
+    public void dispatchCommand(@NonNull CommandSender sender, @NonNull String command) {
+        command = command.replaceAll(" {2}", "").trim();
+        String finalCommand = command;
+
+        if (command.equals("") || command.equals(" ")) throw new IllegalArgumentException("Command cannot be \"\"");
+
+        new Thread(() -> {
+            ChatEvent chatEvent = new ChatEvent(sender, finalCommand,true,true);
+            server.getPluginManager().callEvent(chatEvent);
+            CommandMessageParser.onCommand(chatEvent);
+        }, "ConsoleChatEvent").start();
     }
 
 
@@ -185,14 +211,14 @@ public class ServerCommandHandler implements Runnable {
                 if(args.length == 0) {
                     sender.sendMessage("Following commands: ");
                     for(Command serverCommand : commandList) {
-                        sender.sendMessage(serverCommand.getCommandName());
+                        sender.sendMessage(serverCommand.getName());
                     }
                 }else{
                     String command = args[0];
                     boolean executed = false;
 
                     for (Command serverCommand : commandList) {
-                        if (serverCommand.getCommandName().equalsIgnoreCase(command)) {
+                        if (serverCommand.getName().equalsIgnoreCase(command)) {
                             if(serverCommand.getUsage().equals("")) {
                                 sender.sendMessage("No usage found.");
                             }else

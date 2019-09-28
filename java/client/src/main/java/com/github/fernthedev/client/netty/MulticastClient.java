@@ -26,9 +26,10 @@ public class MulticastClient {
     private Map<String, ServerAddress> addressServerAddressMap = new HashMap<>();
 
     public void checkServers(int amount) {
-        try(MulticastSocket socket = new MulticastSocket(4446);) {
+        try(MulticastSocket socket = new MulticastSocket(4446)) {
 
             InetAddress group = InetAddress.getByName(StaticHandler.address);
+
             socket.joinGroup(group);
 
             DatagramPacket packet;

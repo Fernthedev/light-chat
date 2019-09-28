@@ -1,10 +1,9 @@
 package com.github.fernthedev.client;
 
-import com.github.fernthedev.packets.CommandPacket;
-import com.github.fernthedev.packets.MessagePacket;
 import com.github.fernthedev.universal.StaticHandler;
 import org.jline.reader.UserInterruptException;
 
+@Deprecated
 public class WaitForCommand implements Runnable {
 
     static boolean running;
@@ -18,22 +17,13 @@ public class WaitForCommand implements Runnable {
         checked = false;
     }
 
-    public void sendMessage(String message) {
-        message = message.replaceAll(" {2}", " ");
-        if (!message.equals("") && !message.equals(" ")) {
 
-            if (message.startsWith("/")) {
-                client.getClientThread().sendObject(new CommandPacket(message.substring(1)));
-            } else
-                client.getClientThread().sendObject(new MessagePacket(message));
-        }
-    }
 
     public void run() {
         running = true;
 
         // client.getLogger().info("Starting the runnable for wait for command ;) " + client.running );
-        while (client.running) {
+        while (client.isRunning()) {
             //  if (client.registered) {
 
             try {
@@ -41,9 +31,9 @@ public class WaitForCommand implements Runnable {
 
                 if (message.equals("")) continue;
 
-                sendMessage(message);
+                client.sendMessage(message);
             } catch (UserInterruptException e) {
-                client.getClientThread().close();
+                client.close();
                 System.exit(0);
             }
 

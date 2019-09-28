@@ -11,9 +11,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 
+@Deprecated
+/**
+ * Replaced by {@link GsonConfig<}
+ */
 public class SettingsManager {
-
-    private final Server server;
 
     private Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -30,8 +32,7 @@ public class SettingsManager {
         return Paths.get("").toAbsolutePath().toString();
     }
 
-    public SettingsManager(Server server,File file) {
-        this.server = server;
+    public SettingsManager(File file) {
         settingsFile = file;
     }
 

@@ -68,6 +68,8 @@ public class Main {
         }
 
         Server server = new Server(port);
+
+        StaticHandler.setCore(new ServerCore(server));
         new Thread(server,"ServerMainThread").start();
     }
 

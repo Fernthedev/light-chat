@@ -3,6 +3,7 @@ package com.github.fernthedev.light;
 import com.github.fernthedev.server.*;
 import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.command.CommandSender;
+import com.github.fernthedev.universal.ColorCode;
 import com.pi4j.io.gpio.*;
 import com.pi4j.io.gpio.exception.GpioPinExistsException;
 import com.pi4j.system.SystemInfo;
@@ -28,13 +29,9 @@ public class LightManager implements Runnable{
     @Getter
     private Pin[] pins;
 
-    private Settings settings;
-    private SettingsManager settingsManager;
 
-
-    public LightManager(Server server,SettingsManager settingsManager) {
+    public LightManager(Server server) {
         this.server = server;
-        this.settingsManager = settingsManager;
 
         gpio = GpioFactory.getInstance();
 
@@ -52,7 +49,7 @@ public class LightManager implements Runnable{
                 }
             }
         } catch (GpioPinExistsException e) {
-            Server.getLogger().info("Unable to check " + e.getMessage());
+            Server.getLogger().info( "{}Unable to check {}", ColorCode.RED, e.getMessage());
         }
     }
 
@@ -150,14 +147,6 @@ public class LightManager implements Runnable{
 
     private interface RunLight {
         void setLightValue(boolean value);
-    }
-
-
-
-
-
-    public Settings getSettings() {
-        return settings;
     }
 
     public GpioPinData getDataFromInt(int pinInt) {

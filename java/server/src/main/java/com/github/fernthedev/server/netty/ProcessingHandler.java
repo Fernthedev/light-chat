@@ -110,7 +110,7 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
             Server.socketList.put(channel,clientPlayer);
 
             ctx.writeAndFlush(new RequestInfoPacket(clientPlayer.getServerKey()));
-
+            Server.getLogger().info("[{}] established",clientPlayer.getAdress());
         }else{
             Server.getLogger().info("Channel is null");
             throw new NullPointerException();

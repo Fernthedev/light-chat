@@ -1,8 +1,9 @@
 package com.github.fernthedev.server;
 
+import com.github.fernthedev.gson.GsonConfig;
 import com.github.fernthedev.light.AuthenticationManager;
 import com.github.fernthedev.light.LightManager;
-import com.github.fernthedev.light.SettingsManager;
+import com.github.fernthedev.light.Settings;
 import com.github.fernthedev.packets.MessagePacket;
 import com.github.fernthedev.packets.Packet;
 import com.github.fernthedev.packets.SelfMessagePacket;
@@ -12,13 +13,17 @@ import com.github.fernthedev.server.backend.CommandMessageParser;
 import com.github.fernthedev.server.backend.LoggerManager;
 import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.command.CommandSender;
+import com.github.fernthedev.server.command.SettingsCommand;
 import com.github.fernthedev.server.event.chat.ServerPlugin;
 import com.github.fernthedev.server.netty.MulticastServer;
 import com.github.fernthedev.server.netty.ProcessingHandler;
 import com.github.fernthedev.server.plugin.PluginManager;
+import com.github.fernthedev.universal.ColorCode;
+import com.github.fernthedev.universal.ConsoleHandler;
 import com.github.fernthedev.universal.StaticHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
+import io.netty.channel.epoll.EpollChannelOption;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.kqueue.KQueueEventLoopGroup;
@@ -39,6 +44,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -49,6 +55,7 @@ import static com.github.fernthedev.server.CommandWorkerThread.commandList;
 
 public class Server implements Runnable {
 
+    private final ServerCommandHandler commandHandler;
     private int port;
 
     private boolean running = false;
@@ -60,7 +67,7 @@ public class Server implements Runnable {
     private PluginManager pluginManager;
 
     @Getter
-    private SettingsManager settingsManager;
+    private static GsonConfig<Settings> settingsManager;
 
     @Getter(AccessLevel.PACKAGE)
     private AutoCompleteHandler autoCompleteHandler;
@@ -90,16 +97,17 @@ public class Server implements Runnable {
         console = new Console();
         server = this;
         autoCompleteHandler = new AutoCompleteHandler(this);
-        StaticHandler.setupTerminal(server.getAutoCompleteHandler());
+//        StaticHandler.setupTerminal(autoCompleteHandler);
 
 
         pluginManager = new PluginManager();
 
-        ServerCommandHandler serverCommandHandler = new ServerCommandHandler(this);
+        commandHandler = new ServerCommandHandler(this);
         commandMessageParser = new CommandMessageParser(this);
         getPluginManager().registerEvents(commandMessageParser, new ServerPlugin());
 
-        new Thread(serverCommandHandler, "ServerBackgroundThread").start();
+//        new Thread(serverCommandHandler, "ServerBackgroundThread").start();
+
     }
 
     public static Server getInstance() {
@@ -142,11 +150,16 @@ public class Server implements Runnable {
 
 
     synchronized void shutdownServer() {
+        getLogger().info(ColorCode.RED + "Shutting down server.");
         running = false;
 
         workerGroup.shutdownGracefully();
         bossGroup.shutdownGracefully();
         System.exit(0);
+    }
+
+    public static String getCurrentPath() {
+        return Paths.get("").toAbsolutePath().toString();
     }
 
     public boolean isRunning() {
@@ -168,98 +181,36 @@ public class Server implements Runnable {
     public void run() {
         thread = Thread.currentThread();
 
+        new Thread(() -> {
+            getLogger().info("Type Command: (try help)");
+            new ConsoleHandler(autoCompleteHandler).start();
+        }, "ConsoleHandler").start();
+
         bossGroup = new NioEventLoopGroup();
         processingHandler = new ProcessingHandler(this);
         workerGroup = new NioEventLoopGroup();
 
-        settingsManager = new SettingsManager(server, new File(SettingsManager.getCurrentPath(), "settings.json"));
-        settingsManager.setup();
+        settingsManager = new GsonConfig<>(new Settings(), new File(getCurrentPath(), "settings.json"));
 
-        server.registerCommand(new Command("settings") {
-            @Override
-            public void onCommand(CommandSender sender, String[] args) {
-
-                if (args.length == 0) {
-                    sender.sendMessage("Possible args: set,get,reload,save");
-                } else {
-                    boolean authenticated = AuthenticationManager.authenticate(sender);
-                    if (authenticated) {
-                        long timeStart;
-                        long timeEnd;
-                        long timeElapsed;
-                        String arg = args[0];
-
-                        switch (arg.toLowerCase()) {
-                            case "set":
-                                if (args.length > 2) {
-                                    String oldValue = args[1];
-                                    String newValue = args[2];
-
-                                    try {
-                                        settingsManager.getSettings().setNewValue(oldValue, newValue);
-                                        sender.sendMessage("Set " + oldValue + " to " + newValue);
-                                    } catch (ClassCastException | IllegalArgumentException e) {
-                                        sender.sendMessage("Error:" + e.getMessage());
-                                    }
-                                } else sender.sendMessage("Usage: settings set {oldvalue} {newvalue}");
-                                break;
-
-                            case "get":
-                                if (args.length > 1) {
-                                    String key = args[1];
-
-                                    try {
-                                        Object value = settingsManager.getSettings().getValue(key);
-                                        sender.sendMessage("Value of " + key + ": " + value);
-                                    } catch (ClassCastException | IllegalArgumentException e) {
-                                        sender.sendMessage("Error:" + e.getMessage());
-                                    }
-                                } else sender.sendMessage("Usage: settings get {serverKey}");
-                                break;
-
-                            case "reload":
-                                sender.sendMessage("Reloading.");
-                                timeStart = System.nanoTime();
-                                settingsManager.saveSettings();
-
-                                settingsManager.load();
-                                timeEnd = System.nanoTime();
-                                timeElapsed = (timeEnd - timeStart) / 1000000;
-                                sender.sendMessage("Finished reloading. Took " + timeElapsed + "ms");
-                                break;
-
-                            case "save":
-                                sender.sendMessage("Saving.");
-                                timeStart = System.nanoTime();
-                                settingsManager.saveSettings();
-                                timeEnd = System.nanoTime();
-                                timeElapsed = (timeEnd - timeStart) / 1000000;
-                                sender.sendMessage("Finished saving. Took " + timeElapsed + "ms");
-                                break;
-                            default:
-                                sender.sendMessage("No such argument found " + arg + " found");
-                                break;
-                        }
-                    }
-                }
-            }
-        });
+        server.registerCommand(new SettingsCommand());
 
         Class channelClass = NioServerSocketChannel.class;
 
-        if (settingsManager.getSettings().isUseNativeTransport()) {
+        if (settingsManager.getConfigData().isUseNativeTransport()) {
             if (SystemUtils.IS_OS_LINUX) {
                 bossGroup = new EpollEventLoopGroup();
                 workerGroup = new EpollEventLoopGroup();
 
                 channelClass = EpollServerSocketChannel.class;
+                getLogger().info(ColorCode.GOLD + "OS IS LINUX! USING EPOLL TRANSPORT");
             }
 
-            if (SystemUtils.IS_OS_MAC_OSX) {
+            if (SystemUtils.IS_OS_MAC_OSX || SystemUtils.IS_OS_FREE_BSD || SystemUtils.IS_OS_NET_BSD || SystemUtils.IS_OS_OPEN_BSD) {
                 bossGroup = new KQueueEventLoopGroup();
                 workerGroup = new KQueueEventLoopGroup();
 
                 channelClass = KQueueServerSocketChannel.class;
+                getLogger().info(ColorCode.GOLD + "OS IS MAC/BSD! USING KQUEUE TRANSPORT");
             }
         }
 
@@ -276,6 +227,8 @@ public class Server implements Runnable {
                                 processingHandler);
                     }
                 }).option(ChannelOption.SO_BACKLOG, 128)
+                .option(ChannelOption.RCVBUF_ALLOCATOR, new AdaptiveRecvByteBufAllocator(512, 512, 64 * 1024))
+                .option(EpollChannelOption.MAX_DATAGRAM_PAYLOAD_SIZE, 512)
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
                 .childOption(ChannelOption.TCP_NODELAY, true)
                 .childOption(ChannelOption.SO_TIMEOUT, 5000);
@@ -324,7 +277,7 @@ public class Server implements Runnable {
             e.printStackTrace();
         }*/
 
-        if (settingsManager.getSettings().isUseMulticast()) {
+        if (settingsManager.getConfigData().isUseMulticast()) {
             try {
                 MulticastServer multicastServer = new MulticastServer("Multicast Thread", this);
                 multicastServer.start();
@@ -335,7 +288,7 @@ public class Server implements Runnable {
 
 
 
-        AuthenticationManager authenticationManager = new AuthenticationManager("changepassword", settingsManager);
+        AuthenticationManager authenticationManager = new AuthenticationManager("changepassword");
         server.registerCommand(authenticationManager);
         server.getPluginManager().registerEvents(authenticationManager, new ServerPlugin());
 
@@ -348,7 +301,7 @@ public class Server implements Runnable {
 
         if (StaticHandler.os.equalsIgnoreCase("Linux") || StaticHandler.os.contains("Linux") || StaticHandler.isLight) {
             logger.info("Running LightManager (Note this is for raspberry pies only)");
-            Thread thread4 = new Thread(new LightManager(this, settingsManager), "LightManagerThread");
+            Thread thread4 = new Thread(new LightManager(this), "LightManagerThread");
             thread4.start();
         } else {
             logger.info("Detected system is not linux. LightManager will not run (manual run with -lightmanager arg)");
@@ -361,6 +314,13 @@ public class Server implements Runnable {
 
     }
 
+    public void dispatchCommand(@NonNull String command) {
+        commandHandler.dispatchCommand(command);
+    }
+
+    public void dispatchCommand(@NonNull CommandSender sender, @NonNull String command) {
+        commandHandler.dispatchCommand(sender, command);
+    }
 
     private void tick() {
         if (System.console() == null && !StaticHandler.isDebug) shutdownServer();

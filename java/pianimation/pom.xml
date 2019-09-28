@@ -11,7 +11,6 @@
 
     <artifactId>pianimation</artifactId>
 
-
     <build>
         <plugins>
             <plugin>
@@ -51,9 +50,6 @@
         </plugins>
     </build>
 
-    <repositories>
-
-    </repositories>
 
     <dependencies>
         <dependency>

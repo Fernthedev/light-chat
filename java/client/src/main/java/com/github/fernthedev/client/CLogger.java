@@ -31,4 +31,9 @@ public class CLogger implements ILogManager {
             log("[DEBUG] " + s);
         }
     }
+
+    @Override
+    public void error(String s) {
+        logger.error(s);
+    }
 }

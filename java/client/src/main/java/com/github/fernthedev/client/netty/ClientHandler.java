@@ -22,6 +22,11 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
     protected EventListener listener;
 
+    protected Client client;
+
+    @Getter
+    protected ConnectedPacket connectedPacket;
+
     public ClientHandler(Client client,EventListener listener) {
         this.listener = listener;
         this.client = client;
@@ -30,10 +35,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         connectedPacket = new ConnectedPacket(client.name,os, client.getUuid());
     }
 
-    protected Client client;
 
-    @Getter
-    protected ConnectedPacket connectedPacket;
 
     @Override
     public void channelActive(ChannelHandlerContext ctx)
@@ -45,6 +47,8 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg)
             throws Exception {
 
+//        client.getLogger().info("Received " + msg);
+
         Packet packet;
 
       //  client.getLogger().info("Received " + msg);
@@ -55,7 +59,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
             //packet = (Packet) EncryptionHandler.decrypt(ob, client.getPrivateKey());
             long startTime = System.nanoTime();
-            packet = (Packet) client.getClientThread().decryptObject(ob);
+            packet = (Packet) client.decryptObject(ob);
 
           //  client.getLogger().info("Decrypted object is " + packet + " took " + (System.nanoTime() - startTime) / 1000000 + "ms");
 
@@ -101,7 +105,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
         client.getLogger().info("Lost connection to server.");
-        client.getClientThread().close();
+        client.close();
     }
 
     @Override
@@ -109,7 +113,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
             throws Exception {
         if(cause instanceof ReadTimeoutException) {
             client.getLogger().info("Timed out connection");
-            client.getClientThread().close();
+            client.close();
         }else{
             cause.printStackTrace();
         }

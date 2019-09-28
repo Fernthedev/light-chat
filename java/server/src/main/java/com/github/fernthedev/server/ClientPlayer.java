@@ -197,7 +197,7 @@ public class ClientPlayer implements CommandSender {
     public void close() {
 
         //DISCONNECT FROM SERVER
-        Server.getLogger().info("Closing player " + this.toString());
+        Server.getLogger().info("Closing player {}", this.toString());
 
         if (channel != null) {
 

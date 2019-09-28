@@ -55,7 +55,7 @@ public class AutoCompleteHandler implements Completer {
         }
 
         AutoCompletePacket autoCompletePacket = new AutoCompletePacket(line.words());
-        client.getClientThread().sendObject(autoCompletePacket);
+        client.sendObject(autoCompletePacket);
 
         keepCheck = true;
         while (keepCheck) {

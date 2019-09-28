@@ -1,4 +1,4 @@
-package com.github.fernthedev.server.command.commands;
+package com.github.fernthedev.server.command;
 
 import com.github.fernthedev.packets.MessagePacket;
 import com.github.fernthedev.server.ClientPlayer;

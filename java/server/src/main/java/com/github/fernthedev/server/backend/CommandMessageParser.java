@@ -5,9 +5,9 @@ import com.github.fernthedev.server.Console;
 import com.github.fernthedev.server.Server;
 import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.command.CommandSender;
-import com.github.fernthedev.server.event.EventHandler;
 import com.github.fernthedev.server.event.Listener;
 import com.github.fernthedev.server.event.chat.ChatEvent;
+import com.github.fernthedev.universal.ColorCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -22,8 +22,7 @@ public class CommandMessageParser implements Listener {
     @NonNull
     private Server server;
 
-    @EventHandler
-    private void onChatEvent(ChatEvent e) {
+    public static void onCommand(ChatEvent e) {
         CommandSender sender = e.getSender();
 
         if(e.isCancelled()) return;
@@ -49,7 +48,7 @@ public class CommandMessageParser implements Listener {
 
     }
 
-    private void handleCommand(CommandSender sender,String messageM) {
+    private static void handleCommand(CommandSender sender,String messageM) {
         String command = messageM;
         String[] checkmessage = command.split(" ", 2);
         List<String> messageword = new ArrayList<>();
@@ -85,13 +84,13 @@ public class CommandMessageParser implements Listener {
             try {
 
                 for (Command serverCommand : commandList) {
-                    if (serverCommand.getCommandName().equalsIgnoreCase(command)) {
+                    if (serverCommand.getName().equalsIgnoreCase(command)) {
                         found = true;
                         String[] args = new String[messageword.size()];
                         args = messageword.toArray(args);
 
 
-                        new CommandWorkerThread(server.getConsole(), serverCommand, args).run();
+                        new CommandWorkerThread(sender, serverCommand, args).run();
 
                         break;
                     }
@@ -101,12 +100,12 @@ public class CommandMessageParser implements Listener {
             }
 
             if (!found) {
-                sender.sendMessage("No such command found");
+                sender.sendMessage(ColorCode.RED + "No such command found");
             }
         }
     }
 
-    private void handleMessage(CommandSender sender, String message) {
+    private static void handleMessage(CommandSender sender, String message) {
         Server.sendMessage("[" + sender.getName() + "] :" + message);
     }
 

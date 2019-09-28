@@ -4,6 +4,7 @@ import com.google.common.io.Resources;
 import com.google.gson.Gson;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import net.minecrell.terminalconsole.TerminalConsoleAppender;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.util.PropertiesUtil;
@@ -22,7 +23,7 @@ import java.util.*;
 // Import log4j classes.
 
 public class StaticHandler {
-    public static String address = "230.0.0.0";
+    public static String address = "224.0.1.42";
 
     public static JSONObject jsonObject = new JSONObject();
 
@@ -45,6 +46,10 @@ public class StaticHandler {
     @Getter
     private static final String KeyFactoryString = "PBKDF2WithHmacSHA1";
 
+    @Getter
+    @Setter
+    private static Core core;
+
     public static String getVersion() {
         return version;
     }
@@ -54,8 +59,8 @@ public class StaticHandler {
 
         version = translateData.getVersion();
 
-
     }
+
 
     public static void runOnAnyOSConsole(String[] args) {
 
@@ -95,10 +100,14 @@ public class StaticHandler {
 
     }
 
+    @Deprecated
     public static void setupTerminal(@NonNull Completer completer) {
         final Terminal terminal = TerminalConsoleAppender.getTerminal();
 
-        if(terminal == null) return;
+        if(terminal == null) {
+            System.err.println("Terminal is not supported. Features such as auto complete may not work.");
+            return;
+        }
 
         lineReader = LineReaderBuilder.builder()
                 .terminal(terminal)
@@ -106,7 +115,7 @@ public class StaticHandler {
                 .build();
 
         lineReader.setOpt(LineReader.Option.DISABLE_EVENT_EXPANSION);
-       // lineReader.unsetOpt(LineReader.Option.INSERT_TAB);
+        lineReader.unsetOpt(LineReader.Option.INSERT_TAB);
 
         TerminalConsoleAppender.setReader(lineReader);
 

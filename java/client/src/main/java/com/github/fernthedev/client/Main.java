@@ -11,11 +11,12 @@ import java.util.logging.Logger;
 
 public class Main {
 
-    static Scanner scanner;
 
     static Client client;
 
     private MulticastClient multicastClient;
+
+    private static Scanner scanner;
 
     private String host = null;
     private int port = -1;
@@ -26,7 +27,8 @@ public class Main {
         Logger.getLogger("io.netty").setLevel(Level.OFF);
         StaticHandler.setupLoggers();
 
-        scanner = new Scanner(System.in);
+        client = new Client();
+
 
 
         for (int i = 0; i < args.length; i++) {
@@ -53,10 +55,7 @@ public class Main {
             }
         }
 
-        if (host == null || host.equals("") || port == -1) {
-            multicastClient = new MulticastClient();
-            check(4);
-        }
+
 
 
         if (System.console() == null && !StaticHandler.isDebug) {
@@ -78,6 +77,14 @@ public class Main {
 
         }
 
+
+
+        if (host == null || host.equals("") || port == -1) {
+            scanner = new Scanner(System.in);
+            multicastClient = new MulticastClient();
+            check(4);
+        }
+
         while (host == null || host.equalsIgnoreCase("") || port == -1) {
             if (host == null || host.equals(""))
                 host = readLine("Host:");
@@ -86,10 +93,14 @@ public class Main {
                 port = readInt("Port:");
         }
 
+//        scanner.close();
+        new Thread(() -> {
+            StaticHandler.setCore(new ClientCore(client));
+            client.setup();
 
-        client = new Client(host, port);
 
-        client.initialize();
+            client.initialize(host, port);
+        }).start();
     }
 
 
