@@ -100,7 +100,7 @@ public class ClientPlayer implements CommandSender {
         this.channel = channel;
         this.uuid = uuid;
 
-        Server.runAsync(() -> tempKeyPair = RSAEncryptionUtil.generateKeyPairs());
+        tempKeyPair = RSAEncryptionUtil.generateKeyPairs();
 
 //        try {
 //            encryptCipher = EncryptionUtil.generateEncryptCipher(tempKeyPair.getPublic());
