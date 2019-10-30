@@ -2,17 +2,15 @@ package com.github.fernthedev.server;
 
 import com.github.fernthedev.light.AuthenticationManager;
 import com.github.fernthedev.packets.*;
+import com.github.fernthedev.packets.handshake.ConnectedPacket;
+import com.github.fernthedev.packets.handshake.KeyResponsePacket;
+import com.github.fernthedev.packets.handshake.RequestConnectInfoPacket;
 import com.github.fernthedev.packets.latency.PongPacket;
 import com.github.fernthedev.server.backend.CommandMessageParser;
 import com.github.fernthedev.server.event.chat.ChatEvent;
-import com.github.fernthedev.universal.StaticHandler;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.crypto.*;
-import javax.crypto.spec.SecretKeySpec;
-import java.io.IOException;
 import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public class EventListener {
@@ -33,7 +31,18 @@ public class EventListener {
 
         // Server.getLogger().info(clientPlayer + " is the sender of packet");
 
-        if(p instanceof TestConnectPacket) {
+        if (p instanceof KeyResponsePacket) {
+          KeyResponsePacket responsePacket = (KeyResponsePacket) p;
+
+            try {
+                clientPlayer.setSecretKey(responsePacket.getSecretKey(clientPlayer.getTempKeyPair().getPrivate()));
+                clientPlayer.sendObject(new RequestConnectInfoPacket());
+            } catch (InvalidKeyException e) {
+                e.printStackTrace();
+            }
+
+
+        } else if (p instanceof TestConnectPacket) {
             TestConnectPacket packet = (TestConnectPacket) p;
             Server.getLogger().info("Connected packet: " + packet.getMessage());
         } else if(p instanceof PongPacket) {
@@ -128,18 +137,18 @@ public class EventListener {
 
     }
 
-    private Object decrypt(SealedObject sealedObject) throws IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
-        SecretKeySpec sks = new SecretKeySpec(clientPlayer.getClientKey().getBytes(), StaticHandler.getCipherTransformation());
-        Cipher cipher = Cipher.getInstance(StaticHandler.getCipherTransformation());
-        cipher.init(Cipher.DECRYPT_MODE, sks);
-
-        try {
-            return sealedObject.getObject(cipher);
-        } catch (ClassNotFoundException | IllegalBlockSizeException | BadPaddingException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+//    private Object decrypt(SealedObject sealedObject) throws IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
+//        SecretKeySpec sks = new SecretKeySpec(clientPlayer.getClientKey().getBytes(), StaticHandler.getCipherTransformation());
+//        Cipher cipher = Cipher.getInstance(StaticHandler.getCipherTransformation());
+//        cipher.init(Cipher.DECRYPT_MODE, sks);
+//
+//        try {
+//            return sealedObject.getObject(cipher);
+//        } catch (ClassNotFoundException | IllegalBlockSizeException | BadPaddingException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
 
     public void handleConnect(ConnectedPacket packet) {
         //Server.getLogger().info("Connected packet received from " + clientPlayer.getAdress());
@@ -184,8 +193,9 @@ public class EventListener {
             return;
         }*/
 
-        clientPlayer.setClientUUID(packet.getUuid(),packet.getPrivateKey());
+//        clientPlayer.setClientUUID(packet.getUuid(),packet.getPublicKey());
 
+//        clientPlayer.setKeyPair(packet.getKeyPair());
 
         //Server.getLogger().info("Players: " + PlayerHandler.players.size());
 
@@ -199,7 +209,7 @@ public class EventListener {
 
       //  Server.getLogger().info("Password required: " + server.getSettingsManager().getSettings().isPasswordRequiredForLogin());
 
-        if(server.getSettingsManager().getConfigData().isPasswordRequiredForLogin()) {
+        if(Server.getSettingsManager().getConfigData().isPasswordRequiredForLogin()) {
             boolean authenticated = AuthenticationManager.authenticate(clientPlayer);
             if(!authenticated) {
                 clientPlayer.sendObject(new MessagePacket("Unable to authenticate"));

@@ -141,15 +141,15 @@ public class ServerCommandHandler implements Runnable {
                 if(sender instanceof Console) {
                     sender.sendMessage("Players: (" + (PlayerHandler.players.size() ) + ")");
 
-                    for (ClientPlayer clientPlayer : new HashMap<>(Server.socketList).values()) {
-                        sender.sendMessage(clientPlayer.getDeviceName() + " :" + clientPlayer.getId() + " { " + clientPlayer.getAdress() + "} Ping:" + clientPlayer.getDelayTime() + "ms");
+                    for (ClientPlayer clientPlayer : new HashMap<>(PlayerHandler.socketList).values()) {
+                        sender.sendMessage(clientPlayer.getDeviceName() + " :" + clientPlayer.getId() + " { " + clientPlayer.getAddress() + "} Ping:" + clientPlayer.getDelayTime() + "ms");
                     }
                 }
 
                 if (sender instanceof ClientPlayer) {
                     String message = "Players: (" + (PlayerHandler.players.size() - 1) + ")";
 
-                    for (ClientPlayer clientPlayer : new HashMap<>(Server.socketList).values()) {
+                    for (ClientPlayer clientPlayer : new HashMap<>(PlayerHandler.socketList).values()) {
                         if (clientPlayer == null) continue;
 
                         message = "\n" + clientPlayer.getDeviceName() + " :" + clientPlayer.getId() + " Ping:" + clientPlayer.getDelayTime() + "ms";
@@ -175,7 +175,7 @@ public class ServerCommandHandler implements Runnable {
                     } else {
                         String player = args[0];
 
-                        for (ClientPlayer clientPlayer : new HashMap<>(Server.socketList).values()) {
+                        for (ClientPlayer clientPlayer : new HashMap<>(PlayerHandler.socketList).values()) {
 
                             if (player.matches("[0-9]+")) {
                                 int id = Integer.parseInt(player);
@@ -191,7 +191,7 @@ public class ServerCommandHandler implements Runnable {
                                         }
                                     }
 
-                                    Server.getInstance().getBanManager().addBan(clientPlayer,new BannedData(clientPlayer.getAdress()));
+                                    Server.getInstance().getBanManager().addBan(clientPlayer,new BannedData(clientPlayer.getAddress()));
 
                                     clientPlayer.sendObject(new MessagePacket("Banned: " + message));
                                     clientPlayer.close();

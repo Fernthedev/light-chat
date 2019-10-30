@@ -2,6 +2,7 @@ package com.github.fernthedev.universal;
 
 import com.google.common.io.Resources;
 import com.google.gson.Gson;
+import io.netty.util.CharsetUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -12,7 +13,6 @@ import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.terminal.Terminal;
-import org.json.simple.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,11 +23,19 @@ import java.util.*;
 // Import log4j classes.
 
 public class StaticHandler {
+
+    public static final int LINE_LIMIT = 8000;
+    public static final String END_STRING = "\n\r";
+    public static final int KEY_SIZE = 4096;
+    public static final int AES_KEY_SIZE = 128;
+    public static final String AES_KEY_MODE = "AES";
+    public static final String AES_CIPHER_TRANSFORMATION = "AES/CBC/PKCS5Padding";
+
+
     public static String address = "224.0.1.42";
 
-    public static JSONObject jsonObject = new JSONObject();
-
     private static Gson gson = new Gson();
+    public static Charset CHARSET_FOR_STRING = CharsetUtil.UTF_8;
 
     public static boolean isDebug = false;
     private static String version = null;
@@ -35,10 +43,12 @@ public class StaticHandler {
     public static boolean isLight = false;
 
     @Getter
-    private static final String cipherTransformation = "AES/CBC/PKCS5Padding";
+    private static final String cipherTransformationOld = "AES/CBC/PKCS5Padding";
 
-    @Getter
-    private static final String ObjecrCipherTrans = "AES";
+//    public static final String RSA_CIPHER_TRANSFORMATION = "RSA/ECB/OAEPWITHSHA-512ANDMGF1PADDING"; //"RSA/ECB/PKCS1Padding";
+
+    public static final String RSA_CIPHER_TRANSFORMATION = "RSA/ECB/PKCS1Padding";
+
 
     @Getter
     private static final String keySpecTransformation = "AES";

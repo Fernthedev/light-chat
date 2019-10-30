@@ -4,26 +4,24 @@ import com.github.fernthedev.packets.MessagePacket;
 import com.github.fernthedev.packets.Packet;
 import com.github.fernthedev.packets.latency.PingPacket;
 import com.github.fernthedev.server.command.CommandSender;
-import com.github.fernthedev.universal.EncryptionHandler;
-import com.github.fernthedev.universal.StaticHandler;
+import com.github.fernthedev.universal.encryption.UnencryptedPacketWrapper;
+import com.github.fernthedev.universal.encryption.util.RSAEncryptionUtil;
 import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
-import javax.crypto.*;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.SealedObject;
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetSocketAddress;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
+import java.security.KeyPair;
 import java.util.UUID;
 
-import static com.github.fernthedev.server.Server.socketList;
+import static com.github.fernthedev.server.PlayerHandler.socketList;
 
 public class ClientPlayer implements CommandSender {
     private boolean connected;
@@ -38,22 +36,33 @@ public class ClientPlayer implements CommandSender {
     @Getter
     private UUID uuid;
 
+
+    /**
+     * The keypair encryption
+     * Used in initial connection establishment
+     */
     @Getter
-    private UUID clientUUID;
+    private KeyPair tempKeyPair;
 
     @Getter
-    private String clientKey;
+    private SecretKey secretKey;
 
-    @Getter
-    @Setter
-    private String serverKey;
-
-    public void setClientUUID(UUID uuid,String privateKey) {
-        this.clientUUID = uuid;
-
-        this.clientKey = EncryptionHandler.decrypt(privateKey,serverKey);
-        encryptCipher = registerEncryptCipher(clientKey);
+    public void setSecretKey(SecretKey secretKey) {
+        this.secretKey = secretKey;
+        this.tempKeyPair = null;
     }
+
+//    /**
+//     * Set the client
+//     * @param uuid The uuid the client generated
+//     * @param privateKey The private key from the client
+//     */
+//    public void setClientUUID(UUID uuid,String privateKey) {
+//        this.clientUUID = uuid;
+//
+//        this.clientKey = EncryptionHandler.decrypt(privateKey,serverKey);
+//        encryptCipher = registerEncryptCipher(clientKey);
+//    }
 
 
 
@@ -74,11 +83,9 @@ public class ClientPlayer implements CommandSender {
     private long delayTime = -1;
 
     @Getter
-    @Setter
     private Cipher encryptCipher;
 
     @Getter
-    @Setter
     private Cipher decryptCipher;
 
     public String getDeviceName() {
@@ -93,11 +100,42 @@ public class ClientPlayer implements CommandSender {
         this.channel = channel;
         this.uuid = uuid;
 
-        serverKey = EncryptionHandler.makeSHA256Hash(uuid.toString());
-        decryptCipher = registerDecryptCipher(serverKey);
+        Server.runAsync(() -> tempKeyPair = RSAEncryptionUtil.generateKeyPairs());
+
+//        try {
+//            encryptCipher = EncryptionUtil.generateEncryptCipher(tempKeyPair.getPublic());
+//        } catch (InvalidKeyException | NoSuchPaddingException | NoSuchAlgorithmException e) {
+//            e.printStackTrace();
+//        }
+//
+////        serverKey = EncryptionHandler.makeSHA256Hash(uuid.toString());
+////        decryptCipher = registerDecryptCipher(serverKey);
+//        try {
+//            assert tempKeyPair != null;
+//            decryptCipher = EncryptionUtil.generateDecryptCipher(tempKeyPair.getPrivate());
+//        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException e) {
+//            e.printStackTrace();
+//        }
+
+
 
         eventListener = new EventListener(server, this);
     }
+
+    @Deprecated
+    public void setKeyPair(KeyPair keyPair) {
+        throw new IllegalStateException("This is deprecated. Kept only in case.");
+//        this.tempKeyPair = null;
+//
+//        try {
+//            encryptCipher = EncryptionUtil.generateEncryptCipher(keyPair.getPublic());
+//            decryptCipher = EncryptionUtil.generateDecryptCipher(keyPair.getPrivate());
+//            Server.getLogger().info("Registered key set with client's key set.");
+//        } catch (InvalidKeyException | NoSuchPaddingException | NoSuchAlgorithmException e) {
+//            e.printStackTrace();
+//        }
+    }
+
 
     /**
      * PingPong delay
@@ -105,12 +143,12 @@ public class ClientPlayer implements CommandSender {
     public long startTime;
     public long endTime;
 
-    void setLastPacket(Object packet) {
+    void setLastPacket(Packet packet) {
         if (packet instanceof Packet) {
         }
     }
 
-    public synchronized void sendObject(@NonNull Packet packet, boolean encrypt) {
+    public void sendObject(@NonNull Packet packet, boolean encrypt) {
             /*
             // Length is 16 byte
             SecretKeySpec sks = new SecretKeySpec(serverKey.getBytes(), StaticHandler.getCipherTransformation());
@@ -119,52 +157,52 @@ public class ClientPlayer implements CommandSender {
             Cipher cipher = Cipher.getInstance(StaticHandler.getCipherTransformation());
             cipher.init(Cipher.ENCRYPT_MODE, sks);*/
         if (encrypt) {
-            SealedObject sealedObject = encryptObject(packet);
+//            SealedObject sealedObject = encryptObject(packet); ////////////////
 
-            channel.writeAndFlush(sealedObject);
-        } else {
             channel.writeAndFlush(packet);
+        } else {
+            channel.writeAndFlush(new UnencryptedPacketWrapper(packet));
         }
 
 
     }
-
-    public Cipher registerDecryptCipher(String key) {
-        try {
-            byte[] salt = new byte[16];
-
-            SecretKeyFactory factory = SecretKeyFactory.getInstance(StaticHandler.getKeyFactoryString());
-            KeySpec spec = new PBEKeySpec(key.toCharArray(), salt, 65536, 256);
-            SecretKey tmp = factory.generateSecret(spec);
-            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKeySpecTransformation());
-            Cipher cipher = Cipher.getInstance(StaticHandler.getObjecrCipherTrans());
-
-            cipher.init(Cipher.DECRYPT_MODE, secret);
-            decryptCipher = cipher;
-            return cipher;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public Cipher registerEncryptCipher(String password) {
-        try {
-            byte[] salt = new byte[16];
-
-            SecretKeyFactory factory = SecretKeyFactory.getInstance(StaticHandler.getKeyFactoryString());
-            KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 256);
-            SecretKey tmp = factory.generateSecret(spec);
-            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKeySpecTransformation());
-
-            Cipher cipher = Cipher.getInstance(StaticHandler.getObjecrCipherTrans());
-            cipher.init(Cipher.ENCRYPT_MODE, secret);
-            return cipher;
-        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+//
+//    public Cipher registerDecryptCipher(String key) {
+//        try {
+//            byte[] salt = new byte[16];
+//
+//            SecretKeyFactory factory = SecretKeyFactory.getInstance(StaticHandler.getKeyFactoryString());
+//            KeySpec spec = new PBEKeySpec(key.toCharArray(), salt, 65536, 256);
+//            SecretKey tmp = factory.generateSecret(spec);
+//            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKeySpecTransformation());
+//            Cipher cipher = Cipher.getInstance(StaticHandler.getObjecrCipherTrans());
+//
+//            cipher.init(Cipher.DECRYPT_MODE, secret);
+//            decryptCipher = cipher;
+//            return cipher;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
+//
+//    public Cipher registerEncryptCipher(String password) {
+//        try {
+//            byte[] salt = new byte[16];
+//
+//            SecretKeyFactory factory = SecretKeyFactory.getInstance(StaticHandler.getKeyFactoryString());
+//            KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 256);
+//            SecretKey tmp = factory.generateSecret(spec);
+//            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKeySpecTransformation());
+//
+//            Cipher cipher = Cipher.getInstance(StaticHandler.getObjecrCipherTrans());
+//            cipher.init(Cipher.ENCRYPT_MODE, secret);
+//            return cipher;
+//        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
 
     public SealedObject encryptObject(Serializable object) {
         try {
@@ -182,6 +220,7 @@ public class ClientPlayer implements CommandSender {
         try {
             if (decryptCipher == null)
                 throw new IllegalArgumentException("Register cipher with registerDecryptCipher() first");
+
             return sealedObject.getObject(decryptCipher);
         } catch (Exception e) {
             e.printStackTrace();
@@ -197,7 +236,7 @@ public class ClientPlayer implements CommandSender {
     public void close() {
 
         //DISCONNECT FROM SERVER
-        Server.getLogger().info("Closing player {}", this.toString());
+        Server.getLogger().info("Closing player {}", this::toString);
 
         if (channel != null) {
 
@@ -218,11 +257,11 @@ public class ClientPlayer implements CommandSender {
     public String toString() {
 
 
-        return "[" + getAdress() + "] [" + deviceName + "|" + id +"]";
+        return "[" + getAddress() + "] [" + deviceName + "|" + id +"]";
     }
 
 
-    public String getAdress() {
+    public String getAddress() {
         if (channel.remoteAddress() == null) {
             return "unknown";
         }

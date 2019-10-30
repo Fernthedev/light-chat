@@ -8,6 +8,10 @@ import com.github.fernthedev.packets.MessagePacket;
 import com.github.fernthedev.packets.Packet;
 import com.github.fernthedev.universal.ConsoleHandler;
 import com.github.fernthedev.universal.StaticHandler;
+import com.github.fernthedev.universal.encryption.RSA.EncryptedGSONObjectDecoder;
+import com.github.fernthedev.universal.encryption.RSA.EncryptedGSONObjectEncoder;
+import com.github.fernthedev.universal.encryption.RSA.IEncryptionKeyHolder;
+import com.github.fernthedev.universal.encryption.UnencryptedPacketWrapper;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollEventLoopGroup;
@@ -16,10 +20,9 @@ import io.netty.channel.kqueue.KQueueEventLoopGroup;
 import io.netty.channel.kqueue.KQueueSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.serialization.ClassResolvers;
-import io.netty.handler.codec.serialization.ObjectDecoder;
-import io.netty.handler.codec.serialization.ObjectEncoder;
+import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.util.CharsetUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -27,21 +30,12 @@ import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.crypto.*;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
-import java.io.IOException;
-import java.io.Serializable;
+import javax.crypto.SecretKey;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
-import java.util.UUID;
 
 
-public class Client {
+public class Client implements IEncryptionKeyHolder {
     public boolean registered;
 
     @Getter
@@ -60,21 +54,7 @@ public class Client {
     public int port;
     public String host;
 
-    @Getter
-    @Setter
-    @NonNull
-    protected String serverKey;
-
-    @Getter
-    @Setter
-    @NonNull
-    protected String privateKey;
-
     protected EventListener listener;
-
-
-    @Getter
-    protected UUID uuid;
 
     public String name;
 //    public static WaitForCommand waitForCommand;
@@ -92,13 +72,14 @@ public class Client {
 
     protected EventLoopGroup workerGroup;
 
-    @Getter
-    @Setter
-    private Cipher decryptCipher;
+//    @Getter
+//    private Cipher decryptCipher;
+//
+//    @Getter
+//    private Cipher encryptCipher;
 
     @Getter
-    @Setter
-    private Cipher encryptCipher;
+    private SecretKey secretKey;
 
     /**
      * PingPong delay
@@ -110,11 +91,6 @@ public class Client {
      * is nanosecond
      */
     public static long miliPingDelay;
-    private boolean connected;
-
-    protected void getProperties() {
-        System.getProperties().list(System.out);
-    }
 
     public void setup() {
         completeHandler = new AutoCompleteHandler(this);
@@ -152,11 +128,10 @@ public class Client {
 
 //        waitForCommand = new WaitForCommand(this);
 
-        connected = false;
         running = true;
 
         listener = new EventListener(this);
-        uuid = UUID.randomUUID();
+
         clientHandler = new ClientHandler(this, listener);
 
         connect();
@@ -190,7 +165,7 @@ public class Client {
         Bootstrap b = new Bootstrap();
         workerGroup = new NioEventLoopGroup();
 
-        Class channelClass = NioSocketChannel.class;
+        Class<? extends AbstractChannel> channelClass = NioSocketChannel.class;
 
         if (SystemUtils.IS_OS_LINUX && osCheck.runNatives()) {
             workerGroup = new EpollEventLoopGroup();
@@ -218,16 +193,23 @@ public class Client {
                 public void initChannel(Channel ch)
                         throws Exception {
                     ch.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(15));
-                    ch.pipeline().addLast(new ObjectEncoder(),
-                            new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
-                            clientHandler);
+
+                    ch.pipeline().addLast("frameDecoder", new LineBasedFrameDecoder(StaticHandler.LINE_LIMIT));
+                    ch.pipeline().addLast("stringDecoder",new EncryptedGSONObjectDecoder(CharsetUtil.UTF_8, Client.this));
+
+                    ch.pipeline().addLast("stringEncoder", new EncryptedGSONObjectEncoder(CharsetUtil.UTF_8, Client.this));
+
+                    ch.pipeline().addLast(clientHandler);
+//                    ch.pipeline().addLast(new ObjectEncoder(),
+//                            new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
+//                            clientHandler);
                 }
             });
 
             getLogger().info("Establishing connection");
             future = b.connect(host, port).await().sync();
             channel = future.channel();
-            getLogger().info("Established channel connection");
+            getLogger().info("Established channel connection ");
 
         } catch (InterruptedException e) {
             getLogger().logError(e.getMessage(), e.getCause());
@@ -235,7 +217,6 @@ public class Client {
 
 
         if (future.isSuccess() && future.channel().isActive()) {
-            connected = true;
 
 
             running = true;
@@ -265,14 +246,11 @@ public class Client {
     }
 
     public void sendObject(@NonNull Packet packet, boolean encrypt) {
-
-
         if (encrypt) {
-            SealedObject sealedObject = encryptObject(packet);
-
-            channel.writeAndFlush(sealedObject);
-        } else {
+//            SealedObject sealedObject = encryptObject(packet);
             channel.writeAndFlush(packet);
+        } else {
+            channel.writeAndFlush(new UnencryptedPacketWrapper(packet));
         }
 
 
@@ -325,64 +303,95 @@ public class Client {
     }
 
 
-    public Object decryptObject(SealedObject sealedObject) {
-        if (decryptCipher == null)
-            throw new IllegalArgumentException("Register cipher with registerDecryptCipher() first");
-        try {
-            return sealedObject.getObject(decryptCipher);
-        } catch (IOException | ClassNotFoundException | IllegalBlockSizeException | BadPaddingException e) {
-            e.printStackTrace();
-        }
-        return null;
+//    @Deprecated
+//    public Object decryptObject(SealedObject sealedObject) {
+//        if (decryptCipher == null)
+//            throw new IllegalArgumentException("Register cipher with registerDecryptCipher() first");
+//        try {
+//            return sealedObject.getObject(decryptCipher);
+//        } catch (IOException | ClassNotFoundException | IllegalBlockSizeException | BadPaddingException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
+
+//    @Deprecated
+//    public Cipher registerDecryptCipher(String key) {
+//        try {
+//            byte[] salt = new byte[16];
+//
+//            SecretKeyFactory factory = SecretKeyFactory.getInstance(StaticHandler.getKeyFactoryString());
+//            KeySpec spec = new PBEKeySpec(key.toCharArray(), salt, 65536, 256);
+//            SecretKey tmp = factory.generateSecret(spec);
+//            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKeySpecTransformation());
+//            Cipher cipher = Cipher.getInstance(StaticHandler.getCipherTransformationOld());
+//
+//            cipher.init(Cipher.DECRYPT_MODE, secret);
+//            return cipher;
+//        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | InvalidKeySpecException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
+//
+//
+//    @Deprecated
+//    public Cipher registerEncryptCipher(String password) {
+//        try {
+//            byte[] salt = new byte[16];
+//
+//            SecretKeyFactory factory = SecretKeyFactory.getInstance(StaticHandler.getKeyFactoryString());
+//            KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 256);
+//            SecretKey tmp = factory.generateSecret(spec);
+//            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKeySpecTransformation());
+//
+//            Cipher cipher = Cipher.getInstance(StaticHandler.getCipherTransformationOld());
+//            cipher.init(Cipher.ENCRYPT_MODE, secret);
+//            return cipher;
+//        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
+
+
+//    @Deprecated
+//    public SealedObject encryptObject(Serializable object) {
+//        try {
+//            if (encryptCipher == null)
+//                throw new IllegalArgumentException("Register cipher with registerEncryptCipher() first");
+//
+//            return new SealedObject(object, encryptCipher);
+//        } catch (IOException | IllegalBlockSizeException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
+
+    @Override
+    public SecretKey getSecretKey(ChannelHandlerContext ctx, Channel channel) {
+        return secretKey;
     }
 
-    public Cipher registerDecryptCipher(String key) {
-        try {
-            byte[] salt = new byte[16];
-
-            SecretKeyFactory factory = SecretKeyFactory.getInstance(StaticHandler.getKeyFactoryString());
-            KeySpec spec = new PBEKeySpec(key.toCharArray(), salt, 65536, 256);
-            SecretKey tmp = factory.generateSecret(spec);
-            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKeySpecTransformation());
-            Cipher cipher = Cipher.getInstance(StaticHandler.getObjecrCipherTrans());
-
-            cipher.init(Cipher.DECRYPT_MODE, secret);
-            return cipher;
-        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | InvalidKeySpecException e) {
-            e.printStackTrace();
-        }
-        return null;
+    @Override
+    public boolean isEncryptionKeyRegistered(ChannelHandlerContext ctx, Channel channel) {
+        return secretKey != null;
     }
 
-    public SealedObject encryptObject(Serializable object) {
-        try {
-            if (encryptCipher == null)
-                throw new IllegalArgumentException("Register cipher with registerEncryptCipher() first");
-
-            return new SealedObject(object, encryptCipher);
-        } catch (IOException | IllegalBlockSizeException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public void setSecretKey(SecretKey secretKey) {
+        this.secretKey = secretKey;
+//        try {
+//            encryptCipher = Cipher.getInstance(StaticHandler.getObjecrCipherTrans());
+//            encryptCipher.init(Cipher.ENCRYPT_MODE, secretKey);
+//
+//            decryptCipher = Cipher.getInstance(StaticHandler.getObjecrCipherTrans());
+//            decryptCipher.init(Cipher.DECRYPT_MODE, secretKey);
+//        } catch (NoSuchAlgorithmException e) {
+//            e.printStackTrace();
+//        } catch (NoSuchPaddingException e) {
+//            e.printStackTrace();
+//        } catch (InvalidKeyException e) {
+//            e.printStackTrace();
+//        }
     }
-
-    public Cipher registerEncryptCipher(String password) {
-        try {
-            byte[] salt = new byte[16];
-
-            SecretKeyFactory factory = SecretKeyFactory.getInstance(StaticHandler.getKeyFactoryString());
-            KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 256);
-            SecretKey tmp = factory.generateSecret(spec);
-            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKeySpecTransformation());
-
-            Cipher cipher = Cipher.getInstance(StaticHandler.getObjecrCipherTrans());
-            cipher.init(Cipher.ENCRYPT_MODE, secret);
-            return cipher;
-        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-
 }

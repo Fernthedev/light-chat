@@ -1,9 +1,11 @@
 package com.github.fernthedev.light.api;
 
+import com.github.fernthedev.light.Settings;
+import com.github.fernthedev.light.api.annotations.LineArgument;
+import com.github.fernthedev.light.api.annotations.LineData;
+import com.github.fernthedev.light.api.lines.ILightLine;
 import com.github.fernthedev.light.api.lines.LightLine;
-import com.github.fernthedev.light.api.lines.LightPinLine;
-import com.github.fernthedev.light.api.lines.LightPrintLine;
-import com.github.fernthedev.light.api.lines.LightSleepLine;
+import com.github.fernthedev.light.exceptions.LightCommentNoEndException;
 import com.github.fernthedev.light.exceptions.LightFileParseException;
 import com.github.fernthedev.server.Server;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
@@ -17,11 +19,15 @@ import org.apache.commons.io.FilenameUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
 public class LightParser {
 
+    private LightParser() {}
+
+    public static final List<ILightLine> parseList = new ArrayList<>();
 
     public static void saveFile(@NonNull LightFile lightFile,File path) throws IOException {
         File file = new File(lightFile.getFile().getPath());
@@ -47,35 +53,48 @@ public class LightParser {
 
 
     public static LightFile parseFile(@NonNull File file) {
-        List<LightLine> lightLines = new ArrayList<>();
+        List<ILightLine> lightLines = new ArrayList<>();
 
         GpioPinDigitalOutput output;
         int lineNumber = 0;
 
+
+        int commentedLineStart = -1;
         String concatenateComment = null;
         String[] commented1 = null;
         boolean commented = false;
 
-        LightLine lightLine = null;
+        ILightLine lightLine = null;
 
         if(file.isDirectory()) {
             return null;
         }
 
+        // Reads the file
         try (Source fileSource = Okio.source(file);
              BufferedSource bufferedSource = Okio.buffer(fileSource)) {
+
+            StringBuilder fullLine = new StringBuilder();
+
             while (true) {
-                String line = bufferedSource.readUtf8Line();
-                if (line == null) break;
+                String argumentStart = bufferedSource.readUtf8Line();
+                if (argumentStart == null) {
 
-                lineNumber++;
+                    if(commented) {
+                        throw new LightCommentNoEndException(new LightLine(commented1[0] + commented1[1], commentedLineStart), "The block comment does not end with a */");
+                    }
 
-                String[] checkMessage = line.split(" ", 2);
+                    break;
+                }
+
+                lineNumber++; // The argumentStart number id
+
+                String[] checkMessage = argumentStart.split(" ", 2);
                 List<String> messageWord = new ArrayList<>();
 
 
                 if (checkMessage.length > 1) {
-                    String[] messagewordCheck = line.split(" ");
+                    String[] messagewordCheck = argumentStart.split(" ");
 
                     int index = 0;
 
@@ -93,133 +112,156 @@ public class LightParser {
                     }
                 }
 
-                line = checkMessage[0];
+                argumentStart = checkMessage[0];
 
-                boolean found = false;
-
-
-                line = line.replaceAll(" {2}", " ");
+                argumentStart = argumentStart.replaceAll(" {2}", " ");
                 String[] args = new String[messageWord.size()];
                 args = messageWord.toArray(args);
 
-                StringBuilder s = new StringBuilder();
+                StringBuilder rawArgumentLineBuilder = new StringBuilder();
 
-                s.append(line);
+                rawArgumentLineBuilder.append(argumentStart);
 
                 for (String ss : args) {
-                    s.append(" ").append(ss);
+                    rawArgumentLineBuilder.append(" ").append(ss);
+                }
+                // All the lines above construct the LightLine instance
+
+                lightLine = new LightLine(rawArgumentLineBuilder.toString(), lineNumber);
+
+                if (argumentStart.startsWith(" ")) {
+                    argumentStart = argumentStart.substring(argumentStart.indexOf(' ')) + 1;
                 }
 
-                lightLine = new LightLine(s.toString(), lineNumber);
 
-                if (line.startsWith(" ")) {
-                    line = line.substring(line.indexOf(" ")) + 1;
-                }
-
-                if (line.startsWith("//")) {
-                    continue;
-                }
-
-                if (line.startsWith("#")) {
-                    continue;
-                }
-
-                if (line.contains("//") || line.contains("#")) {
-                    int index;
-                    if (line.contains("//")) {
-                        index = line.indexOf("//");
-                    } else {
-                        index = line.indexOf('#');
+                // LINE COMMENT CHECK
+                {
+                    if (argumentStart.startsWith("//")) {
+                        continue;
                     }
 
-                    line = line.substring(index);
+                    if (argumentStart.startsWith("#")) {
+                        continue;
+                    }
+
+                    if (argumentStart.contains("//") || argumentStart.contains("#")) {
+                        int index;
+                        if (argumentStart.contains("//")) {
+                            index = argumentStart.indexOf("//");
+                        } else {
+                            index = argumentStart.indexOf('#');
+                        }
+
+                        argumentStart = argumentStart.substring(index);
+                    }
                 }
+                // LINE COMMENT CHECK
 
-                if (line.contains("/*") && !commented) {
-                    commented = true;
-                    commented1 = line.split("/\\*", 2);
+                // BLOCK COMMENT CHECK
+                {
+                    String rawArgumentLine = rawArgumentLineBuilder.toString();
+                    if (rawArgumentLine.contains("/*") && !commented) {
+                        commented = true;
+                        commented1 = rawArgumentLine.split("/\\*", 2);
 
-                    concatenateComment = commented1[0];
+                        concatenateComment = commented1[0];
+
+                        commentedLineStart = lineNumber;
+                    }
+
+                    if (rawArgumentLine.contains("*/") && commented) {
+                        String[] commented2 = commented1[1].split("\\*/", 2);
+
+                        concatenateComment += commented2[1];
+
+                        argumentStart = concatenateComment;
+                        commented = false;
+                    }
                 }
-
-                if (line.contains("*/") && commented) {
-                    String[] commented2 = commented1[1].split("\\*/", 2);
-
-                    concatenateComment += commented2[1];
-
-                    line = concatenateComment;
-                    commented = false;
-                }
+                // BLOCK COMMENT CHECK
 
                 if (commented) {
                     continue;
                 }
 
+                boolean foundOnList = false;
 
-                if (line.equalsIgnoreCase("print") && args.length > 1) {
-                    StringBuilder st = new StringBuilder();
-                    int t = 0;
-                    for (String se : args) {
-                        if (t > 0) st.append(" ");
-                        st.append(se);
-
-                        t++;
-                    }
-
-                    lightLines.add(new LightPrintLine(lightLine, st.toString()));
-                }
-
-                if (line.equalsIgnoreCase("pin") && args.length > 1) {
-                    if (args[0].equalsIgnoreCase("all")) {
-
-
-                        String newPar = args[1];
-
-                        boolean toggle;
-
-                        if (newPar.equalsIgnoreCase("on")) {
-                            toggle = true;
-                        } else if (newPar.equalsIgnoreCase("off")) {
-                            toggle = false;
-                        } else {
-                            throw new LightFileParseException(lightLine, "Could not find parameter " + newPar);
-                        }
-
-                        lightLines.add(new LightPinLine(lightLine, true, toggle));
-
-
-                    } else if (args[0].matches("[0-9]+")) {
-                        int pinInt = Integer.parseInt(args[0]);
-
-
-                        String newPar = args[1];
-                        boolean toggle;
-
-                        if (newPar.equalsIgnoreCase("on")) {
-                            toggle = true;
-                        } else if (newPar.equalsIgnoreCase("off")) {
-                            toggle = false;
-                        } else {
-                            throw new LightFileParseException(lightLine, "Could not find parameter " + newPar);
-                        }
-
-                        lightLines.add(new LightPinLine(lightLine, pinInt, toggle));
-
-
-                    } else {
-                        throw new LightFileParseException(lightLine, "Argument " + args[0] + " can only be numerical.");
+                for (ILightLine iLightLine : parseList) {
+                    if(iLightLine.getArgumentName().equalsIgnoreCase(argumentStart)) {
+                        lightLines.add(iLightLine.constructLightLine(lightLine, args));
+                        foundOnList = true;
                     }
                 }
 
-                if (line.equalsIgnoreCase("sleep")) {
-                    if (args.length > 0) {
-                        String amount = args[0];
-                        if (amount.replaceAll("\\.", "").matches("[0-9]+")) {
-                            double time = Double.parseDouble(amount);
-                            lightLines.add(new LightSleepLine(lightLine, time));
-                        }
-                    }
+
+                if(!foundOnList) {
+                    throw new LightFileParseException(lightLine, "The line could not be parsed correctly at the start. Unrecognized: \"" + argumentStart + "\"");
                 }
+
+//                if (argumentStart.equalsIgnoreCase("print") && args.length > 1) {
+//                    StringBuilder st = new StringBuilder();
+//                    int t = 0;
+//                    for (String se : args) {
+//                        if (t > 0) st.append(" ");
+//                        st.append(se);
+//
+//                        t++;
+//                    }
+//
+//                    lightLines.add(new LightPrintLine(lightLine, st.toString()));
+//                }
+
+//                if (argumentStart.equalsIgnoreCase("pin") && args.length > 1) {
+//                    if (args[0].equalsIgnoreCase("all")) {
+//
+//
+//                        String newPar = args[1];
+//
+//                        boolean toggle;
+//
+//                        if (newPar.equalsIgnoreCase("on")) {
+//                            toggle = true;
+//                        } else if (newPar.equalsIgnoreCase("off")) {
+//                            toggle = false;
+//                        } else {
+//                            throw new LightFileParseException(lightLine, "Could not find parameter " + newPar);
+//                        }
+//
+//                        lightLines.add(new LightPinLine(lightLine, true, toggle));
+//
+//
+//                    } else if (args[0].matches("[0-9]+")) {
+//                        int pinInt = Integer.parseInt(args[0]);
+//
+//
+//                        String newPar = args[1];
+//                        boolean toggle;
+//
+//                        if (newPar.equalsIgnoreCase("on")) {
+//                            toggle = true;
+//                        } else if (newPar.equalsIgnoreCase("off")) {
+//                            toggle = false;
+//                        } else {
+//                            throw new LightFileParseException(lightLine, "Could not find parameter " + newPar);
+//                        }
+//
+//                        lightLines.add(new LightPinLine(lightLine, pinInt, toggle));
+//
+//
+//                    } else {
+//                        throw new LightFileParseException(lightLine, "Argument " + args[0] + " can only be numerical.");
+//                    }
+//                }
+
+//                if (argumentStart.equalsIgnoreCase("sleep")) {
+//                    if (args.length > 0) {
+//                        String amount = args[0];
+//                        if (amount.replaceAll("\\.", "").matches("[0-9]+")) {
+//                            double time = Double.parseDouble(amount);
+//                            lightLines.add(new LightSleepLine(lightLine, time));
+//                        }
+//                    }
+//                }
 
             }
         } catch (FileNotFoundException e) {
@@ -231,6 +273,63 @@ public class LightParser {
         }
 
         return new LightFile(file, lightLines);
+    }
+
+
+    public static String formatString(ILightLine lightLine) {
+        StringBuilder formattedString = new StringBuilder();
+
+        formattedString.append(lightLine.getArgumentName());
+
+        for (Field field : lightLine.getClass().getDeclaredFields()) {
+            if(field.isAnnotationPresent(LineArgument.class)) {
+                Settings.SettingValue settingValue = field.getAnnotation(Settings.SettingValue.class);
+
+                String name = settingValue.name();
+
+                if(name.equals("")) name = field.getName();
+
+                try {
+                    formattedString
+                            .append(" ")
+                            .append(name)
+                            .append("(")
+                            .append(field.getDeclaringClass())
+                            .append(")").append("={").append(field.get(lightLine)).append("}");
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return formattedString.toString();
+    }
+
+    public static String formatString(Class<? extends ILightLine> lightClass) {
+        StringBuilder formattedString = new StringBuilder();
+
+        if(!lightClass.isAnnotationPresent(LineData.class)) throw new IllegalArgumentException("Class does not have LineData annotation set.");
+
+        formattedString.append(lightClass.getAnnotation(LineData.class).name());
+
+        for (Field field : lightClass.getDeclaredFields()) {
+            if(field.isAnnotationPresent(LineArgument.class)) {
+                Settings.SettingValue settingValue = field.getAnnotation(Settings.SettingValue.class);
+
+                String name = settingValue.name();
+
+                if(name.equals("")) name = field.getName();
+
+                formattedString
+                        .append(" ")
+                        .append(name)
+                        .append("(")
+                        .append(field.getDeclaringClass())
+                        .append(")").append("={").append(field.getType()).append("}");
+            }
+        }
+
+        return formattedString.toString();
     }
 
     /**

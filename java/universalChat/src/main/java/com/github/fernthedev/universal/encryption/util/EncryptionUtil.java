@@ -1,29 +1,110 @@
-package com.github.fernthedev.universal;
+package com.github.fernthedev.universal.encryption.util;
+
+import com.github.fernthedev.universal.StaticHandler;
+import com.github.fernthedev.universal.encryption.EncryptedBytes;
+import lombok.NonNull;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
-import java.security.AlgorithmParameters;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+import java.security.*;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
+import java.util.Base64;
 
-public class EncryptionHandler {
+public class EncryptionUtil {
 
-    @Deprecated
-    public static void logEncrypt(String password, Object encrypted) {
-        System.out.println("Encrypting with password " + password + " the object \"" + encrypted + "\"");
+    public static SecretKey generateSecretKey() {
+
+        KeyGenerator generator;
+        try {
+
+            generator = KeyGenerator.getInstance(StaticHandler.AES_KEY_MODE);
+            generator.init(StaticHandler.AES_KEY_SIZE); // The AES key size in number of bits
+
+            return generator.generateKey();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
-    @Deprecated
-    public static void logDecrypt(String password, Object encrypted) {
-        System.out.println("Decrypting with password " + password + " the object \"" + encrypted + "\"");
+    /**
+     * Encrypt object with password
+     * @param object Object to be encrypted
+     * @param secret Password to use for encryption
+     * @return Encrypted version of object
+     */
+    public static SealedObject encrypt(Serializable object, SecretKey secret) {
+        try {
+            Cipher cipher = Cipher.getInstance(StaticHandler.AES_CIPHER_TRANSFORMATION);
+            cipher.init(Cipher.ENCRYPT_MODE, secret);
+
+
+            // properly encode the complete ciphertext
+            //logEncrypt(password, object);
+            return new SealedObject(object, cipher);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Encrypt object with password
+     * @param data Object to be encrypted
+     * @param secret Password to use for encryption
+     * @return Encrypted version of object
+     */
+    public static EncryptedBytes encrypt(String data, SecretKey secret) throws InvalidKeyException {
+
+        try {
+            Cipher cipher = Cipher.getInstance(StaticHandler.AES_CIPHER_TRANSFORMATION);
+            cipher.init(Cipher.ENCRYPT_MODE, secret);
+
+            // properly encode the complete ciphertext
+            //logEncrypt(password, object);
+
+            byte[] encodedData = cipher.doFinal(Base64.getEncoder().encode(data.getBytes()));
+            byte[] params = cipher.getParameters().getEncoded();
+            String paramAlgorithm = cipher.getParameters().getAlgorithm();
+
+            return new EncryptedBytes(encodedData, params, paramAlgorithm);
+        } catch (NoSuchAlgorithmException | IllegalBlockSizeException | NoSuchPaddingException | BadPaddingException | IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Decrypt data with secret
+     * @param encryptedBytes Object to be decrypted
+     * @param secret Password to use for decryption
+     * @return Decrypted version of object
+     */
+    public static String decrypt(EncryptedBytes encryptedBytes, @NonNull SecretKey secret) throws InvalidKeyException {
+        try {
+
+            // get parameter object for password-based encryption
+            AlgorithmParameters algParams;
+            algParams = AlgorithmParameters.getInstance(encryptedBytes.getParamAlgorithm());
+
+            // initialize with parameter encoding from above
+            algParams.init(encryptedBytes.getParams());
+
+            Cipher cipher = Cipher.getInstance(StaticHandler.AES_CIPHER_TRANSFORMATION);
+            cipher.init(Cipher.DECRYPT_MODE, secret, algParams);
+
+            return new String(Base64.getDecoder().decode(cipher.doFinal(encryptedBytes.getData())));
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException | IOException | InvalidAlgorithmParameterException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -32,7 +113,7 @@ public class EncryptionHandler {
      * @param password Password to use for encryption
      * @return Encrypted version of plaintext
      */
-    public static String encrypt(String plainText, String password) {
+    public static String encryptWithPassword(String plainText, String password) {
         try {
             SecureRandom random = new SecureRandom();
             byte[] salt = new byte[16];
@@ -43,7 +124,7 @@ public class EncryptionHandler {
             SecretKey tmp = factory.generateSecret(spec);
             SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKeySpecTransformation());
 
-            Cipher cipher = Cipher.getInstance(StaticHandler.getCipherTransformation());
+            Cipher cipher = Cipher.getInstance(StaticHandler.getCipherTransformationOld());
             cipher.init(Cipher.ENCRYPT_MODE, secret);
             AlgorithmParameters params = cipher.getParameters();
             byte[] iv = params.getParameterSpec(IvParameterSpec.class).getIV();
@@ -70,7 +151,7 @@ public class EncryptionHandler {
      * @param password Password to use for encryption
      * @return Encrypted version of object
      */
-    public static SealedObject encrypt(Serializable object, String password) {
+    public static SealedObject encryptWithPassword(Serializable object, String password) {
         try {
             byte[] salt = new byte[16];
 
@@ -79,25 +160,21 @@ public class EncryptionHandler {
             SecretKey tmp = factory.generateSecret(spec);
             SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKeySpecTransformation());
 
-            Cipher cipher = Cipher.getInstance(StaticHandler.getObjecrCipherTrans());
-            cipher.init(Cipher.ENCRYPT_MODE, secret);
-
-            // properly encode the complete ciphertext
-            //logEncrypt(password, object);
-            return new SealedObject(object, cipher);
+            return encrypt(object, secret);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
+
     /**
-     * Decrypt string encrypted using {@link this#encrypt(String, String)}
+     * Decrypt string encrypted using {@link this#encryptWithPassword(String, String)}
      * @param encryptedText Encrypted string
      * @param password Same password to decrypt
      * @return Plain text
      */
-    public static String decrypt(String encryptedText, String password) {
+    public static String decryptWithPassword(String encryptedText, String password) {
         try {
             byte[] ciphertext = DatatypeConverter.parseBase64Binary(encryptedText);
             if (ciphertext.length < 48) {
@@ -111,7 +188,7 @@ public class EncryptionHandler {
             KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 256);
             SecretKey tmp = factory.generateSecret(spec);
             SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKeySpecTransformation());
-            Cipher cipher = Cipher.getInstance(StaticHandler.getCipherTransformation());
+            Cipher cipher = Cipher.getInstance(StaticHandler.getCipherTransformationOld());
 
             cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(iv));
             byte[] plaintext = cipher.doFinal(ct);
@@ -125,12 +202,12 @@ public class EncryptionHandler {
     }
 
     /**
-     * Decrypt object using {@link this#encrypt(Serializable, String)}
+     * Decrypt object using {@link this#encryptWithPassword(Serializable, String)}
      * @param sealedObject Encrypted object to decrypt
      * @param key Password to decrypt
      * @return Unencrypted object
      */
-    public static Object decrypt(SealedObject sealedObject, String key) {
+    public static Object decryptWithPassword(SealedObject sealedObject, String key) {
         try {
             byte[] salt = new byte[16];
 
@@ -138,7 +215,7 @@ public class EncryptionHandler {
             KeySpec spec = new PBEKeySpec(key.toCharArray(), salt, 65536, 256);
             SecretKey tmp = factory.generateSecret(spec);
             SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKeySpecTransformation());
-            Cipher cipher = Cipher.getInstance(StaticHandler.getObjecrCipherTrans());
+            Cipher cipher = Cipher.getInstance(StaticHandler.getCipherTransformationOld());
 
             cipher.init(Cipher.DECRYPT_MODE, secret);
 

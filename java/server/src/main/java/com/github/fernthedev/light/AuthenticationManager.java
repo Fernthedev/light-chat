@@ -108,7 +108,7 @@ public class AuthenticationManager extends Command implements Listener {
                             event.getSender().sendMessage("Incorrect password");
                             playerInfo.tries++;
                         }else{
-                            Server.getInstance().getBanManager().addBan(clientPlayer,new BannedData(clientPlayer.getAdress()));
+                            Server.getInstance().getBanManager().addBan(clientPlayer,new BannedData(clientPlayer.getAddress()));
                             checking.remove(event.getSender());
                         }
                     }
@@ -124,7 +124,7 @@ public class AuthenticationManager extends Command implements Listener {
                             event.getSender().sendMessage(ColorCode.RED + "Incorrect password");
                             playerInfo.tries++;
                         }else{
-                            LoggerManager.getInstance().log(event.getSender().getName() + ":" + clientPlayer.getAdress() + " tried to authenticate but failed 2 times");
+                            LoggerManager.getInstance().log(event.getSender().getName() + ":" + clientPlayer.getAddress() + " tried to authenticate but failed 2 times");
                             checking.remove(event.getSender());
                         }
                     }

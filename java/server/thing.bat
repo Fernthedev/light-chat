@@ -1,2 +1,2 @@
-cd target
-java -jar server-1.0-SNAPSHOT.jar -lightmanager
+
+java -jar .\target\server-1.0-SNAPSHOT.jar -lightmanager

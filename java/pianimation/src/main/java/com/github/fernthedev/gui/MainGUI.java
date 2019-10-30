@@ -2,7 +2,7 @@ package com.github.fernthedev.gui;
 
 import com.github.fernthedev.light.api.LightFile;
 import com.github.fernthedev.light.api.LightParser;
-import com.github.fernthedev.light.api.lines.LightLine;
+import com.github.fernthedev.light.api.lines.ILightLine;
 import com.github.fernthedev.light.api.lines.LightPinLine;
 import com.github.fernthedev.light.api.lines.LightSleepLine;
 import com.google.gson.Gson;
@@ -276,7 +276,7 @@ public class MainGUI extends JFrame {
                         PinData.FrameData lastFrame = null;
 
                         for (int ii = 0; ii < lightFile.getLineList().size(); ii++) {
-                            LightLine lightLine = lightFile.getLineList().get(ii);
+                            ILightLine lightLine = lightFile.getLineList().get(ii);
 
                             if (lightLine instanceof LightPinLine) {
                                 LightPinLine lightPinLine = (LightPinLine) lightLine;
@@ -361,7 +361,7 @@ public class MainGUI extends JFrame {
                     PinData.PinMode lastPinMode = null;
 
                     for (PinData pinData : pinDatas) {
-                        List<LightLine> lightLines = new ArrayList<>();
+                        List<ILightLine> lightLines = new ArrayList<>();
 
                         double sleep = 0;
                         int fpsInt = (int) fps.getValue();
@@ -370,7 +370,7 @@ public class MainGUI extends JFrame {
 
                         for (PinData.FrameData frameData : pinData.getFrames()) {
                             int curLine = lightLines.size();
-                            LightLine lightLine = new LightPinLine(lightLines.size(), pinData.getId(), frameData.getPinMode().toBoolean());
+                            ILightLine lightLine = new LightPinLine(lightLines.size(), pinData.getId(), frameData.getPinMode().toBoolean());
 
                             if (frameData.isAllPins()) {
                                 lightLine = new LightPinLine(lightLines.size(), true, frameData.getPinMode().toBoolean());
@@ -386,7 +386,7 @@ public class MainGUI extends JFrame {
 
 
                             if (toSleep) {
-                                LightLine oldLine = lightLine;
+                                ILightLine oldLine = lightLine;
                                 lightLine = new LightSleepLine(LightSleepLine.formatString(sleep), curLine, sleep);
 
                                 sleep = 0;

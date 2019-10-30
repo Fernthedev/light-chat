@@ -1,6 +1,7 @@
 package com.github.fernthedev.server;
 
 import com.github.fernthedev.packets.SelfMessagePacket;
+import io.netty.channel.Channel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
@@ -14,10 +15,12 @@ import java.util.concurrent.ConcurrentMap;
 @RequiredArgsConstructor
 public class PlayerHandler implements Runnable {
 
+    public static final ConcurrentMap<Channel, ClientPlayer> socketList = new ConcurrentHashMap<>();
+
     @NonNull
     private Server server;
 
-    public static ConcurrentMap<Integer, ClientPlayer> players = new ConcurrentHashMap<>();
+    public static final ConcurrentMap<Integer, ClientPlayer> players = new ConcurrentHashMap<>();
 
 
     /**
@@ -35,7 +38,7 @@ public class PlayerHandler implements Runnable {
     public void run() {
         Map<ClientPlayer, TimeoutData> clientPlayerMap = new HashMap<>();
         while (server.isRunning()) {
-            for (ClientPlayer clientPlayer : Server.socketList.values()) {
+            for (ClientPlayer clientPlayer : socketList.values()) {
 
                 if (!clientPlayerMap.containsKey(clientPlayer)) {
                     clientPlayerMap.put(clientPlayer, new TimeoutData(0, 0));

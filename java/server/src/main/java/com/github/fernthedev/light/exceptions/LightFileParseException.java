@@ -1,37 +1,37 @@
 package com.github.fernthedev.light.exceptions;
 
-import com.github.fernthedev.light.api.lines.LightLine;
+import com.github.fernthedev.light.api.lines.ILightLine;
 import lombok.Getter;
 
 public class LightFileParseException extends RuntimeException {
 
     @Getter
-    private LightLine lightLine;
+    protected ILightLine lightLine;
 
 
 
-    public LightFileParseException(LightLine lightLine, String message) {
+    public LightFileParseException(ILightLine lightLine, String message) {
         super(formatErrorMessage(lightLine,message));
         handleLightLine(lightLine);
     }
 
 
-    public LightFileParseException(LightLine lightLine, Exception exception) {
+    public LightFileParseException(ILightLine lightLine, Exception exception) {
         super(formatErrorMessage(lightLine),exception);
         handleLightLine(lightLine);
     }
 
-    public LightFileParseException(LightLine lightLine,String message, Exception exception) {
+    public LightFileParseException(ILightLine lightLine, String message, Exception exception) {
         super(formatErrorMessage(lightLine,message),exception);
         handleLightLine(lightLine);
     }
 
-    public LightFileParseException(LightLine lightLine) {
+    public LightFileParseException(ILightLine lightLine) {
         super(formatErrorMessage(lightLine));
         handleLightLine(lightLine);
     }
 
-    private void handleLightLine(LightLine lightLine) {
+    protected void handleLightLine(ILightLine lightLine) {
         this.lightLine = lightLine;
     }
 
@@ -39,12 +39,12 @@ public class LightFileParseException extends RuntimeException {
         super.printStackTrace();
     }
 
-    private static String formatErrorMessage(LightLine lightLine) {
-        return "Error at " + lightLine.getLine() + ":" + lightLine.getLineNumber();
+    protected static String formatErrorMessage(ILightLine lightLine) {
+        return "Error at {" + lightLine.getLine() + "}:" + lightLine.getLineNumber();
     }
 
-    private static String formatErrorMessage(LightLine lightLine,String message) {
-        return "Error at " + lightLine.getLine() + ":" + lightLine.getLineNumber() + "" +
+    protected static String formatErrorMessage(ILightLine lightLine, String message) {
+        return formatErrorMessage(lightLine) +
                 "\nCause of error: " + message;
     }
 

@@ -1,6 +1,6 @@
 package com.github.fernthedev.light.api;
 
-import com.github.fernthedev.light.api.lines.LightLine;
+import com.github.fernthedev.light.api.lines.ILightLine;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +17,12 @@ public class LightFile {
     private File file;
 
     @NonNull
-    private List<LightLine> lineList;
+    private List<ILightLine> lineList;
 
     public List<String> toStringList() {
         List<String> lines = new ArrayList<>();
 
-        for(LightLine line : lineList) {
+        for(ILightLine line : lineList) {
             lines.add(line.getLine());
         }
 

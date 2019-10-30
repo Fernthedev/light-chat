@@ -24,6 +24,8 @@
     <orderEntry type="library" name="Maven: net.minecrell:terminalconsoleappender:1.2.0" level="project" />
     <orderEntry type="library" name="Maven: org.jline:jline-reader:3.12.1" level="project" />
     <orderEntry type="library" name="Maven: org.fusesource.jansi:jansi:1.18" level="project" />
+    <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.8" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.security:spring-security-crypto:5.2.0.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: com.pi4j:pi4j-core:1.2-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.squareup.okio:okio:2.2.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.2.60" level="project" />

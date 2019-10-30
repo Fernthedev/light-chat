@@ -25,8 +25,8 @@ public class BanManager {
         if(banned.isEmpty()) load();
 
         for(BannedData bannedData : banned) {
-            Server.getLogger().info("Checking " + clientPlayer.getAdress() + " data "+ bannedData);
-            if(bannedData.getIp().equals(clientPlayer.getAdress())) {
+            Server.getLogger().info("Checking " + clientPlayer.getAddress() + " data "+ bannedData);
+            if(bannedData.getIp().equals(clientPlayer.getAddress())) {
                 Server.getLogger().info("Found banned " + bannedData.getIp());
                 return true;
             }

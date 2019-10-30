@@ -4,6 +4,7 @@ import com.github.fernthedev.server.*;
 import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.command.CommandSender;
 import com.github.fernthedev.universal.ColorCode;
+import com.github.fernthedev.universal.StaticHandler;
 import com.pi4j.io.gpio.*;
 import com.pi4j.io.gpio.exception.GpioPinExistsException;
 import com.pi4j.system.SystemInfo;
@@ -33,23 +34,31 @@ public class LightManager implements Runnable{
     public LightManager(Server server) {
         this.server = server;
 
-        gpio = GpioFactory.getInstance();
-
         try {
-            pins = RaspiPin.allPins(SystemInfo.getBoardType());
-        } catch (IOException | InterruptedException e) {
-            Server.getLogger().error(e.getMessage(),e);
-        }
+            gpio = GpioFactory.getInstance();
 
-        try {
-            if (pins != null) {
-                for (Pin pin : pins) {
-
-                    pinDataMap.put(pin,new GpioPinData(gpio.provisionDigitalOutputPin(pin, "LightManager"+pin.getName(), PinState.HIGH), pin, pin.getAddress()));
-                }
+            try {
+                pins = RaspiPin.allPins(SystemInfo.getBoardType());
+            } catch (IOException | InterruptedException e) {
+                Server.getLogger().error(e.getMessage(), e);
             }
-        } catch (GpioPinExistsException e) {
-            Server.getLogger().info( "{}Unable to check {}", ColorCode.RED, e.getMessage());
+
+            try {
+                if (pins != null) {
+                    for (Pin pin : pins) {
+
+                        pinDataMap.put(pin, new GpioPinData(gpio.provisionDigitalOutputPin(pin, "LightManager" + pin.getName(), PinState.HIGH), pin, pin.getAddress()));
+                    }
+                }
+            } catch (GpioPinExistsException e) {
+                Server.getLogger().info("{}Unable to check {}", ColorCode.RED, e.getMessage());
+            }
+        } catch (UnsatisfiedLinkError | IllegalArgumentException e) {
+            if(StaticHandler.isLight) {
+                e.printStackTrace();
+            } else {
+                throw e;
+            }
         }
     }
 
@@ -67,6 +76,8 @@ public class LightManager implements Runnable{
         }
 
         LightFileFormatter fileFormatter = new LightFileFormatter(this,gpio);
+
+
 
         server.registerCommand(new Command("light") {
             @Override

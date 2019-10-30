@@ -2,7 +2,7 @@ package com.github.fernthedev.client.netty;
 
 import com.github.fernthedev.client.Client;
 import com.github.fernthedev.client.EventListener;
-import com.github.fernthedev.packets.ConnectedPacket;
+import com.github.fernthedev.packets.handshake.ConnectedPacket;
 import com.github.fernthedev.packets.Packet;
 import com.github.fernthedev.universal.StaticHandler;
 import io.netty.channel.ChannelHandler;
@@ -32,7 +32,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         this.client = client;
         String os = client.getOSName();
 
-        connectedPacket = new ConnectedPacket(client.name,os, client.getUuid());
+        connectedPacket = new ConnectedPacket(client.name,os);
     }
 
 
@@ -47,8 +47,6 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg)
             throws Exception {
 
-//        client.getLogger().info("Received " + msg);
-
         Packet packet;
 
       //  client.getLogger().info("Received " + msg);
@@ -59,11 +57,12 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
             //packet = (Packet) EncryptionHandler.decrypt(ob, client.getPrivateKey());
             long startTime = System.nanoTime();
-            packet = (Packet) client.decryptObject(ob);
+            client.getLogger().error("Sealed object received, not expected.");
+//            packet = (Packet) client.decryptObject(ob);
 
           //  client.getLogger().info("Decrypted object is " + packet + " took " + (System.nanoTime() - startTime) / 1000000 + "ms");
 
-            listener.received(packet);
+//            listener.received(packet);
         }else if (msg instanceof Packet){
             packet = (Packet) msg;
 
@@ -85,7 +84,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     public static String encrypt(String encryptionKey,String plainText) {
         String encryptedText = "";
         try {
-            Cipher cipher   = Cipher.getInstance(StaticHandler.getCipherTransformation());
+            Cipher cipher   = Cipher.getInstance(StaticHandler.getCipherTransformationOld());
             byte[] key      = encryptionKey.getBytes("UTF-8");
             SecretKeySpec secretKey = new SecretKeySpec(key, "AES");
             IvParameterSpec ivparameterspec = new IvParameterSpec(key);

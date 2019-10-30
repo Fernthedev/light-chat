@@ -1,11 +1,17 @@
 package com.github.fernthedev.client;
 
 import com.github.fernthedev.packets.*;
+import com.github.fernthedev.packets.handshake.ConnectedPacket;
+import com.github.fernthedev.packets.handshake.InitialHandshakePacket;
+import com.github.fernthedev.packets.handshake.KeyResponsePacket;
+import com.github.fernthedev.packets.handshake.RequestConnectInfoPacket;
 import com.github.fernthedev.packets.latency.PingPacket;
 import com.github.fernthedev.packets.latency.PingReceive;
 import com.github.fernthedev.packets.latency.PongPacket;
-import com.github.fernthedev.universal.EncryptionHandler;
-import org.apache.commons.lang3.Validate;
+import com.github.fernthedev.universal.encryption.util.EncryptionUtil;
+
+import javax.crypto.SecretKey;
+import java.security.InvalidKeyException;
 
 public class EventListener {
 
@@ -38,36 +44,30 @@ public class EventListener {
 
         } else if (p instanceof IllegalConnection) {
             client.getLogger().info(((IllegalConnection) p).getMessage());
-        } else if(p instanceof RequestInfoPacket) {
-            RequestInfoPacket packet = (RequestInfoPacket) p;
+        } else if(p instanceof InitialHandshakePacket) {
+            // Handles object encryption key sharing
+            InitialHandshakePacket packet = (InitialHandshakePacket) p;
 
-            client.setServerKey(packet.getKey());
-            client.setEncryptCipher(client.registerEncryptCipher(client.getServerKey()));
+            SecretKey secretKey = EncryptionUtil.generateSecretKey();
+            client.setSecretKey(secretKey);
 
-            String pass = EncryptionHandler.makeSHA256Hash(client.getUuid().toString());
 
-            Validate.notNull(pass);
-
-            String privateKey = EncryptionHandler.encrypt(pass, packet.getKey());
-
-            client.setPrivateKey(pass);
-            client.setDecryptCipher(client.registerDecryptCipher(client.getPrivateKey()));
+            try {
+                KeyResponsePacket responsePacket = new KeyResponsePacket(secretKey, packet.getPublicKey());
+                client.sendObject(responsePacket, false);
+            } catch (InvalidKeyException e) {
+                e.printStackTrace();
+            }
+        } else if (p instanceof RequestConnectInfoPacket) {
 
             client.registered = true;
 
             ConnectedPacket connectedPacket = client.getClientHandler().getConnectedPacket();
 
-            connectedPacket.setPrivateKey(privateKey);
-
-            client.sendObject(connectedPacket,false);
-
-            //client.sendObject(connectedPacket);
-
-
-
+            client.sendObject(connectedPacket);
             client.getLogger().info("Sent connect packet for request");
 
-        }else if(p instanceof SelfMessagePacket) {
+        } else if(p instanceof SelfMessagePacket) {
             switch (((SelfMessagePacket) p).getType()) {
                 case TIMED_OUT_REGISTRATION:
                     client.getLogger().info("Timed out on registering.");

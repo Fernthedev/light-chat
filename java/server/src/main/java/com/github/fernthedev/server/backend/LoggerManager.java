@@ -64,7 +64,7 @@ public class LoggerManager implements Listener {
         if(!logFolder.exists())
             logFolder.mkdir();
 
-        logFile = new File(logFolder, date+".log");
+        logFile = new File(logFolder, date + ".log");
         if(!logFile.exists()) {
             try {
                 logFile.createNewFile();

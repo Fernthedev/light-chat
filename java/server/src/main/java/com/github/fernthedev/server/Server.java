@@ -20,6 +20,8 @@ import com.github.fernthedev.server.netty.ProcessingHandler;
 import com.github.fernthedev.server.plugin.PluginManager;
 import com.github.fernthedev.universal.ColorCode;
 import com.github.fernthedev.universal.ConsoleHandler;
+import com.github.fernthedev.universal.encryption.RSA.EncryptedGSONObjectDecoder;
+import com.github.fernthedev.universal.encryption.RSA.EncryptedGSONObjectEncoder;
 import com.github.fernthedev.universal.StaticHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -30,9 +32,8 @@ import io.netty.channel.kqueue.KQueueEventLoopGroup;
 import io.netty.channel.kqueue.KQueueServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.serialization.ClassResolvers;
-import io.netty.handler.codec.serialization.ObjectDecoder;
-import io.netty.handler.codec.serialization.ObjectEncoder;
+import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.util.CharsetUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -47,8 +48,6 @@ import java.net.UnknownHostException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import static com.github.fernthedev.server.CommandWorkerThread.commandList;
 
@@ -74,11 +73,12 @@ public class Server implements Runnable {
     @Getter
     private CommandMessageParser commandMessageParser;
 
+
+
     public Console getConsole() {
         return console;
     }
 
-    public static ConcurrentMap<Channel,ClientPlayer> socketList = new ConcurrentHashMap<>();
     static List<Thread> serverInstanceThreads = new ArrayList<>();
 
     private static Logger logger;
@@ -133,7 +133,7 @@ public class Server implements Runnable {
 
     private static synchronized void sendObjectToAllPlayers(@NonNull Packet packet) {
         new Thread(() -> {
-            for(ClientPlayer clientPlayer : socketList.values()) {
+            for(ClientPlayer clientPlayer : PlayerHandler.socketList.values()) {
 
                 if (packet != null) {
                     if (clientPlayer.channel.isActive()) {
@@ -194,7 +194,7 @@ public class Server implements Runnable {
 
         server.registerCommand(new SettingsCommand());
 
-        Class channelClass = NioServerSocketChannel.class;
+        Class<? extends ServerChannel> channelClass = NioServerSocketChannel.class;
 
         if (settingsManager.getConfigData().isUseNativeTransport()) {
             if (SystemUtils.IS_OS_LINUX) {
@@ -216,15 +216,23 @@ public class Server implements Runnable {
 
         ServerBootstrap bootstrap = new ServerBootstrap();
 
+        EncryptionKeyFinder keyFinder = new EncryptionKeyFinder();
+
         bootstrap.group(bossGroup, workerGroup)
                 .channel(channelClass)
                 .childHandler(new ChannelInitializer<Channel>() {
                     @Override
                     public void initChannel(Channel ch) {
 
-                        ch.pipeline().addLast(new ObjectEncoder(),
-                                new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
-                                processingHandler);
+//                        ch.pipeline().addLast(new ObjectEncoder(),
+//                                new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
+//                                processingHandler);
+                        ch.pipeline().addLast("frameDecoder", new LineBasedFrameDecoder(StaticHandler.LINE_LIMIT));
+                        ch.pipeline().addLast("stringDecoder", new EncryptedGSONObjectDecoder(CharsetUtil.UTF_8, keyFinder));
+
+                        ch.pipeline().addLast("stringEncoder", new EncryptedGSONObjectEncoder(CharsetUtil.UTF_8, keyFinder));
+
+                        ch.pipeline().addLast(processingHandler);
                     }
                 }).option(ChannelOption.SO_BACKLOG, 128)
                 .option(ChannelOption.RCVBUF_ALLOCATOR, new AdaptiveRecvByteBufAllocator(512, 512, 64 * 1024))
@@ -249,7 +257,7 @@ public class Server implements Runnable {
 
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            for (ClientPlayer clientPlayer : socketList.values()) {
+            for (ClientPlayer clientPlayer : PlayerHandler.socketList.values()) {
                 if (clientPlayer.channel.isOpen()) {
                     Server.getLogger().info("Gracefully shutting down");
                     Server.sendObjectToAllPlayers(new SelfMessagePacket(SelfMessagePacket.MessageType.LOST_SERVER_CONNECTION));
@@ -370,6 +378,10 @@ public class Server implements Runnable {
         if(banManager == null) banManager = new BanManager();
 
         return banManager;
+    }
+
+    public static void runAsync(Runnable code) {
+        new Thread(code, "Async-Thread").start();
     }
 
     public List<Command> getCommands() {

@@ -4,10 +4,6 @@ import com.github.fernthedev.packets.MessagePacket;
 import com.github.fernthedev.server.ClientPlayer;
 import com.github.fernthedev.server.Console;
 import com.github.fernthedev.server.PlayerHandler;
-import com.github.fernthedev.server.Server;
-import com.github.fernthedev.server.command.Command;
-import com.github.fernthedev.server.command.CommandSender;
-import com.github.fernthedev.server.command.TabExecutor;
 import lombok.NonNull;
 
 import java.util.ArrayList;
@@ -27,7 +23,7 @@ public class KickCommand extends Command implements TabExecutor {
             if (args.length == 0) {
                 sender.sendMessage("No player to kick?");
             } else {
-                for (ClientPlayer clientPlayer : new HashMap<>(Server.socketList).values())
+                for (ClientPlayer clientPlayer : new HashMap<>(PlayerHandler.socketList).values())
 
                     if (args[0].matches("[0-9]+")) {
                         try {

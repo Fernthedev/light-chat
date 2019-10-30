@@ -1,8 +1,8 @@
 package com.github.fernthedev.server.netty;
 
-import com.github.fernthedev.packets.ConnectedPacket;
+import com.github.fernthedev.packets.handshake.ConnectedPacket;
 import com.github.fernthedev.packets.Packet;
-import com.github.fernthedev.packets.RequestInfoPacket;
+import com.github.fernthedev.packets.handshake.InitialHandshakePacket;
 import com.github.fernthedev.server.ClientPlayer;
 import com.github.fernthedev.server.EventListener;
 import com.github.fernthedev.server.PlayerHandler;
@@ -32,7 +32,7 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        ClientPlayer clientPlayer = Server.socketList.get(ctx.channel());
+        ClientPlayer clientPlayer = PlayerHandler.socketList.get(ctx.channel());
 
         if(PlayerHandler.players.containsValue(clientPlayer) && ctx.isRemoved()) {
 
@@ -50,18 +50,18 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 
         try {
 
-            EventListener eventListener = Server.socketList.get(ctx.channel()).getEventListener();
+            EventListener eventListener = PlayerHandler.socketList.get(ctx.channel()).getEventListener();
 
             if(msg instanceof ConnectedPacket) {
                 eventListener.handleConnect((ConnectedPacket) msg);
             }else {
-                if (!Server.socketList.containsKey(ctx.channel())) {
+                if (!PlayerHandler.socketList.containsKey(ctx.channel())) {
                     // Discard the received data silently.
                     ((ByteBuf) msg).release();
                 }else if (msg instanceof SealedObject) {
                     SealedObject requestData = (SealedObject) msg;
 
-                    Packet packet = (Packet) Server.socketList.get(ctx.channel()).decryptObject(requestData);
+                    Packet packet = (Packet) PlayerHandler.socketList.get(ctx.channel()).decryptObject(requestData);
 
                     eventListener.received(packet);
 
@@ -85,11 +85,7 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         if(!ctx.channel().isActive()) {
-            try {
-                ctx.close().sync();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ctx.close();
         }
 
        // Server.getLogger().info("Channel Registering");
@@ -107,10 +103,10 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
             //Server.getLogger().info("Registering " + clientPlayer.getNameAddress());
 
 
-            Server.socketList.put(channel,clientPlayer);
+            PlayerHandler.socketList.put(channel,clientPlayer);
 
-            ctx.writeAndFlush(new RequestInfoPacket(clientPlayer.getServerKey()));
-            Server.getLogger().info("[{}] established",clientPlayer.getAdress());
+            clientPlayer.sendObject(new InitialHandshakePacket(clientPlayer.getTempKeyPair().getPublic()), false);
+            Server.getLogger().info("[{}] established", clientPlayer.getAddress());
         }else{
             Server.getLogger().info("Channel is null");
             throw new NullPointerException();
