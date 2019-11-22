@@ -1,11 +1,12 @@
 package com.github.fernthedev.server;
 
-import com.github.fernthedev.light.AuthenticationManager;
-import com.github.fernthedev.packets.*;
-import com.github.fernthedev.packets.handshake.ConnectedPacket;
-import com.github.fernthedev.packets.handshake.KeyResponsePacket;
-import com.github.fernthedev.packets.handshake.RequestConnectInfoPacket;
-import com.github.fernthedev.packets.latency.PongPacket;
+import com.github.fernthedev.core.data.LightCandidate;
+import com.github.fernthedev.server.backend.AuthenticationManager;
+import com.github.fernthedev.core.packets.*;
+import com.github.fernthedev.core.packets.handshake.ConnectedPacket;
+import com.github.fernthedev.core.packets.handshake.KeyResponsePacket;
+import com.github.fernthedev.core.packets.handshake.RequestConnectInfoPacket;
+import com.github.fernthedev.core.packets.latency.PongPacket;
 import com.github.fernthedev.server.backend.CommandMessageParser;
 import com.github.fernthedev.server.event.chat.ChatEvent;
 import org.apache.commons.lang3.StringUtils;

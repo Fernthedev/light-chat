@@ -2,9 +2,9 @@ package com.github.fernthedev.client.netty;
 
 import com.github.fernthedev.client.Client;
 import com.github.fernthedev.client.EventListener;
-import com.github.fernthedev.packets.handshake.ConnectedPacket;
-import com.github.fernthedev.packets.Packet;
-import com.github.fernthedev.universal.StaticHandler;
+import com.github.fernthedev.core.packets.handshake.ConnectedPacket;
+import com.github.fernthedev.core.packets.Packet;
+import com.github.fernthedev.core.StaticHandler;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;

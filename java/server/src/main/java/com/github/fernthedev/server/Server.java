@@ -1,28 +1,28 @@
 package com.github.fernthedev.server;
 
+import com.github.fernthedev.core.ColorCode;
+import com.github.fernthedev.core.ConsoleHandler;
+import com.github.fernthedev.core.StaticHandler;
+import com.github.fernthedev.core.encryption.codecs.fastjson.EncryptedFastJSONObjectDecoder;
+import com.github.fernthedev.core.encryption.codecs.fastjson.EncryptedFastJSONObjectEncoder;
+import com.github.fernthedev.core.encryption.codecs.gson.EncryptedGSONObjectDecoder;
+import com.github.fernthedev.core.encryption.codecs.gson.EncryptedGSONObjectEncoder;
+import com.github.fernthedev.core.packets.MessagePacket;
+import com.github.fernthedev.core.packets.Packet;
+import com.github.fernthedev.core.packets.SelfMessagePacket;
 import com.github.fernthedev.gson.GsonConfig;
-import com.github.fernthedev.light.AuthenticationManager;
 import com.github.fernthedev.light.LightManager;
-import com.github.fernthedev.light.Settings;
-import com.github.fernthedev.packets.MessagePacket;
-import com.github.fernthedev.packets.Packet;
-import com.github.fernthedev.packets.SelfMessagePacket;
-import com.github.fernthedev.server.backend.AutoCompleteHandler;
-import com.github.fernthedev.server.backend.BanManager;
-import com.github.fernthedev.server.backend.CommandMessageParser;
-import com.github.fernthedev.server.backend.LoggerManager;
+import com.github.fernthedev.light.exceptions.NoPi4JLibsFoundException;
+import com.github.fernthedev.server.backend.*;
 import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.command.CommandSender;
+import com.github.fernthedev.server.command.LightCommand;
 import com.github.fernthedev.server.command.SettingsCommand;
 import com.github.fernthedev.server.event.chat.ServerPlugin;
 import com.github.fernthedev.server.netty.MulticastServer;
 import com.github.fernthedev.server.netty.ProcessingHandler;
 import com.github.fernthedev.server.plugin.PluginManager;
-import com.github.fernthedev.universal.ColorCode;
-import com.github.fernthedev.universal.ConsoleHandler;
-import com.github.fernthedev.universal.encryption.RSA.EncryptedGSONObjectDecoder;
-import com.github.fernthedev.universal.encryption.RSA.EncryptedGSONObjectEncoder;
-import com.github.fernthedev.universal.StaticHandler;
+import com.github.fernthedev.server.settings.Settings;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollChannelOption;
@@ -33,13 +33,15 @@ import io.netty.channel.kqueue.KQueueServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.codec.MessageToMessageDecoder;
+import io.netty.handler.codec.MessageToMessageEncoder;
 import io.netty.util.CharsetUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.SystemUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -72,7 +74,7 @@ public class Server implements Runnable {
     private AutoCompleteHandler autoCompleteHandler;
     @Getter
     private CommandMessageParser commandMessageParser;
-
+    private MulticastServer multicastServer;
 
 
     public Console getConsole() {
@@ -152,6 +154,8 @@ public class Server implements Runnable {
     synchronized void shutdownServer() {
         getLogger().info(ColorCode.RED + "Shutting down server.");
         running = false;
+        multicastServer.stopMulticast();
+
 
         workerGroup.shutdownGracefully();
         bossGroup.shutdownGracefully();
@@ -191,6 +195,7 @@ public class Server implements Runnable {
         workerGroup = new NioEventLoopGroup();
 
         settingsManager = new GsonConfig<>(new Settings(), new File(getCurrentPath(), "settings.json"));
+        settingsManager.save();
 
         server.registerCommand(new SettingsCommand());
 
@@ -218,6 +223,25 @@ public class Server implements Runnable {
 
         EncryptionKeyFinder keyFinder = new EncryptionKeyFinder();
 
+        MessageToMessageEncoder encoder;
+        MessageToMessageDecoder decoder;
+
+        switch (settingsManager.getConfigData().getCodecEnum()) {
+            case GSON:
+                encoder = new EncryptedGSONObjectEncoder(CharsetUtil.UTF_8, keyFinder);
+                decoder = new EncryptedGSONObjectDecoder(CharsetUtil.UTF_8, keyFinder);
+                break;
+            case ALIBABA_FASTJSON:
+                encoder = new EncryptedFastJSONObjectEncoder(CharsetUtil.UTF_8, keyFinder);
+                decoder = new EncryptedFastJSONObjectDecoder(CharsetUtil.UTF_8, keyFinder);
+                break;
+            default:
+                encoder = new EncryptedGSONObjectEncoder(CharsetUtil.UTF_8, keyFinder);
+                decoder = new EncryptedGSONObjectDecoder(CharsetUtil.UTF_8, keyFinder);
+                break;
+        }
+
+
         bootstrap.group(bossGroup, workerGroup)
                 .channel(channelClass)
                 .childHandler(new ChannelInitializer<Channel>() {
@@ -228,9 +252,9 @@ public class Server implements Runnable {
 //                                new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
 //                                processingHandler);
                         ch.pipeline().addLast("frameDecoder", new LineBasedFrameDecoder(StaticHandler.LINE_LIMIT));
-                        ch.pipeline().addLast("stringDecoder", new EncryptedGSONObjectDecoder(CharsetUtil.UTF_8, keyFinder));
+                        ch.pipeline().addLast("stringDecoder", decoder);
 
-                        ch.pipeline().addLast("stringEncoder", new EncryptedGSONObjectEncoder(CharsetUtil.UTF_8, keyFinder));
+                        ch.pipeline().addLast("stringEncoder", encoder);
 
                         ch.pipeline().addLast(processingHandler);
                     }
@@ -287,7 +311,7 @@ public class Server implements Runnable {
 
         if (settingsManager.getConfigData().isUseMulticast()) {
             try {
-                MulticastServer multicastServer = new MulticastServer("Multicast Thread", this);
+                multicastServer = new MulticastServer("Multicast Thread", this);
                 multicastServer.start();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -309,8 +333,27 @@ public class Server implements Runnable {
 
         if (StaticHandler.os.equalsIgnoreCase("Linux") || StaticHandler.os.contains("Linux") || StaticHandler.isLight) {
             logger.info("Running LightManager (Note this is for raspberry pies only)");
-            Thread thread4 = new Thread(new LightManager(this), "LightManagerThread");
-            thread4.start();
+
+            Thread lightThread = new Thread(() -> {
+
+                try {
+                    LightManager.init();
+                    registerCommand(new LightCommand());
+                    logger.info("Registered");
+                } catch (IllegalArgumentException | ExceptionInInitializerError | NoPi4JLibsFoundException e) {
+                    logger.error("Unable to load Pi4J Libraries. To load stacktrace, add -debug flag. Message: {}", e.getMessage());
+                    if (StaticHandler.isDebug) {
+                        e.printStackTrace();
+                        registerCommand(new LightCommand());
+                        logger.info("Registered");
+                    }
+                }
+
+            }, "LightThread");
+            registerCommand(new LightCommand());
+            lightThread.start();
+
+
         } else {
             logger.info("Detected system is not linux. LightManager will not run (manual run with -lightmanager arg)");
         }
@@ -361,7 +404,7 @@ public class Server implements Runnable {
     }
 
     public static void registerLogger() {
-        logger = LogManager.getLogger(Server.class);
+        logger = LoggerFactory.getLogger(Server.class);
     }
 
     /**
@@ -378,10 +421,6 @@ public class Server implements Runnable {
         if(banManager == null) banManager = new BanManager();
 
         return banManager;
-    }
-
-    public static void runAsync(Runnable code) {
-        new Thread(code, "Async-Thread").start();
     }
 
     public List<Command> getCommands() {

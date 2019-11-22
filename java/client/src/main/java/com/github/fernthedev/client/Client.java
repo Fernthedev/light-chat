@@ -2,16 +2,16 @@ package com.github.fernthedev.client;
 
 import com.github.fernthedev.client.backend.AutoCompleteHandler;
 import com.github.fernthedev.client.netty.ClientHandler;
-import com.github.fernthedev.exceptions.DebugException;
-import com.github.fernthedev.packets.CommandPacket;
-import com.github.fernthedev.packets.MessagePacket;
-import com.github.fernthedev.packets.Packet;
-import com.github.fernthedev.universal.ConsoleHandler;
-import com.github.fernthedev.universal.StaticHandler;
-import com.github.fernthedev.universal.encryption.RSA.EncryptedGSONObjectDecoder;
-import com.github.fernthedev.universal.encryption.RSA.EncryptedGSONObjectEncoder;
-import com.github.fernthedev.universal.encryption.RSA.IEncryptionKeyHolder;
-import com.github.fernthedev.universal.encryption.UnencryptedPacketWrapper;
+import com.github.fernthedev.core.exceptions.DebugException;
+import com.github.fernthedev.core.packets.CommandPacket;
+import com.github.fernthedev.core.packets.MessagePacket;
+import com.github.fernthedev.core.packets.Packet;
+import com.github.fernthedev.core.ConsoleHandler;
+import com.github.fernthedev.core.StaticHandler;
+import com.github.fernthedev.core.encryption.RSA.IEncryptionKeyHolder;
+import com.github.fernthedev.core.encryption.UnencryptedPacketWrapper;
+import com.github.fernthedev.core.encryption.codecs.gson.EncryptedGSONObjectDecoder;
+import com.github.fernthedev.core.encryption.codecs.gson.EncryptedGSONObjectEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollEventLoopGroup;
@@ -27,8 +27,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang3.SystemUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.SecretKey;
 import java.net.InetAddress;
@@ -96,6 +96,7 @@ public class Client implements IEncryptionKeyHolder {
         completeHandler = new AutoCompleteHandler(this);
 
         registerLogger();
+        running = true;
 
         new Thread(() -> {
             getLogger().info("Starting console handler");
@@ -128,7 +129,7 @@ public class Client implements IEncryptionKeyHolder {
 
 //        waitForCommand = new WaitForCommand(this);
 
-        running = true;
+
 
         listener = new EventListener(this);
 
@@ -146,7 +147,7 @@ public class Client implements IEncryptionKeyHolder {
     }
 
     protected void registerLogger() {
-        logger = LogManager.getLogger(Client.class.getName());
+        logger = LoggerFactory.getLogger(Client.class.getName());
         cLogger = new CLogger(logger);
     }
 

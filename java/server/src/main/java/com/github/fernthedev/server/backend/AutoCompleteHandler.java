@@ -1,6 +1,6 @@
 package com.github.fernthedev.server.backend;
 
-import com.github.fernthedev.packets.LightCandidate;
+import com.github.fernthedev.core.data.LightCandidate;
 import com.github.fernthedev.server.Server;
 import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.command.TabExecutor;

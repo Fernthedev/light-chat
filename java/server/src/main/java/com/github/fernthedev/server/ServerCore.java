@@ -1,9 +1,9 @@
 package com.github.fernthedev.server;
 
-import com.github.fernthedev.universal.Core;
+import com.github.fernthedev.core.Core;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 
 @RequiredArgsConstructor
 public class ServerCore implements Core {

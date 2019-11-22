@@ -1,9 +1,10 @@
 package com.github.fernthedev.client;
 
-import com.github.fernthedev.universal.StaticHandler;
+import com.github.fernthedev.core.StaticHandler;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+
 
 @RequiredArgsConstructor
 public class CLogger implements ILogManager {

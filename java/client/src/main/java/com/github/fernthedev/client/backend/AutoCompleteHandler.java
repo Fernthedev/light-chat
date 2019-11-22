@@ -1,8 +1,8 @@
 package com.github.fernthedev.client.backend;
 
 import com.github.fernthedev.client.Client;
-import com.github.fernthedev.packets.AutoCompletePacket;
-import com.github.fernthedev.packets.LightCandidate;
+import com.github.fernthedev.core.packets.AutoCompletePacket;
+import com.github.fernthedev.core.data.LightCandidate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.jline.reader.Candidate;

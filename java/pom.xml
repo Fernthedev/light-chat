@@ -11,7 +11,8 @@
     <packaging>pom</packaging>
     <properties>
         <project.buildVer>1.4-RELEASE</project.buildVer>
-        <project.nettyver>4.1.42.Final</project.nettyver>
+        <project.lightreader>1.2</project.lightreader>
+        <project.nettyver>4.1.43.Final</project.nettyver>
     </properties>
 
     <build>
@@ -19,10 +20,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.1.2</version>
+                <version>3.2.0</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
+                        <phase>verify</phase>
                         <goals>
                             <goal>jar-no-fork</goal>
                         </goals>
@@ -45,6 +47,12 @@
                     <minimizeJar>true</minimizeJar>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
                     <createSourcesJar>true</createSourcesJar>
+<!--                    <relocations>-->
+<!--                        <relocation>-->
+<!--                        <pattern>com.github.fernthedev.light</pattern>-->
+<!--                        <shadedPattern>shaded.com.github.fernthedev.light</shadedPattern>-->
+<!--                        </relocation>-->
+<!--                    </relocations>-->
                     <filters>
                         <filter>
                             <artifact>log4j:log4j</artifact>
@@ -152,14 +160,12 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
-
-</build>
+    </build>
 
     <modules>
         <module>server</module>
         <module>client</module>
-        <module>universalChat</module>
-        <module>pianimation</module>
+        <module>core</module>
     </modules>
 
     <repositories>
@@ -231,16 +237,11 @@
             <version>1.18.4</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>1.23</version>
-        </dependency>
 
         <dependency>
             <groupId>com.github.Fernthedev</groupId>
             <artifactId>fern-configmanager</artifactId>
-            <version>1.0.4</version>
+            <version>1.0.5</version>
         </dependency>
 
 

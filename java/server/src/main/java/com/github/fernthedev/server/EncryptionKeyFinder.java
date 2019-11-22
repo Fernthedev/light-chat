@@ -1,6 +1,6 @@
 package com.github.fernthedev.server;
 
-import com.github.fernthedev.universal.encryption.RSA.IEncryptionKeyHolder;
+import com.github.fernthedev.core.encryption.RSA.IEncryptionKeyHolder;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.NonNull;

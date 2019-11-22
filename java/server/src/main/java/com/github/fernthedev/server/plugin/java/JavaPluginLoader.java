@@ -9,7 +9,6 @@ import com.github.fernthedev.server.plugin.exception.InvalidDescriptionException
 import com.github.fernthedev.server.plugin.exception.InvalidPluginException;
 import com.github.fernthedev.server.plugin.exception.UnknownDependencyException;
 import org.apache.commons.lang3.Validate;
-import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -137,9 +136,9 @@ public final class JavaPluginLoader implements PluginLoader {
 
         } catch (IOException ex) {
             throw new InvalidDescriptionException(ex);
-        } catch (YAMLException ex) {
+        } /*catch (YAMLException ex) {
             throw new InvalidDescriptionException(ex);
-        } finally {
+        } */finally {
             if (jar != null) {
                 try {
                     jar.close();

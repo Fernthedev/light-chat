@@ -2,9 +2,9 @@ package com.github.fernthedev.client.netty;
 
 
 import com.github.fernthedev.client.ServerAddress;
-import com.github.fernthedev.exceptions.DebugChainedException;
-import com.github.fernthedev.universal.MulticastData;
-import com.github.fernthedev.universal.StaticHandler;
+import com.github.fernthedev.core.exceptions.DebugChainedException;
+import com.github.fernthedev.core.MulticastData;
+import com.github.fernthedev.core.StaticHandler;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 
@@ -49,9 +49,7 @@ public class MulticastClient {
 
                 received = received.replaceAll(" ","");
 
-                try {
-                    JsonReader reader = new JsonReader(new StringReader(received));
-
+                try(JsonReader reader = new JsonReader(new StringReader(received))) {
                     reader.setLenient(true);
 
                     MulticastData data = new Gson().fromJson(reader, MulticastData.class);
@@ -65,14 +63,13 @@ public class MulticastClient {
                     }
                 } catch (Exception e) {
                     if(StaticHandler.isDebug) {
-                        throw new DebugChainedException(e,"Unable to read packet");
+                        throw new DebugChainedException(e, "Unable to read packet");
                     }
                 }
 
             }
 
             socket.leaveGroup(group);
-            socket.close();
         }catch (SocketTimeoutException ignored) {
 
         } catch (IOException | DebugChainedException e) {

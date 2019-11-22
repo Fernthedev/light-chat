@@ -1,14 +1,14 @@
 package com.github.fernthedev.client;
 
-import com.github.fernthedev.packets.*;
-import com.github.fernthedev.packets.handshake.ConnectedPacket;
-import com.github.fernthedev.packets.handshake.InitialHandshakePacket;
-import com.github.fernthedev.packets.handshake.KeyResponsePacket;
-import com.github.fernthedev.packets.handshake.RequestConnectInfoPacket;
-import com.github.fernthedev.packets.latency.PingPacket;
-import com.github.fernthedev.packets.latency.PingReceive;
-import com.github.fernthedev.packets.latency.PongPacket;
-import com.github.fernthedev.universal.encryption.util.EncryptionUtil;
+import com.github.fernthedev.core.packets.*;
+import com.github.fernthedev.core.packets.handshake.ConnectedPacket;
+import com.github.fernthedev.core.packets.handshake.InitialHandshakePacket;
+import com.github.fernthedev.core.packets.handshake.KeyResponsePacket;
+import com.github.fernthedev.core.packets.handshake.RequestConnectInfoPacket;
+import com.github.fernthedev.core.packets.latency.PingPacket;
+import com.github.fernthedev.core.packets.latency.PingReceive;
+import com.github.fernthedev.core.packets.latency.PongPacket;
+import com.github.fernthedev.core.encryption.util.EncryptionUtil;
 
 import javax.crypto.SecretKey;
 import java.security.InvalidKeyException;

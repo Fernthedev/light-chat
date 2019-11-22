@@ -7,7 +7,7 @@ import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.command.CommandSender;
 import com.github.fernthedev.server.event.Listener;
 import com.github.fernthedev.server.event.chat.ChatEvent;
-import com.github.fernthedev.universal.ColorCode;
+import com.github.fernthedev.core.ColorCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 

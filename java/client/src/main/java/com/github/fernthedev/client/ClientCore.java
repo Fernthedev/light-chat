@@ -1,9 +1,10 @@
 package com.github.fernthedev.client;
 
-import com.github.fernthedev.universal.Core;
+import com.github.fernthedev.core.Core;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+
 
 @RequiredArgsConstructor
 public class ClientCore implements Core {
@@ -27,7 +28,11 @@ public class ClientCore implements Core {
 
     @Override
     public void runCommand(String command) {
-        client.sendMessage(command);
+        if (client.registered) {
+            client.sendMessage(command);
+        } else {
+            getLogger().error("The client has not been registered yet.");
+        }
     }
 
     @Override

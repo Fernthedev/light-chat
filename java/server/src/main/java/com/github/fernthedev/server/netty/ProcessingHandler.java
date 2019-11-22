@@ -1,8 +1,8 @@
 package com.github.fernthedev.server.netty;
 
-import com.github.fernthedev.packets.handshake.ConnectedPacket;
-import com.github.fernthedev.packets.Packet;
-import com.github.fernthedev.packets.handshake.InitialHandshakePacket;
+import com.github.fernthedev.core.packets.Packet;
+import com.github.fernthedev.core.packets.handshake.ConnectedPacket;
+import com.github.fernthedev.core.packets.handshake.InitialHandshakePacket;
 import com.github.fernthedev.server.ClientPlayer;
 import com.github.fernthedev.server.EventListener;
 import com.github.fernthedev.server.PlayerHandler;
@@ -14,7 +14,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
 
-import javax.crypto.SealedObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -58,15 +57,17 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
                 if (!PlayerHandler.socketList.containsKey(ctx.channel())) {
                     // Discard the received data silently.
                     ((ByteBuf) msg).release();
-                }else if (msg instanceof SealedObject) {
+                } /*else if (msg instanceof SealedObject) {
                     SealedObject requestData = (SealedObject) msg;
+
+                    // TODO: REMOVE DEPRECATED CODE
 
                     Packet packet = (Packet) PlayerHandler.socketList.get(ctx.channel()).decryptObject(requestData);
 
                     eventListener.received(packet);
 
 
-                } else if (msg instanceof Packet) {
+                }*/ else if (msg instanceof Packet) {
                     eventListener.received((Packet) msg);
                 }
             }

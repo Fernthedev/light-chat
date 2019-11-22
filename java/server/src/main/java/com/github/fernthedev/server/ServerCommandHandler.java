@@ -1,14 +1,14 @@
 package com.github.fernthedev.server;
 
 
-import com.github.fernthedev.packets.MessagePacket;
+import com.github.fernthedev.core.packets.MessagePacket;
 import com.github.fernthedev.server.backend.BannedData;
 import com.github.fernthedev.server.backend.CommandMessageParser;
 import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.command.CommandSender;
 import com.github.fernthedev.server.command.KickCommand;
 import com.github.fernthedev.server.event.chat.ChatEvent;
-import com.github.fernthedev.universal.StaticHandler;
+import com.github.fernthedev.core.StaticHandler;
 import lombok.NonNull;
 import org.jline.reader.UserInterruptException;
 

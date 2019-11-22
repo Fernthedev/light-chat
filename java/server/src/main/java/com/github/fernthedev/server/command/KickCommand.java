@@ -1,6 +1,6 @@
 package com.github.fernthedev.server.command;
 
-import com.github.fernthedev.packets.MessagePacket;
+import com.github.fernthedev.core.packets.MessagePacket;
 import com.github.fernthedev.server.ClientPlayer;
 import com.github.fernthedev.server.Console;
 import com.github.fernthedev.server.PlayerHandler;

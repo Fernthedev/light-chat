@@ -2,7 +2,7 @@ package com.github.fernthedev.server.backend;
 
 import com.github.fernthedev.server.ClientPlayer;
 import com.github.fernthedev.server.Server;
-import com.github.fernthedev.universal.StaticHandler;
+import com.github.fernthedev.core.StaticHandler;
 import com.google.gson.Gson;
 import lombok.NonNull;
 

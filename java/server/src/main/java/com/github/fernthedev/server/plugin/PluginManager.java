@@ -4,7 +4,6 @@ import com.github.fernthedev.server.Server;
 import com.github.fernthedev.server.event.*;
 import com.github.fernthedev.server.plugin.exception.IllegalPluginAccessException;
 import org.apache.commons.lang3.Validate;
-import org.apache.logging.log4j.Level;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -45,7 +44,7 @@ public class PluginManager {
             try {
                 registration.callEvent(event);
             } catch (Exception ex) {
-                Server.getLogger().log(Level.FATAL, "Could not pass event " + event.getEventName() + " to ", ex);
+                Server.getLogger().error("Could not pass event " + event.getEventName() + " to ", ex);
             }
         }
     }

@@ -4,15 +4,8 @@ import com.github.fernthedev.server.plugin.exception.InvalidDescriptionException
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.AbstractConstruct;
-import org.yaml.snakeyaml.constructor.SafeConstructor;
-import org.yaml.snakeyaml.nodes.Node;
-import org.yaml.snakeyaml.nodes.Tag;
 
 import java.io.InputStream;
-import java.io.Reader;
-import java.io.Writer;
 import java.util.*;
 
 /**
@@ -150,39 +143,39 @@ import java.util.*;
  *</pre></blockquote>
  */
 public final class PluginDescriptionFile {
-    private static final ThreadLocal<Yaml> YAML = new ThreadLocal<Yaml>() {
-        @Override
-        protected Yaml initialValue() {
-            return new Yaml(new SafeConstructor() {
-                {
-                    yamlConstructors.put(null, new AbstractConstruct() {
-                        @Override
-                        public Object construct(final Node node) {
-                            if (!node.getTag().startsWith("!@")) {
-                                // Unknown tag - will fail
-                                return SafeConstructor.undefinedConstructor.construct(node);
-                            }
-                            // Unknown awareness - provide a graceful substitution
-                            return new PluginAwareness() {
-                                @Override
-                                public String toString() {
-                                    return node.toString();
-                                }
-                            };
-                        }
-                    });
-                    for (final PluginAwareness.Flags flag : PluginAwareness.Flags.values()) {
-                        yamlConstructors.put(new Tag("!@" + flag.name()), new AbstractConstruct() {
-                            @Override
-                            public PluginAwareness.Flags construct(final Node node) {
-                                return flag;
-                            }
-                        });
-                    }
-                }
-            });
-        }
-    };
+//    private static final ThreadLocal<Yaml> YAML = new ThreadLocal<Yaml>() {
+//        @Override
+//        protected Yaml initialValue() {
+//            return new Yaml(new SafeConstructor() {
+//                {
+//                    yamlConstructors.put(null, new AbstractConstruct() {
+//                        @Override
+//                        public Object construct(final Node node) {
+//                            if (!node.getTag().startsWith("!@")) {
+//                                // Unknown tag - will fail
+//                                return SafeConstructor.undefinedConstructor.construct(node);
+//                            }
+//                            // Unknown awareness - provide a graceful substitution
+//                            return new PluginAwareness() {
+//                                @Override
+//                                public String toString() {
+//                                    return node.toString();
+//                                }
+//                            };
+//                        }
+//                    });
+//                    for (final PluginAwareness.Flags flag : PluginAwareness.Flags.values()) {
+//                        yamlConstructors.put(new Tag("!@" + flag.name()), new AbstractConstruct() {
+//                            @Override
+//                            public PluginAwareness.Flags construct(final Node node) {
+//                                return flag;
+//                            }
+//                        });
+//                    }
+//                }
+//            });
+//        }
+//    };
     String rawName = null;
     private String name = null;
     private String main = null;
@@ -200,9 +193,9 @@ public final class PluginDescriptionFile {
     private Map<?, ?> lazyPermissions = null;
     private Set<PluginAwareness> awareness = ImmutableSet.of();
 
-    public PluginDescriptionFile(final InputStream stream) throws InvalidDescriptionException {
-        loadMap(asMap(YAML.get().load(stream)));
-    }
+//    public PluginDescriptionFile(final InputStream stream) throws InvalidDescriptionException {
+//        loadMap(asMap(YAML.get().load(stream)));
+//    }
 
     /**
      * Loads a PluginDescriptionFile from the specified reader
@@ -211,9 +204,9 @@ public final class PluginDescriptionFile {
      * @throws InvalidDescriptionException If the PluginDescriptionFile is
      *     invalid
      */
-    public PluginDescriptionFile(final Reader reader) throws InvalidDescriptionException {
-        loadMap(asMap(YAML.get().load(reader)));
-    }
+//    public PluginDescriptionFile(final Reader reader) throws InvalidDescriptionException {
+//        loadMap(asMap(YAML.get().load(reader)));
+//    }
 
     /**
      * Creates a new PluginDescriptionFile with the given detailed
@@ -226,6 +219,10 @@ public final class PluginDescriptionFile {
         name = pluginName.replace(' ', '_');
         version = pluginVersion;
         main = mainClass;
+    }
+
+    public PluginDescriptionFile(InputStream stream) {
+
     }
 
     /**
@@ -616,14 +613,14 @@ public final class PluginDescriptionFile {
         return classLoaderOf;
     }
 
-    /**
-     * Saves this PluginDescriptionFile to the given writer
-     *
-     * @param writer Writer to output this file to
-     */
-    public void save(Writer writer) {
-        YAML.get().dump(saveMap(), writer);
-    }
+//    /**
+//     * Saves this PluginDescriptionFile to the given writer
+//     *
+//     * @param writer Writer to output this file to
+//     */
+//    public void save(Writer writer) {
+//        YAML.get().dump(saveMap(), writer);
+//    }
 
     private void loadMap(Map<?, ?> map) throws InvalidDescriptionException {
         try {

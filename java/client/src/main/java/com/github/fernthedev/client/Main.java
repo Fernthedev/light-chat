@@ -1,7 +1,7 @@
 package com.github.fernthedev.client;
 
 import com.github.fernthedev.client.netty.MulticastClient;
-import com.github.fernthedev.universal.StaticHandler;
+import com.github.fernthedev.core.StaticHandler;
 import org.fusesource.jansi.AnsiConsole;
 
 import java.io.IOException;
@@ -93,14 +93,10 @@ public class Main {
                 port = readInt("Port:");
         }
 
-//        scanner.close();
-        new Thread(() -> {
-            StaticHandler.setCore(new ClientCore(client));
-            client.setup();
 
-
-            client.initialize(host, port);
-        }).start();
+        client.setup();
+        StaticHandler.setCore(new ClientCore(client));
+        client.initialize(host, port);
     }
 
 

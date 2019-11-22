@@ -1,6 +1,6 @@
 package com.github.fernthedev.server;
 
-import com.github.fernthedev.universal.StaticHandler;
+import com.github.fernthedev.core.StaticHandler;
 import org.fusesource.jansi.AnsiConsole;
 
 import java.io.IOException;

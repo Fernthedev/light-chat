@@ -1,6 +1,6 @@
 package com.github.fernthedev.client;
 
-import com.github.fernthedev.universal.StaticHandler;
+import com.github.fernthedev.core.StaticHandler;
 import org.jline.reader.UserInterruptException;
 
 @Deprecated

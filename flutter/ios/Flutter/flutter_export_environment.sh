@@ -1,7 +1,7 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
 export "FLUTTER_ROOT=C:\Flutter\flutter_windows_v1.0.0-stable"
-export "FLUTTER_APPLICATION_PATH=C:\Users\fernr\AndroidStudioProjects\pi_chat_lock"
+export "FLUTTER_APPLICATION_PATH=C:\Users\fernr\IdeaProjects\lighttest\flutter"
 export "FLUTTER_TARGET=lib\main.dart"
 export "FLUTTER_BUILD_DIR=build"
 export "SYMROOT=${SOURCE_ROOT}/../build\ios"

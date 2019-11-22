@@ -30,7 +30,7 @@ class Main extends StatelessWidget {
     if (fileHandler.serverData == null) {
       fileHandler.serverData = new List<ServerData>();
       fileHandler.serverData
-          .add(ServerData("192.168.2.11", 2000, "no wawwasu"));
+          .add(ServerData("192.168.0.17", 2000, "no wawwasu"));
       fileHandler.serverData.add(ServerData("192.168.3.11", 2005, "no u"));
       fileHandler.serverData
           .add(ServerData("192.168.5.11", 1942, "no easdawu"));
@@ -39,7 +39,7 @@ class Main extends StatelessWidget {
     if (fileHandler.serverData.isEmpty) {
       fileHandler.serverData = new List<ServerData>();
       fileHandler.serverData
-          .add(ServerData("192.168.2.11", 2000, "no wawwasu"));
+          .add(ServerData("192.168.0.17", 2000, "no wawwasu"));
       fileHandler.serverData.add(ServerData("192.168.3.11", 2005, "no u"));
     }
 

@@ -1,10 +1,10 @@
 package com.github.fernthedev.server.netty;
 
 
+import com.github.fernthedev.core.MulticastData;
+import com.github.fernthedev.core.StaticHandler;
 import com.github.fernthedev.server.PlayerHandler;
 import com.github.fernthedev.server.Server;
-import com.github.fernthedev.universal.MulticastData;
-import com.github.fernthedev.universal.StaticHandler;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -12,17 +12,31 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
 
-public class MulticastServer  extends QuoteServerThread {
+public class MulticastServer extends QuoteServerThread {
 
     private Server server;
 
-    public MulticastServer(String name,Server server) throws IOException {
+    private volatile boolean run;
+
+//    @Synchronized
+//    private void setRun(boolean run) {
+//        this.run = run;
+//    }
+
+    public MulticastServer(String name, Server server) throws IOException {
         super(name);
         this.server = server;
+        run = true;
+//        setRun(true);
+    }
+
+    public void stopMulticast() {
+        run = false;
+//        setRun(false);
     }
 
     public void run() {
-        while (moreQuotes) {
+        while (moreQuotes && run) {
             try {
                 byte[] buf;
                 // don't wait for request...just send a quote

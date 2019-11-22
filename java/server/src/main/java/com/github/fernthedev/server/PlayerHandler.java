@@ -1,6 +1,6 @@
 package com.github.fernthedev.server;
 
-import com.github.fernthedev.packets.SelfMessagePacket;
+import com.github.fernthedev.core.packets.SelfMessagePacket;
 import io.netty.channel.Channel;
 import lombok.AllArgsConstructor;
 import lombok.Data;

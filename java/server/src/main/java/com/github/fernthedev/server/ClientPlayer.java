@@ -1,22 +1,17 @@
 package com.github.fernthedev.server;
 
-import com.github.fernthedev.packets.MessagePacket;
-import com.github.fernthedev.packets.Packet;
-import com.github.fernthedev.packets.latency.PingPacket;
+import com.github.fernthedev.core.encryption.UnencryptedPacketWrapper;
+import com.github.fernthedev.core.encryption.util.RSAEncryptionUtil;
+import com.github.fernthedev.core.packets.MessagePacket;
+import com.github.fernthedev.core.packets.Packet;
+import com.github.fernthedev.core.packets.latency.PingPacket;
 import com.github.fernthedev.server.command.CommandSender;
-import com.github.fernthedev.universal.encryption.UnencryptedPacketWrapper;
-import com.github.fernthedev.universal.encryption.util.RSAEncryptionUtil;
 import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.SealedObject;
 import javax.crypto.SecretKey;
-import java.io.IOException;
-import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.security.KeyPair;
 import java.util.UUID;
@@ -44,6 +39,7 @@ public class ClientPlayer implements CommandSender {
     @Getter
     private KeyPair tempKeyPair;
 
+
     @Getter
     private SecretKey secretKey;
 
@@ -70,7 +66,7 @@ public class ClientPlayer implements CommandSender {
         this.deviceName = deviceName;
     }
 
-    public Channel channel;
+    public final Channel channel;
 
     private String deviceName;
 
@@ -82,11 +78,10 @@ public class ClientPlayer implements CommandSender {
     @Getter
     private long delayTime = -1;
 
-    @Getter
-    private Cipher encryptCipher;
+//    @Getter
+//    private Cipher encryptCipher;
 
-    @Getter
-    private Cipher decryptCipher;
+
 
     public String getDeviceName() {
         return deviceName;
@@ -101,6 +96,11 @@ public class ClientPlayer implements CommandSender {
         this.uuid = uuid;
 
         tempKeyPair = RSAEncryptionUtil.generateKeyPairs();
+
+
+
+
+
 
 //        try {
 //            encryptCipher = EncryptionUtil.generateEncryptCipher(tempKeyPair.getPublic());
@@ -204,29 +204,29 @@ public class ClientPlayer implements CommandSender {
 //        return null;
 //    }
 
-    public SealedObject encryptObject(Serializable object) {
-        try {
-            if (encryptCipher == null)
-                throw new IllegalArgumentException("Register cipher with registerEncryptCipher() first");
-
-            return new SealedObject(object, encryptCipher);
-        } catch (IOException | IllegalBlockSizeException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public Object decryptObject(SealedObject sealedObject) {
-        try {
-            if (decryptCipher == null)
-                throw new IllegalArgumentException("Register cipher with registerDecryptCipher() first");
-
-            return sealedObject.getObject(decryptCipher);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+//    public SealedObject encryptObject(Serializable object) {
+//        try {
+//            if (encryptCipher == null)
+//                throw new IllegalArgumentException("Register cipher with registerEncryptCipher() first");
+//
+//            return new SealedObject(object, encryptCipher);
+//        } catch (IOException | IllegalBlockSizeException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
+//
+//    public Object decryptObject(SealedObject sealedObject) {
+//        try {
+//            if (decryptCipher == null)
+//                throw new IllegalArgumentException("Register cipher with registerDecryptCipher() first");
+//
+//            return sealedObject.getObject(decryptCipher);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
 
 
     public void sendObject(Packet packet) {
@@ -236,7 +236,7 @@ public class ClientPlayer implements CommandSender {
     public void close() {
 
         //DISCONNECT FROM SERVER
-        Server.getLogger().info("Closing player {}", this::toString);
+        Server.getLogger().info("Closing player {}", toString());
 
         if (channel != null) {
 

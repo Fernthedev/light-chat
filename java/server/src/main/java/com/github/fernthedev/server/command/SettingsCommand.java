@@ -1,10 +1,13 @@
 package com.github.fernthedev.server.command;
 
 import com.github.fernthedev.gson.GsonConfig;
-import com.github.fernthedev.light.AuthenticationManager;
-import com.github.fernthedev.light.Settings;
 import com.github.fernthedev.server.Server;
-import lombok.NonNull;
+import com.github.fernthedev.server.backend.AuthenticationManager;
+import com.github.fernthedev.server.settings.Settings;
+import com.github.fernthedev.core.ColorCode;
+
+import java.util.List;
+import java.util.Map;
 
 public class SettingsCommand extends Command {
 
@@ -35,7 +38,8 @@ public class SettingsCommand extends Command {
 
                             try {
                                 settingsManager.getConfigData().setValue(settingName, newValue);
-                                sender.sendMessage("Set " + settingName + " to " + newValue);
+                                sender.sendMessage(ColorCode.GREEN + "Set " + settingName + " to " + newValue);
+                                sender.sendMessage(ColorCode.YELLOW + "Some settings will require a restart to take effect.");
                             } catch (ClassCastException | IllegalArgumentException e) {
                                 sender.sendMessage("Error: " + e.getMessage() + " {" + e.getClass().getName() + "}");
                             }
@@ -67,10 +71,13 @@ public class SettingsCommand extends Command {
                         break;
 
                     case "list":
-                        sender.sendMessage("Possible setting names:");
+                        sender.sendMessage("Possible setting names : {possible values, empty if any are allowed}");
 
-                        for(String settingName : settingsManager.getConfigData().getSettingNames(true)) {
-                            sender.sendMessage(settingName);
+                        Map<String, List<String>> nameValueMap = settingsManager.getConfigData().getSettingValues(true);
+
+                        for(String settingName : nameValueMap.keySet()) {
+                            List<String> possibleValues = nameValueMap.get(settingName);
+                            sender.sendMessage(settingName + " : " + possibleValues.toString());
                         }
 
                         break;

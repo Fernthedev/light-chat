@@ -1,6 +1,6 @@
 package com.github.fernthedev.server.command;
 
-import com.github.fernthedev.packets.Packet;
+import com.github.fernthedev.core.packets.Packet;
 
 public interface CommandSender {
 
