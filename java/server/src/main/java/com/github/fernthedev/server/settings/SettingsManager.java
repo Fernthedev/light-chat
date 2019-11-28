@@ -1,5 +1,6 @@
 package com.github.fernthedev.server.settings;
 
+import com.github.fernthedev.gson.GsonConfig;
 import com.github.fernthedev.server.Server;
 import com.github.fernthedev.core.StaticHandler;
 import com.google.gson.Gson;
@@ -11,10 +12,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 
-@Deprecated
 /**
- * Replaced by {@link GsonConfig<}
+ * Replaced by {@link GsonConfig <>}
  */
+@Deprecated
 public class SettingsManager {
 
     private Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -62,7 +63,7 @@ public class SettingsManager {
 
 
             } catch (Exception e) {
-                if (StaticHandler.isDebug) {
+                if (StaticHandler.isDebug()) {
                     Server.getLogger().error(e.getMessage(), e.getCause());
                 }
                 settingsFile.delete();

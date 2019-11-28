@@ -50,7 +50,7 @@ public class AutoCompleteHandler implements Completer {
 
                 if(args.isEmpty()) return candidates;
 
-                args.remove(0);
+                args.remove(0); // Remove the command as first argument
 
                 @NonNull List<String> completions = tabExecutor.getCompletions(args.toArray(new String[0]));
 

@@ -18,7 +18,7 @@ public class LoggerManager implements Listener {
     private static LoggerManager loggerManager;
 
     public LoggerManager() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM-yyyy-dd-hh:mm-aa");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM-yyyy-dd-hh--mm-aa");
 
         date = simpleDateFormat.format(new Date());
 
@@ -76,7 +76,7 @@ public class LoggerManager implements Listener {
 
     @EventHandler
     public void onChatEvent(ChatEvent e) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM-yyyy-dd-hh:mm-aa");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM-yyyy-dd.hh-mm-aa");
 
         String time = simpleDateFormat.format(new Date());
 
@@ -93,7 +93,7 @@ public class LoggerManager implements Listener {
     }
 
     public void log(String message) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM-yyyy-dd-hh:mm-aa");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM-yyyy-dd-hh--mm-aa");
 
         String time = simpleDateFormat.format(new Date());
 

@@ -3,16 +3,29 @@
     <Appenders>
         <TerminalConsole name="Console">
 <!--            <PatternLayout pattern="[%d{HH:mm:ss} %level]: %msg%n"/>-->
-            <PatternLayout noConsoleNoAnsi="true" pattern="%highlight{[%d{HH:mm:ss} %level]: %minecraftFormatting{%msg}%n%xEx}"/>
+            <PatternLayout noConsoleNoAnsi="true" pattern="%highlightError{[%d{HH:mm:ss} %level]: %minecraftFormatting{%msg}%n%xEx}"/>
         </TerminalConsole>
         <Async name="Async">
             <AppenderRef ref="Console"/>
         </Async>
+        <RollingRandomAccessFile name="roll-by-time-and-size" fileName="./logs/latest.log" filePattern="./logs/%d{yyyy-MM-dd}.%i.log.gz">
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <OnStartupTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="25 MB"/>
+            </Policies>
+
+            <PatternLayout pattern="[%d{HH:mm:ss} %level]: %minecraftFormatting{%msg}{strip}%n%xEx" />
+
+        </RollingRandomAccessFile>
     </Appenders>
     <Loggers>
-        <Logger level="OFF" name="io.netty"/>
-        <Root level="all">
-            <AppenderRef ref="Console"/>
+        <Logger level="WARN" name="io.netty"/>
+        <Logger level="WARN" name="org.reflections"/>
+
+        <Root level="info">
+            <AppenderRef ref="Async"/>
+            <AppenderRef ref="roll-by-time-and-size"/>
         </Root>
     </Loggers>
 

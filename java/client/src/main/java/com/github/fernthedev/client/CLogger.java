@@ -28,7 +28,7 @@ public class CLogger implements ILogManager {
 
     @Override
     public void debug(String s) {
-        if(StaticHandler.isDebug) {
+        if(StaticHandler.isDebug()) {
             log("[DEBUG] " + s);
         }
     }

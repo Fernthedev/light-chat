@@ -283,7 +283,7 @@ public class Client implements IEncryptionKeyHolder {
         if(channel != null) {
             //DISCONNECT FROM SERVER
             if (channel.isActive()) {
-                if (StaticHandler.isDebug) {
+                if (StaticHandler.isDebug()) {
                     try {
                         throw new DebugException();
                     } catch (DebugException e) {

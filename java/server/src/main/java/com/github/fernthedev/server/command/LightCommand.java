@@ -1,17 +1,17 @@
 package com.github.fernthedev.server.command;
 
 import com.github.fernthedev.light.LightFileFormatter;
-import com.github.fernthedev.light.api.LightFile;
-import com.github.fernthedev.light.api.LightParser;
 import com.github.fernthedev.server.ClientPlayer;
 import com.github.fernthedev.server.Console;
 import com.github.fernthedev.server.backend.AuthenticationManager;
-import com.google.gson.GsonBuilder;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-public class LightCommand extends Command{
+public class LightCommand extends Command implements TabExecutor {
     public LightCommand() {
         super("light");
     }
@@ -65,11 +65,6 @@ public class LightCommand extends Command{
                                 sender.sendMessage("Reading file " + path);
                             }
 
-                            LightFile lightFile = LightParser.parseFile(file);
-
-                            sender.sendMessage("The file is " + lightFile.toString());
-                            sender.sendMessage("Contents" + new GsonBuilder().setPrettyPrinting().create().toJson(lightFile));
-
                             LightFileFormatter.executeLightFile(file);
 
                         }
@@ -83,5 +78,16 @@ public class LightCommand extends Command{
         }else{
             sender.sendMessage("Incorrect usage. Arguments: off, on, readfile, readfolder");
         }
+    }
+
+    @Override
+    public List<String> getCompletions(String[] args) {
+        if(args.length == 0) {
+            return Arrays.asList("off",
+                    "on",
+                    "readfile",
+                    "readfolder");
+        }
+        return new ArrayList<>();
     }
 }

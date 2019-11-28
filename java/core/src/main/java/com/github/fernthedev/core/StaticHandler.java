@@ -8,11 +8,14 @@ import lombok.NonNull;
 import lombok.Synchronized;
 import net.minecrell.terminalconsole.TerminalConsoleAppender;
 import org.apache.commons.lang3.SystemUtils;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.apache.logging.log4j.util.PropertiesUtil;
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.terminal.Terminal;
+import org.reflections.Reflections;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -38,7 +41,15 @@ public class StaticHandler {
     private static final Gson gson = new Gson();
     public static final Charset CHARSET_FOR_STRING = CharsetUtil.UTF_8;
 
-    public static boolean isDebug = false;
+    @Getter
+    private static boolean debug = false;
+
+    public static void setDebug(boolean debug) {
+        StaticHandler.debug = debug;
+        Configurator.setLevel(getCore().getLogger().getName(), debug ? Level.DEBUG : Level.INFO);
+        Configurator.setLevel(Reflections.class.getName(), debug ? Level.DEBUG : Level.WARN);
+    }
+
     private static String version = null;
     public static String os = System.getProperty("os.name");
     public static boolean isLight = false;
@@ -60,6 +71,7 @@ public class StaticHandler {
     @Synchronized
     public static void setCore(Core core) {
         StaticHandler.core = core;
+//        Configurator.setLevel(getCore().getLogger().getName(), debug ? Level.DEBUG : Level.INFO);
         PacketRegistry.registerDefaultPackets();
     }
 
@@ -71,11 +83,11 @@ public class StaticHandler {
     }
 
     public StaticHandler() {
-        TranslateData translateData = gson.fromJson(getFile("variables.json"),TranslateData.class);
+        TranslateData translateData = gson.fromJson(getFile("variables.json"), TranslateData.class);
 
         version = translateData.getVersion();
 
-
+//        Configurator.setLevel(Reflections.class.getName(), debug ? Level.DEBUG : Level.WARN);
     }
 
 
@@ -130,6 +142,8 @@ public class StaticHandler {
                 .terminal(terminal)
                 .completer(completer)
                 .build();
+
+        System.out.println(terminal + " is the terminal " + completer + " is completer");
 
         lineReader.setOpt(LineReader.Option.DISABLE_EVENT_EXPANSION);
         lineReader.unsetOpt(LineReader.Option.INSERT_TAB);

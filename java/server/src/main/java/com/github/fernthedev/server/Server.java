@@ -25,7 +25,6 @@ import com.github.fernthedev.server.plugin.PluginManager;
 import com.github.fernthedev.server.settings.Settings;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
-import io.netty.channel.epoll.EpollChannelOption;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.kqueue.KQueueEventLoopGroup;
@@ -260,11 +259,10 @@ public class Server implements Runnable {
                     }
                 }).option(ChannelOption.SO_BACKLOG, 128)
                 .option(ChannelOption.RCVBUF_ALLOCATOR, new AdaptiveRecvByteBufAllocator(512, 512, 64 * 1024))
-                .option(EpollChannelOption.MAX_DATAGRAM_PAYLOAD_SIZE, 512)
+         //       .option(EpollChannelOption.MAX_DATAGRAM_PAYLOAD_SIZE, 512)
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
                 .childOption(ChannelOption.TCP_NODELAY, true)
                 .childOption(ChannelOption.SO_TIMEOUT, 5000);
-
 
         logger.info("Server socket registered");
 
@@ -324,12 +322,10 @@ public class Server implements Runnable {
         server.registerCommand(authenticationManager);
         server.getPluginManager().registerEvents(authenticationManager, new ServerPlugin());
 
-        LoggerManager loggerManager = new LoggerManager();
+//        LoggerManager loggerManager = new LoggerManager();
+//        pluginManager.registerEvents(loggerManager, new ServerPlugin());
 
-
-        pluginManager.registerEvents(loggerManager, new ServerPlugin());
-
-        logger.info("Running on [" + StaticHandler.os + "]");
+        logger.info("Running on [{}]", StaticHandler.os);
 
         if (StaticHandler.os.equalsIgnoreCase("Linux") || StaticHandler.os.contains("Linux") || StaticHandler.isLight) {
             logger.info("Running LightManager (Note this is for raspberry pies only)");
@@ -342,7 +338,7 @@ public class Server implements Runnable {
                     logger.info("Registered");
                 } catch (IllegalArgumentException | ExceptionInInitializerError | NoPi4JLibsFoundException e) {
                     logger.error("Unable to load Pi4J Libraries. To load stacktrace, add -debug flag. Message: {}", e.getMessage());
-                    if (StaticHandler.isDebug) {
+                    if (StaticHandler.isDebug()) {
                         e.printStackTrace();
                         registerCommand(new LightCommand());
                         logger.info("Registered");
@@ -374,7 +370,7 @@ public class Server implements Runnable {
     }
 
     private void tick() {
-        if (System.console() == null && !StaticHandler.isDebug) shutdownServer();
+        if (System.console() == null && !StaticHandler.isDebug()) shutdownServer();
     }
 
     public static synchronized void closeThread(Thread thread) {

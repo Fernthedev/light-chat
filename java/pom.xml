@@ -10,9 +10,10 @@
 
     <packaging>pom</packaging>
     <properties>
-        <project.buildVer>1.4-RELEASE</project.buildVer>
+        <project.buildVer>1.5-RELEASE</project.buildVer>
         <project.lightreader>1.2</project.lightreader>
         <project.nettyver>4.1.43.Final</project.nettyver>
+        <project.jline>3.13.2</project.jline>
     </properties>
 
     <build>
@@ -122,7 +123,13 @@
                             </includes>
                         </filter>
                         <filter>
-                            <artifact>net.minecrell:terminalconsoleappender</artifact>
+                            <artifact>org.jline:*</artifact>
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                        </filter>
+                        <filter>
+                            <artifact>net.minecrell:*</artifact>
                             <includes>
                                 <include>**</include>
                             </includes>

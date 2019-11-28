@@ -41,14 +41,14 @@ public class Main {
             }
 
             if (arg.equalsIgnoreCase("-debug")) {
-                StaticHandler.isDebug = true;
+                StaticHandler.setDebug(true);
             }
         }
 
 
         if (port == -1) port = 2000;
 
-        if (System.console() == null && !StaticHandler.isDebug) {
+        if (System.console() == null && !StaticHandler.isDebug()) {
 
             String filename = Main.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6);
             System.out.println("No console found");

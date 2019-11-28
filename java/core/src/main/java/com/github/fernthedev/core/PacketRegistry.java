@@ -47,7 +47,7 @@ public class PacketRegistry {
 
         for (Package packageT : Package.getPackages()) {
             if (packageT.getName().startsWith(StaticHandler.PACKET_PACKAGE)) {
-                StaticHandler.getCore().getLogger().info("Registering the package " + packageT.getName());
+                StaticHandler.getCore().getLogger().debug("Registering the package " + packageT.getName());
                 registerPacketPackage(packageT.getName());
             }
         }

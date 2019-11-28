@@ -62,7 +62,7 @@ public class MulticastClient {
                         addressServerAddressMap.put(address,serverAddress);
                     }
                 } catch (Exception e) {
-                    if(StaticHandler.isDebug) {
+                    if(StaticHandler.isDebug()) {
                         throw new DebugChainedException(e, "Unable to read packet");
                     }
                 }
