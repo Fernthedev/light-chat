@@ -4,8 +4,6 @@ This is basically just a fork of my chatroom program that allows turning on and 
 |:---:|:---:|
 | **Java Server/Client**        | ![](https://github.com/Fernthedev/light-chat/workflows/Java%20CI/badge.svg)|
 
-Java: ![](https://github.com/Fernthedev/light-chat/workflows/Java%20CI/badge.svg)
-
 # Features:
 - Uses JSON for packet wrapping and allows cross-platform usage 
 - Encryption using RSA 4096 key exchange (server generates temporary key pair -> server sends public key -> client generates AES 256 key -> encrypts key with server's public key -> server and client use AES key from client for the rest of communications) 
