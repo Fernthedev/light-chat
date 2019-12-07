@@ -13,7 +13,7 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
-    - name: Enter Java Project
-      run: cd ./java
+#    - name: Enter Java Project
+#      run: cd ./java
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      run: mvn -B package --file ./java/pom.xml
