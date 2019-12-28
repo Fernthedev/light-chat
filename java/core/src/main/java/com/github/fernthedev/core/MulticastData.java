@@ -12,19 +12,23 @@ public class MulticastData {
 
     public MulticastData() {}
 
-    public MulticastData(int port, String verison) {
+    public MulticastData(int port, String verison, String minVersion) {
         this.port = port;
         this.version = verison;
+        this.minVersion = minVersion;
+        this.address = address;
     }
 
-    public MulticastData(int port, String verison,int clientNumbers) {
-        this(port,verison);
+    public MulticastData(int port, String version, String minVersion, int clientNumbers) {
+        this(port, version, minVersion);
         this.clientNumbers = clientNumbers;
     }
 
     private String address;
 
     private String version;
+    private String minVersion;
+
     private int port;
 
     private int clientNumbers = 0;

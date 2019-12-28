@@ -18,7 +18,7 @@ public class ClientCore implements Core {
 
     @Override
     public Logger getLogger() {
-        return client.getLog4jLogger();
+        return client.getLogger();
     }
 
     @Override

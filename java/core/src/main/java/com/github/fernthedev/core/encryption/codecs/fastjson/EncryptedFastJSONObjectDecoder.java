@@ -11,6 +11,7 @@ import com.github.fernthedev.core.encryption.RSA.NoSecretKeyException;
 import com.github.fernthedev.core.encryption.UnencryptedPacketWrapper;
 import com.github.fernthedev.core.encryption.util.EncryptionUtil;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.string.StringDecoder;
 
@@ -23,6 +24,7 @@ import java.util.List;
 /**
  * Converts encrypted json to a decrypted object
  */
+@ChannelHandler.Sharable
 public class EncryptedFastJSONObjectDecoder extends StringDecoder {
 
     protected IEncryptionKeyHolder encryptionKeyHolder;

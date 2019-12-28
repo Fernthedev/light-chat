@@ -1,9 +1,11 @@
 package com.github.fernthedev.core.packets;
 
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
 @PacketInfo(name = "SELF_MESSAGE_PACKET")
+@ToString
 public class SelfMessagePacket extends Packet {
     private MessageType type;
 

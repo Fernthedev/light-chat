@@ -10,7 +10,6 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
-import java.util.concurrent.TimeUnit;
 
 public class MulticastServer extends QuoteServerThread {
 
@@ -41,7 +40,7 @@ public class MulticastServer extends QuoteServerThread {
                 byte[] buf;
                 // don't wait for request...just send a quote
 
-                MulticastData dataSend = new MulticastData(server.getPort(), StaticHandler.getVersion(), PlayerHandler.players.size());
+                MulticastData dataSend = new MulticastData(server.getPort(), StaticHandler.getVERSION_DATA().getVariablesJSON().getVersion(), StaticHandler.getVERSION_DATA().getVariablesJSON().getMinVersion(), PlayerHandler.players.size());
 
                 buf = new Gson().toJson(dataSend).getBytes();
 
@@ -51,7 +50,7 @@ public class MulticastServer extends QuoteServerThread {
                 socket.send(packet);
 
                 try {
-                    sleep((long) (Math.random() * TimeUnit.SECONDS.toMillis(5)));
+                    sleep((long) (Math.random() * 200));
                 }
                 catch (InterruptedException ignored) { }
             }
@@ -65,6 +64,7 @@ public class MulticastServer extends QuoteServerThread {
                 e.printStackTrace();
             }
         }
+        Server.getLogger().info("Closing MultiCast Server");
         socket.close();
     }
 

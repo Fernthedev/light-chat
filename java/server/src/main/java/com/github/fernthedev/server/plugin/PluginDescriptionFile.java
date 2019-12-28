@@ -32,66 +32,66 @@ import java.util.*;
  * <p>
  * This is a list of the possible yaml keys, with specific details included in
  * the respective method documentations:
- * <table border=1>
+ * <!-- <table border=1>
  * <caption>The description of the plugin.yml layout</caption>
- * <tr>
+  * <tr>
  *     <th>Node</th>
  *     <th>Method</th>
  *     <th>Summary</th>
  * </tr><tr>
- *     <td><code>name</code></td>
- *     <td>{@link #getName()}</td>
- *     <td>The unique name of plugin</td>
+// *     `<code>name</code>
+ *     {@link #getName()}
+ *     The unique name of plugin
  * </tr><tr>
- *     <td><code>version</code></td>
- *     <td>{@link #getVersion()}</td>
- *     <td>A plugin revision identifier</td>
+ *     <code>version</code>
+ *     {@link #getVersion()}
+ *     A plugin revision identifier
  * </tr><tr>
- *     <td><code>main</code></td>
- *     <td>{@link #getMain()}</td>
- *     <td>The plugin's initial class file</td>
+ *     <code>main</code>
+ *     {@link #getMain()}
+ *     The plugin's initial class file
  * </tr><tr>
- *     <td><code>author</code><br><code>authors</code></td>
- *     <td>{@link #getAuthors()}</td>
- *     <td>The plugin contributors</td>
+ *     <code>author</code><br><code>authors</code>
+ *     {@link #getAuthors()}
+ *     The plugin contributors
  * </tr><tr>
- *     <td><code>description</code></td>
- *     <td>{@link #getDescription()}</td>
- *     <td>Human readable plugin summary</td>
+ *     <code>description</code>
+ *     {@link #getDescription()}
+ *     Human readable plugin summary
  * </tr><tr>
- *     <td><code>website</code></td>
- *     <td>{@link #getWebsite()}</td>
- *     <td>The URL to the plugin's site</td>
+ *     <code>website</code>
+ *     {@link #getWebsite()}
+ *     The URL to the plugin's site
  * </tr><tr>
- *     <td><code>prefix</code></td>
- *     <td>{@link #getPrefix()}</td>
- *     <td>The token to prefix plugin log entries</td>
+ *     <code>prefix</code>
+ *     {@link #getPrefix()}
+ *     The token to prefix plugin log entries
  * </tr><tr>
- *     <td><code>load</code></td>
- *     <td>{@link #getLoad()}</td>
- *     <td>The phase of server-startup this plugin will load during</td>
+ *     <code>load</code>
+ *     {@link #getLoad()}
+ *     The phase of server-startup this plugin will load during
  * </tr><tr>
- *     <td><code>depend</code></td>
- *     <td>{@link #getDepend()}</td>
- *     <td>Other required plugins</td>
+ *     <code>depend</code>
+ *     {@link #getDepend()}
+ *     Other required plugins
  * </tr><tr>
- *     <td><code>softdepend</code></td>
- *     <td>{@link #getSoftDepend()}</td>
- *     <td>Other plugins that add functionality</td>
+ *     <code>softdepend</code>
+ *     {@link #getSoftDepend()}
+ *     Other plugins that add functionality
  * </tr><tr>
- *     <td><code>loadbefore</code></td>
- *     <td>{@link #getLoadBefore()}</td>
- *     <td>The inverse softdepend</td>
+ *     <code>loadbefore</code>
+ *     {@link #getLoadBefore()}
+ *     The inverse softdepend
  * </tr><tr>
- *     <td><code>commands</code></td>
- *     <td>{@link #getCommands()}</td>
- *     <td>The commands the plugin will register</td>
+ *     <code>commands</code>
+ *     {@link #getCommands()}
+ *     The commands the plugin will register
  * </tr>
- *     <td><code>awareness</code></td>
- *     <td>{@link #getAwareness()}</td>
- *     <td>The concepts that the plugin acknowledges</td>
+ *     <code>awareness</code>
+ *     {@link #getAwareness()}
+ *     The concepts that the plugin acknowledges
  * </tr>
- * </table>
+ * </table>-->
  * <p>
  * A plugin.yml example:<blockquote><pre>
  *name: Inferno

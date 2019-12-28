@@ -1,3 +1,4 @@
 {
-    "version": "${project.buildVer}"
+    "version": "${version}",
+    "minVersion": "${minVersion}"
 }

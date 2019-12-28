@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 
 /**
- * Replaced by {@link GsonConfig <>}
+ * Replaced by {@link GsonConfig}
  */
 @Deprecated
 public class SettingsManager {

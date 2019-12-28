@@ -1,5 +1,8 @@
 package com.github.fernthedev.client;
 
+import com.github.fernthedev.core.StaticHandler;
+import com.github.fernthedev.core.VersionData;
+import com.github.fernthedev.core.encryption.util.EncryptionUtil;
 import com.github.fernthedev.core.packets.*;
 import com.github.fernthedev.core.packets.handshake.ConnectedPacket;
 import com.github.fernthedev.core.packets.handshake.InitialHandshakePacket;
@@ -8,7 +11,6 @@ import com.github.fernthedev.core.packets.handshake.RequestConnectInfoPacket;
 import com.github.fernthedev.core.packets.latency.PingPacket;
 import com.github.fernthedev.core.packets.latency.PingReceive;
 import com.github.fernthedev.core.packets.latency.PongPacket;
-import com.github.fernthedev.core.encryption.util.EncryptionUtil;
 
 import javax.crypto.SecretKey;
 import java.security.InvalidKeyException;
@@ -48,12 +50,31 @@ public class EventListener {
             // Handles object encryption key sharing
             InitialHandshakePacket packet = (InitialHandshakePacket) p;
 
+            VersionData versionData = packet.getVersionData();
+
+            StaticHandler.VERSION_RANGE versionRange = StaticHandler.getVersionRangeStatus(versionData);
+
+            if (versionRange == StaticHandler.VERSION_RANGE.MATCH_REQUIREMENTS) client.getLogger().info("Version range requirements match Server version.");
+            else {
+                // Current version is smaller than the server's required minimum
+                if(versionRange == StaticHandler.VERSION_RANGE.WE_ARE_LOWER) {
+                    client.getLogger().info("The client version ({}) does not meet server's minimum version ({}) requirements. Expect incompatibility issues", StaticHandler.getVERSION_DATA().getVersion(), versionData.getMinVersion());
+                }
+
+                // Current version is larger than server's minimum version
+                if (versionRange == StaticHandler.VERSION_RANGE.WE_ARE_HIGHER) {
+                    client.getLogger().info("The server version ({}) does not meet client's minimum version ({}) requirements. Expect incompatibility issues", versionData.getVersion(), StaticHandler.getVERSION_DATA().getMinVersion());
+                }
+
+            }
+
             SecretKey secretKey = EncryptionUtil.generateSecretKey();
             client.setSecretKey(secretKey);
 
 
             try {
                 KeyResponsePacket responsePacket = new KeyResponsePacket(secretKey, packet.getPublicKey());
+
                 client.sendObject(responsePacket, false);
             } catch (InvalidKeyException e) {
                 e.printStackTrace();

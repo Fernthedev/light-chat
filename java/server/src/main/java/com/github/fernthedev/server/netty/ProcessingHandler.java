@@ -1,5 +1,6 @@
 package com.github.fernthedev.server.netty;
 
+import com.github.fernthedev.core.StaticHandler;
 import com.github.fernthedev.core.packets.Packet;
 import com.github.fernthedev.core.packets.handshake.ConnectedPacket;
 import com.github.fernthedev.core.packets.handshake.InitialHandshakePacket;
@@ -8,22 +9,14 @@ import com.github.fernthedev.server.EventListener;
 import com.github.fernthedev.server.PlayerHandler;
 import com.github.fernthedev.server.Server;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
 import java.util.UUID;
 
 @ChannelHandler.Sharable
 public class ProcessingHandler extends ChannelInboundHandlerAdapter {
-
-
-
-    private List<Object> packetsLost = new ArrayList<>();
 
     private Server server;
 
@@ -33,6 +26,8 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         ClientPlayer clientPlayer = PlayerHandler.socketList.get(ctx.channel());
 
+        if(clientPlayer == null) return;
+
         if(PlayerHandler.players.containsValue(clientPlayer) && ctx.isRemoved()) {
 
 
@@ -41,6 +36,36 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         }
 
         //clientPlayer.close();
+    }
+
+    /**
+     * Calls {@link ChannelHandlerContext#fireExceptionCaught(Throwable)} to forward
+     * to the next {@link ChannelHandler} in the {@link ChannelPipeline}.
+     * <p>
+     * Sub-classes may override this method to change behavior.
+     *
+     * @param ctx
+     * @param cause
+     */
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+
+        if(cause instanceof IOException || cause.getCause() instanceof IOException) {
+            Server.getLogger().info("The channel {} has been closed from the client side.", ctx.channel());
+
+            ClientPlayer clientPlayer = PlayerHandler.socketList.get(ctx.channel());
+
+            if(clientPlayer == null) return;
+
+            if(clientPlayer.getName() != null && clientPlayer.isRegistered()) Server.broadcast("[" + clientPlayer.getName() + "] has disconnected from the server");
+
+            if(PlayerHandler.players.containsValue(clientPlayer)) {
+
+
+                PlayerHandler.players.remove(clientPlayer.getId());
+                clientPlayer.close();
+            }
+        }else super.exceptionCaught(ctx, cause);
     }
 
     @Override
@@ -99,14 +124,18 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         }
 
         if (channel != null) {
+
+
             ClientPlayer clientPlayer = new ClientPlayer(server,channel,UUID.randomUUID());
 
             //Server.getLogger().info("Registering " + clientPlayer.getNameAddress());
 
-
             PlayerHandler.socketList.put(channel,clientPlayer);
 
-            clientPlayer.sendObject(new InitialHandshakePacket(clientPlayer.getTempKeyPair().getPublic()), false);
+            clientPlayer.awaitKeys();
+
+            clientPlayer.sendObject(new InitialHandshakePacket(clientPlayer.getTempKeyPair().getPublic(), StaticHandler.getVERSION_DATA()), false);
+
             Server.getLogger().info("[{}] established", clientPlayer.getAddress());
         }else{
             Server.getLogger().info("Channel is null");

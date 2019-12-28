@@ -1,10 +1,14 @@
 package com.github.fernthedev.server;
 
+import com.github.fernthedev.core.VersionData;
 import com.github.fernthedev.core.encryption.UnencryptedPacketWrapper;
 import com.github.fernthedev.core.encryption.util.RSAEncryptionUtil;
 import com.github.fernthedev.core.packets.MessagePacket;
 import com.github.fernthedev.core.packets.Packet;
 import com.github.fernthedev.core.packets.latency.PingPacket;
+import com.github.fernthedev.fernutils.threads.Task;
+import com.github.fernthedev.fernutils.threads.ThreadUtils;
+import com.github.fernthedev.fernutils.threads.single.TaskInfo;
 import com.github.fernthedev.server.command.CommandSender;
 import io.netty.channel.Channel;
 import lombok.Getter;
@@ -16,12 +20,12 @@ import java.net.InetSocketAddress;
 import java.security.KeyPair;
 import java.util.UUID;
 
-import static com.github.fernthedev.server.PlayerHandler.socketList;
-
-public class ClientPlayer implements CommandSender {
+public class ClientPlayer implements CommandSender, AutoCloseable {
     private boolean connected;
 
-    public boolean registered = false;
+    @Getter
+    @Setter
+    private boolean registered = false;
 
     @Getter
     private EventListener eventListener;
@@ -30,6 +34,11 @@ public class ClientPlayer implements CommandSender {
 
     @Getter
     private UUID uuid;
+
+    @Getter
+    @Setter
+    private VersionData versionData;
+
 
 
     /**
@@ -81,23 +90,29 @@ public class ClientPlayer implements CommandSender {
 //    @Getter
 //    private Cipher encryptCipher;
 
-
-
-    public String getDeviceName() {
-        return deviceName;
-    }
-
     public boolean isConnected() {
         return connected;
+    }
+
+    private TaskInfo keyTask;
+
+    public void awaitKeys() {
+        if(keyTask != null) keyTask.awaitFinish(2);
     }
 
     public ClientPlayer(Server server,Channel channel, UUID uuid) {
         this.channel = channel;
         this.uuid = uuid;
 
-        tempKeyPair = RSAEncryptionUtil.generateKeyPairs();
+        this.keyTask = ThreadUtils.runAsync(new Task() {
+            @Override
+            public void run(TaskInfo taskInfo) {
+                tempKeyPair = RSAEncryptionUtil.generateKeyPairs();
+                taskInfo.finish(this);
+            }
+        });
 
-
+        eventListener = new EventListener(server, this);
 
 
 
@@ -119,7 +134,6 @@ public class ClientPlayer implements CommandSender {
 
 
 
-        eventListener = new EventListener(server, this);
     }
 
     @Deprecated
@@ -236,14 +250,14 @@ public class ClientPlayer implements CommandSender {
     public void close() {
 
         //DISCONNECT FROM SERVER
-        Server.getLogger().info("Closing player {}", toString());
+        Server.getLogger().info("Closing player {}", this);
 
         if (channel != null) {
 
             channel.close();
 
 
-            socketList.remove(channel);
+            PlayerHandler.socketList.remove(channel);
         }
 
         connected = false;
@@ -255,9 +269,7 @@ public class ClientPlayer implements CommandSender {
 
     @Override
     public String toString() {
-
-
-        return "[" + getAddress() + "] [" + deviceName + "|" + id +"]";
+        return "[" + getAddress() + "|" + deviceName + "|" + id +"]";
     }
 
 
@@ -277,7 +289,7 @@ public class ClientPlayer implements CommandSender {
     }
 
     public static void pingAll() {
-        for(ClientPlayer clientPlayer : socketList.values()) {
+        for(ClientPlayer clientPlayer : PlayerHandler.socketList.values()) {
             clientPlayer.ping();
         }
     }

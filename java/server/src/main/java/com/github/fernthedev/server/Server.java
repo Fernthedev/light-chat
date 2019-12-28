@@ -3,6 +3,7 @@ package com.github.fernthedev.server;
 import com.github.fernthedev.core.ColorCode;
 import com.github.fernthedev.core.ConsoleHandler;
 import com.github.fernthedev.core.StaticHandler;
+import com.github.fernthedev.core.encryption.codecs.AcceptablePacketTypes;
 import com.github.fernthedev.core.encryption.codecs.fastjson.EncryptedFastJSONObjectDecoder;
 import com.github.fernthedev.core.encryption.codecs.fastjson.EncryptedFastJSONObjectEncoder;
 import com.github.fernthedev.core.encryption.codecs.gson.EncryptedGSONObjectDecoder;
@@ -10,10 +11,15 @@ import com.github.fernthedev.core.encryption.codecs.gson.EncryptedGSONObjectEnco
 import com.github.fernthedev.core.packets.MessagePacket;
 import com.github.fernthedev.core.packets.Packet;
 import com.github.fernthedev.core.packets.SelfMessagePacket;
+import com.github.fernthedev.fernutils.threads.ThreadUtils;
+import com.github.fernthedev.fernutils.threads.single.TaskInfo;
 import com.github.fernthedev.gson.GsonConfig;
 import com.github.fernthedev.light.LightManager;
 import com.github.fernthedev.light.exceptions.NoPi4JLibsFoundException;
-import com.github.fernthedev.server.backend.*;
+import com.github.fernthedev.server.backend.AuthenticationManager;
+import com.github.fernthedev.server.backend.AutoCompleteHandler;
+import com.github.fernthedev.server.backend.BanManager;
+import com.github.fernthedev.server.backend.CommandMessageParser;
 import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.command.CommandSender;
 import com.github.fernthedev.server.command.LightCommand;
@@ -24,6 +30,7 @@ import com.github.fernthedev.server.netty.ProcessingHandler;
 import com.github.fernthedev.server.plugin.PluginManager;
 import com.github.fernthedev.server.settings.Settings;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
@@ -39,6 +46,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.SystemUtils;
+import org.apache.commons.lang3.time.StopWatch;
+import org.fusesource.jansi.AnsiConsole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,17 +57,19 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.github.fernthedev.server.CommandWorkerThread.commandList;
 
 
 public class Server implements Runnable {
 
-    private final ServerCommandHandler commandHandler;
+    private ServerCommandHandler commandHandler;
     private int port;
 
-    private boolean running = false;
+    private boolean running;
 
     private static Thread thread;
 
@@ -80,33 +91,92 @@ public class Server implements Runnable {
         return console;
     }
 
-    static List<Thread> serverInstanceThreads = new ArrayList<>();
-
     private static Logger logger;
 
     private ChannelFuture future;
-    private EventLoopGroup bossGroup,workerGroup;
+    private EventLoopGroup bossGroup, workerGroup;
 
     private static Server server;
     private ProcessingHandler processingHandler;
 
 
+    public static void main(String[] args) {
+        AnsiConsole.systemInstall();
+        java.util.logging.Logger.getLogger("io.netty").setLevel(java.util.logging.Level.OFF);
+        StaticHandler.setupLoggers();
+
+
+        //  Logger.getLogger("io.netty").setLevel(java.util.logging.Level.OFF);
+
+        int port = -1;
+
+        boolean debug = false;
+
+        for (int i = 0; i < args.length; i++) {
+            String arg = args[i];
+
+            if (arg.equalsIgnoreCase("-port")) {
+                try {
+                    port = Integer.parseInt(args[i + 1]);
+                } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                    port = -1;
+                }
+            }
+
+            if(arg.equalsIgnoreCase("-lightmanager")) {
+                StaticHandler.isLight = true;
+            }
+
+            if (arg.equalsIgnoreCase("-debug")) {
+                debug = true;
+            }
+        }
+
+
+
+        if (System.console() == null && !debug) {
+
+            String filename = Server.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6);
+            System.out.println("No console found");
+
+            String[] newArgs = new String[]{"cmd", "/c", "start", "cmd", "/c", "java -jar -Xmx2G -Xms2G \"" + filename + "\""};
+
+            List<String> launchArgs = new ArrayList<>(Arrays.asList(newArgs));
+            launchArgs.addAll(Arrays.asList(args));
+
+            try {
+                Runtime.getRuntime().exec(launchArgs.toArray(new String[]{}));
+                System.exit(0);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+
+        Server server = new Server(port);
+        StaticHandler.setCore(new ServerCore(server));
+        StaticHandler.setDebug(debug);
+        new Thread(server,"ServerMainThread").start();
+    }
+
     Server(int port) {
         getLogger();
         running = true;
         this.port = port;
+
         console = new Console();
         server = this;
         autoCompleteHandler = new AutoCompleteHandler(this);
 //        StaticHandler.setupTerminal(autoCompleteHandler);
 
 
-        pluginManager = new PluginManager();
-
-        commandHandler = new ServerCommandHandler(this);
-        commandMessageParser = new CommandMessageParser(this);
-        getPluginManager().registerEvents(commandMessageParser, new ServerPlugin());
-
+        ThreadUtils.runAsync(() -> {
+            pluginManager = new PluginManager();
+            commandHandler = new ServerCommandHandler(Server.this);
+            commandMessageParser = new CommandMessageParser(this);
+            getPluginManager().registerEvents(commandMessageParser, new ServerPlugin());
+        });
 //        new Thread(serverCommandHandler, "ServerBackgroundThread").start();
 
     }
@@ -117,20 +187,20 @@ public class Server implements Runnable {
 
 
 
-    private void await() {
-        new Thread(() -> {
-            while (running) {
-                try {
-                    future = future.await().sync();
-
-                    future.channel().closeFuture().sync();
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        },"AwaitThread");
-    }
+//    private void await() {
+//        new Thread(() -> {
+//            while (running) {
+//                try {
+//                    future = future.await().sync();
+//
+//                    future.channel().closeFuture().sync();
+//
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        },"AwaitThread");
+//    }
 
     private static synchronized void sendObjectToAllPlayers(@NonNull Packet packet) {
         new Thread(() -> {
@@ -153,11 +223,11 @@ public class Server implements Runnable {
     synchronized void shutdownServer() {
         getLogger().info(ColorCode.RED + "Shutting down server.");
         running = false;
-        multicastServer.stopMulticast();
+        if (multicastServer != null) multicastServer.stopMulticast();
 
+        if (workerGroup != null) workerGroup.shutdownGracefully();
+        if (bossGroup != null) bossGroup.shutdownGracefully();
 
-        workerGroup.shutdownGracefully();
-        bossGroup.shutdownGracefully();
         System.exit(0);
     }
 
@@ -182,6 +252,12 @@ public class Server implements Runnable {
      */
     @Override
     public void run() {
+        StaticHandler.displayVersion();
+        List<TaskInfo> tasks = new ArrayList<>();
+
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        check();
         thread = Thread.currentThread();
 
         new Thread(() -> {
@@ -189,15 +265,108 @@ public class Server implements Runnable {
             new ConsoleHandler(autoCompleteHandler).start();
         }, "ConsoleHandler").start();
 
+        TaskInfo settingTask = ThreadUtils.runAsync(() -> {
+            settingsManager = new GsonConfig<>(new Settings(), new File(getCurrentPath(), "settings.json"));
+            settingsManager.save();
+
+            port = settingsManager.getConfigData().getPort();
+            server.registerCommand(new SettingsCommand());
+        });
+        tasks.add(settingTask);
+
+        tasks.add(ThreadUtils.runAsync(() -> {
+            settingTask.awaitFinish(2);
+            initServer();
+        }));
+
+        new Thread(new PlayerHandler(this),"PlayerHandlerThread").start();
+
+        tasks.add(ThreadUtils.runAsync(() -> Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            for (ClientPlayer clientPlayer : PlayerHandler.socketList.values()) {
+                if (clientPlayer.channel.isOpen()) {
+                    Server.getLogger().info("Gracefully shutting down");
+                    Server.sendObjectToAllPlayers(new SelfMessagePacket(SelfMessagePacket.MessageType.LOST_SERVER_CONNECTION));
+                    clientPlayer.close();
+                }
+            }
+        }))));
+
+
+
+
+
+
+        /*
+        try {
+            new MulticastServer("Multicast",this).start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
+
+        tasks.add(ThreadUtils.runAsync(() -> {
+            settingTask.awaitFinish(2);
+            if (settingsManager.getConfigData().isUseMulticast()) {
+                getLogger().info("Initializing MultiCast Server");
+                try {
+                    multicastServer = new MulticastServer("MultiCast Thread", this);
+                    multicastServer.start();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }));
+
+
+        tasks.add(ThreadUtils.runAsync(() -> {
+            AuthenticationManager authenticationManager = new AuthenticationManager("changepassword");
+            server.registerCommand(authenticationManager);
+            server.getPluginManager().registerEvents(authenticationManager, new ServerPlugin());
+        }));
+
+
+//        LoggerManager loggerManager = new LoggerManager();
+//        pluginManager.registerEvents(loggerManager, new ServerPlugin());
+
+        logger.info("Running on [{}]", StaticHandler.os);
+
+        tasks.add(ThreadUtils.runAsync(() -> {
+            if (StaticHandler.os.equalsIgnoreCase("Linux") || StaticHandler.os.contains("Linux") || StaticHandler.isLight) {
+                logger.info("Running LightManager (Note this is for raspberry pies only)");
+
+                Thread lightThread = new Thread(() -> {
+
+                    try {
+                        LightManager.init();
+                        registerCommand(new LightCommand());
+                    } catch (IllegalArgumentException | ExceptionInInitializerError | NoPi4JLibsFoundException e) {
+                        logger.error("Unable to load Pi4J Libraries. To load stacktrace, add -debug flag. Message: {}", e.getMessage());
+                        if (StaticHandler.isDebug()) {
+                            e.printStackTrace();
+                            registerCommand(new LightCommand());
+                        }
+                    }
+
+                }, "LightThread");
+                registerCommand(new LightCommand());
+                lightThread.start();
+            } else {
+                logger.info("Detected system is not linux. LightManager will not run (manual run with -lightmanager arg)");
+            }
+        }));
+
+
+//        await();
+
+
+        for(TaskInfo taskInfo : tasks) taskInfo.awaitFinish(0);
+
+        logger.info("Finished initializing. Took {}ms", stopWatch.getTime(TimeUnit.MILLISECONDS));
+    }
+
+    private void initServer() {
         bossGroup = new NioEventLoopGroup();
         processingHandler = new ProcessingHandler(this);
         workerGroup = new NioEventLoopGroup();
-
-        settingsManager = new GsonConfig<>(new Settings(), new File(getCurrentPath(), "settings.json"));
-        settingsManager.save();
-
-        server.registerCommand(new SettingsCommand());
-
         Class<? extends ServerChannel> channelClass = NioServerSocketChannel.class;
 
         if (settingsManager.getConfigData().isUseNativeTransport()) {
@@ -218,22 +387,20 @@ public class Server implements Runnable {
             }
         }
 
+
         ServerBootstrap bootstrap = new ServerBootstrap();
 
         EncryptionKeyFinder keyFinder = new EncryptionKeyFinder();
 
-        MessageToMessageEncoder encoder;
-        MessageToMessageDecoder decoder;
+        MessageToMessageEncoder<AcceptablePacketTypes> encoder;
+        MessageToMessageDecoder<ByteBuf> decoder;
 
         switch (settingsManager.getConfigData().getCodecEnum()) {
-            case GSON:
-                encoder = new EncryptedGSONObjectEncoder(CharsetUtil.UTF_8, keyFinder);
-                decoder = new EncryptedGSONObjectDecoder(CharsetUtil.UTF_8, keyFinder);
-                break;
             case ALIBABA_FASTJSON:
                 encoder = new EncryptedFastJSONObjectEncoder(CharsetUtil.UTF_8, keyFinder);
                 decoder = new EncryptedFastJSONObjectDecoder(CharsetUtil.UTF_8, keyFinder);
                 break;
+            case GSON:
             default:
                 encoder = new EncryptedGSONObjectEncoder(CharsetUtil.UTF_8, keyFinder);
                 decoder = new EncryptedGSONObjectDecoder(CharsetUtil.UTF_8, keyFinder);
@@ -259,37 +426,21 @@ public class Server implements Runnable {
                     }
                 }).option(ChannelOption.SO_BACKLOG, 128)
                 .option(ChannelOption.RCVBUF_ALLOCATOR, new AdaptiveRecvByteBufAllocator(512, 512, 64 * 1024))
-         //       .option(EpollChannelOption.MAX_DATAGRAM_PAYLOAD_SIZE, 512)
+                //       .option(EpollChannelOption.MAX_DATAGRAM_PAYLOAD_SIZE, 512)
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
-                .childOption(ChannelOption.TCP_NODELAY, true)
-                .childOption(ChannelOption.SO_TIMEOUT, 5000);
+                .childOption(ChannelOption.TCP_NODELAY, true);
+//                .childOption(ChannelOption.SO_TIMEOUT, 5000);
 
         logger.info("Server socket registered");
 
-        new Thread(new PlayerHandler(this),"PlayerHandlerThread").start();
-        //Timer pingPongTimer = new Timer("pingpong");
-
-
-        //await();
         try {
             future = bootstrap.bind(port).sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            for (ClientPlayer clientPlayer : PlayerHandler.socketList.values()) {
-                if (clientPlayer.channel.isOpen()) {
-                    Server.getLogger().info("Gracefully shutting down");
-                    Server.sendObjectToAllPlayers(new SelfMessagePacket(SelfMessagePacket.MessageType.LOST_SERVER_CONNECTION));
-                    clientPlayer.close();
-                }
-            }
-        }));
-
         try {
-            logger.info("Server started successfully at localhost (Connect with " + InetAddress.getLocalHost().getHostAddress() + ") using port " + port);
+            logger.info("Server started successfully at localhost (Connect with {}) using port {}", InetAddress.getLocalHost().getHostAddress(), port);
         } catch (UnknownHostException e) {
             logger.error(e.getMessage(), e);
         }
@@ -297,68 +448,8 @@ public class Server implements Runnable {
         if (!future.isSuccess()) {
             logger.info("Failed to bind port");
         } else {
-            logger.info("Binded port on " + future.channel().localAddress());
+            logger.info("Binded port on {}", future.channel().localAddress());
         }
-
-        /*
-        try {
-            new MulticastServer("Multicast",this).start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-
-        if (settingsManager.getConfigData().isUseMulticast()) {
-            try {
-                multicastServer = new MulticastServer("Multicast Thread", this);
-                multicastServer.start();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-
-        AuthenticationManager authenticationManager = new AuthenticationManager("changepassword");
-        server.registerCommand(authenticationManager);
-        server.getPluginManager().registerEvents(authenticationManager, new ServerPlugin());
-
-//        LoggerManager loggerManager = new LoggerManager();
-//        pluginManager.registerEvents(loggerManager, new ServerPlugin());
-
-        logger.info("Running on [{}]", StaticHandler.os);
-
-        if (StaticHandler.os.equalsIgnoreCase("Linux") || StaticHandler.os.contains("Linux") || StaticHandler.isLight) {
-            logger.info("Running LightManager (Note this is for raspberry pies only)");
-
-            Thread lightThread = new Thread(() -> {
-
-                try {
-                    LightManager.init();
-                    registerCommand(new LightCommand());
-                    logger.info("Registered");
-                } catch (IllegalArgumentException | ExceptionInInitializerError | NoPi4JLibsFoundException e) {
-                    logger.error("Unable to load Pi4J Libraries. To load stacktrace, add -debug flag. Message: {}", e.getMessage());
-                    if (StaticHandler.isDebug()) {
-                        e.printStackTrace();
-                        registerCommand(new LightCommand());
-                        logger.info("Registered");
-                    }
-                }
-
-            }, "LightThread");
-            registerCommand(new LightCommand());
-            lightThread.start();
-
-
-        } else {
-            logger.info("Detected system is not linux. LightManager will not run (manual run with -lightmanager arg)");
-        }
-
-
-        await();
-
-        tick();
-
     }
 
     public void dispatchCommand(@NonNull String command) {
@@ -369,7 +460,7 @@ public class Server implements Runnable {
         commandHandler.dispatchCommand(sender, command);
     }
 
-    private void tick() {
+    private void check() {
         if (System.console() == null && !StaticHandler.isDebug()) shutdownServer();
     }
 
@@ -385,7 +476,7 @@ public class Server implements Runnable {
         },"CloseThread");
     }
 
-    public static void sendMessage(String message) {
+    public static void broadcast(String message) {
         Server.getLogger().info(message);
         Server.sendObjectToAllPlayers(new MessagePacket(message));
     }

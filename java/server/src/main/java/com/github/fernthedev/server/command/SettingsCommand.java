@@ -1,10 +1,10 @@
 package com.github.fernthedev.server.command;
 
-import com.github.fernthedev.gson.GsonConfig;
+import com.github.fernthedev.common.Config;
+import com.github.fernthedev.core.ColorCode;
 import com.github.fernthedev.server.Server;
 import com.github.fernthedev.server.backend.AuthenticationManager;
 import com.github.fernthedev.server.settings.Settings;
-import com.github.fernthedev.core.ColorCode;
 
 import java.util.List;
 import java.util.Map;
@@ -28,7 +28,7 @@ public class SettingsCommand extends Command {
                 long timeEnd;
                 long timeElapsed;
                 String arg = args[0];
-                GsonConfig<Settings> settingsManager = Server.getSettingsManager();
+                Config<Settings> settingsManager = Server.getSettingsManager();
 
                 switch (arg.toLowerCase()) {
                     case "set":
@@ -73,7 +73,7 @@ public class SettingsCommand extends Command {
                     case "list":
                         sender.sendMessage("Possible setting names : {possible values, empty if any are allowed}");
 
-                        Map<String, List<String>> nameValueMap = settingsManager.getConfigData().getSettingValues(true);
+                        Map<String, List<String>> nameValueMap = settingsManager.getConfigData().getSettingValuesAsync(true);
 
                         for(String settingName : nameValueMap.keySet()) {
                             List<String> possibleValues = nameValueMap.get(settingName);

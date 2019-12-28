@@ -25,7 +25,7 @@ public class EncryptionUtil {
         try {
 
             generator = KeyGenerator.getInstance(StaticHandler.AES_KEY_MODE);
-            generator.init(StaticHandler.AES_KEY_SIZE); // The AES key size in number of bits
+            generator.init(StaticHandler.AES_KEY_SIZE); // The AES key size in number of bits (256)
 
             return generator.generateKey();
         } catch (NoSuchAlgorithmException e) {
@@ -169,7 +169,7 @@ public class EncryptionUtil {
 
 
     /**
-     * Decrypt string encrypted using {@link this#encryptWithPassword(String, String)}
+     * Decrypt string encrypted using {@link #encryptWithPassword(String, String)}
      * @param encryptedText Encrypted string
      * @param password Same password to decrypt
      * @return Plain text
@@ -202,7 +202,7 @@ public class EncryptionUtil {
     }
 
     /**
-     * Decrypt object using {@link this#encryptWithPassword(Serializable, String)}
+     * Decrypt object using {@link #encryptWithPassword(Serializable, String)}
      * @param sealedObject Encrypted object to decrypt
      * @param key Password to decrypt
      * @return Unencrypted object

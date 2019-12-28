@@ -10,6 +10,7 @@ import com.github.fernthedev.core.encryption.UnencryptedPacketWrapper;
 import com.github.fernthedev.core.encryption.codecs.AcceptablePacketTypes;
 import com.github.fernthedev.core.encryption.codecs.LineEndStringEncoder;
 import com.github.fernthedev.core.encryption.util.EncryptionUtil;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import lombok.NonNull;
@@ -21,6 +22,7 @@ import java.util.List;
 /**
  * Converts an object to a encrypted json
  */
+@ChannelHandler.Sharable
 public class EncryptedFastJSONObjectEncoder extends MessageToMessageEncoder<AcceptablePacketTypes> {
 
 

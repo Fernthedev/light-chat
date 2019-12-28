@@ -1,7 +1,6 @@
 package com.github.fernthedev.core.encryption.codecs.gson;
 
 import com.github.fernthedev.core.PacketRegistry;
-import com.github.fernthedev.core.packets.Packet;
 import com.github.fernthedev.core.encryption.EncryptedBytes;
 import com.github.fernthedev.core.encryption.EncryptedPacketWrapper;
 import com.github.fernthedev.core.encryption.PacketWrapper;
@@ -9,8 +8,10 @@ import com.github.fernthedev.core.encryption.RSA.IEncryptionKeyHolder;
 import com.github.fernthedev.core.encryption.RSA.NoSecretKeyException;
 import com.github.fernthedev.core.encryption.UnencryptedPacketWrapper;
 import com.github.fernthedev.core.encryption.util.EncryptionUtil;
+import com.github.fernthedev.core.packets.Packet;
 import com.google.gson.Gson;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.string.StringDecoder;
 
@@ -23,6 +24,7 @@ import java.util.List;
 /**
  * Converts encrypted json to a decrypted object
  */
+@ChannelHandler.Sharable
 public class EncryptedGSONObjectDecoder extends StringDecoder {
 
     private static final Gson gson = new Gson();
@@ -85,11 +87,15 @@ public class EncryptedGSONObjectDecoder extends StringDecoder {
     public Object getParsedObject(String packetIdentifier, String jsonObject) {
         Class<? extends Packet> aClass = PacketRegistry.getPacketClassFromRegistry(packetIdentifier);
 
-        if(aClass.isInstance(Packet.class)) {
-            throw new IllegalArgumentException("The class provided is not a packet type. Received: " + aClass);
-        }
+//        if(!aClass.isNestmateOf(Packet.class)) {
+//            throw new IllegalArgumentException("The class provided is not a packet type. Received: " + aClass);
+//        }
 
-        return gson.fromJson(jsonObject, aClass);
+        try {
+            return gson.fromJson(jsonObject, aClass);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Attempting to parse packet " + packetIdentifier + " (" + aClass.getName() + ") ", e);
+        }
     }
 
     protected String decrypt(ChannelHandlerContext ctx, EncryptedBytes encryptedString) {

@@ -1,7 +1,6 @@
 package com.github.fernthedev.client.netty;
 
 
-import com.github.fernthedev.client.ServerAddress;
 import com.github.fernthedev.core.exceptions.DebugChainedException;
 import com.github.fernthedev.core.MulticastData;
 import com.github.fernthedev.core.StaticHandler;
@@ -21,9 +20,9 @@ import java.util.Map;
 
 public class MulticastClient {
 
-    public List<ServerAddress> serversAddress = new ArrayList<>();
+    public List<MulticastData> serversAddress = new ArrayList<>();
 
-    private Map<String, ServerAddress> addressServerAddressMap = new HashMap<>();
+    private Map<String, MulticastData> addressServerAddressMap = new HashMap<>();
 
     public void checkServers(int amount) {
         try(MulticastSocket socket = new MulticastSocket(4446)) {
@@ -49,17 +48,17 @@ public class MulticastClient {
 
                 received = received.replaceAll(" ","");
 
-                try(JsonReader reader = new JsonReader(new StringReader(received))) {
+                try (JsonReader reader = new JsonReader(new StringReader(received))) {
                     reader.setLenient(true);
 
                     MulticastData data = new Gson().fromJson(reader, MulticastData.class);
 
                     String address = (packet.getAddress()).getHostAddress();
+                    data.setAddress(address);
 
                     if(!addressServerAddressMap.containsKey(address)) {
-                        ServerAddress serverAddress = new ServerAddress(address, data.getPort(), data.getVersion());
-                        serversAddress.add(serverAddress);
-                        addressServerAddressMap.put(address,serverAddress);
+                        serversAddress.add(data);
+                        addressServerAddressMap.put(address, data);
                     }
                 } catch (Exception e) {
                     if(StaticHandler.isDebug()) {

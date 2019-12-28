@@ -1,12 +1,13 @@
 package com.github.fernthedev.server.settings;
 
 import com.github.fernthedev.core.encryption.codecs.CodecEnum;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import com.github.fernthedev.fernutils.threads.ThreadUtils;
+import com.github.fernthedev.fernutils.threads.multiple.TaskInfoList;
+import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -14,11 +15,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
 @Data
+@ToString
 public class Settings {
+
+    @SettingValue
+    private int port = 2000;
 
     @SettingValue
     private String password = "password";
@@ -50,7 +56,7 @@ public class Settings {
                 break;
         }
 
-        if(StringUtils.isNumeric( newValue)) {
+        if (StringUtils.isNumeric(newValue)) {
             try {
                 value = Integer.parseInt(newValue);
             } catch (NumberFormatException ignored) {
@@ -58,7 +64,7 @@ public class Settings {
             }
         }
 
-        if(newValue.equals("") || oldValue.equals("")) {
+        if (newValue.equals("") || oldValue.equals("")) {
             throw new IllegalArgumentException("Values cannot be empty");
         }
 
@@ -74,22 +80,20 @@ public class Settings {
     }
 
     /**
-     *
-     * @deprecated Use {@link #getSettingValues(boolean)} instead
+     * @deprecated Use {@link #getSettingValues(boolean)} or {@link #getSettingValuesAsync(boolean)} instead
      */
     @Deprecated
     public List<String> getSettingNames(boolean editable) {
         List<String> stringList = new ArrayList<>();
         for (Field field : getClass().getDeclaredFields()) {
-            if(field.isAnnotationPresent(SettingValue.class)) {
+            if (field.isAnnotationPresent(SettingValue.class)) {
                 SettingValue settingValue = field.getAnnotation(SettingValue.class);
 
-                if(!editable) continue;
+                if (!editable) continue;
 
                 String name = settingValue.name();
 
-                if(name.equals("")) name = field.getName();
-
+                if (name.equals("")) name = field.getName();
 
 
                 stringList.add(name);
@@ -101,7 +105,10 @@ public class Settings {
 
     public Map<String, List<String>> getSettingValues(boolean editable) {
         Map<String, List<String>> stringList = new HashMap<>();
+
         for (Field field : getClass().getDeclaredFields()) {
+
+
             if (field.isAnnotationPresent(SettingValue.class)) {
                 SettingValue settingValue = field.getAnnotation(SettingValue.class);
 
@@ -110,23 +117,31 @@ public class Settings {
                 String name = settingValue.name();
                 List<String> possibleValues = Arrays.asList(settingValue.values());
 
-
                 if (possibleValues.isEmpty()) {
                     // ENUM
                     if (field.isEnumConstant()) {
-                        Field[] constants = field.getClass().getEnumConstants();
-                        Arrays.stream(constants).forEach(field1 -> {
+                        possibleValues = Arrays.stream(field.getClass().getEnumConstants()).map(s -> {
                             try {
-                                possibleValues.add(field.get(this).toString());
+                                return s.get(this).toString();
                             } catch (IllegalAccessException e) {
-                                e.printStackTrace();
+                                return null;
                             }
-                        });
+                        }).collect(Collectors.toList());
+
+
+//                        Arrays.stream(constants).forEach(field1 -> {
+//                            try {
+//                                possibleValues.add(field1.get(this).toString());
+//
+//                            } catch (IllegalAccessException e) {
+//                                e.printStackTrace();
+//                            }
+//                        });
                     }
                     // Boolean
                     if (boolean.class.equals(field.getType())) {
-                        possibleValues.add(String.valueOf(true));
-                        possibleValues.add(String.valueOf(false));
+                        possibleValues.add("truee");
+                        possibleValues.add("false");
                     }
                 }
 
@@ -138,7 +153,75 @@ public class Settings {
             }
         }
 
+
+
         return stringList;
+    }
+
+    public Map<String, List<String>> getSettingValuesAsync(boolean editable) {
+        TaskInfoList<Field, Pair<String, List<String>>> ob = ThreadUtils.runForLoopAsync(Arrays.asList(getClass().getDeclaredFields()), (field -> {
+
+
+            if (field.isAnnotationPresent(SettingValue.class)) {
+                SettingValue settingValue = field.getAnnotation(SettingValue.class);
+
+                if (!settingValue.editable() && editable) return null;
+
+                String name = settingValue.name();
+
+                List<String> possibleValues = new ArrayList<>(Arrays.asList(settingValue.values()));
+
+
+                if (possibleValues.isEmpty()) {
+                    // ENUM
+                    if (field.isEnumConstant()) {
+                        possibleValues = Arrays.stream(field.getClass().getEnumConstants()).map(s -> {
+                            try {
+                                return s.get(this).toString();
+                            } catch (IllegalAccessException e) {
+                                return null;
+                            }
+                        }).collect(Collectors.toList());
+
+
+//                        Arrays.stream(constants).forEach(field1 -> {
+//                            try {
+//                                possibleValues.add(field1.get(this).toString());
+//
+//                            } catch (IllegalAccessException e) {
+//                                e.printStackTrace();
+//                            }
+//                        });
+//                        System.out.println("Enum values: " + possibleValues);
+                    }
+                    // Boolean
+                    if (boolean.class.equals(field.getType())) {
+                        possibleValues.add("true");
+                        possibleValues.add("false");
+                    }
+                }
+
+
+                if (name.equals("")) name = field.getName();
+                return new ImmutablePair<>(name, possibleValues);
+            }
+            return null;
+        }));
+
+        // 51 ms parallel
+        Map<Field, Pair<String, List<String>>> fieldReturnValues = ob.runThreads();
+
+        ob.awaitFinish(10);
+
+
+        Map<String, List<String>> returnValues = new HashMap<>();
+
+        for (Field field : fieldReturnValues.keySet()) {
+            Pair<String, List<String>> pair = fieldReturnValues.get(field);
+            returnValues.put(pair.getKey(), pair.getRight());
+        }
+
+        return returnValues;
     }
 
     public void setValue(@NonNull String key, String val) {
@@ -153,13 +236,13 @@ public class Settings {
                 if (name.equalsIgnoreCase(key)) {
                     try {
 
-                        if(!settingValue.editable()) {
+                        if (!settingValue.editable()) {
                             throw new IllegalArgumentException("You cannot edit a value which is not editable");
                         }
 
                         Object wrappedVal = null;
 
-                        if(!field.getClass().isPrimitive() && !field.getClass().isInstance(String.class)) {
+                        if (!field.getClass().isPrimitive() && !field.getClass().isInstance(String.class)) {
                             throw new IllegalArgumentException("Setting value is not primitive type or string which is not supported.");
                         }
 
@@ -207,7 +290,7 @@ public class Settings {
                 if (name.equalsIgnoreCase(key)) {
                     try {
 
-                        if(!settingValue.editable()) {
+                        if (!settingValue.editable()) {
                             throw new IllegalArgumentException("You cannot edit a value which is not editable");
                         }
 
@@ -229,14 +312,14 @@ public class Settings {
 
     public Object getValue(@NonNull String key) {
         for (Field field : getClass().getDeclaredFields()) {
-            if(field.isAnnotationPresent(SettingValue.class)) {
+            if (field.isAnnotationPresent(SettingValue.class)) {
                 SettingValue settingValue = field.getAnnotation(SettingValue.class);
 
                 String name = settingValue.name();
 
-                if(name.equals("")) name = field.getName();
+                if (name.equals("")) name = field.getName();
 
-                if(name.equalsIgnoreCase(key)) {
+                if (name.equalsIgnoreCase(key)) {
                     try {
                         return field.get(this);
                     } catch (IllegalAccessException e) {

@@ -29,38 +29,39 @@ public class CommandMessageParser implements Listener {
 
         Runnable runnable;
 
-        Runnable messageRunnable = () -> handleCommand(sender, e.getMessage());
+        Runnable commandRunnable = () -> handleCommand(sender, e.getMessage()); // Just a static identifier
+        Runnable messageRunnable = () -> handleMessage(sender, e.getMessage()); // Just a static identifier
+
         if(e.getSender() instanceof Console) {
-            runnable = messageRunnable;
-        }else{
+            runnable = commandRunnable;
+        } else {
             if(e.isCommand()) {
-                runnable = messageRunnable;
+                runnable = commandRunnable;
             }else{
-                runnable = () -> handleMessage(sender,e.getMessage());
+                runnable = messageRunnable;
             }
         }
 
         if(e.isAsynchronous()) {
             new Thread(runnable).start();
-        }else{
+        } else {
             runnable.run();
         }
 
     }
 
-    private static void handleCommand(CommandSender sender,String messageM) {
-        String command = messageM;
-        String[] checkmessage = command.split(" ", 2);
-        List<String> messageword = new ArrayList<>();
+    private static void handleCommand(CommandSender sender, String command) {
+        String[] splitString = command.split(" ", 2);
+        List<String> arguments = new ArrayList<>();
 
 
-        if (checkmessage.length > 1) {
-            String[] messagewordCheck = command.split(" ");
+        if (splitString.length > 1) {
+            String[] splitArgumentsCommand = command.split(" ");
 
             int index = 0;
 
 
-            for (String message : messagewordCheck) {
+            for (String message : splitArgumentsCommand) {
                 if (message == null) continue;
 
                 message = message.replaceAll(" {2}", " ");
@@ -69,11 +70,11 @@ public class CommandMessageParser implements Listener {
                 if (index == 1 || message.equals("")) continue;
 
 
-                messageword.add(message);
+                arguments.add(message);
             }
         }
 
-        command = checkmessage[0];
+        command = splitString[0];
 
         boolean found = false;
 
@@ -86,8 +87,8 @@ public class CommandMessageParser implements Listener {
                 for (Command serverCommand : commandList) {
                     if (serverCommand.getName().equalsIgnoreCase(command)) {
                         found = true;
-                        String[] args = new String[messageword.size()];
-                        args = messageword.toArray(args);
+                        String[] args = new String[arguments.size()];
+                        args = arguments.toArray(args);
 
 
                         new CommandWorkerThread(sender, serverCommand, args).run();
@@ -106,7 +107,7 @@ public class CommandMessageParser implements Listener {
     }
 
     private static void handleMessage(CommandSender sender, String message) {
-        Server.sendMessage("[" + sender.getName() + "] :" + message);
+        Server.broadcast("[" + sender.getName() + "] :" + message);
     }
 
 }

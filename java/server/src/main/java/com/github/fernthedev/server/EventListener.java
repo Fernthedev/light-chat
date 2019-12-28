@@ -1,12 +1,14 @@
 package com.github.fernthedev.server;
 
+import com.github.fernthedev.core.StaticHandler;
+import com.github.fernthedev.core.VersionData;
 import com.github.fernthedev.core.data.LightCandidate;
-import com.github.fernthedev.server.backend.AuthenticationManager;
 import com.github.fernthedev.core.packets.*;
 import com.github.fernthedev.core.packets.handshake.ConnectedPacket;
 import com.github.fernthedev.core.packets.handshake.KeyResponsePacket;
 import com.github.fernthedev.core.packets.handshake.RequestConnectInfoPacket;
 import com.github.fernthedev.core.packets.latency.PongPacket;
+import com.github.fernthedev.server.backend.AuthenticationManager;
 import com.github.fernthedev.server.backend.CommandMessageParser;
 import com.github.fernthedev.server.event.chat.ChatEvent;
 import org.apache.commons.lang3.StringUtils;
@@ -33,8 +35,7 @@ public class EventListener {
         // Server.getLogger().info(clientPlayer + " is the sender of packet");
 
         if (p instanceof KeyResponsePacket) {
-          KeyResponsePacket responsePacket = (KeyResponsePacket) p;
-
+            KeyResponsePacket responsePacket = (KeyResponsePacket) p;
             try {
                 clientPlayer.setSecretKey(responsePacket.getSecretKey(clientPlayer.getTempKeyPair().getPrivate()));
                 clientPlayer.sendObject(new RequestConnectInfoPacket());
@@ -42,10 +43,9 @@ public class EventListener {
                 e.printStackTrace();
             }
 
-
         } else if (p instanceof TestConnectPacket) {
             TestConnectPacket packet = (TestConnectPacket) p;
-            Server.getLogger().info("Connected packet: " + packet.getMessage());
+            Server.getLogger().info("Connected packet: {}", packet.getMessage());
         } else if(p instanceof PongPacket) {
             clientPlayer.endTime = System.nanoTime();
 
@@ -60,10 +60,6 @@ public class EventListener {
             Server.getInstance().getPluginManager().callEvent(chatEvent);
 
             CommandMessageParser.onCommand(chatEvent);
-
-            /*if(!chatEvent.isCancelled()) {
-                Server.sendMessage("[" + clientPlayer.getDeviceName() + "] :" + messagePacket.getMessage());
-            }*/
         } else if (p instanceof CommandPacket) {
 
             CommandPacket packet = (CommandPacket) p;
@@ -74,60 +70,6 @@ public class EventListener {
             Server.getInstance().getPluginManager().callEvent(chatEvent);
 
             CommandMessageParser.onCommand(chatEvent);
-
-            /*
-            String[] checkmessage = command.split(" ", 2);
-            List<String> messageword = new ArrayList<>();
-
-            if (checkmessage.length > 1) {
-                String [] messagewordCheck = command.split(" ");
-
-                int index = 0;
-
-                for(String message : messagewordCheck) {
-                    if(message == null) continue;
-
-                    message = message.replaceAll(" {2}"," ");
-
-                    index++;
-                    if(index == 1 || message.equals("")) continue;
-
-
-                    messageword.add(message);
-                }
-            }
-
-            command = checkmessage[0];
-
-
-            command = command.replaceAll(" {2}"," ");
-
-            if(!command.equals("")) {
-                try {
-                    ChatEvent chatEvent = new ChatEvent(clientPlayer,command,true,true);
-                    Server.getInstance().getPluginManager().callEvent(chatEvent);
-                    if(chatEvent.isCancelled()) {
-                        return;
-                    }
-
-                    for (Command serverCommand : commandList) {
-                        if (serverCommand.getCommandName().equalsIgnoreCase(command)) {
-                            String[] args = new String[messageword.size()];
-                            args = messageword.toArray(args);
-
-                            // Server.getLogger().info("Executing " + command);
-
-
-                            if(!chatEvent.isCancelled()) {
-                                new Thread(new CommandWorkerThread(clientPlayer, serverCommand, args),"CommandThread").start();
-                            }
-                            break;
-                        }
-                    }
-                } catch (Exception e) {
-                    Server.getLogger().error(e.getMessage(),e.getCause());
-                }
-            }*/
         }else if (p instanceof AutoCompletePacket) {
             AutoCompletePacket packet = (AutoCompletePacket) p;
             List<LightCandidate> candidates = server.getAutoCompleteHandler().handleLine(packet.getWords());
@@ -177,7 +119,7 @@ public class EventListener {
 
 
         for(ClientPlayer player : PlayerHandler.players.values()) {
-            if(player.getDeviceName().equalsIgnoreCase(packet.getName())) {
+            if(player.getName().equalsIgnoreCase(packet.getName())) {
                 disconnectIllegalName(packet,"Name already in use");
                 return;
             }
@@ -205,6 +147,24 @@ public class EventListener {
         clientPlayer.setId(id);
         clientPlayer.os = packet.getOS();
 
+        VersionData versionData = packet.getVersionData();
+
+        StaticHandler.VERSION_RANGE versionRange = StaticHandler.getVersionRangeStatus(versionData);
+
+        if (versionRange == StaticHandler.VERSION_RANGE.MATCH_REQUIREMENTS) Server.getLogger().info("{}'s version range requirements match Server version.", clientPlayer);
+        else {
+            // Current version is larger than client's minimum version
+            if(versionRange == StaticHandler.VERSION_RANGE.WE_ARE_HIGHER) {
+                Server.getLogger().info("{}'s version ({}) does not meet server's minimum version ({}) requirements. Expect incompatibility issues", clientPlayer, versionData.getVersion(), StaticHandler.getVERSION_DATA().getMinVersion());
+            }
+
+
+            // Current version is smaller than the client's required minimum
+            if (versionRange == StaticHandler.VERSION_RANGE.WE_ARE_LOWER) {
+                Server.getLogger().info("The server version ({}) does not meet {}'s minimum version ({}) requirements. Expect incompatibility issues", StaticHandler.getVERSION_DATA().getVersion(), clientPlayer, versionData.getMinVersion());
+            }
+        }
+
 
         PlayerHandler.players.put(clientPlayer.getId(), clientPlayer);
 
@@ -219,12 +179,13 @@ public class EventListener {
             }
         }
 
-        clientPlayer.registered = true;
+        clientPlayer.setRegistered(true);
 
-        Server.getLogger().info(clientPlayer.getDeviceName() + " has connected to the server [" + clientPlayer.os+"]");
+        Server.getLogger().info("{} has connected to the server [{}]", clientPlayer.getName(), clientPlayer.os);
+        Server.broadcast(clientPlayer.getName() + " has joined the server. [" + clientPlayer.os + "]");
         clientPlayer.sendObject(new SelfMessagePacket(SelfMessagePacket.MessageType.REGISTER_PACKET));
-        Server.getLogger().debug("NAME:ID " + clientPlayer.getDeviceName() + ":" + clientPlayer.getId());
-        Server.getLogger().debug(PlayerHandler.players.get(clientPlayer.getId()).getDeviceName() + " the name." + PlayerHandler.players.get(clientPlayer.getId()).getId() + " the id");
+        Server.getLogger().debug("NAME:ID {}:{}", clientPlayer.getName(), clientPlayer.getId());
+        Server.getLogger().debug("{} the name.{} the id", PlayerHandler.players.get(clientPlayer.getId()).getName(), PlayerHandler.players.get(clientPlayer.getId()).getId());
 
     }
 
@@ -233,7 +194,7 @@ public class EventListener {
     }
 
     private void disconnectIllegalName(ConnectedPacket packet,String message) {
-        Server.getLogger().info(clientPlayer + " was disconnected for illegal name. Name: " + packet.getName() + " Reason: " + message + " ID " + clientPlayer.getId());
+        Server.getLogger().info("{} was disconnected for illegal name. Name: {} Reason: {} ID {}", clientPlayer, packet.getName(), message, clientPlayer.getId());
         clientPlayer.sendObject(new IllegalConnection("You have been disconnected for illegal name. Name: " + packet.getName() + " Reason: " + message),false);
         clientPlayer.close();
     }

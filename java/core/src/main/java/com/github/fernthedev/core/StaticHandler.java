@@ -3,14 +3,13 @@ package com.github.fernthedev.core;
 import com.google.common.io.Resources;
 import com.google.gson.Gson;
 import io.netty.util.CharsetUtil;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Synchronized;
+import lombok.*;
 import net.minecrell.terminalconsole.TerminalConsoleAppender;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.apache.logging.log4j.util.PropertiesUtil;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
@@ -25,6 +24,7 @@ import java.util.*;
 
 // Import log4j classes.
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StaticHandler {
 
     public static final int LINE_LIMIT = 8000;
@@ -50,7 +50,6 @@ public class StaticHandler {
         Configurator.setLevel(Reflections.class.getName(), debug ? Level.DEBUG : Level.WARN);
     }
 
-    private static String version = null;
     public static String os = System.getProperty("os.name");
     public static boolean isLight = false;
 
@@ -78,16 +77,53 @@ public class StaticHandler {
     @Getter
     private static Core core;
 
-    public static String getVersion() {
-        return version;
+    @Getter
+    private static final VersionData VERSION_DATA;
+
+    static {
+        VERSION_DATA = new VersionData(gson.fromJson(getFile("variables.json"), VariablesJSON.class));
     }
 
-    public StaticHandler() {
-        TranslateData translateData = gson.fromJson(getFile("variables.json"), TranslateData.class);
+    public static boolean checkVersionRequirements(VersionData otherVer) {
+        return VERSION_DATA.getVersion().compareTo(otherVer.getMinVersion()) >= 0 && VERSION_DATA.getMinVersion().compareTo(otherVer.getMinVersion()) <= 0;
+    }
 
-        version = translateData.getVersion();
+    public static VERSION_RANGE getVersionRangeStatus(VersionData otherVersion) {
+        return getVersionRangeStatus(VERSION_DATA, otherVersion);
+    }
 
-//        Configurator.setLevel(Reflections.class.getName(), debug ? Level.DEBUG : Level.WARN);
+    public static VERSION_RANGE getVersionRangeStatus(VersionData versionData, VersionData otherVersion) {
+        DefaultArtifactVersion current = versionData.getVersion();
+        DefaultArtifactVersion min = versionData.getMinVersion();
+
+        DefaultArtifactVersion otherCurrent = otherVersion.getVersion();
+        DefaultArtifactVersion otherMin = otherVersion.getMinVersion();
+
+        // Current version is smaller than the server's required minimum
+        if(current.compareTo(otherMin) < 0) {
+            return VERSION_RANGE.WE_ARE_LOWER;
+        }else
+
+        // Current version is larger than server's minimum version
+        if (min.compareTo(otherCurrent) > 0) {
+            return VERSION_RANGE.WE_ARE_HIGHER;
+        } else return VERSION_RANGE.MATCH_REQUIREMENTS;
+    }
+
+    public static void displayVersion() {
+        getCore().getLogger().info(ColorCode.GREEN + "Running version: {} minimum required: {}", StaticHandler.getVERSION_DATA().getVersion(), StaticHandler.getVERSION_DATA().getMinVersion());
+    }
+
+    @AllArgsConstructor
+    @Getter
+    public enum VERSION_RANGE {
+        OTHER_IS_LOWER(-1),
+        WE_ARE_HIGHER(-1),
+        MATCH_REQUIREMENTS(0),
+        WE_ARE_LOWER(1),
+        OTHER_IS_HIGHER(1);
+
+        private int id;
     }
 
 
@@ -171,14 +207,6 @@ public class StaticHandler {
             e.printStackTrace();
         }
         return null;*/
-    }
-
-    private class TranslateData {
-        private String version;
-
-        private String getVersion() {
-            return version;
-        }
     }
 
     public static String getFile(String fileName) {

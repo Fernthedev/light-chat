@@ -10,6 +10,7 @@ import com.github.fernthedev.core.encryption.codecs.AcceptablePacketTypes;
 import com.github.fernthedev.core.encryption.codecs.LineEndStringEncoder;
 import com.github.fernthedev.core.encryption.util.EncryptionUtil;
 import com.google.gson.Gson;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import lombok.NonNull;
@@ -21,6 +22,7 @@ import java.util.List;
 /**
  * Converts an object to a encrypted json
  */
+@ChannelHandler.Sharable
 public class EncryptedGSONObjectEncoder extends MessageToMessageEncoder<AcceptablePacketTypes> {
 
     private static final Gson gson = new Gson();
@@ -78,7 +80,7 @@ public class EncryptedGSONObjectEncoder extends MessageToMessageEncoder<Acceptab
             EncryptedBytes encryptedBytes = encrypt(ctx, decryptedJSON);
 
             // Adds the encrypted json in the packet wrapper
-            PacketWrapper packetWrapper = new EncryptedPacketWrapper(encryptedBytes, (Packet) msg);
+            PacketWrapper<?> packetWrapper = new EncryptedPacketWrapper(encryptedBytes, (Packet) msg);
             String jsonPacketWrapper = gson.toJson(packetWrapper);
 
 

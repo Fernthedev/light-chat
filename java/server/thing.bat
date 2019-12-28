@@ -1,2 +1,2 @@
 
-java -jar .\target\server-1.0-SNAPSHOT.jar -lightmanager
+java -jar .\build\libs\server-1.0-SNAPSHOT.jar -lightmanager

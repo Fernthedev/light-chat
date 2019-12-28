@@ -48,7 +48,7 @@ public class PlayerHandler implements Runnable {
 
                 timeoutData.secondsPassed++;
 
-                if (!clientPlayer.registered || !clientPlayer.channel.isActive()) {
+                if (!clientPlayer.isRegistered() || !clientPlayer.channel.isActive()) {
                     timeoutData.registerTimeout++;
                 } else timeoutData.registerTimeout = 0;
 
@@ -57,7 +57,7 @@ public class PlayerHandler implements Runnable {
                 }
 
 
-                if (timeoutData.registerTimeout > 30 && !clientPlayer.registered) {
+                if (timeoutData.registerTimeout > 30 && !clientPlayer.isRegistered()) {
                     clientPlayer.sendObject(new SelfMessagePacket(SelfMessagePacket.MessageType.TIMED_OUT_REGISTRATION), false);
 
                     clientPlayer.close();

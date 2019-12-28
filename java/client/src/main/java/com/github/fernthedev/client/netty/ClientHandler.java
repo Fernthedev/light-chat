@@ -2,9 +2,9 @@ package com.github.fernthedev.client.netty;
 
 import com.github.fernthedev.client.Client;
 import com.github.fernthedev.client.EventListener;
-import com.github.fernthedev.core.packets.handshake.ConnectedPacket;
-import com.github.fernthedev.core.packets.Packet;
 import com.github.fernthedev.core.StaticHandler;
+import com.github.fernthedev.core.packets.Packet;
+import com.github.fernthedev.core.packets.handshake.ConnectedPacket;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -15,6 +15,7 @@ import javax.crypto.Cipher;
 import javax.crypto.SealedObject;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 @ChannelHandler.Sharable
@@ -32,7 +33,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         this.client = client;
         String os = client.getOSName();
 
-        connectedPacket = new ConnectedPacket(client.name,os);
+        connectedPacket = new ConnectedPacket(client.name, os, StaticHandler.getVERSION_DATA());
     }
 
 
@@ -57,7 +58,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
             //packet = (Packet) EncryptionHandler.decrypt(ob, client.getPrivateKey());
             long startTime = System.nanoTime();
-            client.getLogger().error("Sealed object received, not expected.");
+            client.getLoggerInterface().error("Sealed object received, not expected.");
 //            packet = (Packet) client.decryptObject(ob);
 
           //  client.getLogger().info("Decrypted object is " + packet + " took " + (System.nanoTime() - startTime) / 1000000 + "ms");
@@ -85,7 +86,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         String encryptedText = "";
         try {
             Cipher cipher   = Cipher.getInstance(StaticHandler.getCipherTransformationOld());
-            byte[] key      = encryptionKey.getBytes("UTF-8");
+            byte[] key      = encryptionKey.getBytes(StandardCharsets.UTF_8);
             SecretKeySpec secretKey = new SecretKeySpec(key, "AES");
             IvParameterSpec ivparameterspec = new IvParameterSpec(key);
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivparameterspec);
@@ -103,7 +104,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-        client.getLogger().info("Lost connection to server.");
+        client.getLoggerInterface().info("Lost connection to server.");
         client.close();
     }
 
@@ -111,7 +112,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
             throws Exception {
         if(cause instanceof ReadTimeoutException) {
-            client.getLogger().info("Timed out connection");
+            client.getLoggerInterface().info("Timed out connection");
             client.close();
         }else{
             cause.printStackTrace();

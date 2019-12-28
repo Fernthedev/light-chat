@@ -113,7 +113,7 @@ public class ServerCommandHandler implements Runnable {
 
                         String message = argString.toString();
 
-                        Server.sendMessage("[Server] :" + message);
+                        Server.broadcast("[Server] :" + message);
                     } else {
                         sender.sendMessage("No message?");
                     }
@@ -142,7 +142,7 @@ public class ServerCommandHandler implements Runnable {
                     sender.sendMessage("Players: (" + (PlayerHandler.players.size() ) + ")");
 
                     for (ClientPlayer clientPlayer : new HashMap<>(PlayerHandler.socketList).values()) {
-                        sender.sendMessage(clientPlayer.getDeviceName() + " :" + clientPlayer.getId() + " { " + clientPlayer.getAddress() + "} Ping:" + clientPlayer.getDelayTime() + "ms");
+                        sender.sendMessage(clientPlayer.getName() + " :" + clientPlayer.getId() + " { " + clientPlayer.getAddress() + "} Ping:" + clientPlayer.getDelayTime() + "ms");
                     }
                 }
 
@@ -152,9 +152,9 @@ public class ServerCommandHandler implements Runnable {
                     for (ClientPlayer clientPlayer : new HashMap<>(PlayerHandler.socketList).values()) {
                         if (clientPlayer == null) continue;
 
-                        message = "\n" + clientPlayer.getDeviceName() + " :" + clientPlayer.getId() + " Ping:" + clientPlayer.getDelayTime() + "ms";
+                        message = "\n" + clientPlayer.getName() + " :" + clientPlayer.getId() + " Ping:" + clientPlayer.getDelayTime() + "ms";
 
-                       // sender.sendMessage(clientPlayer.getDeviceName() + " :" + clientPlayer.getId() + " Ping:" + clientPlayer.getDelayTime() + "ms");
+                       // sender.sendMessage(clientPlayer.getName() + " :" + clientPlayer.getId() + " Ping:" + clientPlayer.getDelayTime() + "ms");
                     }
 
                     sender.sendMessage(message);

@@ -2,16 +2,19 @@ package com.github.fernthedev.client;
 
 import com.github.fernthedev.client.backend.AutoCompleteHandler;
 import com.github.fernthedev.client.netty.ClientHandler;
-import com.github.fernthedev.core.exceptions.DebugException;
-import com.github.fernthedev.core.packets.CommandPacket;
-import com.github.fernthedev.core.packets.MessagePacket;
-import com.github.fernthedev.core.packets.Packet;
+import com.github.fernthedev.client.netty.MulticastClient;
 import com.github.fernthedev.core.ConsoleHandler;
+import com.github.fernthedev.core.MulticastData;
 import com.github.fernthedev.core.StaticHandler;
+import com.github.fernthedev.core.VersionData;
 import com.github.fernthedev.core.encryption.RSA.IEncryptionKeyHolder;
 import com.github.fernthedev.core.encryption.UnencryptedPacketWrapper;
 import com.github.fernthedev.core.encryption.codecs.gson.EncryptedGSONObjectDecoder;
 import com.github.fernthedev.core.encryption.codecs.gson.EncryptedGSONObjectEncoder;
+import com.github.fernthedev.core.exceptions.DebugException;
+import com.github.fernthedev.core.packets.CommandPacket;
+import com.github.fernthedev.core.packets.MessagePacket;
+import com.github.fernthedev.core.packets.Packet;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollEventLoopGroup;
@@ -27,12 +30,17 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang3.SystemUtils;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.fusesource.jansi.AnsiConsole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.crypto.SecretKey;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.*;
+import java.util.logging.Level;
 
 
 public class Client implements IEncryptionKeyHolder {
@@ -44,15 +52,189 @@ public class Client implements IEncryptionKeyHolder {
 
     private static Logger logger;
 
-    public Logger getLog4jLogger() {
-        return logger;
+    private MulticastClient multicastClient;
+
+
+    public static void main(String[] args) {
+        new Client(args);
     }
+
+    public Client(String[] args) {
+        AnsiConsole.systemInstall();
+        java.util.logging.Logger.getLogger("io.netty").setLevel(Level.OFF);
+        StaticHandler.setupLoggers();
+        registerLogger();
+        StaticHandler.setCore(new ClientCore(this));
+
+
+        for (int i = 0; i < args.length; i++) {
+            String arg = args[i];
+
+            if (arg.equalsIgnoreCase("-port")) {
+                try {
+                    port = Integer.parseInt(args[i + 1]);
+                } catch (NumberFormatException | IndexOutOfBoundsException e) {
+                    port = -1;
+                }
+            }
+
+            if (arg.equalsIgnoreCase("-ip")) {
+                try {
+                    host = args[i + 1];
+                } catch (IndexOutOfBoundsException e) {
+                    host = null;
+                }
+            }
+
+            if (arg.equalsIgnoreCase("-debug")) {
+                StaticHandler.setDebug(true);
+            }
+        }
+
+
+
+
+        if (System.console() == null && !StaticHandler.isDebug()) {
+
+            String filename = Client.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6);
+            System.out.println("No console found");
+
+            String[] newArgs = new String[]{"cmd", "/c", "start", "cmd", "/c", "java -jar -Xmx2G -Xms2G \"" + filename + "\""};
+
+            List<String> launchArgs = new ArrayList<>(Arrays.asList(newArgs));
+            launchArgs.addAll(Arrays.asList(args));
+
+            try {
+                Runtime.getRuntime().exec(launchArgs.toArray(new String[]{}));
+                System.exit(0);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+
+        Scanner scanner = new Scanner(System.in);
+        if (host == null || host.equals("") || port == -1) {
+            multicastClient = new MulticastClient();
+            check(scanner,4);
+        }
+
+        while (host == null || host.equalsIgnoreCase("") || port == -1) {
+            if (host == null || host.equals(""))
+                host = readLine(scanner, "Host:");
+
+            if (port == -1)
+                port = readInt(scanner, "Port:");
+        }
+
+
+
+        initialize(host, port);
+    }
+
+    private static String readLine(Scanner scanner, String message) {
+        if (!(message == null || message.equals(""))) {
+            System.out.println(message);
+        }
+        if (scanner.hasNextLine()) {
+            return scanner.nextLine();
+        } else return null;
+    }
+
+    private static int readInt(Scanner scanner, String message) {
+        if (!(message == null || message.equals(""))) {
+            System.out.println(message);
+        }
+        if (scanner.hasNextLine()) {
+            return scanner.nextInt();
+        } else return -1;
+    }
+
+
+    private void check(Scanner scanner, int amount) {
+        System.out.println("Looking for Multicast servers");
+        multicastClient.checkServers(amount);
+
+        if (!multicastClient.serversAddress.isEmpty()) {
+            Map<Integer, MulticastData> servers = new HashMap<>();
+            System.out.println("Select one of these servers, or use none to skip, refresh to refresh");
+            int index = 0;
+            for (MulticastData serverAddress : multicastClient.serversAddress) {
+                index++;
+                servers.put(index, serverAddress);
+                
+                DefaultArtifactVersion serverCurrent = new DefaultArtifactVersion(serverAddress.getVersion());
+                DefaultArtifactVersion serverMin = new DefaultArtifactVersion(serverAddress.getMinVersion());
+
+                StaticHandler.VERSION_RANGE range = StaticHandler.getVersionRangeStatus(new VersionData(serverCurrent, serverMin));
+                
+                if (range == StaticHandler.VERSION_RANGE.MATCH_REQUIREMENTS){
+                    System.out.println(">" + index + " | " + serverAddress.getAddress() + ":" + serverAddress.getPort());
+                } else {
+                    // Current version is smaller than the server's required minimum
+                    if(range == StaticHandler.VERSION_RANGE.WE_ARE_LOWER) {
+                        System.out.println(">" + index + " | " + serverAddress.getAddress() + ":" + serverAddress.getPort() + " (Server's required minimum version is " + serverAddress.getMinVersion() + " while your current version is smaller {" + StaticHandler.getVERSION_DATA().getVersion() + "} Incompatibility issues may arise)");
+                    }
+
+                    // Current version is larger than server's minimum version
+                    if (range == StaticHandler.VERSION_RANGE.WE_ARE_HIGHER) {
+                        System.out.println(">" + index + " | " + serverAddress.getAddress() + ":" + serverAddress.getPort() + " (Server's version is " + serverAddress.getVersion() + " while your minimum version is larger {" + StaticHandler.getVERSION_DATA().getMinVersion() + "} Incompatibility issues may arise)");
+                    }
+
+                }
+            }
+
+            while (scanner.hasNextLine()) {
+                String answer = scanner.nextLine();
+
+                boolean checked = false;
+
+                answer = answer.replaceAll(" ", "");
+
+                if (answer.equalsIgnoreCase("none")) {
+                    break;
+                }
+
+                if (answer.equalsIgnoreCase("refresh")) {
+                    checked = true;
+                    check(scanner, 7);
+                }
+
+                if (answer.matches("[0-9]+")) {
+                    checked = true;
+                    try {
+                        int serverIndex = Integer.parseInt(answer);
+
+                        if (servers.containsKey(serverIndex)) {
+                            MulticastData serverAddress = servers.get(index);
+
+                            host = serverAddress.getAddress();
+                            port = serverAddress.getPort();
+                            System.out.println("Selected " + serverAddress.getAddress() + ":" + serverAddress.getPort());
+                            break;
+                        } else {
+                            System.out.println("Not in the list");
+                        }
+                    } catch (NumberFormatException ignored) {
+                        System.out.println("Not a number or refresh/none");
+                    }
+                }
+
+                if (!checked) {
+                    System.out.println("Unknown argument");
+                }
+            }
+        }
+    }
+
+
 
     @Getter
     protected IOSCheck osCheck;
 
-    public int port;
-    public String host;
+    private int port = -1;
+    private String host;
 
     protected EventListener listener;
 
@@ -107,7 +289,9 @@ public class Client implements IEncryptionKeyHolder {
     }
 
     public void initialize(String host, int port) {
+        setup();
         getLogger().info("Initializing");
+        StaticHandler.displayVersion();
 
         this.port = port;
         this.host = host;
@@ -122,7 +306,7 @@ public class Client implements IEncryptionKeyHolder {
         try {
             name = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
-            getLogger().logError(e.getMessage(), e.getCause());
+            getLogger().error(e.getMessage(), e.getCause());
             close();
         }
 
@@ -155,9 +339,13 @@ public class Client implements IEncryptionKeyHolder {
         return System.getProperty("os.name");
     }
 
-    public ILogManager getLogger() {
+    public ILogManager getLoggerInterface() {
         if (logger == null) registerLogger();
         return cLogger;
+    }
+
+    public Logger getLogger() {
+        return logger;
     }
 
     public void connect() {
@@ -210,10 +398,9 @@ public class Client implements IEncryptionKeyHolder {
             getLogger().info("Establishing connection");
             future = b.connect(host, port).await().sync();
             channel = future.channel();
-            getLogger().info("Established channel connection ");
 
         } catch (InterruptedException e) {
-            getLogger().logError(e.getMessage(), e.getCause());
+            getLogger().error(e.getMessage(), e.getCause());
         }
 
 
@@ -287,7 +474,7 @@ public class Client implements IEncryptionKeyHolder {
                     try {
                         throw new DebugException();
                     } catch (DebugException e) {
-                        getLogger().logError(e.getMessage(),e.getCause());
+                        getLogger().error("Debug stacktrace, not an actual error", e);
                     }
                 }
 
@@ -299,7 +486,7 @@ public class Client implements IEncryptionKeyHolder {
             }
         }
 
-        getLogger().log("Closing client!");
+        getLogger().info("Closing client!");
         System.exit(0);
     }
 
