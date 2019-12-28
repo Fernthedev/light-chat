@@ -17,10 +17,17 @@ jobs:
         run: cd java && chmod +x ./gradlew
       - name: Build with Gradle
         run: cd java && ./gradlew clean build
-      - name: Upload artifact
+      - name: Upload server artifact
         uses: actions/upload-artifact@v1.0.0
         with:
           # Artifact name
-          name: Jar Files
+          name: Server Jar Files
           # Directory containing files to upload
-          path: ./java/server/build/libs ./java/client/build/libs
+          path: ./java/server/build/libs 
+      - name: Upload client artifact 
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          # Artifact name
+          name: Client Jar Files
+          # Directory containing files to upload
+          path: ./java/client/build/libs
