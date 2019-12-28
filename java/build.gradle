@@ -21,8 +21,8 @@ allprojects {
     group = 'com.github.fernthedev'
     version = '1.0-SNAPSHOT'
 
-    project.ext.buildVer = "1.5.1" // Build version
-    project.ext.minBuildVer = "1.5-RELEASE" // Minimum build
+    project.ext.buildVer = "1.5.2" // Build version
+    project.ext.minBuildVer = "1.5.2" // Minimum build
 }
 
 subprojects {
