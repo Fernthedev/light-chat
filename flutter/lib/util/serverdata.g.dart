@@ -7,15 +7,18 @@ part of 'serverdata.dart';
 // **************************************************************************
 
 ServerData _$ServerDataFromJson(Map<String, dynamic> json) {
-  return ServerData(json['ip'] as String, json['port'] as int,
-      json['hashedPassword'] as String);
+  return ServerData(
+    json['ip'] as String,
+    json['port'] as int,
+    json['hashedPassword'] as String,
+  );
 }
 
 Map<String, dynamic> _$ServerDataToJson(ServerData instance) =>
     <String, dynamic>{
       'ip': instance.ip,
       'port': instance.port,
-      'hashedPassword': instance.hashedPassword
+      'hashedPassword': instance.hashedPassword,
     };
 
 // **************************************************************************
