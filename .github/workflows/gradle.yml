@@ -14,7 +14,7 @@ jobs:
         with:
           java-version: 1.8
       - name: Change wrapper permissions
-        run: cd java && chmod +x ./java/gradlew
+        run: cd java && chmod +x ./gradlew
       - name: Build with Gradle
         run: cd java && ./gradlew clean build
       - name: Upload artifact
