@@ -22,8 +22,8 @@ allprojects {
     group = 'com.github.fernthedev'
     version = '1.0-SNAPSHOT'
 
-    project.ext.buildVer = "1.5.2" // Build version
-    project.ext.minBuildVer = "1.5.2" // Minimum build
+    project.ext.buildVer = "1.5.3" // Build version
+    project.ext.minBuildVer = "1.5.3" // Minimum build
 }
 
 subprojects {
@@ -39,6 +39,7 @@ subprojects {
     repositories {
         jcenter()
         mavenLocal()
+
         maven {
             url = 'https://jitpack.io'
         }

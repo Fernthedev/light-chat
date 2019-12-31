@@ -15,7 +15,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
-import java.util.Base64;
 
 public class EncryptionUtil {
 
@@ -70,7 +69,7 @@ public class EncryptionUtil {
             // properly encode the complete ciphertext
             //logEncrypt(password, object);
 
-            byte[] encodedData = cipher.doFinal(Base64.getEncoder().encode(data.getBytes()));
+            byte[] encodedData = cipher.doFinal(data.getBytes(StaticHandler.CHARSET_FOR_STRING));
             byte[] params = cipher.getParameters().getEncoded();
             String paramAlgorithm = cipher.getParameters().getAlgorithm();
 
@@ -91,8 +90,7 @@ public class EncryptionUtil {
         try {
 
             // get parameter object for password-based encryption
-            AlgorithmParameters algParams;
-            algParams = AlgorithmParameters.getInstance(encryptedBytes.getParamAlgorithm());
+            AlgorithmParameters algParams = AlgorithmParameters.getInstance(encryptedBytes.getParamAlgorithm());
 
             // initialize with parameter encoding from above
             algParams.init(encryptedBytes.getParams());
@@ -100,7 +98,7 @@ public class EncryptionUtil {
             Cipher cipher = Cipher.getInstance(StaticHandler.AES_CIPHER_TRANSFORMATION);
             cipher.init(Cipher.DECRYPT_MODE, secret, algParams);
 
-            return new String(Base64.getDecoder().decode(cipher.doFinal(encryptedBytes.getData())));
+            return new String(cipher.doFinal(encryptedBytes.getData()), StaticHandler.CHARSET_FOR_STRING);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException | IOException | InvalidAlgorithmParameterException e) {
             e.printStackTrace();
         }
