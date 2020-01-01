@@ -64,16 +64,20 @@ public class EncryptedGSONObjectDecoder extends StringDecoder {
         super.decode(ctx, msg, tempDecodeList);
 
         String decodedStr = (String) tempDecodeList.get(0);
-        PacketWrapper packetWrapper = gson.fromJson(decodedStr, PacketWrapper.class);
+        PacketWrapper<?> packetWrapper = gson.fromJson(decodedStr, PacketWrapper.class);
 
         String decryptedJSON;
 
-        if (packetWrapper.encrypt()) {
-            packetWrapper = gson.fromJson(decodedStr, EncryptedPacketWrapper.class);
-            decryptedJSON = decrypt(ctx, ((EncryptedPacketWrapper) packetWrapper).getJsonObject());
-        } else {
-            packetWrapper = gson.fromJson(decodedStr, UnencryptedPacketWrapper.class);
-            decryptedJSON = ((UnencryptedPacketWrapper) packetWrapper).getJsonObject();
+        try {
+            if (packetWrapper.encrypt()) {
+                packetWrapper = gson.fromJson(decodedStr, EncryptedPacketWrapper.class);
+                decryptedJSON = decrypt(ctx, ((EncryptedPacketWrapper) packetWrapper).getJsonObject());
+            } else {
+                packetWrapper = gson.fromJson(decodedStr, UnencryptedPacketWrapper.class);
+                decryptedJSON = ((UnencryptedPacketWrapper) packetWrapper).getJsonObject();
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Unable to parse string: " + decodedStr, e);
         }
 
         out.add(getParsedObject(packetWrapper.getPacketIdentifier(), decryptedJSON));
@@ -94,7 +98,7 @@ public class EncryptedGSONObjectDecoder extends StringDecoder {
         try {
             return gson.fromJson(jsonObject, aClass);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Attempting to parse packet " + packetIdentifier + " (" + aClass.getName() + ") ", e);
+            throw new IllegalArgumentException("Attempting to parse packet " + packetIdentifier + " (" + aClass.getName() + ") with string\n" + jsonObject , e);
         }
     }
 

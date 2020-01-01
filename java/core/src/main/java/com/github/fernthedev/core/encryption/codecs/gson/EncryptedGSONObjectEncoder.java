@@ -1,6 +1,6 @@
 package com.github.fernthedev.core.encryption.codecs.gson;
 
-import com.github.fernthedev.core.packets.Packet;
+import com.github.fernthedev.core.StaticHandler;
 import com.github.fernthedev.core.encryption.EncryptedBytes;
 import com.github.fernthedev.core.encryption.EncryptedPacketWrapper;
 import com.github.fernthedev.core.encryption.PacketWrapper;
@@ -9,6 +9,7 @@ import com.github.fernthedev.core.encryption.UnencryptedPacketWrapper;
 import com.github.fernthedev.core.encryption.codecs.AcceptablePacketTypes;
 import com.github.fernthedev.core.encryption.codecs.LineEndStringEncoder;
 import com.github.fernthedev.core.encryption.util.EncryptionUtil;
+import com.github.fernthedev.core.packets.Packet;
 import com.google.gson.Gson;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -63,6 +64,7 @@ public class EncryptedGSONObjectEncoder extends MessageToMessageEncoder<Acceptab
     @Override
     protected void encode(ChannelHandlerContext ctx, AcceptablePacketTypes msg, List<Object> out) throws Exception {
 
+        StaticHandler.getCore().getLogger().info("Sending " + gson.toJson(msg));
         if (msg instanceof UnencryptedPacketWrapper) {
 
             String decryptedJSON = gson.toJson(msg);
