@@ -8,7 +8,7 @@ public abstract class Packet implements AcceptablePacketTypes {
     private static final long serialVersionUID = -5039841570298012421L;
 
     @Getter
-    protected final @NonNull String packetName;
+    protected final transient @NonNull String packetName;
 
     public static String getPacketName(Class<?> packet) {
         if (!packet.isAnnotationPresent(PacketInfo.class)) throw new IllegalStateException("Packet must have a packet info annotation");
