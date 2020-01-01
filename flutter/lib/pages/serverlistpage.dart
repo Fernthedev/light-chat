@@ -1,7 +1,8 @@
-import 'package:chatclientflutter/main.dart';
-import 'package:chatclientflutter/pages/ServerEditPage.dart';
-import 'package:chatclientflutter/util/filehandler.dart';
-import 'package:chatclientflutter/util/serverdata.dart';
+
+import 'package:lightchat_client/data/serverdata.dart';
+import 'package:lightchat_client/main.dart';
+import 'package:lightchat_client/pages/ServerEditPage.dart';
+import 'package:lightchat_client/util/filehandler.dart';
 import 'package:flutter/material.dart';
 
 class ServerPage extends StatefulWidget {

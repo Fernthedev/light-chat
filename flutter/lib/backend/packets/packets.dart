@@ -1,14 +1,10 @@
 
-import 'dart:convert';
-
-import 'package:chatclientflutter/backend/transport/codecs/AcceptablePacketTypes.dart';
-import 'package:chatclientflutter/backend/transport/packet_registry.dart';
-import 'package:chatclientflutter/util/encryption.dart';
+import 'package:lightchat_client/backend/transport/codecs/AcceptablePacketTypes.dart';
+import 'package:lightchat_client/backend/transport/packet_registry.dart';
 import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:lombok/lombok.dart';
-import 'package:chatclientflutter/backend/transport/packetwrapper.dart';
-import 'package:pointycastle/export.dart';
+import 'package:lightchat_client/backend/transport/packetwrapper.dart';
 
 
 part 'packets.g.dart';
@@ -18,10 +14,10 @@ abstract class Packet implements AcceptablePacketTypes, JsonSerializableClass  {
   @protected
   Packet();
 
-  String packetIdentifier;
+  @JsonKey(ignore: true)
+  String packetName;
 
-  Packet.setName(this.packetIdentifier);
-
+  Packet.setName(this.packetName);
 
 
   /// A necessary factory constructor for creating a new User instance
@@ -35,97 +31,41 @@ abstract class Packet implements AcceptablePacketTypes, JsonSerializableClass  {
 //  /// to JSON. The implementation simply calls the private, generated
 //  /// helper method `_$UserToJson`.
 //  Map<String, dynamic> toJson() => _$PacketToJson(this);
-
+  @override
+  String getPacketName() {
+    return packetName;
+  }
 }
 
 @JsonSerializable()
 @ToString()
-class ConnectedPacket extends Packet {
+class _TemplatePacket extends Packet {
+
+  static final _TemplatePacket constant = _TemplatePacket();
 
   @protected
-  ConnectedPacket();
+  _TemplatePacket() : super.setName("TEMPLATE_PACKET");
 
-  ConnectedPacket.setName() : super.setName("CONNECTED_PACKET");
+  factory _TemplatePacket.create() {
+    _TemplatePacket packet = _TemplatePacket();
 
-  String name;
-
-  String os;
+    return packet;
+  }
 
   /// A necessary factory constructor for creating a new User instance
   /// from a map. Pass the map to the generated `_$UserFromJson()` constructor.
   /// The constructor is named after the source class, in this case, User.
-  factory ConnectedPacket.fromJson(Map<String, dynamic> json) => _$ConnectedPacketFromJson(json);
+  factory _TemplatePacket.fromJson(Map<String, dynamic> json) => _$_TemplatePacketFromJson(json);
 
   @override
   JsonSerializableClass fromJson(Map<String, dynamic> json) {
-    return ConnectedPacket.fromJson(json);
+    return _TemplatePacket.fromJson(json);
   }
 
   /// `toJson` is the convention for a class to declare support for serialization
   /// to JSON. The implementation simply calls the private, generated
   /// helper method `_$UserToJson`.
   @override
-  Map<String, dynamic> toJson() => _$ConnectedPacketToJson(this);
+  Map<String, dynamic> toJson() => _$_TemplatePacketToJson(this);
 }
 
-@JsonSerializable()
-@ToString()
-class TemplatePacket extends Packet {
-
-  @protected
-  TemplatePacket();
-
-  TemplatePacket.setName() : super.setName("TEMPLATE_PACKET");
-
-  /// A necessary factory constructor for creating a new User instance
-  /// from a map. Pass the map to the generated `_$UserFromJson()` constructor.
-  /// The constructor is named after the source class, in this case, User.
-  factory TemplatePacket.fromJson(Map<String, dynamic> json) => _$TemplatePacketFromJson(json);
-
-  @override
-  JsonSerializableClass fromJson(Map<String, dynamic> json) {
-    return TemplatePacket.fromJson(json);
-  }
-
-  /// `toJson` is the convention for a class to declare support for serialization
-  /// to JSON. The implementation simply calls the private, generated
-  /// helper method `_$UserToJson`.
-  @override
-  Map<String, dynamic> toJson() => _$TemplatePacketToJson(this);
-}
-
-@JsonSerializable()
-@ToString()
-class InitialHandshakePacket extends Packet {
-
-
-  String publicKey;
-
-
-  get publicKeyAsKey {
-
-  }
-
-  @protected
-  InitialHandshakePacket();
-
-  InitialHandshakePacket.create(RSAPublicKey publicKey) : super.setName("INITIAL_HANDSHAKE_PACKET") {
-    this.publicKey = EncryptionUtil.rsaAsymmetricKeyToString(publicKey);
-  }
-
-  /// A necessary factory constructor for creating a new User instance
-  /// from a map. Pass the map to the generated `_$UserFromJson()` constructor.
-  /// The constructor is named after the source class, in this case, User.
-  factory InitialHandshakePacket.fromJson(Map<String, dynamic> json) => _$InitialHandshakePacketFromJson(json);
-
-  @override
-  JsonSerializableClass fromJson(Map<String, dynamic> json) {
-    return InitialHandshakePacket.fromJson(json);
-  }
-
-  /// `toJson` is the convention for a class to declare support for serialization
-  /// to JSON. The implementation simply calls the private, generated
-  /// helper method `_$UserToJson`.
-  @override
-  Map<String, dynamic> toJson() => _$InitialHandshakePacketToJson(this);
-}

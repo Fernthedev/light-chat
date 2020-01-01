@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:chatclientflutter/main.dart';
-import 'package:chatclientflutter/util/serverdata.dart';
+import 'package:lightchat_client/data/serverdata.dart';
+import 'package:lightchat_client/main.dart';
 import 'package:flutter/material.dart';
 
 class ServerEditPage extends StatelessWidget {

@@ -1,15 +1,18 @@
 import 'dart:collection';
 import 'dart:io';
 
-import 'package:chatclientflutter/backend/client.dart';
-import 'package:chatclientflutter/backend/multicast.dart';
-import 'package:chatclientflutter/pages/serverlistpage.dart';
-import 'package:chatclientflutter/util/filehandler.dart';
-import 'package:chatclientflutter/util/serverdata.dart';
+import 'package:device_info/device_info.dart';
+import 'package:lightchat_client/assets/variables.dart';
+import 'package:lightchat_client/backend/client.dart';
+import 'package:lightchat_client/pages/serverlistpage.dart';
+import 'package:lightchat_client/util/filehandler.dart';
+import 'backend/multicast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import 'assets/colors.dart';
+import 'backend/packets/handshake_packets.dart';
+import 'data/serverdata.dart';
 
 void main() => runApp(Main());
 
@@ -18,10 +21,13 @@ class Main extends StatelessWidget {
   static GlobalKey _mainKey;
 
   static GlobalKey currentKey;
+  static DeviceInfoPlugin deviceInfo;
 
   @override
   Widget build(BuildContext context) {
     _fileHandler = new FileHandler();
+    deviceInfo = DeviceInfoPlugin();
+
 
     return LoginForm(null);
   }
@@ -30,10 +36,10 @@ class Main extends StatelessWidget {
     if (fileHandler.serverData == null) {
       fileHandler.serverData = new List<ServerData>();
       fileHandler.serverData
-          .add(ServerData("192.168.0.17", 2000, "no wawwasu"));
+          .add(ServerData("192.168.0.17", 2000, "test1"));
       fileHandler.serverData.add(ServerData("192.168.3.11", 2005, "no u"));
       fileHandler.serverData
-          .add(ServerData("192.168.5.11", 1942, "no easdawu"));
+          .add(ServerData("192.168.5.11", 1942, "test2"));
     }
 
     if (fileHandler.serverData.isEmpty) {
@@ -85,7 +91,7 @@ class LoginFormState extends State<LoginForm> {
 
   Visibility _animationVisiblity;
 
-  String _ip = "";
+  String _ip = "192.168.0.17";
   int _port = 2000;
   String _password = "";
 
@@ -99,7 +105,7 @@ class LoginFormState extends State<LoginForm> {
     // If the form is valid, display a snackbar. In the real world, you'd
     // often want to call a server or save the information in a database
     final context = loginFormHomeKey.currentState.context;
-    Client client = Client();
+    Client client = Client(ConnectedPacket.create(Platform.localHostname,Platform.operatingSystem, Variables.versionData));
     try {
       client.initializeConnection(new ServerData(_ip, _port, _password));
       setState(() {

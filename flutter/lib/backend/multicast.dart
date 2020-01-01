@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:chatclientflutter/main.dart';
 import 'package:lombok/lombok.dart';
+
+import '../main.dart';
 
 part 'multicast.g.dart';
 
