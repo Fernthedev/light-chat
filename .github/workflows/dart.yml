@@ -1,0 +1,22 @@
+name: Dart Client CI (Ubuntu)
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    container:
+      image:  google/dart:latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install dependencies
+      run: cd dart/client && pub get
+    - name: Script permission
+      run: cd dart/client && chmod +x ./build.sh
+    - name: Compile to native
+      run: cd dart/client && ./build.sh
+#     - name: Run tests
+#       run: pub run test
