@@ -1,4 +1,4 @@
-name: Dart Client CI (Ubuntu)
+name: Dart Client CI (MacOS)
 
 on: [push]
 
@@ -7,8 +7,8 @@ jobs:
 
     runs-on: macos-latest
 
-    # container:
-    #   image:  google/dart:latest
+    container:
+      image:  google/dart:latest
 
     steps:
     - uses: actions/checkout@v1

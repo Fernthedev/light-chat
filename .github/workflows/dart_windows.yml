@@ -1,4 +1,4 @@
-name: Dart Client CI (Ubuntu)
+name: Dart Client CI (Windows)
 
 on: [push]
 
@@ -7,8 +7,8 @@ jobs:
 
     runs-on: windows-latest
 
-    # container:
-    #   image:  microsoft/windows:1909
+    container:
+      image:  google/dart:latest
 
     steps:
     - uses: actions/checkout@v1
