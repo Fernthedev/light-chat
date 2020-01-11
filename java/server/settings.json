@@ -1,0 +1,8 @@
+{
+  "port": 2000,
+  "password": "password",
+  "useMulticast": true,
+  "passwordRequiredForLogin": false,
+  "useNativeTransport": true,
+  "codecEnum": "GSON"
+}

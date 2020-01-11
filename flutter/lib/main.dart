@@ -2,17 +2,18 @@ import 'dart:collection';
 import 'dart:io';
 
 import 'package:device_info/device_info.dart';
-import 'package:lightchat_client/assets/variables.dart';
-import 'package:lightchat_client/backend/client.dart';
-import 'package:lightchat_client/pages/serverlistpage.dart';
-import 'package:lightchat_client/util/filehandler.dart';
-import 'backend/multicast.dart';
+import 'package:light_chat_client/client.dart';
+import 'package:light_chat_client/data/serverdata.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:light_chat_client/multicast.dart';
+import 'package:light_chat_client/packets/handshake_packets.dart';
+import 'package:light_chat_client/variables.dart';
+import 'package:light_chat_client_flutter/pages/chatpage.dart';
+import 'package:light_chat_client_flutter/pages/serverlistpage.dart';
+import 'package:light_chat_client_flutter/util/filehandler.dart';
 
 import 'assets/colors.dart';
-import 'backend/packets/handshake_packets.dart';
-import 'data/serverdata.dart';
 
 void main() => runApp(Main());
 
@@ -20,8 +21,19 @@ class Main extends StatelessWidget {
   static FileHandler _fileHandler;
   static GlobalKey _mainKey;
 
+  static Client client;
+
   static GlobalKey currentKey;
   static DeviceInfoPlugin deviceInfo;
+
+  static Future<String> getDeviceName() async {
+    if (Platform.isAndroid) return await deviceInfo.androidInfo.then((info) => info.androidId);
+    if (Platform.isIOS) return await deviceInfo.iosInfo.then((info) => info.model);
+
+    Variables.debug = true; // TODO: Remove when finish debugging
+
+    throw "Not running on a device";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,10 +65,10 @@ class Main extends StatelessWidget {
   }
 
   static GlobalKey get mainKey => _mainKey;
-
-  static set mainKey(GlobalKey value) {
-    _mainKey = value;
-  }
+//
+//  static set mainKey(GlobalKey value) {
+//    _mainKey = value;
+//  }
 
   static FileHandler get fileHandler => _fileHandler;
 }
@@ -89,7 +101,7 @@ class LoginFormState extends State<LoginForm> {
     }
   }
 
-  Visibility _animationVisiblity;
+  Visibility _animationVisibility;
 
   String _ip = "192.168.0.17";
   int _port = 2000;
@@ -99,15 +111,20 @@ class LoginFormState extends State<LoginForm> {
     _ip = value;
   }
 
-  void _performLogin() {
+
+
+  Future<void> _performLogin() async {
     // Validate will return true if the form is valid, or false if
     // the form is invalid.
     // If the form is valid, display a snackbar. In the real world, you'd
     // often want to call a server or save the information in a database
     final context = loginFormHomeKey.currentState.context;
-    Client client = Client(ConnectedPacket.create(Platform.localHostname,Platform.operatingSystem, Variables.versionData));
+
+    ServerData serverData = ServerData(_ip, _port, _password);
+
+    Main.client = Client(ConnectedPacket.create(await Main.getDeviceName(), Platform.operatingSystem, Variables.versionData));
     try {
-      client.initializeConnection(new ServerData(_ip, _port, _password));
+      Main.client.initializeConnection(serverData);
       setState(() {
         showAnimation = true;
       });
@@ -116,6 +133,21 @@ class LoginFormState extends State<LoginForm> {
         showAnimation = false;
       });
     }
+
+    Main.client.onConnect(onConnect);
+  }
+
+  void onConnect(ServerData serverData) {
+    BuildContext context = Main.mainKey.currentState.context;
+    setState(() {
+      showAnimation = false;
+    });
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ChatPage(serverData)
+        ),
+    );
   }
 
   void _submit() {
@@ -147,7 +179,7 @@ class LoginFormState extends State<LoginForm> {
     Widget ipField =
          TextFormField(
           decoration: const InputDecoration(
-            hintText: '192.168.2.*',
+            hintText: '192.168.0.*',
             labelText: 'IP Address',
             border: OutlineInputBorder(),
           ),
@@ -229,15 +261,31 @@ class LoginFormState extends State<LoginForm> {
       size: 50.0,
     );
 
-    _animationVisiblity = Visibility(
+    _animationVisibility = Visibility(
       child: animation,
       visible: showAnimation,
     );
 
-    HashMap buttonMap = new HashMap<String, Runnable>();
+    HashMap buttonMap = HashMap<String, Function()>();
 
-    buttonMap["Search for servers on network"] = Multicast();
-    buttonMap["Saved servers"] = new ServerPageRunnable();
+
+    buttonMap["Search for servers on network"] = Multicast().startChecking;
+    buttonMap["Saved servers"] = ServerPageRunnable().run;
+    /// This is for debugging
+//    buttonMap["Chat page"] = () {
+//      BuildContext context = Main.mainKey.currentState.context;
+//      Navigator.push(
+//        context,
+//        MaterialPageRoute(builder: (context) =>
+//            ChatPage(
+//                ServerData("n",
+//                  2000,
+//                  null,
+//                )
+//            )
+//        ),
+//      );
+//    };
 
     List<String> buttonKeys = buttonMap.keys.toList();
 
@@ -245,8 +293,9 @@ class LoginFormState extends State<LoginForm> {
 // not shown here).
     PopupMenuButton popupMenuButton = PopupMenuButton<String>(
       onSelected: (String result) {
-        Runnable runnable = buttonMap[result];
-        runnable.run();
+        Function runnable = buttonMap[result];
+        runnable();
+//        runnable.run();
       },
       itemBuilder: (BuildContext context) =>
           buttonKeys.map<PopupMenuItem<String>>((String value) {
@@ -308,7 +357,7 @@ class LoginFormState extends State<LoginForm> {
                     passwordField,
                     SizedBox(height: 12.0),
                     connectButton,
-                    _animationVisiblity
+                    _animationVisibility
                   ],
                 ),
               )),

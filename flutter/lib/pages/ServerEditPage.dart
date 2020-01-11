@@ -1,12 +1,14 @@
 import 'dart:io';
 
-import 'package:lightchat_client/data/serverdata.dart';
-import 'package:lightchat_client/main.dart';
+
 import 'package:flutter/material.dart';
+import 'package:light_chat_client/data/serverdata.dart';
+import 'package:light_chat_client_flutter/main.dart';
+
 
 class ServerEditPage extends StatelessWidget {
-  static ServerData _serverData;
-  static ServerData _originalServerData;
+  ServerData _serverData;
+  ServerData _originalServerData;
   int index;
   static bool difModified = false;
 
@@ -56,6 +58,8 @@ class ServerEditPage extends StatelessWidget {
         } on ArgumentError {
           return 'Not a valid ip address';
         }
+
+        return "";
       },
       keyboardType:
           TextInputType.numberWithOptions(signed: false, decimal: true),
@@ -116,7 +120,7 @@ class ServerEditPage extends StatelessWidget {
       // Screen.
       onGenerateRoute: (settings) {
         // If you push the PassArguments route
-        if (settings.name == ServerEditPage.routeName) {
+        if (settings.name == routeName) {
           // Cast the arguments to the correct type: ScreenArguments.
           final List<Object> args = settings.arguments;
 
@@ -185,10 +189,10 @@ class ServerEditPage extends StatelessWidget {
                         );
                       },
                     );
-                  }else {
+                  } else {
                     Navigator.pop(context);
                   }
-
+                  return Future.value();
                 },
                 icon: Icon(Icons.arrow_back_ios),
               )

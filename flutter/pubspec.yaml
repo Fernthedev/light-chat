@@ -1,4 +1,4 @@
-name: lightchat_client
+name: light_chat_client_flutter
 description: A network client in Flutter for my Light-Chat java server
 
 # The following defines the version and build number for your application.
@@ -36,6 +36,8 @@ dependencies:
   uuid: ^2.0.1
   version: ^1.0.0
   basic_utils: ^2.4.3
+  light_chat_client:
+    path: ../dart/client/
   #  protobuf: ^0.13.11
   #  protoc_plugin: ^16.0.5
   # The following adds the Cupertino Icons font to your application.

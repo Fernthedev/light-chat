@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:lightchat_client/data/serverdata.dart';
+import 'package:light_chat_client/data/serverdata.dart';
 import 'package:path_provider/path_provider.dart';
 
 class FileHandler {
