@@ -1,0 +1,20 @@
+name: Dart Client CI (Ubuntu)
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    # container:
+    #   image:  microsoft/windows:1909
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install dependencies
+      run: cd dart/client && pub get
+    - name: Compile to native
+      run: cd dart/client && bash ./build.bat
+#     - name: Run tests
+#       run: pub run test

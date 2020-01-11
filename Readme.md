@@ -3,6 +3,7 @@ This is basically just a fork of my chatroom program that allows turning on and 
 | **Software** | **Status** |
 |:---:|:---:|
 | **Java Server/Client**        | ![](https://github.com/Fernthedev/light-chat/workflows/Java%20CI/badge.svg)|
+| **Dart Client CI (Ubuntu)**        | ![](https://github.com/Fernthedev/light-chat/workflows/Dart%20Client%20CI%20(Ubuntu)/badge.svg)|
 
 # Features:
 - Uses JSON for packet wrapping and allows cross-platform usage 
