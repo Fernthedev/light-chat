@@ -17,6 +17,6 @@ jobs:
     - name: Script permission
       run: cd dart/client && chmod +x ./build.sh
     - name: Compile to native
-      run: cd dart/client && build.sh
+      run: ./dart/client/build.sh
 #     - name: Run tests
 #       run: pub run test
