@@ -8,14 +8,14 @@ import com.google.gson.Gson;
 /**
  * Wraps a packet not meant to be encrypted
  */
-public class UnencryptedPacketWrapper extends PacketWrapper<String> implements AcceptablePacketTypes {
+public class UnencryptedPacketWrapper extends PacketWrapper<AcceptablePacketTypes> implements AcceptablePacketTypes {
 
     private static final Gson gson = new Gson();
 
     protected UnencryptedPacketWrapper() {}
 
     public UnencryptedPacketWrapper(Packet jsonObject) {
-        super(gson.toJson(jsonObject), jsonObject.getPacketName());
+        super(jsonObject, jsonObject.getPacketName());
 
         if (PacketRegistry.checkIfRegistered(jsonObject) == PacketRegistry.RegisteredReturnValues.NOT_IN_REGISTRY) {
             throw new IllegalArgumentException("The packet trying to be wrapped is not registered. \"" + jsonObject.getClass() + "\"");

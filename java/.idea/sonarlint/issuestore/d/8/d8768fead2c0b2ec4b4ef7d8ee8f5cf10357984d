@@ -1,0 +1,12 @@
+
+Rsquid:UnusedPrivateMethodˆ",Remove this unused private "saveMap" method.(¶Ş“
+Jsquid:S1172à"-Remove this unused method parameter "stream".(ªŸ…õùÿÿÿÿ
+Rsquid:S1133ä"5Do not forget to remove this deprecated code someday.(Á¼†şÿÿÿÿ
+jsquid:S3776ñ"RRefactor this method to reduce its Cognitive Complexity from 65 to the 15 allowed.(šÊ·
+{squid:S1450Á"^Remove the "lazyPermissions" field and declare it as a local variable in the relevant methods.(††œ‹ûÿÿÿÿ
+psquid:S2293ß"YReplace the type specification in this constructor call with the diamond operator ("<>").(ÃËˆ:
+Psquid:UnusedPrivateMethod±"*Remove this unused private "asMap" method.(…Íüü
+Rsquid:UnusedPrivateMethodñ",Remove this unused private "loadMap" method.(šÊ·
+Psquid:S1068Á"3Remove this unused "lazyPermissions" private field.(††œ‹ûÿÿÿÿ
+`squid:HiddenFieldCheckß">Rename "awareness" which hides the field declared at line 194.(ÃËˆ:
+Lsquid:S1133½"5Do not forget to remove this deprecated code someday.(¥Á½2

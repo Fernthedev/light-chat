@@ -76,6 +76,11 @@ public class EventListener {
 
             packet.setCandidateList(candidates);
             clientPlayer.sendObject(packet);
+        } else if (p instanceof HashedPasswordPacket) {
+            AuthenticationManager.attemptAuthenticationHash(
+                    ((HashedPasswordPacket) p).getHashedPassword(),
+                    clientPlayer
+            );
         }
 
     }

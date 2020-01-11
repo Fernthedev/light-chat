@@ -1,0 +1,4 @@
+
+Psquid:MissingDeprecatedCheck""(Add the missing @deprecated Javadoc tag.(“–ýþ
+Lsquid:S1133""5Do not forget to remove this deprecated code someday.(“–ýþ
+hsquid:S3776O"RRefactor this method to reduce its Cognitive Complexity from 97 to the 15 allowed.(Ê¦¡:

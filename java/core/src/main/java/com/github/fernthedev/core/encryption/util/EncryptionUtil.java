@@ -238,6 +238,7 @@ public class EncryptionUtil {
      * @param input String to be hashed
      * @return The hashed string
      */
+    @NonNull
     public static String makeSHA256Hash(String input) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -254,7 +255,7 @@ public class EncryptionUtil {
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
-        return null;
+        throw new IllegalStateException("Unable to create hash");
     }
 
     private static class DatatypeConverter {

@@ -1,6 +1,7 @@
 package com.github.fernthedev.core.encryption.codecs.gson;
 
 import com.github.fernthedev.core.PacketRegistry;
+import com.github.fernthedev.core.StaticHandler;
 import com.github.fernthedev.core.encryption.EncryptedBytes;
 import com.github.fernthedev.core.encryption.EncryptedPacketWrapper;
 import com.github.fernthedev.core.encryption.PacketWrapper;
@@ -64,6 +65,7 @@ public class EncryptedGSONObjectDecoder extends StringDecoder {
         super.decode(ctx, msg, tempDecodeList);
 
         String decodedStr = (String) tempDecodeList.get(0);
+        StaticHandler.getCore().getLogger().info("Decoding the string {}", decodedStr);
         PacketWrapper<?> packetWrapper = gson.fromJson(decodedStr, PacketWrapper.class);
 
         String decryptedJSON;
@@ -71,16 +73,20 @@ public class EncryptedGSONObjectDecoder extends StringDecoder {
         try {
             if (packetWrapper.encrypt()) {
                 packetWrapper = gson.fromJson(decodedStr, EncryptedPacketWrapper.class);
-                decryptedJSON = decrypt(ctx, ((EncryptedPacketWrapper) packetWrapper).getJsonObject());
+
+                EncryptedBytes encryptedBytes = gson.fromJson(packetWrapper.getJsonObject(), EncryptedBytes.class);
+                decryptedJSON = decrypt(ctx, (encryptedBytes));
             } else {
                 packetWrapper = gson.fromJson(decodedStr, UnencryptedPacketWrapper.class);
-                decryptedJSON = ((UnencryptedPacketWrapper) packetWrapper).getJsonObject();
+                decryptedJSON = packetWrapper.getJsonObject();
             }
         } catch (Exception e) {
             throw new IllegalArgumentException("Unable to parse string: " + decodedStr, e);
         }
 
         out.add(getParsedObject(packetWrapper.getPacketIdentifier(), decryptedJSON));
+
+//        StaticHandler.getCore().getLogger().info("Received {}", new Gson().toJson(packetWrapper));
     }
 
     /**

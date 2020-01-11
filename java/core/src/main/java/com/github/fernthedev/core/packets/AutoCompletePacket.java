@@ -15,7 +15,6 @@ public class AutoCompletePacket extends Packet {
 
     private List<LightCandidate> candidateList = new ArrayList<>();
 
-
     @NonNull
     private List<String> words;
 

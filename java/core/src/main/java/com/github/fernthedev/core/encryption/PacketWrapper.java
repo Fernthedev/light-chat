@@ -1,15 +1,21 @@
 package com.github.fernthedev.core.encryption;
 
+import com.google.gson.Gson;
 import lombok.Getter;
 
-public class PacketWrapper<T> {
+import java.io.Serializable;
 
+public class PacketWrapper<T> implements Serializable {
 
+    protected static Gson gson = new Gson();
 
     protected boolean ENCRYPT = false;
 
     @Getter
-    private T jsonObject;
+    private String jsonObject;
+
+    @Getter
+    private transient T jsonObjectInstance;
 
     @Getter
     private String packetIdentifier;
@@ -23,10 +29,9 @@ public class PacketWrapper<T> {
     }
 
     public PacketWrapper(T object, String packetIdentifier) {
-
-
         this.packetIdentifier = packetIdentifier;
-        this.jsonObject = object;
+        this.jsonObjectInstance = object;
+        this.jsonObject = gson.toJson(object);
     }
 
 //    @Deprecated

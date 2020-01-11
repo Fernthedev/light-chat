@@ -1,5 +1,7 @@
 package com.github.fernthedev.server.backend;
 
+import com.github.fernthedev.core.data.HashedPassword;
+import com.github.fernthedev.core.encryption.util.EncryptionUtil;
 import com.github.fernthedev.core.packets.SelfMessagePacket;
 import com.github.fernthedev.server.ClientPlayer;
 import com.github.fernthedev.server.Console;
@@ -46,7 +48,6 @@ public class AuthenticationManager extends Command implements Listener {
     }
 
     public static boolean authenticate(CommandSender sender) {
-
         if (sender instanceof Console) {
             return true;
         }
@@ -61,7 +62,6 @@ public class AuthenticationManager extends Command implements Listener {
 
         if (sender instanceof ClientPlayer) {
             playerInfo.mode = Mode.AUTHENTICATE;
-//            Server.getLogger().info("Sending fill password");
             ClientPlayer clientPlayer = (ClientPlayer) sender;
             clientPlayer.sendObject(new SelfMessagePacket(SelfMessagePacket.MessageType.FILL_PASSWORD),false);
             sender.sendMessage("Type in password:");
@@ -136,6 +136,52 @@ public class AuthenticationManager extends Command implements Listener {
                 Server.getSettingsManager().getConfigData().setPassword(event.getMessage());
                 Server.getSettingsManager().save();
                 checking.remove(event.getSender());
+            }
+        }
+    }
+
+
+    /**
+     * This requires the password to be hashed, whether the packet is encrypted
+     * or not. SelfMessagePacket with FillMessagePacket is sent, it should
+     * receive a MessagePacket in return or HashedPasswordPacket with the password hashed.
+     * If password given is incorrect, SelfMessagePacket.MessageType.INCORRECT_PASSWORD_ATTEMPT
+     * is sent. If authentication finishes with incorrect password,
+     * SelfMessagePacket.MessageType.INCORRECT_PASSWORD_FAILURE is sent.
+     * @param hashedPassword
+     * @param sender
+     */
+    public static void attemptAuthenticationHash(HashedPassword hashedPassword, CommandSender sender) {
+        String rightPass = EncryptionUtil.makeSHA256Hash(Server.getSettingsManager().getConfigData().getPassword());
+        if(checking.containsKey(sender)) {
+            PlayerInfo playerInfo = checking.get(sender);
+
+            if(sender instanceof ClientPlayer) {
+                ClientPlayer clientPlayer = (ClientPlayer) sender;
+
+                if(playerInfo.mode == Mode.AUTHENTICATE) {
+                    if(rightPass.equals(hashedPassword.getPassword())) {
+                        sender.sendMessage(ColorCode.GREEN + "Correct password. Successfully authenticated:");
+                        playerInfo.authenticated = true;
+                        checking.remove(sender);
+                    }else{
+                        if(playerInfo.tries <= 2) {
+                            sender.sendMessage(ColorCode.RED + "Incorrect password");
+                            sender.sendPacket(new SelfMessagePacket(SelfMessagePacket.MessageType.INCORRECT_PASSWORD_ATTEMPT));
+                            playerInfo.tries++;
+                        } else {
+                            Server.getLogger().warn("{}:{} tried to authenticate but failed 2 times", sender.getName(), clientPlayer.getAddress());
+                            sender.sendPacket(new SelfMessagePacket(SelfMessagePacket.MessageType.INCORRECT_PASSWORD_FAILURE));
+                            checking.remove(sender);
+                        }
+                    }
+                }
+
+
+            }
+
+            if(sender instanceof Console) {
+                checking.remove(sender);
             }
         }
     }

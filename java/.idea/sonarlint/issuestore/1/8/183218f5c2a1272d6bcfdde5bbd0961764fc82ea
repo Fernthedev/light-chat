@@ -1,0 +1,17 @@
+
+Nsquid:S1066Ø"/Merge this if statement with the enclosing one.(¾ƒéó8œÒûùõ-
+"squid:ClassVariableVisibilityCheck"UMake startTime a static final constant or non-public and provide accessors if needed.(ÉÒ€ÿÿÿÿÿ8œÒûùõ-
+|
+squid:S135¼"YReduce the total number of break and continue statements in this loop to use at most one.(ó« øÿÿÿÿ8œÒûùõ-
+Rsquid:S1444“"3Make this "public static miliPingDelay" field final(å³¾º8œÒûùõ-
+†"squid:ClassVariableVisibilityCheckñ"PMake name a static final constant or non-public and provide accessors if needed.( şÍ¾8œÒûùõ-
+"squid:ClassVariableVisibilityCheck“"YMake miliPingDelay a static final constant or non-public and provide accessors if needed.(å³¾º8œÒûùõ-
+esquid:S2142’"FEither re-interrupt this method or rethrow the "InterruptedException".(ä ¹€8œÒûùõ-
+Ssquid:S1444"/Make this "public static startTime" field final(ÉÒ€ÿÿÿÿÿ8œÒûùõ-
+Lsquid:S1444"-Make this "public static endTime" field final(¼…Á×8”’áñô-
+‰"squid:ClassVariableVisibilityCheck"SMake endTime a static final constant or non-public and provide accessors if needed.(¼…Á×8”’áñô-
+psquid:S3776>"RRefactor this method to reduce its Cognitive Complexity from 26 to the 15 allowed.(É§¬«8œÒûùõ-
+esquid:S2142É"FEither re-interrupt this method or rethrow the "InterruptedException".(ä ¹€8œÒûùõ-
+`squid:S3457°"AFormat specifiers should be used instead of string concatenation.(ÃëÀ’8œÒûùõ-
+‹"squid:ClassVariableVisibilityCheck/"VMake registered a static final constant or non-public and provide accessors if needed.(âÒÃê8œÒûùõ-
+qsquid:S3776›"RRefactor this method to reduce its Cognitive Complexity from 38 to the 15 allowed.(şÃË8œÒûùõ-

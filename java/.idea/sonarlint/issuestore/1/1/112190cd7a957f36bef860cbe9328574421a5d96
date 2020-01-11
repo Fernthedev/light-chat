@@ -1,0 +1,6 @@
+
+ˆ"squid:ClassVariableVisibilityCheck!"NMake os a static final constant or non-public and provide accessors if needed.(“Üìºúÿÿÿÿ8˜‹Íêô-
+]squid:MissingDeprecatedCheckŒ"(Add the missing @deprecated Javadoc tag.(ÇÂ¥äûÿÿÿÿ8¢ì†éô-
+Ysquid:S1133Œ"5Do not forget to remove this deprecated code someday.(ÇÂ¥äûÿÿÿÿ8¢ì†éô-
+‰"squid:ClassVariableVisibilityCheck"SMake endTime a static final constant or non-public and provide accessors if needed.(åø¥²8¢ì†éô-
+"squid:ClassVariableVisibilityCheck"UMake startTime a static final constant or non-public and provide accessors if needed.(¬ç¥±ùÿÿÿÿ8¢ì†éô-

@@ -62,16 +62,18 @@ public class EncryptedFastJSONObjectDecoder extends StringDecoder {
         super.decode(ctx, msg, tempDecodeList);
 
         String decodedStr = (String) tempDecodeList.get(0);
-        PacketWrapper packetWrapper = JSON.parseObject(decodedStr, PacketWrapper.class);
+        PacketWrapper<?> packetWrapper = JSON.parseObject(decodedStr, PacketWrapper.class);
 
         String decryptedJSON;
 
         if (packetWrapper.encrypt()) {
             packetWrapper = JSON.parseObject(decodedStr, EncryptedPacketWrapper.class);
-            decryptedJSON = decrypt(ctx, ((EncryptedPacketWrapper) packetWrapper).getJsonObject());
+
+            EncryptedBytes encryptedBytes = JSON.parseObject(packetWrapper.getJsonObject(), EncryptedBytes.class);
+            decryptedJSON = decrypt(ctx, (encryptedBytes));
         } else {
             packetWrapper = JSON.parseObject(decodedStr, UnencryptedPacketWrapper.class);
-            decryptedJSON = ((UnencryptedPacketWrapper) packetWrapper).getJsonObject();
+            decryptedJSON = packetWrapper.getJsonObject();
         }
 
         out.add(getParsedObject(packetWrapper.getPacketIdentifier(), decryptedJSON));

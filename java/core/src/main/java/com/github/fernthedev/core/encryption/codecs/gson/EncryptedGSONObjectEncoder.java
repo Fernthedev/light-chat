@@ -64,9 +64,9 @@ public class EncryptedGSONObjectEncoder extends MessageToMessageEncoder<Acceptab
     @Override
     protected void encode(ChannelHandlerContext ctx, AcceptablePacketTypes msg, List<Object> out) throws Exception {
 
-        StaticHandler.getCore().getLogger().info("Sending " + gson.toJson(msg));
+        PacketWrapper<?> packetWrapper;
         if (msg instanceof UnencryptedPacketWrapper) {
-
+            packetWrapper = (PacketWrapper<?>) msg;
             String decryptedJSON = gson.toJson(msg);
 
             encoder.encode(ctx, decryptedJSON, out); // Just encodes the string
@@ -82,15 +82,15 @@ public class EncryptedGSONObjectEncoder extends MessageToMessageEncoder<Acceptab
             EncryptedBytes encryptedBytes = encrypt(ctx, decryptedJSON);
 
             // Adds the encrypted json in the packet wrapper
-            PacketWrapper<?> packetWrapper = new EncryptedPacketWrapper(encryptedBytes, (Packet) msg);
+            packetWrapper = new EncryptedPacketWrapper(encryptedBytes, (Packet) msg);
             String jsonPacketWrapper = gson.toJson(packetWrapper);
-
 
             // Encodes the string for sending
             encoder.encode(ctx, jsonPacketWrapper, out);
 
         }
 
+        StaticHandler.getCore().getLogger().info("Sending {}", gson.toJson(packetWrapper));
     }
 
     public EncryptedBytes encrypt(ChannelHandlerContext ctx, String decryptedString) {

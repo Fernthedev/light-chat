@@ -15,6 +15,8 @@ public class SelfMessagePacket extends Packet {
 
     public enum MessageType {
         FILL_PASSWORD,
+        INCORRECT_PASSWORD_ATTEMPT, // The password attempted is wrong
+        INCORRECT_PASSWORD_FAILURE, // The passwords attempted were wrong, so cancelling authentication
         LOST_SERVER_CONNECTION,
         REGISTER_PACKET,
         TIMED_OUT_REGISTRATION
