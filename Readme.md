@@ -4,8 +4,8 @@ This is basically just a fork of my chatroom program that allows turning on and 
 |:---:|:---:|
 | **Java Server/Client**        | ![](https://github.com/Fernthedev/light-chat/workflows/Java%20CI/badge.svg)|
 | **Dart Client CI (Ubuntu 18.04/latest)**        | ![](https://github.com/Fernthedev/light-chat/workflows/Dart%20Client%20CI%20(Ubuntu)/badge.svg)|
-| **Dart Client CI (MacOS Catalina 10.15/latest)**        | ![](https://github.com/Fernthedev/light-chat/workflows/Dart%20Client%20CI%20(MacOS)/badge.svg)|
-| **Dart Client CI (Windows Server 2019/latest)**        | ![](https://github.com/Fernthedev/light-chat/workflows/Dart%20Client%20CI%20(Windows)/badge.svg)|
+<!-- | **Dart Client CI (MacOS Catalina 10.15/latest)**        | ![](https://github.com/Fernthedev/light-chat/workflows/Dart%20Client%20CI%20(MacOS)/badge.svg)| -->
+<!-- | **Dart Client CI (Windows Server 2019/latest)**        | ![](https://github.com/Fernthedev/light-chat/workflows/Dart%20Client%20CI%20(Windows)/badge.svg)| -->
 
 # Features:
 - Uses JSON for packet wrapping and allows cross-platform usage 
