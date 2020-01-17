@@ -41,7 +41,8 @@ jobs:
     - uses: DanTup/gh-actions/setup-dart@master
     - name: Install dependencies
       run: cd dart/client && pub get
+    - run: cd dart/client && mkdir build
     - name: Compile to native
-      run: cd dart/client && dart2native bin/main.dart -v -o build/client-${{ matrix.output-name }}
+      run: cd dart/client && dart2native bin/main.dart -v -o build/client-${{ matrix.os }}
 #     - name: Run tests
 #       run: pub run test
