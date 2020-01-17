@@ -30,22 +30,22 @@ jobs:
         include:
           - os: ubuntu-latest
             output-name: client-linux
-            shell:
+            and: '&&'
           - os: macOS-latest
             output-name: client-mac
-            shell:
+            and: '&&'
           - os: windows-latest
             output-name: client-windows.exe
-            shell: cmd
+            and: '-and'
     # container:
     #   image:  google/dart:latest
     steps:
     - uses: actions/checkout@v1
     - uses: DanTup/gh-actions/setup-dart@master
     - name: Install dependencies
-      run: ${{ matrix.shell }} cd dart/client && pub get
-    - run: ${{ matrix.shell }} cd dart/client && mkdir build
+      run: cd dart/client ${{ matrix.and }} pub get
+    - run: cd dart/client ${{ matrix.and }} mkdir build
     - name: Compile to native
-      run: ${{ matrix.shell }} cd dart/client && dart2native bin/main.dart -v -o build/client-${{ matrix.output-name }}
+      run: cd dart/client ${{ matrix.and }} dart2native bin/main.dart -v -o build/client-${{ matrix.output-name }}
 #     - name: Run tests
 #       run: pub run test
