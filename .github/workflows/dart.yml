@@ -47,5 +47,12 @@ jobs:
     - run: cd dart/client ${{ matrix.and }} mkdir build
     - name: Compile to native
       run: cd dart/client ${{ matrix.and }} dart2native bin/main.dart -v -o build/client-${{ matrix.output-name }}
+    - name: Upload artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        # Artifact name
+        name: Compiled Native Artifacts 
+        # Directory containing files to upload
+        path: dart/client/build/
 #     - name: Run tests
 #       run: pub run test
