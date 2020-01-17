@@ -29,20 +29,23 @@ jobs:
         os: [ubuntu-latest, windows-latest, macOS-latest]
         include:
           - os: ubuntu-latest
-            output-name: hello-linux
+            output-name: client-linux
+            shell: bash
           - os: macOS-latest
-            output-name: hello-mac
+            output-name: client-mac
+            shell: bash
           - os: windows-latest
-            output-name: hello-windows.exe
+            output-name: client-windows.exe
+            shell: cmd
     # container:
     #   image:  google/dart:latest
     steps:
     - uses: actions/checkout@v1
     - uses: DanTup/gh-actions/setup-dart@master
     - name: Install dependencies
-      run: cd dart/client && pub get
-    - run: cd dart/client && mkdir build
+      run: ${{ matrix.shell }} cd dart/client && pub get
+    - run: ${{ matrix.shell }} cd dart/client && mkdir build
     - name: Compile to native
-      run: cd dart/client && dart2native bin/main.dart -v -o build/client-${{ matrix.os }}
+      run: ${{ matrix.shell }} cd dart/client && dart2native bin/main.dart -v -o build/client-${{ matrix.output-name }}
 #     - name: Run tests
 #       run: pub run test
