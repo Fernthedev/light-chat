@@ -30,10 +30,10 @@ jobs:
         include:
           - os: ubuntu-latest
             output-name: client-linux
-            shell: bash
+            shell:
           - os: macOS-latest
             output-name: client-mac
-            shell: bash
+            shell:
           - os: windows-latest
             output-name: client-windows.exe
             shell: cmd
