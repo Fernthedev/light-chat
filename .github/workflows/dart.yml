@@ -36,7 +36,7 @@ jobs:
             and: '&&'
           - os: windows-latest
             output-name: client-windows.exe
-            and: '-and'
+            and: ';'
     # container:
     #   image:  google/dart:latest
     steps:
