@@ -115,9 +115,6 @@ Vcore/src/main/java/com/github/fernthedev/core/packets/handshake/KeyResponsePack
 Tcore/src/main/java/com/github/fernthedev/core/encryption/util/RSAEncryptionUtil.java,f\9\f9cc6bce26361e92296b4d54b29e9a70e00dc36b
 }
 Mcore/src/main/java/com/github/fernthedev/core/packets/latency/PingPacket.java,a\4\a43e123754b4933e1ab9db63b06d87d8631cf1ae
-:
-
-.gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
 q
 Acore/src/main/java/com/github/fernthedev/core/packets/Packet.java,f\3\f3b193283c759f9557db09a067075b84e8a9ee9a
 ‚
@@ -136,3 +133,5 @@ Tserver/src/main/java/com/github/fernthedev/server/backend/AuthenticationManager
 Ocore/src/main/java/com/github/fernthedev/core/packets/HashedPasswordPacket.java,b\4\b4c147f976a600e48bb9e276e769e4cf31800027
 v
 Fcore/src/main/java/com/github/fernthedev/core/data/HashedPassword.java,7\f\7fbab74a7a377e37459d22ca53b54b616402e391
+|
+Lserver/src/main/java/com/github/fernthedev/server/backend/LoggerManager.java,0\c\0ce0769225753be03c0e905f0a34f2c6e9702616
