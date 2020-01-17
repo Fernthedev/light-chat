@@ -11,11 +11,14 @@ import 'package:light_chat_client/variables.dart';
 
 void main(List<String> arguments) {
   String host;
-  int port;
+  var port = -1;
   String name;
 
   for (var arg in arguments) {
-    print('Checking arg: $arg');
+    if (Variables.debug) {
+      print('Checking arg: $arg');
+    }
+
     if (arg == '-ip' || arg == '-host') {
       host = getValueFromArg(arg, arguments);
     }
@@ -55,11 +58,11 @@ Client client;
 class PacketListenerConsole extends PacketListener {
   @override
   void handle(Packet p, [Object result]) {
-    print('Handling packet ${p.runtimeType}');
+    // print('Handling packet ${p.runtimeType}');
     switch (p.runtimeType) {
       case SelfMessagePacket:
         SelfMessagePacket packet = p;
-        print('Message Type: ${p.toString()}');
+        // print('Message Type: ${p.toString()}');
         switch (packet.messageType) {
           case MessageType.FILL_PASSWORD:
             print('Reading console input');
@@ -107,7 +110,7 @@ void readCmdLine() async {
 }
 
 String setValIfNull(String arg, String message) {
-  if (arg == null) {
+  if (arg == null || arg == '-1') {
     print(message);
     return stdin.readLineSync();
   } else {

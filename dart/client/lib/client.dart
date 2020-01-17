@@ -130,7 +130,6 @@ class Client implements IKeyEncriptionHolder {
   }
 
   Future<void> onReceive(dynamic data) async {
-    await flush();
     if (data is Uint8List) {
       var list = data;
 
@@ -160,12 +159,12 @@ class Client implements IKeyEncriptionHolder {
 
   void onDoneEvent() {}
 
-  Future<void> flush() async {
-    await socket.done.then((t) {
-      socket.flush();
-    });
-    return Future.value();
-  }
+  // Future<void> flush() async {
+  //   await socket.done.then((t) {
+  //     socket.flush();
+  //   });
+  //   return Future.value();
+  // }
 
   Future<void> write(AcceptablePacketTypes packet,
       [bool encrypt = true]) async {
@@ -203,7 +202,7 @@ class Client implements IKeyEncriptionHolder {
     //   });
     // } else {
     await write(packet, encrypt);
-    await flush();
+    // await flush();
     // }
 
     return Future.value();
