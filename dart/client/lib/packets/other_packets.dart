@@ -159,7 +159,7 @@ enum MessageType {
 class HashedPasswordPacket extends Packet {
   static final HashedPasswordPacket constant = HashedPasswordPacket();
 
-  HashedPasswordPacket() : super.setName('SELF_MESSAGE_PACKET');
+  HashedPasswordPacket() : super.setName('HASHED_PASSWORD_PACKET');
 
   HashedPassword hashedPassword;
 
