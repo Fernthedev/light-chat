@@ -85,7 +85,7 @@ subprojects {
         from(sourceSets.main.resources.srcDirs) {
             include 'variables.json'
 
-            // replace version and mcversion
+
             expand 'version':project.buildVer, 'minVersion':project.minBuildVer
         }
 

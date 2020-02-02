@@ -30,6 +30,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang3.SystemUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.fusesource.jansi.AnsiConsole;
 import org.slf4j.Logger;
@@ -50,22 +52,16 @@ public class Client implements IEncryptionKeyHolder {
     @Setter
     private boolean running = false;
 
-    private static Logger logger;
-
-    private MulticastClient multicastClient;
+    protected static Logger logger = logger = LoggerFactory.getLogger(Client.class);
 
 
     public static void main(String[] args) {
-        new Client(args);
-    }
-
-    public Client(String[] args) {
         AnsiConsole.systemInstall();
         java.util.logging.Logger.getLogger("io.netty").setLevel(Level.OFF);
         StaticHandler.setupLoggers();
-        registerLogger();
-        StaticHandler.setCore(new ClientCore(this));
 
+        String host = null;
+        int port = -1;
 
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
@@ -73,21 +69,29 @@ public class Client implements IEncryptionKeyHolder {
             if (arg.equalsIgnoreCase("-port")) {
                 try {
                     port = Integer.parseInt(args[i + 1]);
+                    if (port < 0) {
+                        logger.error("-port cannot be less than 0");
+                        port = -1;
+                    } else logger.info("Using port {}", args[i+ + 1]);
                 } catch (NumberFormatException | IndexOutOfBoundsException e) {
+                    logger.error("-port is not a number");
                     port = -1;
                 }
             }
 
-            if (arg.equalsIgnoreCase("-ip")) {
+            if (arg.equalsIgnoreCase("-ip") || arg.equalsIgnoreCase("-host")) {
                 try {
                     host = args[i + 1];
+                    logger.info("Using host {}", args[i+ + 1]);
                 } catch (IndexOutOfBoundsException e) {
+                    logger.error("Cannot find argument for -host");
                     host = null;
                 }
             }
 
             if (arg.equalsIgnoreCase("-debug")) {
                 StaticHandler.setDebug(true);
+                logger.debug("Debug enabled");
             }
         }
 
@@ -97,7 +101,7 @@ public class Client implements IEncryptionKeyHolder {
         if (System.console() == null && !StaticHandler.isDebug()) {
 
             String filename = Client.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6);
-            System.out.println("No console found");
+            logger.info("No console found. Starting with CMD assuming it's Windows");
 
             String[] newArgs = new String[]{"cmd", "/c", "start", "cmd", "/c", "java -jar -Xmx2G -Xms2G \"" + filename + "\""};
 
@@ -113,11 +117,16 @@ public class Client implements IEncryptionKeyHolder {
 
         }
 
-
+        MulticastClient multicastClient;
         Scanner scanner = new Scanner(System.in);
         if (host == null || host.equals("") || port == -1) {
             multicastClient = new MulticastClient();
-            check(scanner,4);
+            Pair<String, Integer> hostPortPair = check(multicastClient, scanner,4);
+
+            if (hostPortPair != null) {
+                host = hostPortPair.getLeft();
+                port = hostPortPair.getRight();
+            }
         }
 
         while (host == null || host.equalsIgnoreCase("") || port == -1) {
@@ -130,12 +139,22 @@ public class Client implements IEncryptionKeyHolder {
 
 
 
+
+        new Client(host, port);
+    }
+
+    public Client(String host, int port) {
+        this.host = host;
+        this.port = port;
+        StaticHandler.setCore(new ClientCore(this));
+        registerLogger();
+
         initialize(host, port);
     }
 
     private static String readLine(Scanner scanner, String message) {
         if (!(message == null || message.equals(""))) {
-            System.out.println(message);
+            logger.info(message);
         }
         if (scanner.hasNextLine()) {
             return scanner.nextLine();
@@ -144,7 +163,7 @@ public class Client implements IEncryptionKeyHolder {
 
     private static int readInt(Scanner scanner, String message) {
         if (!(message == null || message.equals(""))) {
-            System.out.println(message);
+            logger.info(message);
         }
         if (scanner.hasNextLine()) {
             return scanner.nextInt();
@@ -152,13 +171,16 @@ public class Client implements IEncryptionKeyHolder {
     }
 
 
-    private void check(Scanner scanner, int amount) {
-        System.out.println("Looking for Multicast servers");
+    private static Pair<String, Integer> check(MulticastClient multicastClient, Scanner scanner, int amount) {
+        logger.info("Looking for MultiCast servers");
         multicastClient.checkServers(amount);
+
+        String host = null;
+        int port = -1;
 
         if (!multicastClient.serversAddress.isEmpty()) {
             Map<Integer, MulticastData> servers = new HashMap<>();
-            System.out.println("Select one of these servers, or use none to skip, refresh to refresh");
+            logger.info("Select one of these servers, or use none to skip, refresh to refresh");
             int index = 0;
             for (MulticastData serverAddress : multicastClient.serversAddress) {
                 index++;
@@ -188,21 +210,9 @@ public class Client implements IEncryptionKeyHolder {
             while (scanner.hasNextLine()) {
                 String answer = scanner.nextLine();
 
-                boolean checked = false;
-
                 answer = answer.replaceAll(" ", "");
 
-                if (answer.equalsIgnoreCase("none")) {
-                    break;
-                }
-
-                if (answer.equalsIgnoreCase("refresh")) {
-                    checked = true;
-                    check(scanner, 7);
-                }
-
                 if (answer.matches("[0-9]+")) {
-                    checked = true;
                     try {
                         int serverIndex = Integer.parseInt(answer);
 
@@ -211,21 +221,29 @@ public class Client implements IEncryptionKeyHolder {
 
                             host = serverAddress.getAddress();
                             port = serverAddress.getPort();
-                            System.out.println("Selected " + serverAddress.getAddress() + ":" + serverAddress.getPort());
+                            logger.info("Selected {}:{}", serverAddress.getAddress(), serverAddress.getPort());
                             break;
                         } else {
-                            System.out.println("Not in the list");
+                            logger.info("Not in the list");
                         }
                     } catch (NumberFormatException ignored) {
-                        System.out.println("Not a number or refresh/none");
+                        logger.info("Not a number or refresh/none");
                     }
                 }
 
-                if (!checked) {
-                    System.out.println("Unknown argument");
+                switch (answer) {
+                    case "none":
+                        return null;
+                    case "refresh":
+                        return check(multicastClient, scanner, 7);
+                    default:
+                        logger.info("Unknown argument");
+                        break;
                 }
             }
         }
+
+        return new ImmutablePair<>(host, port);
     }
 
 
@@ -233,7 +251,7 @@ public class Client implements IEncryptionKeyHolder {
     @Getter
     protected IOSCheck osCheck;
 
-    private int port = -1;
+    private int port;
     private String host;
 
     protected EventListener listener;
@@ -331,7 +349,6 @@ public class Client implements IEncryptionKeyHolder {
     }
 
     protected void registerLogger() {
-        logger = LoggerFactory.getLogger(Client.class.getName());
         cLogger = new CLogger(logger);
     }
 

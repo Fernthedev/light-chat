@@ -117,10 +117,10 @@ public class EncryptionUtil {
             byte[] salt = new byte[16];
             random.nextBytes(salt);
 
-            SecretKeyFactory factory = SecretKeyFactory.getInstance(StaticHandler.getKeyFactoryString());
+            SecretKeyFactory factory = SecretKeyFactory.getInstance(StaticHandler.getKEY_FACTORY_STRING());
             KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 256);
             SecretKey tmp = factory.generateSecret(spec);
-            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKeySpecTransformation());
+            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKEY_SPEC_TRANSFORMATION());
 
             Cipher cipher = Cipher.getInstance(StaticHandler.getCipherTransformationOld());
             cipher.init(Cipher.ENCRYPT_MODE, secret);
@@ -153,10 +153,10 @@ public class EncryptionUtil {
         try {
             byte[] salt = new byte[16];
 
-            SecretKeyFactory factory = SecretKeyFactory.getInstance(StaticHandler.getKeyFactoryString());
+            SecretKeyFactory factory = SecretKeyFactory.getInstance(StaticHandler.getKEY_FACTORY_STRING());
             KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 256);
             SecretKey tmp = factory.generateSecret(spec);
-            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKeySpecTransformation());
+            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKEY_SPEC_TRANSFORMATION());
 
             return encrypt(object, secret);
         } catch (Exception e) {
@@ -182,10 +182,10 @@ public class EncryptionUtil {
             byte[] iv = Arrays.copyOfRange(ciphertext, 16, 32);
             byte[] ct = Arrays.copyOfRange(ciphertext, 32, ciphertext.length);
 
-            SecretKeyFactory factory = SecretKeyFactory.getInstance(StaticHandler.getKeyFactoryString());
+            SecretKeyFactory factory = SecretKeyFactory.getInstance(StaticHandler.getKEY_FACTORY_STRING());
             KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 256);
             SecretKey tmp = factory.generateSecret(spec);
-            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKeySpecTransformation());
+            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKEY_SPEC_TRANSFORMATION());
             Cipher cipher = Cipher.getInstance(StaticHandler.getCipherTransformationOld());
 
             cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(iv));
@@ -209,10 +209,10 @@ public class EncryptionUtil {
         try {
             byte[] salt = new byte[16];
 
-            SecretKeyFactory factory = SecretKeyFactory.getInstance(StaticHandler.getKeyFactoryString());
+            SecretKeyFactory factory = SecretKeyFactory.getInstance(StaticHandler.getKEY_FACTORY_STRING());
             KeySpec spec = new PBEKeySpec(key.toCharArray(), salt, 65536, 256);
             SecretKey tmp = factory.generateSecret(spec);
-            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKeySpecTransformation());
+            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKEY_SPEC_TRANSFORMATION());
             Cipher cipher = Cipher.getInstance(StaticHandler.getCipherTransformationOld());
 
             cipher.init(Cipher.DECRYPT_MODE, secret);

@@ -44,15 +44,16 @@ public class MulticastServer extends QuoteServerThread {
 
                 buf = new Gson().toJson(dataSend).getBytes();
 
-                InetAddress group = InetAddress.getByName(StaticHandler.address);
+                InetAddress group = InetAddress.getByName(StaticHandler.getAddress());
                 DatagramPacket packet;
                 packet = new DatagramPacket(buf, buf.length, group, 4446);
                 socket.send(packet);
 
                 try {
                     sleep((long) (Math.random() * 200));
+                } catch (InterruptedException ignored) {
+                    Thread.currentThread().interrupt();
                 }
-                catch (InterruptedException ignored) { }
             }
             catch (IOException e) {
                 e.printStackTrace();
@@ -61,7 +62,7 @@ public class MulticastServer extends QuoteServerThread {
             try {
                 Thread.sleep(15);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
         Server.getLogger().info("Closing MultiCast Server");

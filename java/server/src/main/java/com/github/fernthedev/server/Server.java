@@ -91,7 +91,8 @@ public class Server implements Runnable {
         return console;
     }
 
-    private static Logger logger;
+    @Getter
+    private static Logger logger = LoggerFactory.getLogger(Server.class);
 
     private ChannelFuture future;
     private EventLoopGroup bossGroup, workerGroup;
@@ -110,34 +111,38 @@ public class Server implements Runnable {
 
         int port = -1;
 
-        boolean debug = false;
-
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
 
             if (arg.equalsIgnoreCase("-port")) {
                 try {
                     port = Integer.parseInt(args[i + 1]);
-                } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                    if (port < 0) {
+                        logger.error("-port cannot be less than 0");
+                        port = -1;
+                    } else logger.info("Using port {}", args[i+ + 1]);
+                } catch (NumberFormatException | IndexOutOfBoundsException e) {
+                    logger.error("-port is not a number");
                     port = -1;
                 }
             }
 
             if(arg.equalsIgnoreCase("-lightmanager")) {
-                StaticHandler.isLight = true;
+                StaticHandler.setLight(true);
             }
 
             if (arg.equalsIgnoreCase("-debug")) {
-                debug = true;
+                StaticHandler.setDebug(true);
+                logger.debug("Debug enabled");
             }
         }
 
 
 
-        if (System.console() == null && !debug) {
+        if (System.console() == null && !StaticHandler.isDebug()) {
 
             String filename = Server.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6);
-            System.out.println("No console found");
+            logger.warn("No console found");
 
             String[] newArgs = new String[]{"cmd", "/c", "start", "cmd", "/c", "java -jar -Xmx2G -Xms2G \"" + filename + "\""};
 
@@ -156,12 +161,10 @@ public class Server implements Runnable {
 
         Server server = new Server(port);
         StaticHandler.setCore(new ServerCore(server));
-        StaticHandler.setDebug(debug);
         new Thread(server,"ServerMainThread").start();
     }
 
     Server(int port) {
-        getLogger();
         running = true;
         this.port = port;
 
@@ -327,10 +330,10 @@ public class Server implements Runnable {
 //        LoggerManager loggerManager = new LoggerManager();
 //        pluginManager.registerEvents(loggerManager, new ServerPlugin());
 
-        logger.info("Running on [{}]", StaticHandler.os);
+        logger.info("Running on [{}]", StaticHandler.OS);
 
         tasks.add(ThreadUtils.runAsync(() -> {
-            if (StaticHandler.os.equalsIgnoreCase("Linux") || StaticHandler.os.contains("Linux") || StaticHandler.isLight) {
+            if (StaticHandler.OS.equalsIgnoreCase("Linux") || StaticHandler.OS.contains("Linux") || StaticHandler.isLight()) {
                 logger.info("Running LightManager (Note this is for raspberry pies only)");
 
                 Thread lightThread = new Thread(() -> {
@@ -485,14 +488,6 @@ public class Server implements Runnable {
         return port;
     }
 
-    public static Logger getLogger() {
-        if(logger == null) registerLogger();
-        return logger;
-    }
-
-    public static void registerLogger() {
-        logger = LoggerFactory.getLogger(Server.class);
-    }
 
     /**
      * This registers the command

@@ -152,19 +152,20 @@ public class AuthenticationManager extends Command implements Listener {
      * @param sender
      */
     public static void attemptAuthenticationHash(HashedPassword hashedPassword, CommandSender sender) {
-        String rightPass = EncryptionUtil.makeSHA256Hash(Server.getSettingsManager().getConfigData().getPassword());
+
         if(checking.containsKey(sender)) {
             PlayerInfo playerInfo = checking.get(sender);
 
             if(sender instanceof ClientPlayer) {
                 ClientPlayer clientPlayer = (ClientPlayer) sender;
-
                 if(playerInfo.mode == Mode.AUTHENTICATE) {
+
+                    String rightPass = EncryptionUtil.makeSHA256Hash(Server.getSettingsManager().getConfigData().getPassword());
                     if(rightPass.equals(hashedPassword.getPassword())) {
                         sender.sendMessage(ColorCode.GREEN + "Correct password. Successfully authenticated:");
                         playerInfo.authenticated = true;
                         checking.remove(sender);
-                    }else{
+                    } else {
                         if(playerInfo.tries <= 2) {
                             sender.sendMessage(ColorCode.RED + "Incorrect password");
                             sender.sendPacket(new SelfMessagePacket(SelfMessagePacket.MessageType.INCORRECT_PASSWORD_ATTEMPT));
@@ -175,9 +176,8 @@ public class AuthenticationManager extends Command implements Listener {
                             checking.remove(sender);
                         }
                     }
+
                 }
-
-
             }
 
             if(sender instanceof Console) {

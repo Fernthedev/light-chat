@@ -6,6 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
+@PacketInfo(name = "HASHED_PASSWORD_PACKET")
 public class HashedPasswordPacket extends Packet {
 
     private HashedPassword hashedPassword;

@@ -1,12 +1,12 @@
 
 Vsquid:S1118":Add a private constructor to hide the implicit public one.(½«äğÿÿÿÿÿ
-gsquid:S00100Š"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ô­Ñ¨
-Vsquid:S3034€">Prevent "int" promotion by adding "& 0xff" to this expression.(²¡ÚĞ
 Gsquid:S4432B"0Use Galois/Counter Mode (GCM/NoPadding) instead.(æÇ—·
-lsquid:S00100å"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ó¸ï½üÿÿÿÿ
+Vsquid:S3034€">Prevent "int" promotion by adding "& 0xff" to this expression.(²¡ÚĞ
+gsquid:S00100Š"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ô­Ñ¨
+lsquid:S00100"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ä Ñüÿÿÿÿ
 gsquid:S00100Ÿ"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(œ¹åÁ
-Gsquid:S4432,"0Use Galois/Counter Mode (GCM/NoPadding) instead.(æÇ—·
+Gsquid:S4432b"0Use Galois/Counter Mode (GCM/NoPadding) instead.(æÇ—·
+lsquid:S00100å"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ó¸ï½üÿÿÿÿ
 p
 squid:S135ª"YReduce the total number of break and continue statements in this loop to use at most one.(‚ÔÅ›
-Gsquid:S4432b"0Use Galois/Counter Mode (GCM/NoPadding) instead.(æÇ—·
-lsquid:S00100"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ä Ñüÿÿÿÿ
+Gsquid:S4432,"0Use Galois/Counter Mode (GCM/NoPadding) instead.(æÇ—·

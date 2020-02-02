@@ -27,7 +27,7 @@ public class MulticastClient {
     public void checkServers(int amount) {
         try(MulticastSocket socket = new MulticastSocket(4446)) {
 
-            InetAddress group = InetAddress.getByName(StaticHandler.address);
+            InetAddress group = InetAddress.getByName(StaticHandler.getAddress());
 
             socket.joinGroup(group);
 

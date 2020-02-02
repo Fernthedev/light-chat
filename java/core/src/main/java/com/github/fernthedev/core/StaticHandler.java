@@ -36,7 +36,13 @@ public class StaticHandler {
 
 
     public static final String PACKET_PACKAGE = "com.github.fernthedev.core.packets";
-    public static final String address = "224.0.1.42";
+
+    /**
+     * Modify if required.
+     */
+    @Getter
+    @Setter
+    private static String address = "224.0.1.42";
 
     private static final Gson gson = new Gson();
     public static final Charset CHARSET_FOR_STRING = CharsetUtil.UTF_8;
@@ -46,12 +52,15 @@ public class StaticHandler {
 
     public static void setDebug(boolean debug) {
         StaticHandler.debug = debug;
-        Configurator.setLevel(getCore().getLogger().getName(), debug ? Level.DEBUG : Level.INFO);
+        if (getCore() != null) Configurator.setLevel(getCore().getLogger().getName(), debug ? Level.DEBUG : Level.INFO);
         Configurator.setLevel(Reflections.class.getName(), debug ? Level.DEBUG : Level.WARN);
     }
 
-    public static String os = System.getProperty("os.name");
-    public static boolean isLight = false;
+    public static final String OS = System.getProperty("os.name");
+
+    @Getter
+    @Setter
+    private static boolean isLight = false;
 
     @Getter
     private static final String cipherTransformationOld = "AES/CBC/PKCS5Padding";
@@ -62,16 +71,19 @@ public class StaticHandler {
 
 
     @Getter
-    private static final String keySpecTransformation = "AES";
+    private static final String KEY_SPEC_TRANSFORMATION = "AES";
 
     @Getter
-    private static final String KeyFactoryString = "PBKDF2WithHmacSHA1";
+    private static final String KEY_FACTORY_STRING = "PBKDF2WithHmacSHA1";
 
     @Synchronized
     public static void setCore(Core core) {
         StaticHandler.core = core;
 //        Configurator.setLevel(getCore().getLogger().getName(), debug ? Level.DEBUG : Level.INFO);
         PacketRegistry.registerDefaultPackets();
+
+        // Updates debug config
+        setDebug(debug);
     }
 
     @Getter
@@ -165,6 +177,10 @@ public class StaticHandler {
 
     }
 
+    /**
+     *
+     * @deprecated Using {@link ConsoleHandler} now
+     */
     @Deprecated
     public static void setupTerminal(@NonNull Completer completer) {
         final Terminal terminal = TerminalConsoleAppender.getTerminal();
