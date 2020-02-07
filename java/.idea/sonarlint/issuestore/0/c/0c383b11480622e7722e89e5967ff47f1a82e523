@@ -1,5 +1,3 @@
 
-usquid:S3776"RRefactor this method to reduce its Cognitive Complexity from 22 to the 15 allowed.(Õ´üşÿÿÿÿ8ÚŞÇòô-
 “"squid:SwitchLastCaseIsDefaultCheck\"YComplete cases by adding the missing enum constants or add a default case to this switch.(Ê§² ùÿÿÿÿ8öÈİòô-
-_squid:S3457"AFormat specifiers should be used instead of string concatenation.(à–8¤¥„ôô-
-dsquid:S3457("AFormat specifiers should be used instead of string concatenation.(¢î¨ıüÿÿÿÿ8¤¥„ôô-
+usquid:S3776"RRefactor this method to reduce its Cognitive Complexity from 21 to the 15 allowed.(Õ´üşÿÿÿÿ8“Ø§è.

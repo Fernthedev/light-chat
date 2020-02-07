@@ -1,8 +1,8 @@
 package com.github.fernthedev.server.settings;
 
-import com.github.fernthedev.gson.GsonConfig;
-import com.github.fernthedev.server.Server;
+import com.github.fernthedev.config.gson.GsonConfig;
 import com.github.fernthedev.core.StaticHandler;
+import com.github.fernthedev.server.Server;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 

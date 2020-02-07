@@ -3,18 +3,14 @@ package com.github.fernthedev.server;
 
 import com.github.fernthedev.core.packets.MessagePacket;
 import com.github.fernthedev.server.backend.BannedData;
-import com.github.fernthedev.server.backend.CommandMessageParser;
 import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.command.CommandSender;
 import com.github.fernthedev.server.command.KickCommand;
 import com.github.fernthedev.server.event.chat.ChatEvent;
-import com.github.fernthedev.core.StaticHandler;
+
 import lombok.NonNull;
-import org.jline.reader.UserInterruptException;
 
 import java.util.HashMap;
-
-import static com.github.fernthedev.server.CommandWorkerThread.commandList;
 
 
 public class ServerCommandHandler implements Runnable {
@@ -32,21 +28,21 @@ public class ServerCommandHandler implements Runnable {
 
     @Deprecated
     public void run() {
-        try {
-            Server.getLogger().info("Type Command: (try help)");
-            while (server.isRunning()) {
-
-                String command = StaticHandler.readLine("> ");
-
-                command = command.replaceAll(" {2}", "").trim();
-
-                if (command.equals("") || command.equals(" ")) continue;
-
-                dispatchCommand(command);
-            }
-        } catch (UserInterruptException e) {
-            server.shutdownServer();
-        }
+//        try {
+//            Server.getLogger().info("Type Command: (try help)");
+//            while (server.isRunning()) {
+//
+//                String command = ""; // StaticHandler.readLine("> ");
+//
+//                command = command.replaceAll(" {2}", "").trim();
+//
+//                if (command.equals("") || command.equals(" ")) continue;
+//
+//                dispatchCommand(command);
+//            }
+//        } catch (UserInterruptException e) {
+//            server.shutdownServer();
+//        }
     }
 
     public void dispatchCommand(@NonNull String command) {
@@ -58,7 +54,7 @@ public class ServerCommandHandler implements Runnable {
         new Thread(() -> {
             ChatEvent chatEvent = new ChatEvent(server.getConsole(), finalCommand,true,true);
             server.getPluginManager().callEvent(chatEvent);
-            CommandMessageParser.onCommand(chatEvent);
+            server.getCommandMessageParser().onCommand(chatEvent);
         }, "ConsoleChatEvent").start();
     }
 
@@ -71,7 +67,7 @@ public class ServerCommandHandler implements Runnable {
         new Thread(() -> {
             ChatEvent chatEvent = new ChatEvent(sender, finalCommand,true,true);
             server.getPluginManager().callEvent(chatEvent);
-            CommandMessageParser.onCommand(chatEvent);
+            server.getCommandMessageParser().onCommand(chatEvent);
         }, "ConsoleChatEvent").start();
     }
 
@@ -191,7 +187,7 @@ public class ServerCommandHandler implements Runnable {
                                         }
                                     }
 
-                                    Server.getInstance().getBanManager().addBan(clientPlayer,new BannedData(clientPlayer.getAddress()));
+                                    server.getBanManager().addBan(clientPlayer,new BannedData(clientPlayer.getAddress()));
 
                                     clientPlayer.sendObject(new MessagePacket("Banned: " + message));
                                     clientPlayer.close();
@@ -210,14 +206,14 @@ public class ServerCommandHandler implements Runnable {
             public void onCommand(CommandSender sender,String[] args) {
                 if(args.length == 0) {
                     sender.sendMessage("Following commands: ");
-                    for(Command serverCommand : commandList) {
+                    for(Command serverCommand : server.getCommands()) {
                         sender.sendMessage(serverCommand.getName());
                     }
                 }else{
                     String command = args[0];
                     boolean executed = false;
 
-                    for (Command serverCommand : commandList) {
+                    for (Command serverCommand : server.getCommands()) {
                         if (serverCommand.getName().equalsIgnoreCase(command)) {
                             if(serverCommand.getUsage().equals("")) {
                                 sender.sendMessage("No usage found.");

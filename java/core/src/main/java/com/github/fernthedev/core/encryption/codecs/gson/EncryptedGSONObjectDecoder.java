@@ -65,7 +65,7 @@ public class EncryptedGSONObjectDecoder extends StringDecoder {
         super.decode(ctx, msg, tempDecodeList);
 
         String decodedStr = (String) tempDecodeList.get(0);
-        StaticHandler.getCore().getLogger().info("Decoding the string {}", decodedStr);
+        StaticHandler.getCore().getLogger().debug("Decoding the string {}", decodedStr);
         PacketWrapper<?> packetWrapper = gson.fromJson(decodedStr, PacketWrapper.class);
 
         String decryptedJSON;

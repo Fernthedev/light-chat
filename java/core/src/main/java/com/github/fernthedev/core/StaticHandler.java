@@ -4,16 +4,11 @@ import com.google.common.io.Resources;
 import com.google.gson.Gson;
 import io.netty.util.CharsetUtil;
 import lombok.*;
-import net.minecrell.terminalconsole.TerminalConsoleAppender;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.apache.logging.log4j.util.PropertiesUtil;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.jline.reader.Completer;
-import org.jline.reader.LineReader;
-import org.jline.reader.LineReaderBuilder;
-import org.jline.terminal.Terminal;
 import org.reflections.Reflections;
 
 import java.io.File;
@@ -79,11 +74,12 @@ public class StaticHandler {
     @Synchronized
     public static void setCore(Core core) {
         StaticHandler.core = core;
-//        Configurator.setLevel(getCore().getLogger().getName(), debug ? Level.DEBUG : Level.INFO);
-        PacketRegistry.registerDefaultPackets();
 
         // Updates debug config
         setDebug(debug);
+//        Configurator.setLevel(getCore().getLogger().getName(), debug ? Level.DEBUG : Level.INFO);
+
+        PacketRegistry.registerDefaultPackets();
     }
 
     @Getter
@@ -164,7 +160,7 @@ public class StaticHandler {
 
     }
 
-    private static LineReader lineReader;
+
 
 
     public static void setupLoggers() {
@@ -177,53 +173,55 @@ public class StaticHandler {
 
     }
 
-    /**
-     *
-     * @deprecated Using {@link ConsoleHandler} now
-     */
-    @Deprecated
-    public static void setupTerminal(@NonNull Completer completer) {
-        final Terminal terminal = TerminalConsoleAppender.getTerminal();
-
-        if(terminal == null) {
-            System.err.println("Terminal is not supported. Features such as auto complete may not work.");
-            return;
-        }
-
-        lineReader = LineReaderBuilder.builder()
-                .terminal(terminal)
-                .completer(completer)
-                .build();
-
-        System.out.println(terminal + " is the terminal " + completer + " is completer");
-
-        lineReader.setOpt(LineReader.Option.DISABLE_EVENT_EXPANSION);
-        lineReader.unsetOpt(LineReader.Option.INSERT_TAB);
-
-        TerminalConsoleAppender.setReader(lineReader);
-
-       // lineReader.option(LineReader.Option.AUTO_FRESH_LINE,true);
-
-    }
-
-    public static String readLine(String format) {
-        return lineReader.readLine(format);
-
-
-        /*
-        if (System.console() != null) {
-            return System.console().readLine();
-        }
-        //System.out.print(format);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(
-                System.in));
-        try {
-            return reader.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;*/
-    }
+//    private static LineReader lineReader;
+//
+//    /**
+//     *
+//     * @deprecated Using {@link ConsoleHandler} now
+//     */
+//    @Deprecated
+//    public static void setupTerminal(@NonNull Completer completer) {
+//        final Terminal terminal = TerminalConsoleAppender.getTerminal();
+//
+//        if(terminal == null) {
+//            System.err.println("Terminal is not supported. Features such as auto complete may not work.");
+//            return;
+//        }
+//
+//        lineReader = LineReaderBuilder.builder()
+//                .terminal(terminal)
+//                .completer(completer)
+//                .build();
+//
+//        System.out.println(terminal + " is the terminal " + completer + " is completer");
+//
+//        lineReader.setOpt(LineReader.Option.DISABLE_EVENT_EXPANSION);
+//        lineReader.unsetOpt(LineReader.Option.INSERT_TAB);
+//
+//        TerminalConsoleAppender.setReader(lineReader);
+//
+//       // lineReader.option(LineReader.Option.AUTO_FRESH_LINE,true);
+//
+//    }
+//
+//    public static String readLine(String format) {
+//        return lineReader.readLine(format);
+//
+//
+//        /*
+//        if (System.console() != null) {
+//            return System.console().readLine();
+//        }
+//        //System.out.print(format);
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(
+//                System.in));
+//        try {
+//            return reader.readLine();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return null;*/
+//    }
 
     public static String getFile(String fileName) {
 

@@ -1,0 +1,11 @@
+apply plugin: 'application'
+dependencies {
+    compile(project(':client'))
+    compile(project(':terminal:terminal-core'))
+}
+
+group "${project.parent.group}.client"
+
+application {
+    mainClassName = "com.github.fernthedev.terminal.client.ClientTerminal"
+}

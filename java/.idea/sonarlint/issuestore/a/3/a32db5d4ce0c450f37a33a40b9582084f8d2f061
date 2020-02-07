@@ -1,4 +1,4 @@
 
-isquid:S37765"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(®½ˆ·
 o
-squid:S135@"YReduce the total number of break and continue statements in this loop to use at most one.(©ì…á
+squid:S135>"YReduce the total number of break and continue statements in this loop to use at most one.(©ì…á
+nsquid:S37763"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(€ªš¹ùÿÿÿÿ

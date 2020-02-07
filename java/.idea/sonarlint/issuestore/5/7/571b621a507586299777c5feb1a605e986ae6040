@@ -1,5 +1,5 @@
 
-Qsquid:S1133"5Do not forget to remove this deprecated code someday.(«©Ϊκύÿÿÿÿ
 Jsquid:S1068"3Remove this unused "canClientAccess" private field.(γ„·¬
 esquid:S4042E"IUse "java.nio.Files#delete" here for better messages on error conditions.(–ύΛιωÿÿÿÿ
 Usquid:MissingDeprecatedCheck"(Add the missing @deprecated Javadoc tag.(«©Ϊκύÿÿÿÿ
+Qsquid:S1133"5Do not forget to remove this deprecated code someday.(«©Ϊκύÿÿÿÿ

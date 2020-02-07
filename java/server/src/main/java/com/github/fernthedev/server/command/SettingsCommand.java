@@ -1,9 +1,8 @@
 package com.github.fernthedev.server.command;
 
-import com.github.fernthedev.common.Config;
+import com.github.fernthedev.config.common.Config;
 import com.github.fernthedev.core.ColorCode;
 import com.github.fernthedev.server.Server;
-import com.github.fernthedev.server.backend.AuthenticationManager;
 import com.github.fernthedev.server.settings.Settings;
 
 import java.util.List;
@@ -12,8 +11,11 @@ import java.util.Map;
 public class SettingsCommand extends Command {
 
 
-    public SettingsCommand() {
+    private final Server server;
+
+    public SettingsCommand(Server server) {
         super("settings");
+        this.server = server;
     }
 
     @Override
@@ -22,13 +24,13 @@ public class SettingsCommand extends Command {
         if (args.length == 0) {
             sender.sendMessage("Possible args: set,get,reload,save, list");
         } else {
-            boolean authenticated = AuthenticationManager.authenticate(sender);
+            boolean authenticated = server.getAuthenticationManager().authenticate(sender);
             if (authenticated) {
                 long timeStart;
                 long timeEnd;
                 long timeElapsed;
                 String arg = args[0];
-                Config<Settings> settingsManager = Server.getSettingsManager();
+                Config<Settings> settingsManager = server.getSettingsManager();
 
                 switch (arg.toLowerCase()) {
                     case "set":

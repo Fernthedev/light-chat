@@ -1,14 +1,5 @@
 
-Lsquid:S2447ş"-Null is returned but a "Boolean" is expected.(¥¹ï8“¯µòô-
-Lsquid:S2447†"-Null is returned but a "Boolean" is expected.(¥¹ï8“¯µòô-
-Dsquid:S14445"(Make this "public static os" field final(™Û‚òûÿÿÿÿ
-"squid:ClassVariableVisibilityCheck5"NMake os a static final constant or non-public and provide accessors if needed.(™Û‚òûÿÿÿÿ
-Xsquid:MissingDeprecatedCheck©"(Add the missing @deprecated Javadoc tag.(ó´Æã8“¯µòô-
-Isquid:S14446"-Make this "public static isLight" field final(ÖŸìòúÿÿÿÿ
-Tsquid:S1133©"5Do not forget to remove this deprecated code someday.(ó´Æã8“¯µòô-
-wsquid:S001159"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(ËÓÂ‹ıÿÿÿÿ
-wsquid:S00115A"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(ÑÏİ´úÿÿÿÿ
-wsquid:S00115'"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(àÀÃğıÿÿÿÿ
-rsquid:S00115D"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(…ËÙÊ
-qsquid:UnusedPrivateMethodû"?Remove this unused private "getOptionalBooleanProperty" method.(±¡â•øÿÿÿÿ8“¯µòô-
-†"squid:ClassVariableVisibilityCheck6"SMake isLight a static final constant or non-public and provide accessors if needed.(ÖŸìòúÿÿÿÿ
+Lsquid:S2447”"-Null is returned but a "Boolean" is expected.(¥¹ï8Ôºµã.
+~squid:S00115="ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(ËÓÂ‹ıÿÿÿÿ8³µóâ.
+qsquid:UnusedPrivateMethod‰"?Remove this unused private "getOptionalBooleanProperty" method.(±¡â•øÿÿÿÿ8Ôºµã.
+Lsquid:S2447Œ"-Null is returned but a "Boolean" is expected.(¥¹ï8Ôºµã.

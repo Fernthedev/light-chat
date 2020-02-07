@@ -1,11 +1,0 @@
-
-Esquid:S1481b")Remove this unused "time" local variable.(º…Ì¸ýÿÿÿÿ
-csquid:S2095g"LUse try-with-resources or close this "BufferedWriter" in a "finally" clause.(‚ˆ‡€
-ksquid:S2095"OUse try-with-resources or close this "PipedOutputStream" in a "finally" clause.(Œ˜ØÖùÿÿÿÿ
-Tsquid:S1854b"8Remove this useless assignment to local variable "time".(º…Ì¸ýÿÿÿÿ
-csquid:S2095$"LUse try-with-resources or close this "BufferedReader" in a "finally" clause.(¯Ô½ð
-Dsquid:S1481"(Remove this unused "out" local variable.(Œ˜ØÖùÿÿÿÿ
-nsquid:S1450"XRemove the "logFolder" field and declare it as a local variable in the relevant methods.(’¾•"
-jsquid:S2095"NUse try-with-resources or close this "PipedInputStream" in a "finally" clause.(ÉüÇñÿÿÿÿÿ
-]squid:S21422"FEither re-interrupt this method or rethrow the "InterruptedException".(ä ¹€
-`squid:S2583h"DChange this condition so that it does not always evaluate to "false"(ðË£Õøÿÿÿÿ

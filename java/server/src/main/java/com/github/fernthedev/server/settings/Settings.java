@@ -2,7 +2,7 @@ package com.github.fernthedev.server.settings;
 
 import com.github.fernthedev.core.encryption.codecs.CodecEnum;
 import com.github.fernthedev.fernutils.threads.ThreadUtils;
-import com.github.fernthedev.fernutils.threads.multiple.TaskInfoList;
+import com.github.fernthedev.fernutils.threads.multiple.TaskInfoForLoop;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -159,7 +159,7 @@ public class Settings {
     }
 
     public Map<String, List<String>> getSettingValuesAsync(boolean editable) {
-        TaskInfoList<Field, Pair<String, List<String>>> ob = ThreadUtils.runForLoopAsync(Arrays.asList(getClass().getDeclaredFields()), (field -> {
+        TaskInfoForLoop<Field, Pair<String, List<String>>> ob = ThreadUtils.runForLoopAsync(Arrays.asList(getClass().getDeclaredFields()), (field -> {
 
 
             if (field.isAnnotationPresent(SettingValue.class)) {

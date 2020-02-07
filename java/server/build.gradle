@@ -1,12 +1,12 @@
-apply plugin: 'application'
+//apply plugin: 'application'
 
 dependencies {
     compile project(':core')
-    implementation 'com.squareup.okio:okio:2.2.2'
-    implementation 'com.github.Fernthedev:LightReader:1.2.1'
+    compile 'com.squareup.okio:okio:2.2.2'
+    compile 'com.github.Fernthedev:LightReader:1.2.1'
 }
 
-
-application {
-    mainClassName = "com.github.fernthedev.server.Server"
-}
+//
+//application {
+//    mainClassName = "com.github.fernthedev.server.Server"
+//}

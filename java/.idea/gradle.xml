@@ -14,6 +14,10 @@
             <option value="$PROJECT_DIR$/client" />
             <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/server" />
+            <option value="$PROJECT_DIR$/terminal" />
+            <option value="$PROJECT_DIR$/terminal/terminal-client" />
+            <option value="$PROJECT_DIR$/terminal/terminal-core" />
+            <option value="$PROJECT_DIR$/terminal/terminal-server" />
           </set>
         </option>
         <option name="useAutoImport" value="true" />

@@ -117,7 +117,7 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
        // Server.getLogger().info("Channel Registering");
         Channel channel = ctx.channel();
 
-        if(Server.getInstance().getBanManager().isBanned(ctx.channel().remoteAddress().toString())) {
+        if(server.getBanManager().isBanned(ctx.channel().remoteAddress().toString())) {
             ctx.flush();
             ctx.close();
             return;

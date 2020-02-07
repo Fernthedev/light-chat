@@ -1,7 +1,6 @@
 package com.github.fernthedev.client;
 
-import com.github.fernthedev.core.StaticHandler;
-import org.jline.reader.UserInterruptException;
+
 
 @Deprecated
 public class WaitForCommand implements Runnable {
@@ -18,26 +17,24 @@ public class WaitForCommand implements Runnable {
     }
 
 
-
     public void run() {
         running = true;
 
         // client.getLogger().info("Starting the runnable for wait for command ;) " + client.running );
-        while (client.isRunning()) {
-            //  if (client.registered) {
+//        while (client.isRunning()) {
+//            //  if (client.registered) {
+//
+//            try {
+//                String message = StaticHandler.readLine("> ");
+//
+//                if (message.equals("")) continue;
+//
+//                client.sendMessage(message);
+//            } catch (UserInterruptException e) {
+//                client.close();
+//                System.exit(0);
+//            }
 
-            try {
-                String message = StaticHandler.readLine("> ");
-
-                if (message.equals("")) continue;
-
-                client.sendMessage(message);
-            } catch (UserInterruptException e) {
-                client.close();
-                System.exit(0);
-            }
-
-            //   }
-        }
+        //   }
     }
 }

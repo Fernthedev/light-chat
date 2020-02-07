@@ -22,10 +22,12 @@ import java.util.Map;
  * Can be used to authenticate command senders.
  */
 public class AuthenticationManager extends Command implements Listener {
-    private static Map<CommandSender,PlayerInfo> checking = new HashMap<>();
+    private final Server server;
+    private Map<CommandSender,PlayerInfo> checking = new HashMap<>();
 
-    public AuthenticationManager(@NonNull String command) {
+    public AuthenticationManager(Server server, @NonNull String command) {
         super(command);
+        this.server = server;
     }
 
     @Override
@@ -47,7 +49,7 @@ public class AuthenticationManager extends Command implements Listener {
         }
     }
 
-    public static boolean authenticate(CommandSender sender) {
+    public boolean authenticate(CommandSender sender) {
         if (sender instanceof Console) {
             return true;
         }
@@ -91,14 +93,14 @@ public class AuthenticationManager extends Command implements Listener {
                 if(playerInfo.mode == Mode.NEW_PASSWORD) {
                     if(StringUtils.isAlphanumeric(event.getMessage())) {
                         event.getSender().sendMessage("Setting password now");
-                        Server.getSettingsManager().getConfigData().setPassword(event.getMessage());
-                        Server.getSettingsManager().save();
+                        server.getSettingsManager().getConfigData().setPassword(event.getMessage());
+                        server.getSettingsManager().save();
                         checking.remove(event.getSender());
                     }else event.getSender().sendMessage("Password can only be alphanumeric");
                 }
 
                 if(playerInfo.mode == Mode.OLD_PASSWORD) {
-                    if(Server.getSettingsManager().getConfigData().getPassword().equals(event.getMessage())) {
+                    if(server.getSettingsManager().getConfigData().getPassword().equals(event.getMessage())) {
                         event.getSender().sendMessage("Correct password. Choose new password:");
                         playerInfo.mode = Mode.NEW_PASSWORD;
                     }else{
@@ -106,14 +108,14 @@ public class AuthenticationManager extends Command implements Listener {
                             event.getSender().sendMessage("Incorrect password");
                             playerInfo.tries++;
                         }else{
-                            Server.getInstance().getBanManager().addBan(clientPlayer,new BannedData(clientPlayer.getAddress()));
+                            server.getBanManager().addBan(clientPlayer,new BannedData(clientPlayer.getAddress()));
                             checking.remove(event.getSender());
                         }
                     }
                 }
 
                 if(playerInfo.mode == Mode.AUTHENTICATE) {
-                    if(Server.getSettingsManager().getConfigData().getPassword().equals(event.getMessage())) {
+                    if(server.getSettingsManager().getConfigData().getPassword().equals(event.getMessage())) {
                         event.getSender().sendMessage(ColorCode.GREEN + "Correct password. Successfully authenticated:");
                         playerInfo.authenticated = true;
                         checking.remove(event.getSender());
@@ -122,7 +124,8 @@ public class AuthenticationManager extends Command implements Listener {
                             event.getSender().sendMessage(ColorCode.RED + "Incorrect password");
                             playerInfo.tries++;
                         }else{
-                            LoggerManager.getInstance().log(event.getSender().getName() + ":" + clientPlayer.getAddress() + " tried to authenticate but failed 2 times");
+                            Server.getLogger().warn(event.getSender().getName() + ":" + clientPlayer.getAddress() + " tried to authenticate but failed 2 times");
+//                            LoggerManager.getInstance().log();
                             checking.remove(event.getSender());
                         }
                     }
@@ -132,9 +135,9 @@ public class AuthenticationManager extends Command implements Listener {
             }
 
             if(event.getSender() instanceof Console) {
-                Server.getLogger().info(ColorCode.GREEN + "Setting password now");
-                Server.getSettingsManager().getConfigData().setPassword(event.getMessage());
-                Server.getSettingsManager().save();
+                server.getLogger().info(ColorCode.GREEN + "Setting password now");
+                server.getSettingsManager().getConfigData().setPassword(event.getMessage());
+                server.getSettingsManager().save();
                 checking.remove(event.getSender());
             }
         }
@@ -151,7 +154,7 @@ public class AuthenticationManager extends Command implements Listener {
      * @param hashedPassword
      * @param sender
      */
-    public static void attemptAuthenticationHash(HashedPassword hashedPassword, CommandSender sender) {
+    public void attemptAuthenticationHash(HashedPassword hashedPassword, CommandSender sender) {
 
         if(checking.containsKey(sender)) {
             PlayerInfo playerInfo = checking.get(sender);
@@ -160,7 +163,7 @@ public class AuthenticationManager extends Command implements Listener {
                 ClientPlayer clientPlayer = (ClientPlayer) sender;
                 if(playerInfo.mode == Mode.AUTHENTICATE) {
 
-                    String rightPass = EncryptionUtil.makeSHA256Hash(Server.getSettingsManager().getConfigData().getPassword());
+                    String rightPass = EncryptionUtil.makeSHA256Hash(server.getSettingsManager().getConfigData().getPassword());
                     if(rightPass.equals(hashedPassword.getPassword())) {
                         sender.sendMessage(ColorCode.GREEN + "Correct password. Successfully authenticated:");
                         playerInfo.authenticated = true;
@@ -171,7 +174,7 @@ public class AuthenticationManager extends Command implements Listener {
                             sender.sendPacket(new SelfMessagePacket(SelfMessagePacket.MessageType.INCORRECT_PASSWORD_ATTEMPT));
                             playerInfo.tries++;
                         } else {
-                            Server.getLogger().warn("{}:{} tried to authenticate but failed 2 times", sender.getName(), clientPlayer.getAddress());
+                            server.getLogger().warn("{}:{} tried to authenticate but failed 2 times", sender.getName(), clientPlayer.getAddress());
                             sender.sendPacket(new SelfMessagePacket(SelfMessagePacket.MessageType.INCORRECT_PASSWORD_FAILURE));
                             checking.remove(sender);
                         }

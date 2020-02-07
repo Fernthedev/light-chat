@@ -1,7 +1,7 @@
 package com.github.fernthedev.server;
 
+import com.github.fernthedev.config.common.Config;
 import com.github.fernthedev.core.ColorCode;
-import com.github.fernthedev.core.ConsoleHandler;
 import com.github.fernthedev.core.StaticHandler;
 import com.github.fernthedev.core.encryption.codecs.AcceptablePacketTypes;
 import com.github.fernthedev.core.encryption.codecs.fastjson.EncryptedFastJSONObjectDecoder;
@@ -13,21 +13,21 @@ import com.github.fernthedev.core.packets.Packet;
 import com.github.fernthedev.core.packets.SelfMessagePacket;
 import com.github.fernthedev.fernutils.threads.ThreadUtils;
 import com.github.fernthedev.fernutils.threads.single.TaskInfo;
-import com.github.fernthedev.gson.GsonConfig;
 import com.github.fernthedev.light.LightManager;
 import com.github.fernthedev.light.exceptions.NoPi4JLibsFoundException;
+import com.github.fernthedev.server.api.IPacketHandler;
 import com.github.fernthedev.server.backend.AuthenticationManager;
-import com.github.fernthedev.server.backend.AutoCompleteHandler;
 import com.github.fernthedev.server.backend.BanManager;
+import com.github.fernthedev.server.backend.ClientAutoCompleteHandler;
 import com.github.fernthedev.server.backend.CommandMessageParser;
 import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.command.CommandSender;
 import com.github.fernthedev.server.command.LightCommand;
-import com.github.fernthedev.server.command.SettingsCommand;
 import com.github.fernthedev.server.event.chat.ServerPlugin;
 import com.github.fernthedev.server.netty.MulticastServer;
 import com.github.fernthedev.server.netty.ProcessingHandler;
 import com.github.fernthedev.server.plugin.PluginManager;
+import com.github.fernthedev.server.settings.NoFileConfig;
 import com.github.fernthedev.server.settings.Settings;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
@@ -42,49 +42,45 @@ import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import io.netty.util.CharsetUtil;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.time.StopWatch;
-import org.fusesource.jansi.AnsiConsole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import static com.github.fernthedev.server.CommandWorkerThread.commandList;
 
 
 public class Server implements Runnable {
 
     private ServerCommandHandler commandHandler;
+
+    @Getter
     private int port;
 
     private boolean running;
-
-    private static Thread thread;
 
     private Console console;
     private BanManager banManager;
     private PluginManager pluginManager;
 
     @Getter
-    private static GsonConfig<Settings> settingsManager;
+    @Setter
+    private Config<Settings> settingsManager = new NoFileConfig<>(new Settings());
 
-    @Getter(AccessLevel.PACKAGE)
-    private AutoCompleteHandler autoCompleteHandler;
     @Getter
     private CommandMessageParser commandMessageParser;
     private MulticastServer multicastServer;
+
+    @Getter
+    private AuthenticationManager authenticationManager;
 
 
     public Console getConsole() {
@@ -97,80 +93,30 @@ public class Server implements Runnable {
     private ChannelFuture future;
     private EventLoopGroup bossGroup, workerGroup;
 
-    private static Server server;
     private ProcessingHandler processingHandler;
 
+    @Getter
+    private ClientAutoCompleteHandler autoCompleteHandler;
 
-    public static void main(String[] args) {
-        AnsiConsole.systemInstall();
-        java.util.logging.Logger.getLogger("io.netty").setLevel(java.util.logging.Level.OFF);
-        StaticHandler.setupLoggers();
+    @Getter
+    private List<IPacketHandler> packetHandlers = new ArrayList<>();
 
-
-        //  Logger.getLogger("io.netty").setLevel(java.util.logging.Level.OFF);
-
-        int port = -1;
-
-        for (int i = 0; i < args.length; i++) {
-            String arg = args[i];
-
-            if (arg.equalsIgnoreCase("-port")) {
-                try {
-                    port = Integer.parseInt(args[i + 1]);
-                    if (port < 0) {
-                        logger.error("-port cannot be less than 0");
-                        port = -1;
-                    } else logger.info("Using port {}", args[i+ + 1]);
-                } catch (NumberFormatException | IndexOutOfBoundsException e) {
-                    logger.error("-port is not a number");
-                    port = -1;
-                }
-            }
-
-            if(arg.equalsIgnoreCase("-lightmanager")) {
-                StaticHandler.setLight(true);
-            }
-
-            if (arg.equalsIgnoreCase("-debug")) {
-                StaticHandler.setDebug(true);
-                logger.debug("Debug enabled");
-            }
-        }
-
-
-
-        if (System.console() == null && !StaticHandler.isDebug()) {
-
-            String filename = Server.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6);
-            logger.warn("No console found");
-
-            String[] newArgs = new String[]{"cmd", "/c", "start", "cmd", "/c", "java -jar -Xmx2G -Xms2G \"" + filename + "\""};
-
-            List<String> launchArgs = new ArrayList<>(Arrays.asList(newArgs));
-            launchArgs.addAll(Arrays.asList(args));
-
-            try {
-                Runtime.getRuntime().exec(launchArgs.toArray(new String[]{}));
-                System.exit(0);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }
-
-
-        Server server = new Server(port);
-        StaticHandler.setCore(new ServerCore(server));
-        new Thread(server,"ServerMainThread").start();
+    public void addPacketHandler(IPacketHandler iPacketHandler) {
+        packetHandlers.add(iPacketHandler);
     }
 
-    Server(int port) {
+    public void removePacketHandler(IPacketHandler packetHandler) {
+        packetHandlers.remove(packetHandler);
+    }
+
+
+
+    public Server(int port) {
         running = true;
         this.port = port;
 
         console = new Console();
-        server = this;
-        autoCompleteHandler = new AutoCompleteHandler(this);
+        autoCompleteHandler = new ClientAutoCompleteHandler(this);
 //        StaticHandler.setupTerminal(autoCompleteHandler);
 
 
@@ -181,11 +127,6 @@ public class Server implements Runnable {
             getPluginManager().registerEvents(commandMessageParser, new ServerPlugin());
         });
 //        new Thread(serverCommandHandler, "ServerBackgroundThread").start();
-
-    }
-
-    public static Server getInstance() {
-        return server;
     }
 
 
@@ -234,9 +175,7 @@ public class Server implements Runnable {
         System.exit(0);
     }
 
-    public static String getCurrentPath() {
-        return Paths.get("").toAbsolutePath().toString();
-    }
+
 
     public boolean isRunning() {
         return running;
@@ -261,26 +200,8 @@ public class Server implements Runnable {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         check();
-        thread = Thread.currentThread();
 
-        new Thread(() -> {
-            getLogger().info("Type Command: (try help)");
-            new ConsoleHandler(autoCompleteHandler).start();
-        }, "ConsoleHandler").start();
 
-        TaskInfo settingTask = ThreadUtils.runAsync(() -> {
-            settingsManager = new GsonConfig<>(new Settings(), new File(getCurrentPath(), "settings.json"));
-            settingsManager.save();
-
-            port = settingsManager.getConfigData().getPort();
-            server.registerCommand(new SettingsCommand());
-        });
-        tasks.add(settingTask);
-
-        tasks.add(ThreadUtils.runAsync(() -> {
-            settingTask.awaitFinish(2);
-            initServer();
-        }));
 
         new Thread(new PlayerHandler(this),"PlayerHandlerThread").start();
 
@@ -307,7 +228,6 @@ public class Server implements Runnable {
         }*/
 
         tasks.add(ThreadUtils.runAsync(() -> {
-            settingTask.awaitFinish(2);
             if (settingsManager.getConfigData().isUseMulticast()) {
                 getLogger().info("Initializing MultiCast Server");
                 try {
@@ -321,9 +241,9 @@ public class Server implements Runnable {
 
 
         tasks.add(ThreadUtils.runAsync(() -> {
-            AuthenticationManager authenticationManager = new AuthenticationManager("changepassword");
-            server.registerCommand(authenticationManager);
-            server.getPluginManager().registerEvents(authenticationManager, new ServerPlugin());
+            authenticationManager = new AuthenticationManager(this, "changepassword");
+            registerCommand(authenticationManager);
+            getPluginManager().registerEvents(authenticationManager, new ServerPlugin());
         }));
 
 
@@ -340,17 +260,17 @@ public class Server implements Runnable {
 
                     try {
                         LightManager.init();
-                        registerCommand(new LightCommand());
+                        registerCommand(new LightCommand(this));
                     } catch (IllegalArgumentException | ExceptionInInitializerError | NoPi4JLibsFoundException e) {
                         logger.error("Unable to load Pi4J Libraries. To load stacktrace, add -debug flag. Message: {}", e.getMessage());
                         if (StaticHandler.isDebug()) {
                             e.printStackTrace();
-                            registerCommand(new LightCommand());
+                            registerCommand(new LightCommand(this));
                         }
                     }
 
                 }, "LightThread");
-                registerCommand(new LightCommand());
+//                registerCommand(new LightCommand(this));
                 lightThread.start();
             } else {
                 logger.info("Detected system is not linux. LightManager will not run (manual run with -lightmanager arg)");
@@ -359,9 +279,11 @@ public class Server implements Runnable {
 
 
 //        await();
-
+        tasks.add(ThreadUtils.runAsync(this::initServer));
 
         for(TaskInfo taskInfo : tasks) taskInfo.awaitFinish(0);
+
+
 
         logger.info("Finished initializing. Took {}ms", stopWatch.getTime(TimeUnit.MILLISECONDS));
     }
@@ -467,25 +389,9 @@ public class Server implements Runnable {
         if (System.console() == null && !StaticHandler.isDebug()) shutdownServer();
     }
 
-    public static synchronized void closeThread(Thread thread) {
-        if(thread == Server.thread) throw new IllegalArgumentException("Cannot be same thread it's joining on");
-
-        new Thread(() -> {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                logger.error(e.getMessage(), e.getCause());
-            }
-        },"CloseThread");
-    }
-
     public static void broadcast(String message) {
         Server.getLogger().info(message);
         Server.sendObjectToAllPlayers(new MessagePacket(message));
-    }
-
-    public int getPort() {
-        return port;
     }
 
 
@@ -495,7 +401,7 @@ public class Server implements Runnable {
      * @return Returns the instance to use it's usage method
      */
     public Command registerCommand(@NonNull Command command) {
-        commandList.add(command);
+        pluginManager.getCommandList().add(command);
         return command;
     }
 
@@ -506,7 +412,7 @@ public class Server implements Runnable {
     }
 
     public List<Command> getCommands() {
-        return commandList;
+        return pluginManager.getCommandList();
     }
 
     public PluginManager getPluginManager() {

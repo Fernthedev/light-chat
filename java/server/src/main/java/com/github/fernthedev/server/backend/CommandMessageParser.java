@@ -14,15 +14,13 @@ import lombok.RequiredArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.fernthedev.server.CommandWorkerThread.commandList;
-
 @RequiredArgsConstructor
 public class CommandMessageParser implements Listener {
 
     @NonNull
     private Server server;
 
-    public static void onCommand(ChatEvent e) {
+    public void onCommand(ChatEvent e) {
         CommandSender sender = e.getSender();
 
         if(e.isCancelled()) return;
@@ -50,7 +48,7 @@ public class CommandMessageParser implements Listener {
 
     }
 
-    private static void handleCommand(CommandSender sender, String command) {
+    private void handleCommand(CommandSender sender, String command) {
         String[] splitString = command.split(" ", 2);
         List<String> arguments = new ArrayList<>();
 
@@ -84,7 +82,7 @@ public class CommandMessageParser implements Listener {
         if (!command.equals("")) {
             try {
 
-                for (Command serverCommand : commandList) {
+                for (Command serverCommand : server.getCommands()) {
                     if (serverCommand.getName().equalsIgnoreCase(command)) {
                         found = true;
                         String[] args = new String[arguments.size()];

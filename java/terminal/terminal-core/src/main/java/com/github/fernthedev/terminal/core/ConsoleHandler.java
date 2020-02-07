@@ -1,5 +1,6 @@
-package com.github.fernthedev.core;
+package com.github.fernthedev.terminal.core;
 
+import com.github.fernthedev.core.StaticHandler;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.minecrell.terminalconsole.SimpleTerminalConsole;
@@ -9,6 +10,16 @@ import org.jline.reader.LineReaderBuilder;
 
 @RequiredArgsConstructor
 public class ConsoleHandler extends SimpleTerminalConsole {
+
+    public static void startConsoleHandlerAsync(Completer completeHandler) {
+        new Thread(() -> {
+            StaticHandler.getCore().getLogger().info("Starting console handler");
+            new ConsoleHandler(completeHandler).start();
+        },"ConsoleHandler").start();
+
+        StaticHandler.getCore().getLogger().info("Started console handler");
+    }
+
     @NonNull
     private Completer completer;
 

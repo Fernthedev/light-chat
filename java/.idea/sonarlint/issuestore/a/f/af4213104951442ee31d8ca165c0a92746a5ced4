@@ -1,5 +1,8 @@
 
-]squid:S2142I"FEither re-interrupt this method or rethrow the "InterruptedException".(ä ¹€
-qsquid:S3776š"RRefactor this method to reduce its Cognitive Complexity from 19 to the 15 allowed.(ò†œ½8ñõõÁö-
-nsquid:S3776R"RRefactor this method to reduce its Cognitive Complexity from 41 to the 15 allowed.(”ş”¡úÿÿÿÿ
-Ysquid:S3457‡"AFormat specifiers should be used instead of string concatenation.(š½Ñä
+esquid:S3457Š"AFormat specifiers should be used instead of string concatenation.(ğµÕªúÿÿÿÿ8ëœÛè.
+nsquid:S3776T"RRefactor this method to reduce its Cognitive Complexity from 41 to the 15 allowed.(”ş”¡úÿÿÿÿ
+qsquid:S3776"RRefactor this method to reduce its Cognitive Complexity from 19 to the 15 allowed.(à‘Ôš8“¢Øè.
+]squid:S2142K"FEither re-interrupt this method or rethrow the "InterruptedException".(ä ¹€
+Ysquid:S2209Š"5Change this instance-reference to a static reference.(ğµÕªúÿÿÿÿ8ëœÛè.
+Ysquid:S2209±"5Change this instance-reference to a static reference.(šòˆ‰üÿÿÿÿ8ëœÛè.
+dsquid:S3457"AFormat specifiers should be used instead of string concatenation.(¸Òâùÿÿÿÿ8Ö±ñè.

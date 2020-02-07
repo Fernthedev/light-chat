@@ -3,16 +3,11 @@ package com.github.fernthedev.server;
 import com.github.fernthedev.server.command.Command;
 import com.github.fernthedev.server.command.CommandSender;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class CommandWorkerThread implements Runnable {
 
     private final Command serverCommand;
     private final String[] args;
     private final CommandSender commandSender;
-
-    public static List<Command> commandList = new ArrayList<>();
 
     public CommandWorkerThread(CommandSender commandSender, Command command, String[] args) {
         this.serverCommand = command;
@@ -34,7 +29,5 @@ public class CommandWorkerThread implements Runnable {
     @Override
     public void run() {
         serverCommand.onCommand(commandSender,args);
-
-        Server.closeThread(Thread.currentThread());
     }
 }

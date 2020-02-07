@@ -8,8 +8,7 @@ import com.github.fernthedev.core.packets.handshake.ConnectedPacket;
 import com.github.fernthedev.core.packets.handshake.KeyResponsePacket;
 import com.github.fernthedev.core.packets.handshake.RequestConnectInfoPacket;
 import com.github.fernthedev.core.packets.latency.PongPacket;
-import com.github.fernthedev.server.backend.AuthenticationManager;
-import com.github.fernthedev.server.backend.CommandMessageParser;
+import com.github.fernthedev.fernutils.threads.ThreadUtils;
 import com.github.fernthedev.server.event.chat.ChatEvent;
 import org.apache.commons.lang3.StringUtils;
 
@@ -57,9 +56,9 @@ public class EventListener {
 
             ChatEvent chatEvent = new ChatEvent(clientPlayer, messagePacket.getMessage(),false,true);
 
-            Server.getInstance().getPluginManager().callEvent(chatEvent);
+            server.getPluginManager().callEvent(chatEvent);
 
-            CommandMessageParser.onCommand(chatEvent);
+            server.getCommandMessageParser().onCommand(chatEvent);
         } else if (p instanceof CommandPacket) {
 
             CommandPacket packet = (CommandPacket) p;
@@ -67,9 +66,9 @@ public class EventListener {
             String command = packet.getMessage();
 
             ChatEvent chatEvent = new ChatEvent(clientPlayer,command,true,true);
-            Server.getInstance().getPluginManager().callEvent(chatEvent);
+            server.getPluginManager().callEvent(chatEvent);
 
-            CommandMessageParser.onCommand(chatEvent);
+            server.getCommandMessageParser().onCommand(chatEvent);
         }else if (p instanceof AutoCompletePacket) {
             AutoCompletePacket packet = (AutoCompletePacket) p;
             List<LightCandidate> candidates = server.getAutoCompleteHandler().handleLine(packet.getWords());
@@ -77,11 +76,17 @@ public class EventListener {
             packet.setCandidateList(candidates);
             clientPlayer.sendObject(packet);
         } else if (p instanceof HashedPasswordPacket) {
-            AuthenticationManager.attemptAuthenticationHash(
+            server.getAuthenticationManager().attemptAuthenticationHash(
                     ((HashedPasswordPacket) p).getHashedPassword(),
                     clientPlayer
             );
         }
+
+        ThreadUtils.runForLoopAsync(server.getPacketHandlers(), iPacketHandler -> {
+            iPacketHandler.handlePacket(p, clientPlayer);
+            return null;
+        }).runThreads();
+
 
     }
 
@@ -175,8 +180,8 @@ public class EventListener {
 
       //  Server.getLogger().info("Password required: " + server.getSettingsManager().getSettings().isPasswordRequiredForLogin());
 
-        if(Server.getSettingsManager().getConfigData().isPasswordRequiredForLogin()) {
-            boolean authenticated = AuthenticationManager.authenticate(clientPlayer);
+        if(server.getSettingsManager().getConfigData().isPasswordRequiredForLogin()) {
+            boolean authenticated = server.getAuthenticationManager().authenticate(clientPlayer);
             if(!authenticated) {
                 clientPlayer.sendObject(new MessagePacket("Unable to authenticate"));
                 clientPlayer.close();

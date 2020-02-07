@@ -3,15 +3,14 @@ package com.github.fernthedev.core;
 import com.github.fernthedev.core.packets.Packet;
 import org.reflections.Reflections;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class PacketRegistry {
 
     private PacketRegistry() {}
 
-    private static final Map<String, Class<? extends Packet>> PACKET_REGISTRY = new HashMap<>();
+    private static final Map<String, Class<? extends Packet>> PACKET_REGISTRY = Collections.synchronizedMap(new HashMap<>());
 
     public static Class<? extends Packet> getPacketClassFromRegistry(String name) {
         if (!PACKET_REGISTRY.containsKey(name)) throw new IllegalArgumentException("The packet registry does not contain packet \"" + name + "\" in the registry. Make sure it is spelled correctly and is case-sensitive.");
@@ -45,11 +44,13 @@ public class PacketRegistry {
 
     public static void registerDefaultPackets() {
 
-        for (Package packageT : Package.getPackages()) {
-            if (packageT.getName().startsWith(StaticHandler.PACKET_PACKAGE)) {
-                StaticHandler.getCore().getLogger().debug("Registering the package {}", packageT.getName());
-                registerPacketPackage(packageT.getName());
-            }
+        for (Package packageT : Arrays.stream(Package.getPackages())
+                .parallel()
+                .filter(aPackage -> aPackage.getName().startsWith(StaticHandler.PACKET_PACKAGE))
+                .collect(Collectors.toList())) {
+
+            StaticHandler.getCore().getLogger().debug("Registering the package {}", packageT.getName());
+            registerPacketPackage(packageT.getName());
         }
     }
 

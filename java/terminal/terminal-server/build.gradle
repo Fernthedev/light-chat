@@ -1,0 +1,17 @@
+apply plugin: 'application'
+repositories {
+    jcenter()
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    compile(project(':server'))
+    compile(project(':terminal:terminal-core'))
+}
+
+group "${project.parent.group}.server"
+
+application {
+    mainClassName = "com.github.fernthedev.terminal.server.ServerTerminal"
+}

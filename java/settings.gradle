@@ -7,3 +7,7 @@ include(':server')
 include(':client')
 include(':core')
 
+include(':terminal')
+include(':terminal:terminal-server')
+include(':terminal:terminal-client')
+include(':terminal:terminal-core')

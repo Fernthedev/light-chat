@@ -1,10 +1,11 @@
 package com.github.fernthedev.core.data;
 
-import org.jline.reader.Candidate;
+import lombok.Getter;
 
 import java.io.Serializable;
 import java.util.Objects;
 
+@Getter
 public class LightCandidate implements Serializable {
 
     private final String value;
@@ -44,9 +45,5 @@ public class LightCandidate implements Serializable {
         this.suffix = suffix;
         this.key = key;
         this.complete = complete;
-    }
-
-    public Candidate toCandidate() {
-        return new Candidate(value,displ,group,descr,suffix,key,complete);
     }
 }

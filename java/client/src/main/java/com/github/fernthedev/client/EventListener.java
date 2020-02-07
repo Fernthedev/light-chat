@@ -26,18 +26,18 @@ public class EventListener {
     public void received(Packet p) {
         if(p instanceof TestConnectPacket) {
             TestConnectPacket packet = (TestConnectPacket) p;
-            client.getLogger().info("Connected packet: " + packet.getMessage());
+            client.getLogger().info("Connected packet: {}", packet.getMessage());
         } else if(p instanceof PingPacket) {
-            Client.startTime = System.nanoTime();
+            client.startTime = System.nanoTime();
 
             client.sendObject(new PongPacket(),false);
         } else if(p instanceof PingReceive) {
 
-            Client.endTime = System.nanoTime();
+            client.endTime = System.nanoTime();
 
-            Client.miliPingDelay = Client.endTime - Client.startTime;
+            client.miliPingDelay = client.endTime - client.startTime;
 
-            client.getLogger().debug("Ping: " + (Client.miliPingDelay / 1000000) + "ms");
+            client.getLogger().debug("Ping: {}", (client.miliPingDelay / 1000000) + "ms");
 
         } else if (p instanceof MessagePacket) {
             MessagePacket messagePacket = (MessagePacket) p;
@@ -106,9 +106,6 @@ public class EventListener {
                     break;
             }
 
-        } else if(p instanceof AutoCompletePacket) {
-            AutoCompletePacket packet = (AutoCompletePacket) p;
-            client.getCompleteHandler().addCandidates(packet.getCandidateList());
         }
     }
 

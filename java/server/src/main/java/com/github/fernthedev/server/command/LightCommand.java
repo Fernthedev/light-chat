@@ -3,7 +3,7 @@ package com.github.fernthedev.server.command;
 import com.github.fernthedev.light.LightFileFormatter;
 import com.github.fernthedev.server.ClientPlayer;
 import com.github.fernthedev.server.Console;
-import com.github.fernthedev.server.backend.AuthenticationManager;
+import com.github.fernthedev.server.Server;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,8 +12,11 @@ import java.util.Arrays;
 import java.util.List;
 
 public class LightCommand extends Command implements TabExecutor {
-    public LightCommand() {
+    private final Server server;
+
+    public LightCommand(Server server) {
         super("light");
+        this.server = server;
     }
 
     @Override
@@ -23,7 +26,7 @@ public class LightCommand extends Command implements TabExecutor {
             boolean authenticated = false;
 
             if(sender instanceof ClientPlayer) {
-                authenticated = AuthenticationManager.authenticate(sender);
+                authenticated = server.getAuthenticationManager().authenticate(sender);
             }
 
             if(sender instanceof Console) authenticated = true;

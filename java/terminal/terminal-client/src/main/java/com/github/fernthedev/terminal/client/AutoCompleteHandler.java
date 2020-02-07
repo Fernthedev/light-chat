@@ -1,8 +1,9 @@
-package com.github.fernthedev.client.backend;
+package com.github.fernthedev.terminal.client;
 
 import com.github.fernthedev.client.Client;
 import com.github.fernthedev.core.packets.AutoCompletePacket;
 import com.github.fernthedev.core.data.LightCandidate;
+import com.github.fernthedev.terminal.core.CandidateUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.jline.reader.Candidate;
@@ -27,7 +28,7 @@ public class AutoCompleteHandler implements Completer {
         if(candidateList != null) {
             List<Candidate> candidateList1 = new ArrayList<>();
             for(LightCandidate lightCandidate : candidates) {
-                candidateList1.add(lightCandidate.toCandidate());
+                candidateList1.add(CandidateUtil.toCandidate(lightCandidate));
             }
             candidateList.addAll(candidateList1);
         }

@@ -1,0 +1,28 @@
+//plugins {
+//    id 'java'
+//    id 'org.jetbrains.kotlin.jvm'
+//}
+//plugins {
+//    id 'application'
+//}
+//apply plugin: 'com.github.johnrengelman.shadow'
+
+subprojects {
+//    apply plugin: 'application'
+    group = "${project.parent.group}.terminal"
+    version = "1.0.0-$protocol_ver"
+
+    dependencies {
+        compile "org.jline:jline:$jline_ver"
+        compile "org.jline:jline-terminal-jansi:$jline_ver"
+        compile 'net.minecrell:terminalconsoleappender:1.2.0'
+        compile 'org.fusesource.jansi:jansi:1.18'
+    }
+
+    jar.classifier = 'old'
+    shadowJar {
+        project.configurations.implementation.canBeResolved = true
+        configurations = [project.configurations.implementation]
+        classifier = ''
+    }
+}

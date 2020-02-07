@@ -90,7 +90,7 @@ public class EncryptedGSONObjectEncoder extends MessageToMessageEncoder<Acceptab
 
         }
 
-        StaticHandler.getCore().getLogger().info("Sending {}", gson.toJson(packetWrapper));
+        StaticHandler.getCore().getLogger().debug("Sending {}", gson.toJson(packetWrapper));
     }
 
     public EncryptedBytes encrypt(ChannelHandlerContext ctx, String decryptedString) {
