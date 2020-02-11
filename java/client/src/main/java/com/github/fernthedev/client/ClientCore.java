@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 @RequiredArgsConstructor
 public class ClientCore implements Core {
     @NonNull
-    private Client client;
+    protected Client client;
 
     @Override
     public boolean isRunning() {
@@ -26,14 +26,7 @@ public class ClientCore implements Core {
         return "Client";
     }
 
-    @Override
-    public void runCommand(String command) {
-        if (client.registered) {
-            client.sendMessage(command);
-        } else {
-            getLogger().error("The client has not been registered yet.");
-        }
-    }
+
 
     @Override
     public void shutdown() {

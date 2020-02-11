@@ -1,27 +1,21 @@
 package com.github.fernthedev.server;
 
 import com.github.fernthedev.core.packets.Packet;
-import com.github.fernthedev.server.command.CommandSender;
+import lombok.AllArgsConstructor;
 
 import java.io.Serializable;
 
-public class Console implements CommandSender, Serializable {
-
+@AllArgsConstructor
+public class Console implements SenderInterface, Serializable {
+    private transient Server server;
 
     private static final long serialVersionUID = -7832219582908962549L;
 
     @Override
-    public void sendPacket(Packet packet) {
-
-    }
-
-    @Override
-    public void sendMessage(String message) {
-        Server.getLogger().info(message);
-    }
+    public void sendPacket(Packet packet) { }
 
     @Override
     public String getName() {
-        return "Server";
+        return server.getName();
     }
 }

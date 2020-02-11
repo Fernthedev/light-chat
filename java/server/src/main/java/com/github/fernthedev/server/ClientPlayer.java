@@ -3,13 +3,12 @@ package com.github.fernthedev.server;
 import com.github.fernthedev.core.VersionData;
 import com.github.fernthedev.core.encryption.UnencryptedPacketWrapper;
 import com.github.fernthedev.core.encryption.util.RSAEncryptionUtil;
-import com.github.fernthedev.core.packets.MessagePacket;
 import com.github.fernthedev.core.packets.Packet;
+import com.github.fernthedev.fernutils.thread.InterfaceTaskInfo;
+import com.github.fernthedev.fernutils.thread.Task;
+import com.github.fernthedev.fernutils.thread.ThreadUtils;
+import com.github.fernthedev.fernutils.thread.single.TaskInfo;
 import com.github.fernthedev.core.packets.latency.PingPacket;
-import com.github.fernthedev.fernutils.threads.Task;
-import com.github.fernthedev.fernutils.threads.ThreadUtils;
-import com.github.fernthedev.fernutils.threads.single.TaskInfo;
-import com.github.fernthedev.server.command.CommandSender;
 import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -20,7 +19,7 @@ import java.net.InetSocketAddress;
 import java.security.KeyPair;
 import java.util.UUID;
 
-public class ClientPlayer implements CommandSender, AutoCloseable {
+public class ClientPlayer implements SenderInterface, AutoCloseable {
     private boolean connected;
 
     @Getter
@@ -106,7 +105,7 @@ public class ClientPlayer implements CommandSender, AutoCloseable {
 
         this.keyTask = ThreadUtils.runAsync(new Task() {
             @Override
-            public void run(TaskInfo taskInfo) {
+            public void run(InterfaceTaskInfo<?, Task> taskInfo) {
                 tempKeyPair = RSAEncryptionUtil.generateKeyPairs();
                 taskInfo.finish(this);
             }
@@ -297,11 +296,6 @@ public class ClientPlayer implements CommandSender, AutoCloseable {
     @Override
     public void sendPacket(Packet packet) {
         sendObject(packet);
-    }
-
-    @Override
-    public void sendMessage(String message) {
-        sendPacket(new MessagePacket(message));
     }
 
     @Override

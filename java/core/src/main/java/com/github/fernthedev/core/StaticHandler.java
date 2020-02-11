@@ -37,7 +37,7 @@ public class StaticHandler {
      */
     @Getter
     @Setter
-    private static String address = "224.0.1.42";
+    private static String MULTICAST_ADDRESS = "224.0.1.42";
 
     private static final Gson gson = new Gson();
     public static final Charset CHARSET_FOR_STRING = CharsetUtil.UTF_8;
@@ -46,6 +46,11 @@ public class StaticHandler {
     private static boolean debug = false;
 
     public static void setDebug(boolean debug) {
+
+        if (StaticHandler.debug != debug) {
+            StaticHandler.getCore().getLogger().info("Set debug mode to: {}", debug);
+        }
+
         StaticHandler.debug = debug;
         if (getCore() != null) Configurator.setLevel(getCore().getLogger().getName(), debug ? Level.DEBUG : Level.INFO);
         Configurator.setLevel(Reflections.class.getName(), debug ? Level.DEBUG : Level.WARN);

@@ -12,7 +12,7 @@ public abstract class Packet implements AcceptablePacketTypes {
     @Getter
     protected final transient @NonNull String packetName;
 
-    public static String getPacketName(Class<?> packet) {
+    public static String getPacketName(Class<? extends Packet> packet) {
         if (packet.equals(Packet.class)) throw new IllegalArgumentException("The class cannot be " + Packet.class.getName());
 
         if (!Packet.class.isAssignableFrom(packet)) throw new IllegalStateException("Packet " + packet.getName() + " must extend " + Packet.class.getName());

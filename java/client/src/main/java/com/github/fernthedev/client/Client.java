@@ -8,8 +8,6 @@ import com.github.fernthedev.core.encryption.UnencryptedPacketWrapper;
 import com.github.fernthedev.core.encryption.codecs.gson.EncryptedGSONObjectDecoder;
 import com.github.fernthedev.core.encryption.codecs.gson.EncryptedGSONObjectEncoder;
 import com.github.fernthedev.core.exceptions.DebugException;
-import com.github.fernthedev.core.packets.CommandPacket;
-import com.github.fernthedev.core.packets.MessagePacket;
 import com.github.fernthedev.core.packets.Packet;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -248,20 +246,7 @@ public class Client implements IEncryptionKeyHolder {
 
 
 
-    public void sendMessage(String message) {
-        try {
-            message = message.replaceAll(" {2}", " ");
-            if (!message.equals("") && !message.equals(" ")) {
 
-                if (message.startsWith("/")) {
-                    sendObject(new CommandPacket(message.substring(1)));
-                } else
-                    sendObject(new MessagePacket(message));
-            }
-        } catch (IllegalArgumentException e) {
-            getLogger().error("Unable to send message. Cause: " + e.getMessage() + " {" + e.getClass().getName() + "}");
-        }
-    }
 
     public void sendObject(@NonNull Packet packet, boolean encrypt) {
         if (encrypt) {

@@ -13,19 +13,23 @@ import java.net.InetAddress;
 
 public class MulticastServer extends QuoteServerThread {
 
+    private final String multicastAddress;
     private Server server;
 
     private volatile boolean run;
+
+
 
 //    @Synchronized
 //    private void setRun(boolean run) {
 //        this.run = run;
 //    }
 
-    public MulticastServer(String name, Server server) throws IOException {
+    public MulticastServer(String name, Server server, String multicastAddress) throws IOException {
         super(name);
         this.server = server;
         run = true;
+        this.multicastAddress = multicastAddress;
 //        setRun(true);
     }
 
@@ -44,7 +48,7 @@ public class MulticastServer extends QuoteServerThread {
 
                 buf = new Gson().toJson(dataSend).getBytes();
 
-                InetAddress group = InetAddress.getByName(StaticHandler.getAddress());
+                InetAddress group = InetAddress.getByName(multicastAddress);
                 DatagramPacket packet;
                 packet = new DatagramPacket(buf, buf.length, group, 4446);
                 socket.send(packet);

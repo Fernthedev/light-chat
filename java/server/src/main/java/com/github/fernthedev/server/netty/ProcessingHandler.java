@@ -8,6 +8,7 @@ import com.github.fernthedev.server.ClientPlayer;
 import com.github.fernthedev.server.EventListener;
 import com.github.fernthedev.server.PlayerHandler;
 import com.github.fernthedev.server.Server;
+import com.github.fernthedev.server.event.PlayerDisconnectEvent;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
@@ -57,7 +58,10 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 
             if(clientPlayer == null) return;
 
-            if(clientPlayer.getName() != null && clientPlayer.isRegistered()) Server.broadcast("[" + clientPlayer.getName() + "] has disconnected from the server");
+            if(clientPlayer.getName() != null && clientPlayer.isRegistered()) {
+                server.getPluginManager().callEvent(new PlayerDisconnectEvent(clientPlayer));
+                server.logInfo("[{}] has disconnected from the server", clientPlayer.getName());
+            }
 
             if(PlayerHandler.players.containsValue(clientPlayer)) {
 
@@ -116,12 +120,6 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 
        // Server.getLogger().info("Channel Registering");
         Channel channel = ctx.channel();
-
-        if(server.getBanManager().isBanned(ctx.channel().remoteAddress().toString())) {
-            ctx.flush();
-            ctx.close();
-            return;
-        }
 
         if (channel != null) {
 

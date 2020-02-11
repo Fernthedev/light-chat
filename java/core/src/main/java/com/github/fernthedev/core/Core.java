@@ -11,7 +11,7 @@ public interface Core {
 
     String getName();
 
-    void runCommand(String command);
+
 
     void shutdown();
 }

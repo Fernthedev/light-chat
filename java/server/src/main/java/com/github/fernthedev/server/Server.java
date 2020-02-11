@@ -8,22 +8,11 @@ import com.github.fernthedev.core.encryption.codecs.fastjson.EncryptedFastJSONOb
 import com.github.fernthedev.core.encryption.codecs.fastjson.EncryptedFastJSONObjectEncoder;
 import com.github.fernthedev.core.encryption.codecs.gson.EncryptedGSONObjectDecoder;
 import com.github.fernthedev.core.encryption.codecs.gson.EncryptedGSONObjectEncoder;
-import com.github.fernthedev.core.packets.MessagePacket;
 import com.github.fernthedev.core.packets.Packet;
 import com.github.fernthedev.core.packets.SelfMessagePacket;
-import com.github.fernthedev.fernutils.threads.ThreadUtils;
-import com.github.fernthedev.fernutils.threads.single.TaskInfo;
-import com.github.fernthedev.light.LightManager;
-import com.github.fernthedev.light.exceptions.NoPi4JLibsFoundException;
+import com.github.fernthedev.fernutils.thread.ThreadUtils;
+import com.github.fernthedev.fernutils.thread.single.TaskInfo;
 import com.github.fernthedev.server.api.IPacketHandler;
-import com.github.fernthedev.server.backend.AuthenticationManager;
-import com.github.fernthedev.server.backend.BanManager;
-import com.github.fernthedev.server.backend.ClientAutoCompleteHandler;
-import com.github.fernthedev.server.backend.CommandMessageParser;
-import com.github.fernthedev.server.command.Command;
-import com.github.fernthedev.server.command.CommandSender;
-import com.github.fernthedev.server.command.LightCommand;
-import com.github.fernthedev.server.event.chat.ServerPlugin;
 import com.github.fernthedev.server.netty.MulticastServer;
 import com.github.fernthedev.server.netty.ProcessingHandler;
 import com.github.fernthedev.server.plugin.PluginManager;
@@ -59,8 +48,10 @@ import java.util.concurrent.TimeUnit;
 
 
 public class Server implements Runnable {
-
-    private ServerCommandHandler commandHandler;
+    
+    @Getter
+    @Setter
+    private String name;
 
     @Getter
     private int port;
@@ -68,19 +59,14 @@ public class Server implements Runnable {
     private boolean running;
 
     private Console console;
-    private BanManager banManager;
+
     private PluginManager pluginManager;
 
     @Getter
     @Setter
     private Config<Settings> settingsManager = new NoFileConfig<>(new Settings());
 
-    @Getter
-    private CommandMessageParser commandMessageParser;
     private MulticastServer multicastServer;
-
-    @Getter
-    private AuthenticationManager authenticationManager;
 
 
     public Console getConsole() {
@@ -95,8 +81,7 @@ public class Server implements Runnable {
 
     private ProcessingHandler processingHandler;
 
-    @Getter
-    private ClientAutoCompleteHandler autoCompleteHandler;
+
 
     @Getter
     private List<IPacketHandler> packetHandlers = new ArrayList<>();
@@ -115,17 +100,12 @@ public class Server implements Runnable {
         running = true;
         this.port = port;
 
-        console = new Console();
-        autoCompleteHandler = new ClientAutoCompleteHandler(this);
+
+        console = new Console(this);
+        StaticHandler.setCore(new ServerCore(this));
 //        StaticHandler.setupTerminal(autoCompleteHandler);
 
-
-        ThreadUtils.runAsync(() -> {
-            pluginManager = new PluginManager();
-            commandHandler = new ServerCommandHandler(Server.this);
-            commandMessageParser = new CommandMessageParser(this);
-            getPluginManager().registerEvents(commandMessageParser, new ServerPlugin());
-        });
+        pluginManager = new PluginManager();
 //        new Thread(serverCommandHandler, "ServerBackgroundThread").start();
     }
 
@@ -146,7 +126,7 @@ public class Server implements Runnable {
 //        },"AwaitThread");
 //    }
 
-    private static synchronized void sendObjectToAllPlayers(@NonNull Packet packet) {
+    public synchronized void sendObjectToAllPlayers(@NonNull Packet packet) {
         new Thread(() -> {
             for(ClientPlayer clientPlayer : PlayerHandler.socketList.values()) {
 
@@ -164,15 +144,13 @@ public class Server implements Runnable {
     }
 
 
-    synchronized void shutdownServer() {
+    public synchronized void shutdownServer() {
         getLogger().info(ColorCode.RED + "Shutting down server.");
         running = false;
         if (multicastServer != null) multicastServer.stopMulticast();
 
         if (workerGroup != null) workerGroup.shutdownGracefully();
         if (bossGroup != null) bossGroup.shutdownGracefully();
-
-        System.exit(0);
     }
 
 
@@ -194,6 +172,7 @@ public class Server implements Runnable {
      */
     @Override
     public void run() {
+        name = "Server-" + Thread.currentThread().getId();
         StaticHandler.displayVersion();
         List<TaskInfo> tasks = new ArrayList<>();
 
@@ -209,7 +188,7 @@ public class Server implements Runnable {
             for (ClientPlayer clientPlayer : PlayerHandler.socketList.values()) {
                 if (clientPlayer.channel.isOpen()) {
                     Server.getLogger().info("Gracefully shutting down");
-                    Server.sendObjectToAllPlayers(new SelfMessagePacket(SelfMessagePacket.MessageType.LOST_SERVER_CONNECTION));
+                    sendObjectToAllPlayers(new SelfMessagePacket(SelfMessagePacket.MessageType.LOST_SERVER_CONNECTION));
                     clientPlayer.close();
                 }
             }
@@ -231,7 +210,7 @@ public class Server implements Runnable {
             if (settingsManager.getConfigData().isUseMulticast()) {
                 getLogger().info("Initializing MultiCast Server");
                 try {
-                    multicastServer = new MulticastServer("MultiCast Thread", this);
+                    multicastServer = new MulticastServer("MultiCast Thread", this, StaticHandler.getMULTICAST_ADDRESS());
                     multicastServer.start();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -240,42 +219,12 @@ public class Server implements Runnable {
         }));
 
 
-        tasks.add(ThreadUtils.runAsync(() -> {
-            authenticationManager = new AuthenticationManager(this, "changepassword");
-            registerCommand(authenticationManager);
-            getPluginManager().registerEvents(authenticationManager, new ServerPlugin());
-        }));
 
 
 //        LoggerManager loggerManager = new LoggerManager();
 //        pluginManager.registerEvents(loggerManager, new ServerPlugin());
 
         logger.info("Running on [{}]", StaticHandler.OS);
-
-        tasks.add(ThreadUtils.runAsync(() -> {
-            if (StaticHandler.OS.equalsIgnoreCase("Linux") || StaticHandler.OS.contains("Linux") || StaticHandler.isLight()) {
-                logger.info("Running LightManager (Note this is for raspberry pies only)");
-
-                Thread lightThread = new Thread(() -> {
-
-                    try {
-                        LightManager.init();
-                        registerCommand(new LightCommand(this));
-                    } catch (IllegalArgumentException | ExceptionInInitializerError | NoPi4JLibsFoundException e) {
-                        logger.error("Unable to load Pi4J Libraries. To load stacktrace, add -debug flag. Message: {}", e.getMessage());
-                        if (StaticHandler.isDebug()) {
-                            e.printStackTrace();
-                            registerCommand(new LightCommand(this));
-                        }
-                    }
-
-                }, "LightThread");
-//                registerCommand(new LightCommand(this));
-                lightThread.start();
-            } else {
-                logger.info("Detected system is not linux. LightManager will not run (manual run with -lightmanager arg)");
-            }
-        }));
 
 
 //        await();
@@ -377,45 +326,15 @@ public class Server implements Runnable {
         }
     }
 
-    public void dispatchCommand(@NonNull String command) {
-        commandHandler.dispatchCommand(command);
-    }
-
-    public void dispatchCommand(@NonNull CommandSender sender, @NonNull String command) {
-        commandHandler.dispatchCommand(sender, command);
-    }
-
     private void check() {
         if (System.console() == null && !StaticHandler.isDebug()) shutdownServer();
     }
 
-    public static void broadcast(String message) {
-        Server.getLogger().info(message);
-        Server.sendObjectToAllPlayers(new MessagePacket(message));
-    }
-
-
-    /**
-     * This registers the command
-     * @param command Command to be registered
-     * @return Returns the instance to use it's usage method
-     */
-    public Command registerCommand(@NonNull Command command) {
-        pluginManager.getCommandList().add(command);
-        return command;
-    }
-
-    public synchronized BanManager getBanManager() {
-        if(banManager == null) banManager = new BanManager();
-
-        return banManager;
-    }
-
-    public List<Command> getCommands() {
-        return pluginManager.getCommandList();
-    }
-
     public PluginManager getPluginManager() {
         return pluginManager;
+    }
+
+    public void logInfo(String o, Object... os) {
+        getLogger().info("[{}] " + o, getName(), os);
     }
 }

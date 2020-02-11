@@ -1,10 +1,8 @@
 package com.github.fernthedev.server.plugin;
 
 import com.github.fernthedev.server.Server;
-import com.github.fernthedev.server.command.Command;
-import com.github.fernthedev.server.event.*;
+import com.github.fernthedev.server.event.api.*;
 import com.github.fernthedev.server.plugin.exception.IllegalPluginAccessException;
-import lombok.Getter;
 import org.apache.commons.lang3.Validate;
 
 import java.lang.reflect.Method;
@@ -17,8 +15,6 @@ public class PluginManager {
 
     private List<Listener> listeners = new ArrayList<>();
 
-    @Getter
-    private List<Command> commandList = new ArrayList<>();
 
 
 

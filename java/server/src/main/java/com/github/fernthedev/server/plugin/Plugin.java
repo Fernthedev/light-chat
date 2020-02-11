@@ -1,7 +1,7 @@
 package com.github.fernthedev.server.plugin;
 
 import com.github.fernthedev.server.Server;
-import com.github.fernthedev.server.event.*;
+import com.github.fernthedev.server.event.api.*;
 import org.apache.commons.lang3.Validate;
 
 import java.lang.reflect.InvocationTargetException;

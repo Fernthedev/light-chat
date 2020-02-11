@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 @RequiredArgsConstructor
 public class ServerCore implements Core {
     @NonNull
-    private Server server;
+    protected final Server server;
 
     @Override
     public boolean isRunning() {
@@ -23,11 +23,6 @@ public class ServerCore implements Core {
     @Override
     public String getName() {
         return "Server";
-    }
-
-    @Override
-    public void runCommand(String command) {
-        server.dispatchCommand(command);
     }
 
     @Override

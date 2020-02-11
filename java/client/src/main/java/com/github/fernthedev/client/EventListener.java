@@ -11,6 +11,7 @@ import com.github.fernthedev.core.packets.handshake.RequestConnectInfoPacket;
 import com.github.fernthedev.core.packets.latency.PingPacket;
 import com.github.fernthedev.core.packets.latency.PingReceive;
 import com.github.fernthedev.core.packets.latency.PongPacket;
+import com.github.fernthedev.fernutils.thread.ThreadUtils;
 
 import javax.crypto.SecretKey;
 import java.security.InvalidKeyException;
@@ -39,12 +40,7 @@ public class EventListener {
 
             client.getLogger().debug("Ping: {}", (client.miliPingDelay / 1000000) + "ms");
 
-        } else if (p instanceof MessagePacket) {
-            MessagePacket messagePacket = (MessagePacket) p;
-            client.getLogger().info(messagePacket.getMessage());
-
-
-        } else if (p instanceof IllegalConnection) {
+        }  else if (p instanceof IllegalConnection) {
             client.getLogger().info(((IllegalConnection) p).getMessage());
         } else if(p instanceof InitialHandshakePacket) {
             // Handles object encryption key sharing
@@ -107,6 +103,10 @@ public class EventListener {
             }
 
         }
+        ThreadUtils.runForLoopAsync(client.getPacketHandlers(), iPacketHandler -> {
+            iPacketHandler.handlePacket(p);
+            return null;
+        }).runThreads();
     }
 
 }

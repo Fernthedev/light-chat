@@ -1,7 +1,7 @@
 package com.github.fernthedev.server.plugin.java;
 
 import com.github.fernthedev.server.Server;
-import com.github.fernthedev.server.event.*;
+import com.github.fernthedev.server.event.api.*;
 import com.github.fernthedev.server.plugin.Plugin;
 import com.github.fernthedev.server.plugin.PluginDescriptionFile;
 import com.github.fernthedev.server.plugin.PluginLoader;

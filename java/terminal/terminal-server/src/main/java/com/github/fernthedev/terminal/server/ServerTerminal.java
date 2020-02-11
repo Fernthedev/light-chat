@@ -3,11 +3,26 @@ package com.github.fernthedev.terminal.server;
 import com.github.fernthedev.config.common.Config;
 import com.github.fernthedev.config.gson.GsonConfig;
 import com.github.fernthedev.core.StaticHandler;
+import com.github.fernthedev.fernutils.thread.ThreadUtils;
+import com.github.fernthedev.light.LightManager;
+import com.github.fernthedev.light.exceptions.NoPi4JLibsFoundException;
+import com.github.fernthedev.server.Console;
+import com.github.fernthedev.server.SenderInterface;
 import com.github.fernthedev.server.Server;
-import com.github.fernthedev.server.ServerCore;
-import com.github.fernthedev.server.command.SettingsCommand;
+import com.github.fernthedev.server.event.chat.ServerPlugin;
 import com.github.fernthedev.server.settings.Settings;
+import com.github.fernthedev.terminal.core.CommonUtil;
 import com.github.fernthedev.terminal.core.ConsoleHandler;
+import com.github.fernthedev.terminal.core.TermCore;
+import com.github.fernthedev.terminal.core.packets.MessagePacket;
+import com.github.fernthedev.terminal.server.backend.AuthenticationManager;
+import com.github.fernthedev.terminal.server.backend.AutoCompleteHandler;
+import com.github.fernthedev.terminal.server.backend.BanManager;
+import com.github.fernthedev.terminal.server.backend.ClientAutoCompleteHandler;
+import com.github.fernthedev.terminal.server.command.AuthCommand;
+import com.github.fernthedev.terminal.server.command.Command;
+import com.github.fernthedev.terminal.server.command.LightCommand;
+import com.github.fernthedev.terminal.server.command.SettingsCommand;
 import lombok.Getter;
 import org.fusesource.jansi.AnsiConsole;
 import org.slf4j.Logger;
@@ -24,6 +39,29 @@ public class ServerTerminal {
 
     @Getter
     private static Config<Settings> settingsManager;
+
+    @Getter
+    private static ServerCommandHandler commandHandler;
+
+    private static Server server;
+
+    @Getter
+    private static BanManager banManager = new BanManager();
+
+    @Getter
+    private static CommandMessageParser commandMessageParser;
+
+
+    @Getter
+    private static AuthenticationManager authenticationManager;
+
+    @Getter
+    private static ClientAutoCompleteHandler autoCompleteHandler;
+
+
+    @Getter
+    private static List<Command> commandList = new ArrayList<>();
+
 
     private static Logger logger = LoggerFactory.getLogger(ServerTerminal.class);
 
@@ -90,20 +128,83 @@ public class ServerTerminal {
         port = settingsManager.getConfigData().getPort();
 
 
-        Server server = new Server(port);
+        server = new Server(port);
         server.setSettingsManager(settingsManager);
+        commandHandler = new ServerCommandHandler(server);
 
-        StaticHandler.setCore(new ServerCore(server));
+
+
+        StaticHandler.setCore(new ServerTermCore(server));
+        CommonUtil.registerTerminalPackets();
+
         new Thread(() -> {
             logger.info("Type Command: (try help)");
-            new ConsoleHandler(new AutoCompleteHandler(server)).start();
+            new ConsoleHandler((TermCore) StaticHandler.getCore(), new AutoCompleteHandler(server)).start();
         }, "ConsoleHandler").start();
-        server.registerCommand(new SettingsCommand(server));
+
+        commandMessageParser = new CommandMessageParser(server);
+        server.getPluginManager().registerEvents(commandMessageParser, new ServerPlugin());
+
+        registerCommand(new SettingsCommand(server));
+
+        ThreadUtils.runAsync(() -> {
+            authenticationManager = new AuthenticationManager(server);
+            server.getPluginManager().registerEvents(authenticationManager, new ServerPlugin());
+        });
+
+
+        registerCommand(new AuthCommand("changepassword", server));
+
+        autoCompleteHandler = new ClientAutoCompleteHandler(server);
+
+        ThreadUtils.runAsync(() -> {
+            if (StaticHandler.OS.equalsIgnoreCase("Linux") || StaticHandler.OS.contains("Linux") || StaticHandler.isLight()) {
+                logger.info("Running LightManager (Note this is for raspberry pies only)");
+
+                Thread lightThread = new Thread(() -> {
+
+                    try {
+                        LightManager.init();
+                        registerCommand(new LightCommand(server));
+                    } catch (IllegalArgumentException | ExceptionInInitializerError | NoPi4JLibsFoundException e) {
+                        logger.error("Unable to load Pi4J Libraries. To load stacktrace, add -debug flag. Message: {}", e.getMessage());
+                        if (StaticHandler.isDebug()) {
+                            e.printStackTrace();
+                            registerCommand(new LightCommand(server));
+                        }
+                    }
+
+                }, "LightThread");
+//                registerCommand(new LightCommand(this));
+                lightThread.start();
+            } else {
+                logger.info("Detected system is not linux. LightManager will not run (manual run with -lightmanager arg)");
+            }
+        });
 
         new Thread(server, "ServerMainThread").start();
     }
 
+    public static Command registerCommand(Command command) {
+        commandList.add(command);
+        return command;
+    }
+
+    public static List<Command> getCommands() {
+        return commandList;
+    }
+
     public static String getCurrentPath() {
         return Paths.get("").toAbsolutePath().toString();
+    }
+
+    public static void broadcast(String message) {
+        Server.getLogger().info(message);
+        server.sendObjectToAllPlayers(new MessagePacket(message));
+    }
+
+    public static void sendMessage(SenderInterface senderInterface, String message) {
+        if (senderInterface instanceof Console) logger.info(message);
+        else senderInterface.sendPacket(new MessagePacket(message));
     }
 }

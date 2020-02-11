@@ -5,7 +5,11 @@ import com.github.fernthedev.client.netty.MulticastClient;
 import com.github.fernthedev.core.MulticastData;
 import com.github.fernthedev.core.StaticHandler;
 import com.github.fernthedev.core.VersionData;
+import com.github.fernthedev.terminal.core.CommonUtil;
 import com.github.fernthedev.terminal.core.ConsoleHandler;
+import com.github.fernthedev.terminal.core.TermCore;
+import com.github.fernthedev.terminal.core.packets.CommandPacket;
+import com.github.fernthedev.terminal.core.packets.MessagePacket;
 import lombok.Getter;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -20,10 +24,12 @@ import java.util.logging.Level;
 
 public class ClientTerminal {
 
+    @Getter
     private static Logger logger = LoggerFactory.getLogger(ClientTerminal.class);
 
     @Getter
     private static AutoCompleteHandler autoCompleteHandler;
+    private static Client client;
 
     public static void main(String[] args) {
         AnsiConsole.systemInstall();
@@ -110,11 +116,14 @@ public class ClientTerminal {
 
 
 
-        Client client = new Client(host, port);
+        client = new Client(host, port);
+
+        StaticHandler.setCore(new ClientTermCore(client));
+        CommonUtil.registerTerminalPackets();
 
         autoCompleteHandler = new AutoCompleteHandler(client);
 
-        ConsoleHandler.startConsoleHandlerAsync(autoCompleteHandler);
+        ConsoleHandler.startConsoleHandlerAsync((TermCore) StaticHandler.getCore(), autoCompleteHandler);
 
         client.addPacketHandler(new PacketHandler());
 
@@ -214,6 +223,21 @@ public class ClientTerminal {
         }
 
         return new ImmutablePair<>(host, port);
+    }
+
+    public static void sendMessage(String message) {
+        try {
+            message = message.replaceAll(" {2}", " ");
+            if (!message.equals("") && !message.equals(" ")) {
+
+                if (message.startsWith("/")) {
+                    client.sendObject(new CommandPacket(message.substring(1)));
+                } else
+                    client.sendObject(new MessagePacket(message));
+            }
+        } catch (IllegalArgumentException e) {
+            logger.error("Unable to send message. Cause: " + e.getMessage() + " {" + e.getClass().getName() + "}");
+        }
     }
 
 }

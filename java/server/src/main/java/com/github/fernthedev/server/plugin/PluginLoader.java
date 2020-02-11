@@ -1,8 +1,8 @@
 package com.github.fernthedev.server.plugin;
 
-import com.github.fernthedev.server.event.Event;
-import com.github.fernthedev.server.event.Listener;
-import com.github.fernthedev.server.event.RegisteredListener;
+import com.github.fernthedev.server.event.api.Event;
+import com.github.fernthedev.server.event.api.Listener;
+import com.github.fernthedev.server.event.api.RegisteredListener;
 import com.github.fernthedev.server.plugin.exception.InvalidPluginException;
 import com.github.fernthedev.server.plugin.exception.UnknownDependencyException;
 

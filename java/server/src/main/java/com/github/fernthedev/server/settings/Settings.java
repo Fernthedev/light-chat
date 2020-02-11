@@ -1,8 +1,8 @@
 package com.github.fernthedev.server.settings;
 
 import com.github.fernthedev.core.encryption.codecs.CodecEnum;
-import com.github.fernthedev.fernutils.threads.ThreadUtils;
-import com.github.fernthedev.fernutils.threads.multiple.TaskInfoForLoop;
+import com.github.fernthedev.fernutils.thread.ThreadUtils;
+import com.github.fernthedev.fernutils.thread.multiple.TaskInfoFunctionList;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -159,7 +159,7 @@ public class Settings {
     }
 
     public Map<String, List<String>> getSettingValuesAsync(boolean editable) {
-        TaskInfoForLoop<Field, Pair<String, List<String>>> ob = ThreadUtils.runForLoopAsync(Arrays.asList(getClass().getDeclaredFields()), (field -> {
+        TaskInfoFunctionList<Field, Pair<String, List<String>>> ob = ThreadUtils.runFunctionListAsync(Arrays.asList(getClass().getDeclaredFields()), (field -> {
 
 
             if (field.isAnnotationPresent(SettingValue.class)) {
