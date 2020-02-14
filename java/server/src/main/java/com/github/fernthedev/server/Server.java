@@ -3,11 +3,10 @@ package com.github.fernthedev.server;
 import com.github.fernthedev.config.common.Config;
 import com.github.fernthedev.core.ColorCode;
 import com.github.fernthedev.core.StaticHandler;
-import com.github.fernthedev.core.encryption.codecs.AcceptablePacketTypes;
-import com.github.fernthedev.core.encryption.codecs.fastjson.EncryptedFastJSONObjectDecoder;
-import com.github.fernthedev.core.encryption.codecs.fastjson.EncryptedFastJSONObjectEncoder;
-import com.github.fernthedev.core.encryption.codecs.gson.EncryptedGSONObjectDecoder;
-import com.github.fernthedev.core.encryption.codecs.gson.EncryptedGSONObjectEncoder;
+import com.github.fernthedev.core.api.APIUsage;
+import com.github.fernthedev.core.encryption.codecs.JSONHandler;
+import com.github.fernthedev.core.encryption.codecs.general.gson.EncryptedJSONObjectDecoder;
+import com.github.fernthedev.core.encryption.codecs.general.gson.EncryptedJSONObjectEncoder;
 import com.github.fernthedev.core.packets.Packet;
 import com.github.fernthedev.core.packets.SelfMessagePacket;
 import com.github.fernthedev.fernutils.thread.ThreadUtils;
@@ -17,9 +16,8 @@ import com.github.fernthedev.server.netty.MulticastServer;
 import com.github.fernthedev.server.netty.ProcessingHandler;
 import com.github.fernthedev.server.plugin.PluginManager;
 import com.github.fernthedev.server.settings.NoFileConfig;
-import com.github.fernthedev.server.settings.Settings;
+import com.github.fernthedev.server.settings.ServerSettings;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
@@ -28,9 +26,6 @@ import io.netty.channel.kqueue.KQueueServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LineBasedFrameDecoder;
-import io.netty.handler.codec.MessageToMessageDecoder;
-import io.netty.handler.codec.MessageToMessageEncoder;
-import io.netty.util.CharsetUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -43,104 +38,69 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
 public class Server implements Runnable {
-    
-    @Getter
-    @Setter
-    private String name;
-
-    @Getter
-    private int port;
-
-    private boolean running;
-
-    private Console console;
-
-    private PluginManager pluginManager;
-
-    @Getter
-    @Setter
-    private Config<Settings> settingsManager = new NoFileConfig<>(new Settings());
-
-    private MulticastServer multicastServer;
-
-
-    public Console getConsole() {
-        return console;
-    }
 
     @Getter
     private static Logger logger = LoggerFactory.getLogger(Server.class);
 
+    @Getter
+    private Thread serverThread;
+
+    @Getter
+    private int port;
+    private boolean running;
+
+    @Getter
+    private Console console;
+    private PluginManager pluginManager = new PluginManager();
+
+    @Getter
+    @Setter
+    private Config<ServerSettings> settingsManager = new NoFileConfig<>(new ServerSettings());
+
+    private MulticastServer multicastServer;
+
     private ChannelFuture future;
     private EventLoopGroup bossGroup, workerGroup;
-
     private ProcessingHandler processingHandler;
 
 
-
+    /**
+     * Custom packet handlers added by outside the main server code
+     */
     @Getter
     private List<IPacketHandler> packetHandlers = new ArrayList<>();
 
-    public void addPacketHandler(IPacketHandler iPacketHandler) {
-        packetHandlers.add(iPacketHandler);
-    }
-
-    public void removePacketHandler(IPacketHandler packetHandler) {
-        packetHandlers.remove(packetHandler);
-    }
-
-
-
     public Server(int port) {
-        running = true;
         this.port = port;
 
 
         console = new Console(this);
         StaticHandler.setCore(new ServerCore(this));
-//        StaticHandler.setupTerminal(autoCompleteHandler);
-
-        pluginManager = new PluginManager();
-//        new Thread(serverCommandHandler, "ServerBackgroundThread").start();
     }
 
+    @APIUsage
+    public void addPacketHandler(IPacketHandler iPacketHandler) {
+        packetHandlers.add(iPacketHandler);
+    }
 
-
-//    private void await() {
-//        new Thread(() -> {
-//            while (running) {
-//                try {
-//                    future = future.await().sync();
-//
-//                    future.channel().closeFuture().sync();
-//
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        },"AwaitThread");
-//    }
+    @APIUsage
+    public void removePacketHandler(IPacketHandler packetHandler) {
+        packetHandlers.remove(packetHandler);
+    }
 
     public synchronized void sendObjectToAllPlayers(@NonNull Packet packet) {
         new Thread(() -> {
-            for(ClientPlayer clientPlayer : PlayerHandler.socketList.values()) {
-
-                if (packet != null) {
-                    if (clientPlayer.channel.isActive()) {
-                        clientPlayer.sendObject(packet);
-                    }
-                    clientPlayer.setLastPacket(packet);
-                } else {
-                    logger.info("not packet");
-                }
+            for (ClientPlayer clientPlayer : PlayerHandler.getChannelMap().values()) {
+                logger.debug("Sending to all {} to {}", packet.getPacketName(), clientPlayer);
+                clientPlayer.sendObject(packet);
             }
         }).start();
-
     }
 
 
@@ -172,7 +132,21 @@ public class Server implements Runnable {
      */
     @Override
     public void run() {
-        name = "Server-" + Thread.currentThread().getId();
+        serverThread = Thread.currentThread();
+
+        start();
+    }
+
+    /**
+     * Starts the server in the current thread
+     */
+    @APIUsage
+    public void start() {
+        if (serverThread == null) serverThread = Thread.currentThread();
+
+        if (running) throw new IllegalStateException("Server is already running");
+
+        running = true;
         StaticHandler.displayVersion();
         List<TaskInfo> tasks = new ArrayList<>();
 
@@ -185,8 +159,8 @@ public class Server implements Runnable {
         new Thread(new PlayerHandler(this),"PlayerHandlerThread").start();
 
         tasks.add(ThreadUtils.runAsync(() -> Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            for (ClientPlayer clientPlayer : PlayerHandler.socketList.values()) {
-                if (clientPlayer.channel.isOpen()) {
+            for (ClientPlayer clientPlayer : PlayerHandler.getChannelMap().values()) {
+                if (clientPlayer.getChannel().isOpen()) {
                     Server.getLogger().info("Gracefully shutting down");
                     sendObjectToAllPlayers(new SelfMessagePacket(SelfMessagePacket.MessageType.LOST_SERVER_CONNECTION));
                     clientPlayer.close();
@@ -210,7 +184,7 @@ public class Server implements Runnable {
             if (settingsManager.getConfigData().isUseMulticast()) {
                 getLogger().info("Initializing MultiCast Server");
                 try {
-                    multicastServer = new MulticastServer("MultiCast Thread", this, StaticHandler.getMULTICAST_ADDRESS());
+                    multicastServer = new MulticastServer("MultiCast Thread", this, StaticHandler.getMulticastAddress());
                     multicastServer.start();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -266,20 +240,7 @@ public class Server implements Runnable {
 
         EncryptionKeyFinder keyFinder = new EncryptionKeyFinder();
 
-        MessageToMessageEncoder<AcceptablePacketTypes> encoder;
-        MessageToMessageDecoder<ByteBuf> decoder;
-
-        switch (settingsManager.getConfigData().getCodecEnum()) {
-            case ALIBABA_FASTJSON:
-                encoder = new EncryptedFastJSONObjectEncoder(CharsetUtil.UTF_8, keyFinder);
-                decoder = new EncryptedFastJSONObjectDecoder(CharsetUtil.UTF_8, keyFinder);
-                break;
-            case GSON:
-            default:
-                encoder = new EncryptedGSONObjectEncoder(CharsetUtil.UTF_8, keyFinder);
-                decoder = new EncryptedGSONObjectDecoder(CharsetUtil.UTF_8, keyFinder);
-                break;
-        }
+        JSONHandler jsonHandler = settingsManager.getConfigData().getCodecEnum().getJsonHandler();
 
 
         bootstrap.group(bossGroup, workerGroup)
@@ -287,14 +248,10 @@ public class Server implements Runnable {
                 .childHandler(new ChannelInitializer<Channel>() {
                     @Override
                     public void initChannel(Channel ch) {
-
-//                        ch.pipeline().addLast(new ObjectEncoder(),
-//                                new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
-//                                processingHandler);
                         ch.pipeline().addLast("frameDecoder", new LineBasedFrameDecoder(StaticHandler.LINE_LIMIT));
-                        ch.pipeline().addLast("stringDecoder", decoder);
+                        ch.pipeline().addLast("stringDecoder", new EncryptedJSONObjectDecoder(settingsManager.getConfigData().getCharset(), keyFinder, jsonHandler));
 
-                        ch.pipeline().addLast("stringEncoder", encoder);
+                        ch.pipeline().addLast("stringEncoder", new EncryptedJSONObjectEncoder(settingsManager.getConfigData().getCharset(), keyFinder, jsonHandler));
 
                         ch.pipeline().addLast(processingHandler);
                     }
@@ -310,7 +267,8 @@ public class Server implements Runnable {
         try {
             future = bootstrap.bind(port).sync();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.error("Interrupted thread {}", getName());
+            serverThread.interrupt();
         }
 
         try {
@@ -322,7 +280,7 @@ public class Server implements Runnable {
         if (!future.isSuccess()) {
             logger.info("Failed to bind port");
         } else {
-            logger.info("Binded port on {}", future.channel().localAddress());
+            logger.info("Bind port on {}", future.channel().localAddress());
         }
     }
 
@@ -335,6 +293,15 @@ public class Server implements Runnable {
     }
 
     public void logInfo(String o, Object... os) {
-        getLogger().info("[{}] " + o, getName(), os);
+        List<Object> objects = new ArrayList<>();
+
+        objects.add(getName());
+        objects.addAll(Arrays.asList(os));
+
+        getLogger().info("[{}] " + o, objects.toArray());
+    }
+
+    public String getName() {
+        return serverThread.getName();
     }
 }

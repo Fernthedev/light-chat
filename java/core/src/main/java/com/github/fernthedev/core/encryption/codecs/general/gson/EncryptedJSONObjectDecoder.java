@@ -1,4 +1,4 @@
-package com.github.fernthedev.core.encryption.codecs.gson;
+package com.github.fernthedev.core.encryption.codecs.general.gson;
 
 import com.github.fernthedev.core.PacketRegistry;
 import com.github.fernthedev.core.StaticHandler;
@@ -8,9 +8,9 @@ import com.github.fernthedev.core.encryption.PacketWrapper;
 import com.github.fernthedev.core.encryption.RSA.IEncryptionKeyHolder;
 import com.github.fernthedev.core.encryption.RSA.NoSecretKeyException;
 import com.github.fernthedev.core.encryption.UnencryptedPacketWrapper;
+import com.github.fernthedev.core.encryption.codecs.JSONHandler;
 import com.github.fernthedev.core.encryption.util.EncryptionUtil;
 import com.github.fernthedev.core.packets.Packet;
-import com.google.gson.Gson;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -26,9 +26,9 @@ import java.util.List;
  * Converts encrypted json to a decrypted object
  */
 @ChannelHandler.Sharable
-public class EncryptedGSONObjectDecoder extends StringDecoder {
+public class EncryptedJSONObjectDecoder extends StringDecoder {
 
-    private static final Gson gson = new Gson();
+    private final JSONHandler jsonHandler;
 
     protected IEncryptionKeyHolder encryptionKeyHolder;
     protected Charset charset;
@@ -36,8 +36,8 @@ public class EncryptedGSONObjectDecoder extends StringDecoder {
     /**
      * Creates a new instance with the current system character set.
      */
-    public EncryptedGSONObjectDecoder(IEncryptionKeyHolder encryptionKeyHolder) {
-        this(Charset.defaultCharset(), encryptionKeyHolder);
+    public EncryptedJSONObjectDecoder(IEncryptionKeyHolder encryptionKeyHolder, JSONHandler jsonHandler) {
+        this(Charset.defaultCharset(), encryptionKeyHolder, jsonHandler);
     }
 
     /**
@@ -45,10 +45,11 @@ public class EncryptedGSONObjectDecoder extends StringDecoder {
      *
      * @param charset
      */
-    public EncryptedGSONObjectDecoder(Charset charset, IEncryptionKeyHolder encryptionKeyHolder) {
+    public EncryptedJSONObjectDecoder(Charset charset, IEncryptionKeyHolder encryptionKeyHolder, JSONHandler jsonHandler) {
         super(charset);
         this.charset = charset;
         this.encryptionKeyHolder = encryptionKeyHolder;
+        this.jsonHandler = jsonHandler;
     }
 
     /**
@@ -66,18 +67,18 @@ public class EncryptedGSONObjectDecoder extends StringDecoder {
 
         String decodedStr = (String) tempDecodeList.get(0);
         StaticHandler.getCore().getLogger().debug("Decoding the string {}", decodedStr);
-        PacketWrapper<?> packetWrapper = gson.fromJson(decodedStr, PacketWrapper.class);
+        PacketWrapper<?> packetWrapper = jsonHandler.fromJson(decodedStr, PacketWrapper.class);
 
         String decryptedJSON;
 
         try {
             if (packetWrapper.encrypt()) {
-                packetWrapper = gson.fromJson(decodedStr, EncryptedPacketWrapper.class);
+                packetWrapper = jsonHandler.fromJson(decodedStr, EncryptedPacketWrapper.class);
 
-                EncryptedBytes encryptedBytes = gson.fromJson(packetWrapper.getJsonObject(), EncryptedBytes.class);
+                EncryptedBytes encryptedBytes = jsonHandler.fromJson(packetWrapper.getJsonObject(), EncryptedBytes.class);
                 decryptedJSON = decrypt(ctx, (encryptedBytes));
             } else {
-                packetWrapper = gson.fromJson(decodedStr, UnencryptedPacketWrapper.class);
+                packetWrapper = jsonHandler.fromJson(decodedStr, UnencryptedPacketWrapper.class);
                 decryptedJSON = packetWrapper.getJsonObject();
             }
         } catch (Exception e) {
@@ -85,32 +86,27 @@ public class EncryptedGSONObjectDecoder extends StringDecoder {
         }
 
         out.add(getParsedObject(packetWrapper.getPacketIdentifier(), decryptedJSON));
-
-//        StaticHandler.getCore().getLogger().info("Received {}", new Gson().toJson(packetWrapper));
     }
 
     /**
      * Converts the JSON Object into it's former instance by providing the class name
+     *
      * @param jsonObject
      * @return
      */
     public Object getParsedObject(String packetIdentifier, String jsonObject) {
         Class<? extends Packet> aClass = PacketRegistry.getPacketClassFromRegistry(packetIdentifier);
 
-//        if(!aClass.isNestmateOf(Packet.class)) {
-//            throw new IllegalArgumentException("The class provided is not a packet type. Received: " + aClass);
-//        }
-
         try {
-            return gson.fromJson(jsonObject, aClass);
+            return jsonHandler.fromJson(jsonObject, aClass);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Attempting to parse packet " + packetIdentifier + " (" + aClass.getName() + ") with string\n" + jsonObject , e);
+            throw new IllegalArgumentException("Attempting to parse packet " + packetIdentifier + " (" + aClass.getName() + ") with string\n" + jsonObject, e);
         }
     }
 
     protected String decrypt(ChannelHandlerContext ctx, EncryptedBytes encryptedString) {
 
-        if(!encryptionKeyHolder.isEncryptionKeyRegistered(ctx, ctx.channel())) throw new NoSecretKeyException();
+        if (!encryptionKeyHolder.isEncryptionKeyRegistered(ctx, ctx.channel())) throw new NoSecretKeyException();
 
         SecretKey secretKey = encryptionKeyHolder.getSecretKey(ctx, ctx.channel());
 

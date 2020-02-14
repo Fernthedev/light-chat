@@ -1,4 +1,4 @@
-package com.github.fernthedev.core.encryption.codecs.gson;
+package com.github.fernthedev.core.encryption.codecs.general.gson;
 
 import com.github.fernthedev.core.StaticHandler;
 import com.github.fernthedev.core.encryption.EncryptedBytes;
@@ -7,10 +7,10 @@ import com.github.fernthedev.core.encryption.PacketWrapper;
 import com.github.fernthedev.core.encryption.RSA.IEncryptionKeyHolder;
 import com.github.fernthedev.core.encryption.UnencryptedPacketWrapper;
 import com.github.fernthedev.core.encryption.codecs.AcceptablePacketTypes;
+import com.github.fernthedev.core.encryption.codecs.JSONHandler;
 import com.github.fernthedev.core.encryption.codecs.LineEndStringEncoder;
 import com.github.fernthedev.core.encryption.util.EncryptionUtil;
 import com.github.fernthedev.core.packets.Packet;
-import com.google.gson.Gson;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
@@ -21,12 +21,12 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 /**
- * Converts an object to a encrypted json
+ * Converts an object to an encrypted json
  */
 @ChannelHandler.Sharable
-public class EncryptedGSONObjectEncoder extends MessageToMessageEncoder<AcceptablePacketTypes> {
+public class EncryptedJSONObjectEncoder extends MessageToMessageEncoder<AcceptablePacketTypes> {
 
-    private static final Gson gson = new Gson();
+    private final JSONHandler jsonHandler;
     private final LineEndStringEncoder encoder;
 
     protected IEncryptionKeyHolder encryptionKeyHolder;
@@ -36,8 +36,8 @@ public class EncryptedGSONObjectEncoder extends MessageToMessageEncoder<Acceptab
     /**
      * Creates a new instance with the current system character set.
      */
-    public EncryptedGSONObjectEncoder(IEncryptionKeyHolder encryptionKeyHolder) {
-        this(Charset.defaultCharset(), encryptionKeyHolder);
+    public EncryptedJSONObjectEncoder(IEncryptionKeyHolder encryptionKeyHolder, JSONHandler jsonHandler) {
+        this(Charset.defaultCharset(), encryptionKeyHolder, jsonHandler);
     }
 
     /**
@@ -45,10 +45,12 @@ public class EncryptedGSONObjectEncoder extends MessageToMessageEncoder<Acceptab
      *
      * @param charset
      */
-    public EncryptedGSONObjectEncoder(Charset charset, IEncryptionKeyHolder encryptionKeyHolder) {
+    public EncryptedJSONObjectEncoder(Charset charset, IEncryptionKeyHolder encryptionKeyHolder, JSONHandler jsonHandler) {
         encoder = new LineEndStringEncoder(charset);
         this.charset = charset;
         this.encryptionKeyHolder = encryptionKeyHolder;
+        this.jsonHandler = jsonHandler;
+        StaticHandler.getCore().getLogger().debug("Using charset {} for encrypting", charset);
     }
 
     /**
@@ -67,7 +69,7 @@ public class EncryptedGSONObjectEncoder extends MessageToMessageEncoder<Acceptab
         PacketWrapper<?> packetWrapper;
         if (msg instanceof UnencryptedPacketWrapper) {
             packetWrapper = (PacketWrapper<?>) msg;
-            String decryptedJSON = gson.toJson(msg);
+            String decryptedJSON = jsonHandler.toJson(msg);
 
             encoder.encode(ctx, decryptedJSON, out); // Just encodes the string
 
@@ -78,19 +80,19 @@ public class EncryptedGSONObjectEncoder extends MessageToMessageEncoder<Acceptab
             }
 
             // Encrypting the data
-            String decryptedJSON = gson.toJson(msg);
+            String decryptedJSON = jsonHandler.toJson(msg);
             EncryptedBytes encryptedBytes = encrypt(ctx, decryptedJSON);
 
             // Adds the encrypted json in the packet wrapper
             packetWrapper = new EncryptedPacketWrapper(encryptedBytes, (Packet) msg);
-            String jsonPacketWrapper = gson.toJson(packetWrapper);
+            String jsonPacketWrapper = jsonHandler.toJson(packetWrapper);
 
             // Encodes the string for sending
             encoder.encode(ctx, jsonPacketWrapper, out);
 
         }
 
-        StaticHandler.getCore().getLogger().debug("Sending {}", gson.toJson(packetWrapper));
+        StaticHandler.getCore().getLogger().debug("Sending {}", jsonHandler.toJson(packetWrapper));
     }
 
     public EncryptedBytes encrypt(ChannelHandlerContext ctx, String decryptedString) {
@@ -103,8 +105,6 @@ public class EncryptedGSONObjectEncoder extends MessageToMessageEncoder<Acceptab
 
 
         @NonNull SecretKey secretKey = encryptionKeyHolder.getSecretKey(ctx, ctx.channel());
-
-//        System.out.println("Encrypting the message");
         EncryptedBytes encryptedJSON = null;
 
         try {

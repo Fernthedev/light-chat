@@ -23,11 +23,11 @@ public class EncryptionKeyFinder implements IEncryptionKeyHolder {
 
     @Override
     public @NonNull SecretKey getSecretKey(ChannelHandlerContext ctx, Channel channel) {
-        return PlayerHandler.socketList.get(channel).getSecretKey();
+        return PlayerHandler.getChannelMap().get(channel).getSecretKey();
     }
 
     @Override
     public boolean isEncryptionKeyRegistered(ChannelHandlerContext ctx, Channel channel) {
-        return PlayerHandler.socketList.get(channel).getSecretKey() != null;
+        return PlayerHandler.getChannelMap().get(channel).getSecretKey() != null;
     }
 }

@@ -44,7 +44,7 @@ public class MulticastServer extends QuoteServerThread {
                 byte[] buf;
                 // don't wait for request...just send a quote
 
-                MulticastData dataSend = new MulticastData(server.getPort(), StaticHandler.getVERSION_DATA().getVariablesJSON().getVersion(), StaticHandler.getVERSION_DATA().getVariablesJSON().getMinVersion(), PlayerHandler.players.size());
+                MulticastData dataSend = new MulticastData(server.getPort(), StaticHandler.getVERSION_DATA().getVariablesJSON().getVersion(), StaticHandler.getVERSION_DATA().getVariablesJSON().getMinVersion(), PlayerHandler.getUuidMap().size());
 
                 buf = new Gson().toJson(dataSend).getBytes();
 

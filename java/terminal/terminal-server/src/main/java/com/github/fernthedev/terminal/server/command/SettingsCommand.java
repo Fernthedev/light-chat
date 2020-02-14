@@ -4,7 +4,7 @@ import com.github.fernthedev.config.common.Config;
 import com.github.fernthedev.core.ColorCode;
 import com.github.fernthedev.server.SenderInterface;
 import com.github.fernthedev.server.Server;
-import com.github.fernthedev.server.settings.Settings;
+import com.github.fernthedev.server.settings.ServerSettings;
 import com.github.fernthedev.terminal.server.ServerTerminal;
 
 import java.util.List;
@@ -32,7 +32,7 @@ public class SettingsCommand extends Command {
                 long timeEnd;
                 long timeElapsed;
                 String arg = args[0];
-                Config<Settings> settingsManager = server.getSettingsManager();
+                Config<ServerSettings> settingsManager = server.getSettingsManager();
 
                 switch (arg.toLowerCase()) {
                     case "set":
@@ -77,11 +77,16 @@ public class SettingsCommand extends Command {
                     case "list":
                         ServerTerminal.sendMessage(sender, "Possible setting names : {possible values, empty if any are allowed}");
 
-                        Map<String, List<String>> nameValueMap = settingsManager.getConfigData().getSettingValuesAsync(true);
+                        try {
+                            Map<String, List<String>> nameValueMap = settingsManager.getConfigData().getSettingValues(true);
 
-                        for(String settingName : nameValueMap.keySet()) {
-                            List<String> possibleValues = nameValueMap.get(settingName);
-                            ServerTerminal.sendMessage(sender, settingName + " : " + possibleValues.toString());
+                            for (String settingName : nameValueMap.keySet()) {
+                                List<String> possibleValues = nameValueMap.get(settingName);
+                                ServerTerminal.sendMessage(sender, settingName + " : " + possibleValues.toString());
+                            }
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
 
                         break;

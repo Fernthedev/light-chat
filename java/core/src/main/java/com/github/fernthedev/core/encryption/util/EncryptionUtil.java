@@ -35,6 +35,7 @@ public class EncryptionUtil {
 
     /**
      * Encrypt object with password
+     *
      * @param object Object to be encrypted
      * @param secret Password to use for encryption
      * @return Encrypted version of object
@@ -56,7 +57,8 @@ public class EncryptionUtil {
 
     /**
      * Encrypt object with password
-     * @param data Object to be encrypted
+     *
+     * @param data   Object to be encrypted
      * @param secret Password to use for encryption
      * @return Encrypted version of object
      */
@@ -82,8 +84,9 @@ public class EncryptionUtil {
 
     /**
      * Decrypt data with secret
+     *
      * @param encryptedBytes Object to be decrypted
-     * @param secret Password to use for decryption
+     * @param secret         Password to use for decryption
      * @return Decrypted version of object
      */
     public static String decrypt(EncryptedBytes encryptedBytes, @NonNull SecretKey secret) throws InvalidKeyException {
@@ -107,8 +110,9 @@ public class EncryptionUtil {
 
     /**
      * Encrypt text with password
+     *
      * @param plainText Text to be encrypted
-     * @param password Password to use for encryption
+     * @param password  Password to use for encryption
      * @return Encrypted version of plaintext
      */
     public static String encryptWithPassword(String plainText, String password) {
@@ -122,7 +126,7 @@ public class EncryptionUtil {
             SecretKey tmp = factory.generateSecret(spec);
             SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKEY_SPEC_TRANSFORMATION());
 
-            Cipher cipher = Cipher.getInstance(StaticHandler.getCipherTransformationOld());
+            Cipher cipher = Cipher.getInstance(StaticHandler.getCIPHER_TRANSFORMATION_OLD());
             cipher.init(Cipher.ENCRYPT_MODE, secret);
             AlgorithmParameters params = cipher.getParameters();
             byte[] iv = params.getParameterSpec(IvParameterSpec.class).getIV();
@@ -135,7 +139,7 @@ public class EncryptionUtil {
             outputStream.write(encryptedText);
 
             // properly encode the complete ciphertext
-           // logEncrypt(password, plainText);
+            // logEncrypt(password, plainText);
             return DatatypeConverter.printBase64Binary(outputStream.toByteArray());
         } catch (Exception e) {
             e.printStackTrace();
@@ -145,7 +149,8 @@ public class EncryptionUtil {
 
     /**
      * Encrypt object with password
-     * @param object Object to be encrypted
+     *
+     * @param object   Object to be encrypted
      * @param password Password to use for encryption
      * @return Encrypted version of object
      */
@@ -168,8 +173,9 @@ public class EncryptionUtil {
 
     /**
      * Decrypt string encrypted using {@link #encryptWithPassword(String, String)}
+     *
      * @param encryptedText Encrypted string
-     * @param password Same password to decrypt
+     * @param password      Same password to decrypt
      * @return Plain text
      */
     public static String decryptWithPassword(String encryptedText, String password) {
@@ -186,7 +192,7 @@ public class EncryptionUtil {
             KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 256);
             SecretKey tmp = factory.generateSecret(spec);
             SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKEY_SPEC_TRANSFORMATION());
-            Cipher cipher = Cipher.getInstance(StaticHandler.getCipherTransformationOld());
+            Cipher cipher = Cipher.getInstance(StaticHandler.getCIPHER_TRANSFORMATION_OLD());
 
             cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(iv));
             byte[] plaintext = cipher.doFinal(ct);
@@ -201,8 +207,9 @@ public class EncryptionUtil {
 
     /**
      * Decrypt object using {@link #encryptWithPassword(Serializable, String)}
+     *
      * @param sealedObject Encrypted object to decrypt
-     * @param key Password to decrypt
+     * @param key          Password to decrypt
      * @return Unencrypted object
      */
     public static Object decryptWithPassword(SealedObject sealedObject, String key) {
@@ -213,12 +220,12 @@ public class EncryptionUtil {
             KeySpec spec = new PBEKeySpec(key.toCharArray(), salt, 65536, 256);
             SecretKey tmp = factory.generateSecret(spec);
             SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKEY_SPEC_TRANSFORMATION());
-            Cipher cipher = Cipher.getInstance(StaticHandler.getCipherTransformationOld());
+            Cipher cipher = Cipher.getInstance(StaticHandler.getCIPHER_TRANSFORMATION_OLD());
 
             cipher.init(Cipher.DECRYPT_MODE, secret);
 
 
-           // logDecrypt(key, sealedObject);
+            // logDecrypt(key, sealedObject);
             return sealedObject.getObject(cipher);
         } catch (BadPaddingException e) {
             try {
@@ -235,6 +242,7 @@ public class EncryptionUtil {
 
     /**
      * Hashes the string
+     *
      * @param input String to be hashed
      * @return The hashed string
      */
@@ -277,18 +285,17 @@ public class EncryptionUtil {
 
         /**
          * Encodes a byte array into a char array by doing base64 encoding.
-         *
+         * <p>
          * The caller must supply a big enough buffer.
          *
-         * @return
-         *      the value of {@code ptr+((len+2)/3)*4}, which is the new offset
-         *      in the output buffer where the further bytes should be placed.
+         * @return the value of {@code ptr+((len+2)/3)*4}, which is the new offset
+         * in the output buffer where the further bytes should be placed.
          */
         static int _printBase64Binary(byte[] input, int offset, int len, char[] buf, int ptr) {
             // encode elements until only 1 or 2 elements are left to encode
             int remaining = len;
             int i;
-            for (i = offset;remaining >= 3; remaining -= 3, i += 3) {
+            for (i = offset; remaining >= 3; remaining -= 3, i += 3) {
                 buf[ptr++] = encode(input[i] >> 2);
                 buf[ptr++] = encode(
                         ((input[i] & 0x3) << 4)
@@ -346,13 +353,12 @@ public class EncryptionUtil {
 
 
         /**
-         * @param text
-         *      base64Binary data is likely to be long, and decoding requires
-         *      each character to be accessed twice (once for counting length, another
-         *      for decoding.)
-         *
-         *      A benchmark showed that taking {@link String} is faster, presumably
-         *      because JIT can inline a lot of string access (with data of 1K chars, it was twice as fast)
+         * @param text base64Binary data is likely to be long, and decoding requires
+         *             each character to be accessed twice (once for counting length, another
+         *             for decoding.)
+         *             <p>
+         *             A benchmark showed that taking {@link String} is faster, presumably
+         *             because JIT can inline a lot of string access (with data of 1K chars, it was twice as fast)
          */
         static byte[] _parseBase64Binary(String text) {
             final int buflen = guessLength(text);

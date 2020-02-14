@@ -1,5 +1,6 @@
 package com.github.fernthedev.terminal.server;
 
+import com.github.fernthedev.core.StaticHandler;
 import com.github.fernthedev.core.data.LightCandidate;
 import com.github.fernthedev.core.packets.HashedPasswordPacket;
 import com.github.fernthedev.core.packets.Packet;
@@ -34,7 +35,7 @@ public class TerminalPacketHandler implements IPacketHandler {
         } if (p instanceof MessagePacket) {
             MessagePacket messagePacket = (MessagePacket) p;
 
-
+            StaticHandler.getCore().getLogger().debug("Handling message {}", messagePacket.getMessage());
             ChatEvent chatEvent = new ChatEvent(clientPlayer, messagePacket.getMessage(),false,true);
 
             server.getPluginManager().callEvent(chatEvent);

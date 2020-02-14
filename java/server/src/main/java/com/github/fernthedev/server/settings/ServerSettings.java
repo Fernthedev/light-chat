@@ -1,5 +1,6 @@
 package com.github.fernthedev.server.settings;
 
+import com.github.fernthedev.core.CoreSettings;
 import com.github.fernthedev.core.encryption.codecs.CodecEnum;
 import com.github.fernthedev.fernutils.thread.ThreadUtils;
 import com.github.fernthedev.fernutils.thread.multiple.TaskInfoFunctionList;
@@ -17,11 +18,12 @@ import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@EqualsAndHashCode(callSuper = true)
 @Getter
 @Setter
 @Data
 @ToString
-public class Settings {
+public class ServerSettings extends CoreSettings {
 
     @SettingValue
     private int port = 2000;
@@ -40,7 +42,6 @@ public class Settings {
 
     @SettingValue(name = "codec")
     private CodecEnum codecEnum = CodecEnum.GSON;
-
 
     @Deprecated
     public void setNewValue(@NonNull String oldValue, @NonNull String newValue) {
@@ -107,15 +108,13 @@ public class Settings {
         Map<String, List<String>> stringList = new HashMap<>();
 
         for (Field field : getClass().getDeclaredFields()) {
-
-
             if (field.isAnnotationPresent(SettingValue.class)) {
                 SettingValue settingValue = field.getAnnotation(SettingValue.class);
 
-                if (!editable) continue;
+                if (editable && !settingValue.editable()) continue;
 
                 String name = settingValue.name();
-                List<String> possibleValues = Arrays.asList(settingValue.values());
+                List<String> possibleValues = new ArrayList<>(Arrays.asList(settingValue.values()));
 
                 if (possibleValues.isEmpty()) {
                     // ENUM
@@ -140,7 +139,7 @@ public class Settings {
                     }
                     // Boolean
                     if (boolean.class.equals(field.getType())) {
-                        possibleValues.add("truee");
+                        possibleValues.add("true");
                         possibleValues.add("false");
                     }
                 }

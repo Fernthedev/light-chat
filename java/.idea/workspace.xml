@@ -1,0 +1,993 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="74a9c842-9768-484a-b6c1-feb6a74ad587" name="Default Changelist" comment="- Decoupling Client and Server to become it's own standalone API and terminal support and other features are being moved to terminal module">
+      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/fernr.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/0/8/082876ac13535380fab7c2fc93538372f38ece0a" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/0/c/0c146214222e74623304f3c68afbf7617ddec411" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/0/c/0ca69618a51a2053ca624f5c4825d6a3d4ae7b3c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/0/d/0d71ce93410c57b4f8001931cdd9bd95fcee0d23" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/7/17b159ec9ca77d7eef95fa3890fc20bf7e9ba0a4" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/8/1874a2d6124a681f76ed07d727d8e75b43de6afc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/a/1a7b5db576445500dca08ebaef9b2047913d950d" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/b/1b294fa53abc0efaaa59958e15d3cc3108125287" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/d/1d93f43f947e3f8c2b6ed27a31731c610ed914be" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/2/1/210c9176ce673a101ecf9b1add3a8ba96626dab1" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/2/4/242b7c277c259035641da6b54729821e8cdce50b" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/2/7/271e951b8b92702cb0388c0515fec5f417f163fb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/2/7/2720a793de9184c0983a40c25d7e694a25c4dbc1" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/3/2/32ce4758d457dbfed975c6654c87e8c45d1a98d5" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/3/4/342515e00046cea71f5177af6de4779778447ba0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/3/5/35e427890d3a4afb8a68ebaa972cabfe27563376" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/3/a/3a4ca36b41132e5be9ab0fa9fdfd5671621cc73c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/3/a/3a8a3fa45b8e1b7106cea4865c7390c07e975524" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/3/c/3cfbb7934821724d2f6dc15bcbc3ddd33be05061" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/4/8/487073280d48901aba99cc716724449c3ef221d5" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/4/8/48a038d33548ae3bca11043c4d093607546e9923" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/4/a/4a5a1611f75de46b632437bf7cd66033891a0c21" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/4/c/4c71f2b319eede16f4081a0ef5bc44d8f6bc1b9c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/5/4/5404ffde61b9c4974e3432bf5b47f010a1687832" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/5/5/555ea2072b296c626e9f54a86be0baa8b7a12cbf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/5/f/5fbd2c0d732ff7cbd0538fc9cae5d27317419d3e" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/6/5/65388e2ed66ac55fc97ae6181aee34c92496f8ab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/6/9/69b0da5b805f1ea92a85fb6510ff2c571cb6f5cf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/6/d/6daddc0662283539f0a995c10788aed29c9b532f" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/7/8/785df942c37ae041116b49c567cf0dd9de36fbad" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/7/d/7d6e002bf0ca62f0a1aa5f847d4666b282fc4a10" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/7/e/7e5959704e53d0038b352e2812f7d33cf5996210" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/7/e/7eaecd9fdef52e4d84cb2dd27b59378e6d248914" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/0/801dfd94806122d5552ee0bbbe22481234522d02" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/0/80423b35b19a3dcef8b2a34725b2d8fd5ec4fc66" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/0/807d2cc43275f2fc2f0719316d4375e1f199577f" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/0/80db0a63c13fa8484510c896598a78635accaf0e" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/7/875f3d9f7bf4cdec1616d9b99cea219eb892f26c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/8/8892f5f7970842b2a15f36623c8074f738d37c18" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/d/8db8e5204baab15938a1f6c0735847fb4f4d2ef2" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/f/8f953378499520004836b525f082840ad6889bd1" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/9/2/9216de389b137ab6c8fa59217165942f7c713845" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/9/2/927611e1396f133af8c0425ec8ff33c88bf002dc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/9/3/935d6a703fc552c3481defbaef332308fb359576" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/9/5/95d480eb456a9c1f1d6d87e86ce09a229a23ed85" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/9/6/9699706405c58a0b99ed807425c4be3de0ed1b65" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/9/7/97de52feb2dfebecdd562a91bb2cb1527ccc69ff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/9/9/99fbe49b4e40d92c5b8b061530442622d7464f60" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/9/c/9caba48d204dd3bbb1a83abe32ef08e9b6985aeb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/a/4/a4f38d4a0b2bcfed2e064aa32f92fe3daa41f7f0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/a/6/a6b3e28f838366247ffa58bdb036a55b39cfe3d4" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/b/2/b2ea469437f8add9c14f4f97c723aebc0d0453fd" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/b/3/b3ffbf5016bcec9d4f529534dca1d6cabcb7381a" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/b/9/b99e147da1cf74eef294475354863650feeb01b1" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/b/a/ba3e3d277d4815cd7e798158e5e755a500e6bd44" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/b/b/bb1a1b5b8fdaa7848141000e871bb5e3bfeea9ec" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/c/1/c1a87b241bb9bf9c24dc5f213240af7d588f79cd" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/c/5/c5586f42724c8a1ffef45138e53dc207919d983f" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/c/7/c7ba7ff69f85d84cf0142489d1b5328bb5adde2e" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/c/b/cb7461413ce2481b9b3941ee38d326fc8f47620e" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/c/b/cbecc2707cc71068f8cbc2ec65f57d8ea317b45f" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/c/e/ce2cb49fc3d016b6045252e17f28014543887beb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/d/1/d11f890a961f14b5518ffa54aa9b28d1914df2e6" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/d/c/dc22cee0f4a19a9af848ef511c57555f144fb94a" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/d/e/de0d45da2b8f16ea8999996095f3bc1f4ae4fccd" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/d/e/de4067fb02c40250c3b7d908cb92e5818119fef6" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/e/1/e142265644bed8d12c37967eb664b16bc3aac1eb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/e/2/e2234e4d7e6078f1694b81a719aae289e9eacf2a" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/e/e/ee9ced3bd1b06dc01c8ac26b35e12ff2c1f74602" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/e/f/ef0d18187845b275c3b6fb4b826e89b49d37bef1" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/e/f/ef865c4e7e4a574ef231b317b0d313183356202f" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/3/f316f970732356305cb722554f50fb2f9b4f363b" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/5/f565b2421dbc8181f162427240946892028b1e49" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/5/f58520bbccee20dc98403ec4329ceaa42726fc1d" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/b/fb83b9a71fe42476ec664aa41b7e4cb030e652c0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/b/fbec5a24cc65a7cef043a966e8419e28d76eca82" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/c/fc1aaf257a7eb7916911577ae8bb460d90f5d3e5" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/e/fe5ec54b977a8fe14f69c06779dd0ecdaa35d9bf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/CoreSettings.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/APIUsage.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/JSONHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/general/gson/EncryptedJSONObjectDecoder.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/general/gson/EncryptedJSONObjectEncoder.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/json/FastJSONHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/json/GSONHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/terminal/banned.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/terminal/settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/6.0.1/executionHistory/executionHistory.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/6.0.1/executionHistory/executionHistory.lock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/6.0.1/fileChanges/last-build.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/6.0.1/fileContent/fileContent.lock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/6.0.1/fileHashes/fileHashes.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/6.0.1/fileHashes/fileHashes.lock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/6.0.1/fileHashes/resourceHashesCache.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/6.0.1/gc.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/6.0.1/javaCompile/classAnalysis.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/6.0.1/javaCompile/jarAnalysis.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/6.0.1/javaCompile/javaCompile.lock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/6.0.1/javaCompile/taskHistory.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/0/7/078b8d36db9499ff209f6791bad1924ab9c43142" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/0/7/078b8d36db9499ff209f6791bad1924ab9c43142" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/0/c/0c383b11480622e7722e89e5967ff47f1a82e523" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/0/c/0c383b11480622e7722e89e5967ff47f1a82e523" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/1/112190cd7a957f36bef860cbe9328574421a5d96" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/1/112190cd7a957f36bef860cbe9328574421a5d96" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/2/12b320c91431ae2ce2a3a7bddaa13db13cb23216" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/2/12b320c91431ae2ce2a3a7bddaa13db13cb23216" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/8/183218f5c2a1272d6bcfdde5bbd0961764fc82ea" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/8/183218f5c2a1272d6bcfdde5bbd0961764fc82ea" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/2/6/269ef774062d5a5b90f27decbbdf6a90d1c7fd98" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/4/1/416b7f7b093e4534d27020a02ef0c4778d700331" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/5/0/5090d0f397b2ba9d25e4c686dca71f0ba40b17a2" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/5/0/5090d0f397b2ba9d25e4c686dca71f0ba40b17a2" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/5/7/571b621a507586299777c5feb1a605e986ae6040" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/5/7/571b621a507586299777c5feb1a605e986ae6040" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/6/4/6425b56f3691a96a38c8b63f6c69ca497ddecb82" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/6/4/6425b56f3691a96a38c8b63f6c69ca497ddecb82" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/7/5/75f4c3fbf8518ffbc54e770587c6143b0936b2e9" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/c/8cc0b216a9b77bd1e52bd820f61be0f590f48854" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/c/8cc0b216a9b77bd1e52bd820f61be0f590f48854" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/a/3/a32db5d4ce0c450f37a33a40b9582084f8d2f061" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/a/7/a78f0ac1573186e7c6bd6c9ad03b8825223ce767" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/a/7/a78f0ac1573186e7c6bd6c9ad03b8825223ce767" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/a/b/ab508ca9a84b1b6631d209e3b570c5a56eccc75f" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/a/f/af4213104951442ee31d8ca165c0a92746a5ced4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/c/0/c036605a4e35940091a73947439856d0e02613fe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/c/4/c46250d0811c02408657a23815062cf86a7b248a" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/c/4/c4a46e5dda63da22945137a4f0a5d0ae703a399e" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/c/4/c4a46e5dda63da22945137a4f0a5d0ae703a399e" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/d/c/dc84eda248bcc582fcecf621708959d79179072b" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/d/c/dc84eda248bcc582fcecf621708959d79179072b" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/e/5/e5e8610982f37efa6046e94060f264e2e310fcd1" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/6/f679f3dca19f76305f8a44f20df3f1faa6831d9f" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/7/f7121d2b27d2aedfc2d25f688c157a111e292b94" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/7/f78d4bb5f1fac45ffbd1f8b12d29232e918a5c41" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/7/f78d4bb5f1fac45ffbd1f8b12d29232e918a5c41" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/f/fffb0d9b2550a43e2971077075c0c4519af984ec" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/DesktopOSCheck.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/ClientSettings.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/EventListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/EventListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/ILogManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/ILogManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/IOSCheck.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/netty/ClientHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/netty/ClientHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/netty/MulticastClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/netty/MulticastClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/StaticHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/StaticHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/CodecEnum.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/CodecEnum.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/fastjson/EncryptedFastJSONObjectDecoder.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/deprecated/fastjson/EncryptedFastJSONObjectDecoder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/fastjson/EncryptedFastJSONObjectEncoder.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/deprecated/fastjson/EncryptedFastJSONObjectEncoder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/gson/EncryptedGSONObjectDecoder.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/deprecated/gson/EncryptedGSONObjectDecoder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/gson/EncryptedGSONObjectEncoder.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/deprecated/gson/EncryptedGSONObjectEncoder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/util/EncryptionUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/util/EncryptionUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/Packet.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/Packet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/PacketInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/PacketInfo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/ClientPlayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/ClientPlayer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/EncryptionKeyFinder.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/EncryptionKeyFinder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/EventListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/EventListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/PlayerHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/PlayerHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/Server.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/netty/MulticastServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/netty/MulticastServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/netty/ProcessingHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/netty/ProcessingHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/settings/Settings.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/settings/ServerSettings.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/settings/SettingsManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/settings/SettingsManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-client/src/main/java/com/github/fernthedev/terminal/client/ClientTermCore.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-client/src/main/java/com/github/fernthedev/terminal/client/ClientTermCore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-client/src/main/java/com/github/fernthedev/terminal/client/ClientTerminal.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-client/src/main/java/com/github/fernthedev/terminal/client/ClientTerminal.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-client/src/main/java/com/github/fernthedev/terminal/client/PacketHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-client/src/main/java/com/github/fernthedev/terminal/client/PacketHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-core/src/main/java/com/github/fernthedev/terminal/core/CommonUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-core/src/main/java/com/github/fernthedev/terminal/core/CommonUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/ServerCommandHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/ServerCommandHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/ServerTerminal.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/ServerTerminal.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/TerminalPacketHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/TerminalPacketHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/command/KickCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/command/KickCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/command/SettingsCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/command/SettingsCommand.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CodeInsightWorkspaceSettings">
+    <option name="optimizeImportsOnTheFly" value="true" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+    <projectState path="$PROJECT_DIR$/api/client-api">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <task path="$PROJECT_DIR$">
+          <activation />
+        </task>
+        <task path="$PROJECT_DIR$/core">
+          <activation />
+        </task>
+        <task path="$PROJECT_DIR$/server">
+          <activation />
+        </task>
+        <projects_view>
+          <tree_state>
+            <expand />
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Enum" />
+        <option value="AnnotationType" />
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="PUSH_AUTO_UPDATE" value="true" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="IgnoredFileRootStore">
+    <option name="generatedRoots">
+      <set>
+        <option value="C:\Users\fernr\IdeaProjects\lighttest\java\.idea" />
+      </set>
+    </option>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="downloadDocsAutomatically" value="true" />
+        <option name="downloadSourcesAutomatically" value="true" />
+        <option name="importAutomatically" value="true" />
+      </MavenImportingSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="1RRP73P249m6LhSTeG4fxnvRIqd" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="SONARLINT_PRECOMMIT_ANALYSIS" value="true" />
+    <property name="add_unversioned_files" value="$PROJECT_DIR$/server/settings.json" />
+    <property name="android.sdk.path" value="$USER_HOME$/AppData/Local/Android/Sdk" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.1528965" />
+    <property name="project.structure.side.proportion" value="0.3693901" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.project.gradle" />
+    <property name="show.migrate.to.gradle.popup" value="false" />
+    <property name="show.unlinked.gradle.project.popup" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveMembersDialog.RECENTS_KEY">
+      <recent name="com.github.fernthedev.universal.encryption.RSAEncryptionUtil" />
+      <recent name="com.github.fernthedev.server.PlayerHandler" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="com.github.fernthedev.terminal.server" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\fernr\IdeaProjects\lighttest\java\core\src\main\java\com\github\fernthedev\core\encryption\codecs\general" />
+      <recent name="C:\Users\fernr\IdeaProjects\lighttest\java\terminal" />
+      <recent name="C:\Users\fernr\IdeaProjects\lighttest\java" />
+      <recent name="C:\Users\fernr\IdeaProjects\lighttest\java\universalChat\src\main\java\com\github\fernthedev\universal\encryption\codecs\fastjson" />
+      <recent name="C:\Users\fernr\IdeaProjects\lighttest\.idea" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.github.fernthedev.core.encryption.codecs.json" />
+      <recent name="com.github.fernthedev.core.encryption.codecs" />
+      <recent name="com.github.fernthedev.server.event" />
+      <recent name="com.github.fernthedev.core.exceptions" />
+      <recent name="com.github.fernthedev.server.api" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\fernr\IdeaProjects\lighttest\java\terminal" />
+      <recent name="C:\Users\fernr\IdeaProjects\lighttest\java\terminal\terminal-server" />
+      <recent name="C:\Users\fernr\IdeaProjects\lighttest\java\old\client" />
+      <recent name="C:\Users\fernr\IdeaProjects\lighttest\java\old\core" />
+      <recent name="C:\Users\fernr\IdeaProjects\lighttest\java\old\server" />
+    </key>
+  </component>
+  <component name="RunAnythingCache">
+    <option name="myCommands">
+      <command value="mvn dependency:purge-local-repository" />
+      <command value="mvn dependencies" />
+      <command value="mvn dependency:tree -U" />
+      <command value="mvn dependency:tree" />
+      <command value="mvn clean package" />
+      <command value="mvn clean package -U" />
+      <command value="gradle dependencies:tree" />
+      <command value="gradle dependency:tree" />
+      <command value="gradle dependencies" />
+      <command value="gradle client:dependencies" />
+    </option>
+  </component>
+  <component name="RunManager" selected="Gradle.Gradle Build">
+    <configuration name="Client" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="com.github.fernthedev.terminal.client.ClientTerminal" />
+      <module name="light-chat.terminal.terminal-client.main" />
+      <option name="PROGRAM_PARAMETERS" value="-host localhost -port 2000" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.github.fernthedev.client.api.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ServerTerminal" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.github.fernthedev.terminal.server.ServerTerminal" />
+      <module name="light-chat.terminal.terminal-server.main" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.github.fernthedev.terminal.server.backend.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application">
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Gradle Build" type="GradleRunConfiguration" factoryName="Gradle">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="--stacktrace" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="clean" />
+            <option value="build" />
+          </list>
+        </option>
+        <option name="vmOptions" value="" />
+      </ExternalSystemSettings>
+      <GradleScriptDebugEnabled>true</GradleScriptDebugEnabled>
+      <method v="2" />
+    </configuration>
+    <configuration name="java [client:dependencies]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="client:dependencies" />
+          </list>
+        </option>
+        <option name="vmOptions" value="" />
+      </ExternalSystemSettings>
+      <GradleScriptDebugEnabled>true</GradleScriptDebugEnabled>
+      <method v="2" />
+    </configuration>
+    <configuration name="java [dependencies]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="dependencies" />
+          </list>
+        </option>
+        <option name="vmOptions" value="" />
+      </ExternalSystemSettings>
+      <GradleScriptDebugEnabled>true</GradleScriptDebugEnabled>
+      <method v="2" />
+    </configuration>
+    <configuration name="java [processResources]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="processResources" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <GradleScriptDebugEnabled>true</GradleScriptDebugEnabled>
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="JUnit" factoryName="JUnit">
+      <option name="TEST_OBJECT" value="class" />
+      <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Maven Build (old)" type="MavenRunConfiguration" factoryName="Maven">
+      <MavenSettings>
+        <option name="myGeneralSettings" />
+        <option name="myRunnerSettings" />
+        <option name="myRunnerParameters">
+          <MavenRunnerParameters>
+            <option name="profiles">
+              <set />
+            </option>
+            <option name="goals">
+              <list>
+                <option value="clean" />
+                <option value="package" />
+              </list>
+            </option>
+            <option name="pomFileName" />
+            <option name="profilesMap">
+              <map />
+            </option>
+            <option name="resolveToWorkspace" value="false" />
+            <option name="workingDirPath" value="$PROJECT_DIR$" />
+          </MavenRunnerParameters>
+        </option>
+      </MavenSettings>
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="TestNG">
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
+      <properties />
+      <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Application.Client" />
+      <item itemvalue="Application.ServerTerminal" />
+      <item itemvalue="Gradle.Gradle Build" />
+      <item itemvalue="Gradle.java [client:dependencies]" />
+      <item itemvalue="Gradle.java [dependencies]" />
+      <item itemvalue="Gradle.java [processResources]" />
+      <item itemvalue="Maven.Maven Build (old)" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.ServerTerminal" />
+        <item itemvalue="Application.Client" />
+        <item itemvalue="Gradle.java [processResources]" />
+        <item itemvalue="Gradle.java [client:dependencies]" />
+        <item itemvalue="Gradle.java [dependencies]" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="74a9c842-9768-484a-b6c1-feb6a74ad587" name="Default Changelist" comment="" />
+      <created>1569626764568</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1569626764568</updated>
+    </task>
+    <task id="LOCAL-00001" summary="Big changes, though small to the average user.&#10;&#10;- Refactored lots of code&#10;- Fixed lots of bugs with terminal usage&#10;- Added color support&#10;- Updated libraries such as JANSI and Jline&#10;- Still needs lots more refactoring of code&#10;- Settings now uses reflection and annotations to point to setting values, making less hard coded and static values and cleaner code&#10;- SettingsManager has been replaced by GsonConfig&lt;&gt;&#10;- Moved more threads async and attempted to fix more spaghetti code (Make less code dependant on each other and more modular)">
+      <created>1569701369228</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1569701369228</updated>
+    </task>
+    <task id="LOCAL-00002" summary="- Did a lot refractoring of code&#10;- Uses JSON (with encryption) while wrapping around an unencrypted JSON block&#10;- Uses RSA for handshake encryption&#10;- While messing with code, I saw the old encryption method was redundant because the key was given in plain text. This was fixed while also using JSON for sending packets. The packets are now wrapped around a JSON packet wrapper that converts the object into it's own JSON object.&#10;- Attempted to lower some latency with more async code &#10;- Added some changes to the LightReader API which is planned to become it's own github repo soon. (And so will PiAnimation) &#10;- The LightReader API uses annotations for defining it's command name and required arguments.">
+      <created>1572398719286</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1572398719286</updated>
+    </task>
+    <task id="LOCAL-00003" summary="- Flutter">
+      <created>1572398808266</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1572398808266</updated>
+    </task>
+    <task id="LOCAL-00004" summary="- Does not allow the server to work correctly">
+      <created>1572398892919</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1572398892919</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Preparing for release">
+      <created>1572399105773</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1572399105773</updated>
+    </task>
+    <task id="LOCAL-00006" summary="- Changed to a PacketRegistry system to allow for cross platform usage (packetname : packet.class)&#10;- Fixed a bug that caused the client to print an exception when sending a message before it was successfully registered&#10;- Added Alibaba FAST_JSON support (config setting) Gson is still default&#10;- Added MultiCast gracefully shut down.">
+      <created>1574383998656</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1574383998656</updated>
+    </task>
+    <task id="LOCAL-00007" summary="- Fixed AutoComplete support&#10;- Fixed Debug mode&#10;- Fixed File Logger and is now on Client support">
+      <created>1574978861448</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1574978861448</updated>
+    </task>
+    <task id="LOCAL-00008" summary="- Fixed a bug causing the native transports for Linux and Mac not being included in jar">
+      <created>1575750347163</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1575750347163</updated>
+    </task>
+    <task id="LOCAL-00009" summary="- Version bump">
+      <created>1575751095933</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1575751095933</updated>
+    </task>
+    <task id="LOCAL-00010" summary="- Moved to gradle&#10;- Removed redundant Main classes&#10;- Using https://github.com/Fernthedev/FernUtils &#10;- Improved Server start time using parallel tasks&#10;- Improved server performance&#10;- Improved connection establishment speed&#10;- Cleaned old code&#10;- Removed lots of old redundancy&#10;- Uses now semantic version&#10;- MultiCast checks if server's minimum version matches client's version requirements and vice-versa&#10;- When establishing connections, the server and client exchange their version data and requirements and each check if the range match requirements. If not, it shows a warning&#10;- MulticastServer sleep timing lowered&#10;- Added gradle CI">
+      <created>1577570084690</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1577570084690</updated>
+    </task>
+    <task id="LOCAL-00011" summary="- Moved to gradle&#10;- Removed redundant Main classes&#10;- Using https://github.com/Fernthedev/FernUtils&#10;- Improved Server start time using parallel tasks&#10;- Improved server performance&#10;- Improved connection establishment speed&#10;- Cleaned old code&#10;- Removed lots of old redundancy&#10;- Uses now semantic version&#10;- MultiCast checks if server's minimum version matches client's version requirements and vice-versa&#10;- When establishing connections, the server and client exchange their version data and requirements and each check if the range match requirements. If not, it shows a warning&#10;- MulticastServer sleep timing lowered&#10;- Added gradle CI">
+      <created>1577570672963</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1577570672963</updated>
+    </task>
+    <task id="LOCAL-00012" summary="- Version bump fix">
+      <created>1577570787909</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1577570787909</updated>
+    </task>
+    <task id="LOCAL-00013" summary="- Version bump fix">
+      <created>1577570981402</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1577570981402</updated>
+    </task>
+    <task id="LOCAL-00014" summary="- Version bump fix">
+      <created>1577571072711</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1577571072711</updated>
+    </task>
+    <task id="LOCAL-00015" summary="- Flutter work done">
+      <created>1577571312108</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1577571312108</updated>
+    </task>
+    <task id="LOCAL-00016" summary="- Remove maven.yml">
+      <created>1577571880965</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1577571880965</updated>
+    </task>
+    <task id="LOCAL-00017" summary="- Attempting to fix CI">
+      <created>1577572313280</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1577572313280</updated>
+    </task>
+    <task id="LOCAL-00018" summary="- Removed unnecessary Base64 encoding/decoding when encrypting&#10;- Bumped version and minimum version to show warning since Base64 encoding/decoding is used on older versions">
+      <created>1577750480105</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1577750480105</updated>
+    </task>
+    <task id="LOCAL-00019" summary="- Error handling in GSON Encoder">
+      <created>1577855722712</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1577855722712</updated>
+    </task>
+    <task id="LOCAL-00020" summary="- Made useless field packetName transient to make Packet size smaller by ignoring in serialization">
+      <created>1577855775016</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1577855775016</updated>
+    </task>
+    <task id="LOCAL-00021" summary="- Clients are now able to auto-fill password with HashedPasswordPacket. This requires the password to be hashed, whether the packet is encrypted or not. SelfMessagePacket with FillMessagePacket is sent, it should receive a MessagePacket in return or HashedPasswordPacket with the password hashed. If password given is incorrect, SelfMessagePacket.MessageType.INCORRECT_PASSWORD_ATTEMPT is sent. If authentication finishes with incorrect password, SelfMessagePacket.MessageType.INCORRECT_PASSWORD_FAILURE is sent.">
+      <created>1578779627928</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1578779627929</updated>
+    </task>
+    <task id="LOCAL-00022" summary="- Clients are now able to auto-fill password with HashedPasswordPacket. This requires the password to be hashed, whether the packet is encrypted or not. SelfMessagePacket with FillMessagePacket is sent, it should receive a MessagePacket in return or HashedPasswordPacket with the password hashed. If password given is incorrect, SelfMessagePacket.MessageType.INCORRECT_PASSWORD_ATTEMPT is sent. If authentication finishes with incorrect password, SelfMessagePacket.MessageType.INCORRECT_PASSWORD_FAILURE is sent.">
+      <created>1580676254259</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1580676254260</updated>
+    </task>
+    <task id="LOCAL-00023" summary="- Clients are now able to auto-fill password with HashedPasswordPacket. This requires the password to be hashed, whether the packet is encrypted or not. SelfMessagePacket with FillMessagePacket is sent, it should receive a MessagePacket in return or HashedPasswordPacket with the password hashed. If password given is incorrect, SelfMessagePacket.MessageType.INCORRECT_PASSWORD_ATTEMPT is sent. If authentication finishes with incorrect password, SelfMessagePacket.MessageType.INCORRECT_PASSWORD_FAILURE is sent.">
+      <created>1580676279962</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1580676279962</updated>
+    </task>
+    <task id="LOCAL-00024" summary="- Decoupling Client and Server to become it's own standalone API and terminal support is being moved to terminal module">
+      <created>1581039962609</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1581039962609</updated>
+    </task>
+    <task id="LOCAL-00025" summary="- Decoupling Client and Server to become it's own standalone API and terminal support and other features are being moved to terminal module">
+      <created>1581452812398</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1581452812398</updated>
+    </task>
+    <task id="LOCAL-00026" summary="- Decoupling Client and Server to become it's own standalone API and terminal support and other features are being moved to terminal module">
+      <created>1581453749730</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1581453749730</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ORDER">
+      <list>
+        <option value="0" />
+        <option value="2" />
+        <option value="3" />
+        <option value="1" />
+      </list>
+    </option>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list />
+          </value>
+        </entry>
+        <entry key="User">
+          <value>
+            <list />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <MESSAGE value="Big changes, though small to the average user.&#10;&#10;- Refactored lots of code&#10;- Fixed lots of bugs with terminal usage&#10;- Added color support&#10;- Updated libraries such as JANSI and Jline&#10;- Still needs lots more refactoring of code&#10;- Settings now uses reflection and annotations to point to setting values, making less hard coded and static values and cleaner code&#10;- SettingsManager has been replaced by GsonConfig&lt;&gt;&#10;- Moved more threads async and attempted to fix more spaghetti code (Make less code dependant on each other and more modular)" />
+    <MESSAGE value="- Did a lot refractoring of code&#10;- Uses JSON (with encryption) while wrapping around an unencrypted JSON block&#10;- Uses RSA for handshake encryption&#10;- While messing with code, I saw the old encryption method was redundant because the key was given in plain text. This was fixed while also using JSON for sending packets. The packets are now wrapped around a JSON packet wrapper that converts the object into it's own JSON object.&#10;- Attempted to lower some latency with more async code &#10;- Added some changes to the LightReader API which is planned to become it's own github repo soon. (And so will PiAnimation) &#10;- The LightReader API uses annotations for defining it's command name and required arguments." />
+    <MESSAGE value="- Flutter" />
+    <MESSAGE value="- Does not allow the server to work correctly" />
+    <MESSAGE value="Preparing for release" />
+    <MESSAGE value="- Changed to a PacketRegistry system to allow for cross platform usage (packetname : packet.class)&#10;- Fixed a bug that caused the client to print an exception when sending a message before it was successfully registered&#10;- Added FASTJSON support (config setting)" />
+    <MESSAGE value="- Changed to a PacketRegistry system to allow for cross platform usage (packetname : packet.class)&#10;- Fixed a bug that caused the client to print an exception when sending a message before it was successfully registered&#10;- Added Alibaba FAST_JSON support (config setting) Gson is still default&#10;- Added MultiCast gracefully shut down." />
+    <MESSAGE value="- Fixed AutoComplete support&#10;- Fixed Debug mode&#10;- Fixed File Logger and is now on Client support" />
+    <MESSAGE value="- Fixed a bug causing the native transports for Linux and Mac not being included in jar" />
+    <MESSAGE value="- Version bump" />
+    <MESSAGE value="- Moved to gradle&#10;- Removed redundant Main classes&#10;- Using https://github.com/Fernthedev/FernUtils &#10;- Improved Server start time using parallel tasks&#10;- Improved server performance&#10;- Improved connection establishment speed&#10;- Cleaned old code&#10;- Removed lots of old redundancy&#10;- Uses now semantic version&#10;- MultiCast checks if server's minimum version matches client's version requirements and vice-versa&#10;- When establishing connections, the server and client exchange their version data and requirements and each check if the range match requirements. If not, it shows a warning&#10;- MulticastServer sleep timing lowered&#10;- Added gradle CI" />
+    <MESSAGE value="- Moved to gradle&#10;- Removed redundant Main classes&#10;- Using https://github.com/Fernthedev/FernUtils&#10;- Improved Server start time using parallel tasks&#10;- Improved server performance&#10;- Improved connection establishment speed&#10;- Cleaned old code&#10;- Removed lots of old redundancy&#10;- Uses now semantic version&#10;- MultiCast checks if server's minimum version matches client's version requirements and vice-versa&#10;- When establishing connections, the server and client exchange their version data and requirements and each check if the range match requirements. If not, it shows a warning&#10;- MulticastServer sleep timing lowered&#10;- Added gradle CI" />
+    <MESSAGE value="- Version bump fix" />
+    <MESSAGE value="- Flutter work done" />
+    <MESSAGE value="- Remove maven.yml" />
+    <MESSAGE value="- Attempting to fix CI" />
+    <MESSAGE value="- Removed unnecessary Base64 encoding/decoding when encrypting&#10;- Bumped version and minimum version to show warning since Base64 encoding/decoding is used on older versions" />
+    <MESSAGE value="- Error handling in GSON Encoder" />
+    <MESSAGE value="- Made useless field packetName transient to make Packet size smaller by ignoring in serialization" />
+    <MESSAGE value="- Clients are now able to auto-fill password with HashedPasswordPacket. This requires the password to be hashed, whether the packet is encrypted or not. SelfMessagePacket with FillMessagePacket is sent, it should receive a MessagePacket in return or HashedPasswordPacket with the password hashed." />
+    <MESSAGE value="- Clients are now able to auto-fill password with HashedPasswordPacket. This requires the password to be hashed, whether the packet is encrypted or not. SelfMessagePacket with FillMessagePacket is sent, it should receive a MessagePacket in return or HashedPasswordPacket with the password hashed. If password given is incorrect, SelfMessagePacket.MessageType.INCORRECT_PASSWORD_ATTEMPT is sent. If authentication finishes with incorrect password, SelfMessagePacket.MessageType.INCORRECT_PASSWORD_FAILURE is sent." />
+    <MESSAGE value="- Decoupling Client and Server to become it's own standalone API and terminal support is being moved to terminal module" />
+    <MESSAGE value="- Decoupling Client and Server to become it's own standalone API and terminal support and other features are being moved to terminal module" />
+    <MESSAGE value="Cleaned lots of old code. Most of the old redundant code has been refactored, optimized and removed for better efficiency and consistency.&#10;- Decoupling Client and Server to become it's own standalone API and terminal support and other features are being moved to terminal module" />
+    <option name="LAST_COMMIT_MESSAGE" value="Cleaned lots of old code. Most of the old redundant code has been refactored, optimized and removed for better efficiency and consistency.&#10;- Decoupling Client and Server to become it's own standalone API and terminal support and other features are being moved to terminal module" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="674" y="167" key="#Client" timestamp="1580674642429">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="674" y="167" key="#Client/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580674642429" />
+    <state x="552" y="177" key="#Notifications" timestamp="1575144798794">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="552" y="177" key="#Notifications/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1575144798794" />
+    <state x="674" y="155" width="587" height="730" key="#Server" timestamp="1577376669949">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="674" y="155" width="587" height="730" key="#Server/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577376669949" />
+    <state x="552" y="179" key="#Updates" timestamp="1578765341583">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="552" y="179" key="#Updates/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1578765341583" />
+    <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1581719458240">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1576960854972" />
+    <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577564664448" />
+    <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581719458240" />
+    <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581030465284" />
+    <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577856546436" />
+    <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580676107201" />
+    <state x="765" y="222" key="#com.intellij.ide.util.MemberChooser" timestamp="1581717258889">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="765" y="222" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1574968534094" />
+    <state x="765" y="222" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577568824225" />
+    <state x="765" y="222" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581717258889" />
+    <state x="765" y="222" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581036184253" />
+    <state x="765" y="222" key="#com.intellij.ide.util.MemberChooser/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1578001621387" />
+    <state x="689" y="304" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1581200529788">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="689" y="304" key="#com.intellij.ide.util.TreeClassChooserDialog/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581200529788" />
+    <state x="803" y="409" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog" timestamp="1580672970186">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="803" y="409" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580672970186" />
+    <state x="640" y="248" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1581709659579">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="640" y="248" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1578765178520" />
+    <state x="640" y="248" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581709659579" />
+    <state x="640" y="248" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577969938152" />
+    <state x="464" y="437" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog" timestamp="1581712727511">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="464" y="437" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581712727511" />
+    <state x="673" y="361" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes" timestamp="1581197355965">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="673" y="361" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581197355965" />
+    <state x="672" y="96" key="#com.intellij.refactoring.move.moveMembers.MoveMembersDialog" timestamp="1581033452592">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="672" y="96" key="#com.intellij.refactoring.move.moveMembers.MoveMembersDialog/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581033452592" />
+    <state x="466" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1581713925808">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="466" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577565959664" />
+    <state x="466" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581713925808" />
+    <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1581711044869">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577562761667" />
+    <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581711044869" />
+    <state x="155" y="58" width="778" height="891" key="#xdebugger.evaluate" timestamp="1577565585451">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="155" y="58" width="778" height="891" key="#xdebugger.evaluate/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577565585451" />
+    <state x="0" y="55" width="1602" height="896" key="CommitChangelistDialog2" timestamp="1581723223396">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="383" y="0" key="CommitChangelistDialog2/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1575751083540" />
+    <state x="165" y="91" width="1602" height="896" key="CommitChangelistDialog2/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1578779607118" />
+    <state x="0" y="57" key="CommitChangelistDialog2/0.0.1920.1040/1920.317.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1581453747196" />
+    <state x="0" y="55" key="CommitChangelistDialog2/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581723223396" />
+    <state x="0" y="57" key="CommitChangelistDialog2/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581039946770" />
+    <state x="142" y="15" key="CommitChangelistDialog2/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577855771405" />
+    <state x="0" y="57" key="CommitChangelistDialog2/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580676276382" />
+    <state x="184" y="91" key="DiffContextDialog" timestamp="1578776978734">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="184" y="91" key="DiffContextDialog/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1578776978734" />
+    <state x="740" y="275" key="FileChooserDialogImpl" timestamp="1581031863858">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="740" y="275" key="FileChooserDialogImpl/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1576958816576" />
+    <state x="740" y="275" key="FileChooserDialogImpl/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577572234685" />
+    <state x="740" y="275" key="FileChooserDialogImpl/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581031863858" />
+    <state x="310" y="315" key="GitRewordDialog" timestamp="1577570646134">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="310" y="315" key="GitRewordDialog/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577570646134" />
+    <state x="818" y="451" key="Github.Dialog.Accounts.Choose" timestamp="1577571097799">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="818" y="451" key="Github.Dialog.Accounts.Choose/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577571097799" />
+    <state width="1877" height="261" key="GridCell.Tab.0.bottom" timestamp="1581722900910">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="261" key="GridCell.Tab.0.bottom/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1576980013836" />
+    <state width="1877" height="261" key="GridCell.Tab.0.bottom/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577923370514" />
+    <state width="1877" height="261" key="GridCell.Tab.0.bottom/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581722900910" />
+    <state width="1877" height="261" key="GridCell.Tab.0.bottom/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581040002511" />
+    <state width="1877" height="261" key="GridCell.Tab.0.bottom/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577976847470" />
+    <state width="1877" height="261" key="GridCell.Tab.0.bottom/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580680527129" />
+    <state width="1877" height="261" key="GridCell.Tab.0.center" timestamp="1581722900910">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="261" key="GridCell.Tab.0.center/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1576980013835" />
+    <state width="1877" height="261" key="GridCell.Tab.0.center/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577923370512" />
+    <state width="1877" height="261" key="GridCell.Tab.0.center/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581722900910" />
+    <state width="1877" height="261" key="GridCell.Tab.0.center/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581040002511" />
+    <state width="1877" height="261" key="GridCell.Tab.0.center/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577976847469" />
+    <state width="1877" height="261" key="GridCell.Tab.0.center/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580680527129" />
+    <state width="1877" height="261" key="GridCell.Tab.0.left" timestamp="1581722900910">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="261" key="GridCell.Tab.0.left/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1576980013835" />
+    <state width="1877" height="261" key="GridCell.Tab.0.left/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577923370512" />
+    <state width="1877" height="261" key="GridCell.Tab.0.left/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581722900910" />
+    <state width="1877" height="261" key="GridCell.Tab.0.left/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581040002511" />
+    <state width="1877" height="261" key="GridCell.Tab.0.left/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577976847468" />
+    <state width="1877" height="261" key="GridCell.Tab.0.left/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580680527129" />
+    <state width="1877" height="261" key="GridCell.Tab.0.right" timestamp="1581722900910">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="261" key="GridCell.Tab.0.right/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1576980013835" />
+    <state width="1877" height="261" key="GridCell.Tab.0.right/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577923370514" />
+    <state width="1877" height="261" key="GridCell.Tab.0.right/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581722900910" />
+    <state width="1877" height="261" key="GridCell.Tab.0.right/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581040002511" />
+    <state width="1877" height="261" key="GridCell.Tab.0.right/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577976847470" />
+    <state width="1877" height="261" key="GridCell.Tab.0.right/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580680527129" />
+    <state width="1877" height="326" key="GridCell.Tab.1.bottom" timestamp="1581201867909">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="326" key="GridCell.Tab.1.bottom/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577572213063" />
+    <state width="1877" height="326" key="GridCell.Tab.1.bottom/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581201867909" />
+    <state width="1877" height="326" key="GridCell.Tab.1.bottom/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581031875141" />
+    <state width="1877" height="326" key="GridCell.Tab.1.center" timestamp="1581201867909">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="326" key="GridCell.Tab.1.center/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577572213063" />
+    <state width="1877" height="326" key="GridCell.Tab.1.center/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581201867909" />
+    <state width="1877" height="326" key="GridCell.Tab.1.center/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581031875141" />
+    <state width="1877" height="326" key="GridCell.Tab.1.left" timestamp="1581201867909">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="326" key="GridCell.Tab.1.left/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577572213062" />
+    <state width="1877" height="326" key="GridCell.Tab.1.left/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581201867909" />
+    <state width="1877" height="326" key="GridCell.Tab.1.left/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581031875141" />
+    <state width="1877" height="326" key="GridCell.Tab.1.right" timestamp="1581201867909">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="326" key="GridCell.Tab.1.right/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577572213063" />
+    <state width="1877" height="326" key="GridCell.Tab.1.right/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581201867909" />
+    <state width="1877" height="326" key="GridCell.Tab.1.right/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581031875141" />
+    <state width="1877" height="326" key="GridCell.Tab.2.bottom" timestamp="1577547930898">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="326" key="GridCell.Tab.2.bottom/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577547930898" />
+    <state width="1877" height="326" key="GridCell.Tab.2.center" timestamp="1577547930898">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="326" key="GridCell.Tab.2.center/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577547930898" />
+    <state width="1877" height="326" key="GridCell.Tab.2.left" timestamp="1577547930898">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="326" key="GridCell.Tab.2.left/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577547930898" />
+    <state width="1877" height="326" key="GridCell.Tab.2.right" timestamp="1577547930898">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="326" key="GridCell.Tab.2.right/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577547930898" />
+    <state x="540" y="254" key="IDE.errors.dialog" timestamp="1577665911633">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="540" y="254" key="IDE.errors.dialog/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1575144755479" />
+    <state x="540" y="254" key="IDE.errors.dialog/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577665911633" />
+    <state x="734" y="146" key="RollbackChangesDialog" timestamp="1575751719435">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="734" y="146" key="RollbackChangesDialog/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1575751719435" />
+    <state x="461" y="163" key="SettingsEditor" timestamp="1581031995772">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="461" y="163" key="SettingsEditor/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577022802234" />
+    <state x="461" y="163" key="SettingsEditor/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1579452319129" />
+    <state x="461" y="163" key="SettingsEditor/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581031995772" />
+    <state x="461" y="163" key="SettingsEditor/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577651244965" />
+    <state x="461" y="163" key="SettingsEditor/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580674042162" />
+    <state x="807" y="428" key="VCS.ChangelistChooser" timestamp="1577570995041">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="807" y="428" key="VCS.ChangelistChooser/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577570995041" />
+    <state x="552" y="248" key="Vcs.Push.Dialog.v2" timestamp="1581453923645">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="552" y="248" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1575750295872" />
+    <state x="552" y="248" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577572314822" />
+    <state x="552" y="248" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.317.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1581453923645" />
+    <state x="552" y="248" key="Vcs.Push.Dialog.v2/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581039966754" />
+    <state x="552" y="248" key="Vcs.Push.Dialog.v2/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577855777263" />
+    <state x="552" y="248" key="Vcs.Push.Dialog.v2/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580676281460" />
+    <state x="756" y="300" key="git4idea.merge.GitMergeDialog" timestamp="1577571776000">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="756" y="300" key="git4idea.merge.GitMergeDialog/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577571776000" />
+    <state x="685" y="292" key="git4idea.merge.GitPullDialog" timestamp="1577571319969">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="685" y="292" key="git4idea.merge.GitPullDialog/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1575144769840" />
+    <state x="685" y="292" key="git4idea.merge.GitPullDialog/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577571319969" />
+    <state x="342" y="84" key="new project wizard" timestamp="1581032399200">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="342" y="84" key="new project wizard/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577191649589" />
+    <state x="342" y="84" key="new project wizard/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1579452654083" />
+    <state x="342" y="84" key="new project wizard/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581032399200" />
+    <state x="616" y="240" width="672" height="677" key="run.anything.popup" timestamp="1581030481584">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="616" y="240" width="672" height="677" key="run.anything.popup/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1576960188452" />
+    <state x="616" y="240" width="672" height="677" key="run.anything.popup/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577567420620" />
+    <state x="616" y="240" width="672" height="677" key="run.anything.popup/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581030481584" />
+    <state x="616" y="240" width="672" height="677" key="run.anything.popup/0.0.1920.1040/3286.10.1920.1040/1920.318.1366.728@0.0.1920.1040" timestamp="1580940781325" />
+    <state x="740" y="325" key="save.file.as.template.dialog" timestamp="1577570572739">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="740" y="325" key="save.file.as.template.dialog/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577570572739" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1581713771480">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577546510922" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581713771480" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577970741019" />
+  </component>
+</project>

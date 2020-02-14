@@ -15,6 +15,7 @@ import com.github.fernthedev.fernutils.thread.ThreadUtils;
 
 import javax.crypto.SecretKey;
 import java.security.InvalidKeyException;
+import java.util.concurrent.TimeUnit;
 
 public class EventListener {
 
@@ -25,24 +26,23 @@ public class EventListener {
     }
 
     public void received(Packet p) {
-        if(p instanceof TestConnectPacket) {
+        if (p instanceof TestConnectPacket) {
             TestConnectPacket packet = (TestConnectPacket) p;
             client.getLogger().info("Connected packet: {}", packet.getMessage());
-        } else if(p instanceof PingPacket) {
-            client.startTime = System.nanoTime();
+        } else if (p instanceof PingPacket) {
+            client.startPingStopwatch();
 
-            client.sendObject(new PongPacket(),false);
-        } else if(p instanceof PingReceive) {
+            client.sendObject(new PongPacket(), false);
+        } else if (p instanceof PingReceive) {
 
-            client.endTime = System.nanoTime();
+            client.endPingStopwatch();
 
-            client.miliPingDelay = client.endTime - client.startTime;
 
-            client.getLogger().debug("Ping: {}", (client.miliPingDelay / 1000000) + "ms");
+            client.getLogger().debug("Ping: {}", (client.getPingTime(TimeUnit.MILLISECONDS)) + "ms");
 
-        }  else if (p instanceof IllegalConnection) {
+        } else if (p instanceof IllegalConnection) {
             client.getLogger().info(((IllegalConnection) p).getMessage());
-        } else if(p instanceof InitialHandshakePacket) {
+        } else if (p instanceof InitialHandshakePacket) {
             // Handles object encryption key sharing
             InitialHandshakePacket packet = (InitialHandshakePacket) p;
 
@@ -50,10 +50,11 @@ public class EventListener {
 
             StaticHandler.VERSION_RANGE versionRange = StaticHandler.getVersionRangeStatus(versionData);
 
-            if (versionRange == StaticHandler.VERSION_RANGE.MATCH_REQUIREMENTS) client.getLogger().info("Version range requirements match Server version.");
+            if (versionRange == StaticHandler.VERSION_RANGE.MATCH_REQUIREMENTS)
+                client.getLogger().info("Version range requirements match Server version.");
             else {
                 // Current version is smaller than the server's required minimum
-                if(versionRange == StaticHandler.VERSION_RANGE.WE_ARE_LOWER) {
+                if (versionRange == StaticHandler.VERSION_RANGE.WE_ARE_LOWER) {
                     client.getLogger().info("The client version ({}) does not meet server's minimum version ({}) requirements. Expect incompatibility issues", StaticHandler.getVERSION_DATA().getVersion(), versionData.getMinVersion());
                 }
 
@@ -76,15 +77,12 @@ public class EventListener {
                 e.printStackTrace();
             }
         } else if (p instanceof RequestConnectInfoPacket) {
-
-            client.registered = true;
-
             ConnectedPacket connectedPacket = client.getClientHandler().getConnectedPacket();
 
             client.sendObject(connectedPacket);
-            client.getLogger().info("Sent connect packet for request");
+            client.getLogger().info("Sent the Connect Packet for request");
 
-        } else if(p instanceof SelfMessagePacket) {
+        } else if (p instanceof SelfMessagePacket) {
             switch (((SelfMessagePacket) p).getType()) {
                 case TIMED_OUT_REGISTRATION:
                     client.getLogger().info("Timed out on registering.");
@@ -92,13 +90,17 @@ public class EventListener {
                     break;
 
                 case REGISTER_PACKET:
-                    client.registered = true;
+                    client.setRegistered(true);
                     client.getLogger().info("Successfully connected to server");
                     break;
 
                 case LOST_SERVER_CONNECTION:
                     client.getLogger().info("Lost connection to server! Must have shutdown!");
-                    client.disconnect();
+                    try {
+                        client.disconnect();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
                     break;
             }
 

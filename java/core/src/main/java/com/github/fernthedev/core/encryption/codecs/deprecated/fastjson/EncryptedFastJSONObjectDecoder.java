@@ -1,4 +1,4 @@
-package com.github.fernthedev.core.encryption.codecs.fastjson;
+package com.github.fernthedev.core.encryption.codecs.deprecated.fastjson;
 
 import com.alibaba.fastjson.JSON;
 import com.github.fernthedev.core.PacketRegistry;

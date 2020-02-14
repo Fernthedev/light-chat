@@ -1,16 +1,22 @@
 package com.github.fernthedev.core.packets;
 
 import com.github.fernthedev.core.encryption.codecs.AcceptablePacketTypes;
-import lombok.Getter;
 import lombok.NonNull;
+import lombok.ToString;
 
 import java.lang.reflect.Modifier;
 
+@ToString
 public abstract class Packet implements AcceptablePacketTypes {
     private static final long serialVersionUID = -5039841570298012421L;
 
-    @Getter
-    protected final transient @NonNull String packetName;
+
+    public String getPacketName() {
+        if (packetName == null) packetName = getClass().getAnnotation(PacketInfo.class).name();
+        return packetName;
+    }
+
+    protected transient @NonNull String packetName;
 
     public static String getPacketName(Class<? extends Packet> packet) {
         if (packet.equals(Packet.class)) throw new IllegalArgumentException("The class cannot be " + Packet.class.getName());

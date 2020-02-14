@@ -1,25 +1,36 @@
 package com.github.fernthedev.server;
 
+import com.github.fernthedev.core.StaticHandler;
 import com.github.fernthedev.core.VersionData;
+import com.github.fernthedev.core.api.APIUsage;
 import com.github.fernthedev.core.encryption.UnencryptedPacketWrapper;
 import com.github.fernthedev.core.encryption.util.RSAEncryptionUtil;
 import com.github.fernthedev.core.packets.Packet;
+import com.github.fernthedev.core.packets.latency.PingPacket;
 import com.github.fernthedev.fernutils.thread.InterfaceTaskInfo;
 import com.github.fernthedev.fernutils.thread.Task;
 import com.github.fernthedev.fernutils.thread.ThreadUtils;
 import com.github.fernthedev.fernutils.thread.single.TaskInfo;
-import com.github.fernthedev.core.packets.latency.PingPacket;
 import io.netty.channel.Channel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.apache.commons.lang3.time.StopWatch;
 
 import javax.crypto.SecretKey;
 import java.net.InetSocketAddress;
 import java.security.KeyPair;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
+/**
+ * Handles client data
+ */
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class ClientPlayer implements SenderInterface, AutoCloseable {
+
+    @Getter
     private boolean connected;
 
     @Getter
@@ -29,8 +40,10 @@ public class ClientPlayer implements SenderInterface, AutoCloseable {
     @Getter
     private EventListener eventListener;
 
-    public String os;
+    @Getter
+    private String os;
 
+    @EqualsAndHashCode.Include()
     @Getter
     private UUID uuid;
 
@@ -39,6 +52,12 @@ public class ClientPlayer implements SenderInterface, AutoCloseable {
     private VersionData versionData;
 
 
+
+    @Getter
+    private final Channel channel;
+
+    @Setter
+    private String deviceName;
 
     /**
      * The keypair encryption
@@ -51,55 +70,21 @@ public class ClientPlayer implements SenderInterface, AutoCloseable {
     @Getter
     private SecretKey secretKey;
 
+
+    private final StopWatch pingStopWatch = new StopWatch();
+
     public void setSecretKey(SecretKey secretKey) {
         this.secretKey = secretKey;
         this.tempKeyPair = null;
     }
 
-//    /**
-//     * Set the client
-//     * @param uuid The uuid the client generated
-//     * @param privateKey The private key from the client
-//     */
-//    public void setClientUUID(UUID uuid,String privateKey) {
-//        this.clientUUID = uuid;
-//
-//        this.clientKey = EncryptionHandler.decrypt(privateKey,serverKey);
-//        encryptCipher = registerEncryptCipher(clientKey);
-//    }
-
-
-
-    public void setDeviceName(String deviceName) {
-        this.deviceName = deviceName;
-    }
-
-    public final Channel channel;
-
-    private String deviceName;
-
-    @Getter
-    @Setter
-    private int id = -1;
-
-    @Setter
-    @Getter
-    private long delayTime = -1;
-
-//    @Getter
-//    private Cipher encryptCipher;
-
-    public boolean isConnected() {
-        return connected;
-    }
-
     private TaskInfo keyTask;
 
     public void awaitKeys() {
-        if(keyTask != null) keyTask.awaitFinish(2);
+        if(keyTask != null) keyTask.awaitFinish(0);
     }
 
-    public ClientPlayer(Server server,Channel channel, UUID uuid) {
+    public ClientPlayer(Server server, Channel channel, UUID uuid) {
         this.channel = channel;
         this.uuid = uuid;
 
@@ -112,140 +97,45 @@ public class ClientPlayer implements SenderInterface, AutoCloseable {
         });
 
         eventListener = new EventListener(server, this);
-
-
-
-
-//        try {
-//            encryptCipher = EncryptionUtil.generateEncryptCipher(tempKeyPair.getPublic());
-//        } catch (InvalidKeyException | NoSuchPaddingException | NoSuchAlgorithmException e) {
-//            e.printStackTrace();
-//        }
-//
-////        serverKey = EncryptionHandler.makeSHA256Hash(uuid.toString());
-////        decryptCipher = registerDecryptCipher(serverKey);
-//        try {
-//            assert tempKeyPair != null;
-//            decryptCipher = EncryptionUtil.generateDecryptCipher(tempKeyPair.getPrivate());
-//        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException e) {
-//            e.printStackTrace();
-//        }
-
-
-
-    }
-
-    @Deprecated
-    public void setKeyPair(KeyPair keyPair) {
-        throw new IllegalStateException("This is deprecated. Kept only in case.");
-//        this.tempKeyPair = null;
-//
-//        try {
-//            encryptCipher = EncryptionUtil.generateEncryptCipher(keyPair.getPublic());
-//            decryptCipher = EncryptionUtil.generateDecryptCipher(keyPair.getPrivate());
-//            Server.getLogger().info("Registered key set with client's key set.");
-//        } catch (InvalidKeyException | NoSuchPaddingException | NoSuchAlgorithmException e) {
-//            e.printStackTrace();
-//        }
     }
 
 
     /**
-     * PingPong delay
+     *
+     * @param timeUnit the time to use
+     * @return ping delay of client
      */
-    public long startTime;
-    public long endTime;
-
-    void setLastPacket(Packet packet) {
-        if (packet instanceof Packet) {
-        }
+    @APIUsage
+    public long getPingDelay(TimeUnit timeUnit) {
+        return pingStopWatch.getTime(timeUnit);
     }
 
+    /**
+     *
+     * @param packet Packet to send
+     * @param encrypt if true the packet will be encrypted
+     */
     public void sendObject(@NonNull Packet packet, boolean encrypt) {
-            /*
-            // Length is 16 byte
-            SecretKeySpec sks = new SecretKeySpec(serverKey.getBytes(), StaticHandler.getCipherTransformation());
-
-            // Create cipher
-            Cipher cipher = Cipher.getInstance(StaticHandler.getCipherTransformation());
-            cipher.init(Cipher.ENCRYPT_MODE, sks);*/
+        StaticHandler.getCore().getLogger().debug("Sending packet {}:{}", packet.getPacketName(), encrypt);
         if (encrypt) {
-//            SealedObject sealedObject = encryptObject(packet); ////////////////
-
             channel.writeAndFlush(packet);
         } else {
             channel.writeAndFlush(new UnencryptedPacketWrapper(packet));
         }
-
-
     }
-//
-//    public Cipher registerDecryptCipher(String key) {
-//        try {
-//            byte[] salt = new byte[16];
-//
-//            SecretKeyFactory factory = SecretKeyFactory.getInstance(StaticHandler.getKeyFactoryString());
-//            KeySpec spec = new PBEKeySpec(key.toCharArray(), salt, 65536, 256);
-//            SecretKey tmp = factory.generateSecret(spec);
-//            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKeySpecTransformation());
-//            Cipher cipher = Cipher.getInstance(StaticHandler.getObjecrCipherTrans());
-//
-//            cipher.init(Cipher.DECRYPT_MODE, secret);
-//            decryptCipher = cipher;
-//            return cipher;
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
-//
-//    public Cipher registerEncryptCipher(String password) {
-//        try {
-//            byte[] salt = new byte[16];
-//
-//            SecretKeyFactory factory = SecretKeyFactory.getInstance(StaticHandler.getKeyFactoryString());
-//            KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 256);
-//            SecretKey tmp = factory.generateSecret(spec);
-//            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKeySpecTransformation());
-//
-//            Cipher cipher = Cipher.getInstance(StaticHandler.getObjecrCipherTrans());
-//            cipher.init(Cipher.ENCRYPT_MODE, secret);
-//            return cipher;
-//        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
-
-//    public SealedObject encryptObject(Serializable object) {
-//        try {
-//            if (encryptCipher == null)
-//                throw new IllegalArgumentException("Register cipher with registerEncryptCipher() first");
-//
-//            return new SealedObject(object, encryptCipher);
-//        } catch (IOException | IllegalBlockSizeException e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
-//
-//    public Object decryptObject(SealedObject sealedObject) {
-//        try {
-//            if (decryptCipher == null)
-//                throw new IllegalArgumentException("Register cipher with registerDecryptCipher() first");
-//
-//            return sealedObject.getObject(decryptCipher);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
 
 
+    /**
+     * Default usage for {@link #sendObject(Packet, boolean)}
+     * @param packet Packet to send
+     */
     public void sendObject(Packet packet) {
         sendObject(packet,true);
     }
 
+    /**
+     * Closes connection
+     */
     public void close() {
 
         //DISCONNECT FROM SERVER
@@ -256,11 +146,11 @@ public class ClientPlayer implements SenderInterface, AutoCloseable {
             channel.close();
 
 
-            PlayerHandler.socketList.remove(channel);
+            PlayerHandler.getChannelMap().remove(channel);
         }
 
         connected = false;
-        PlayerHandler.players.remove(getId());
+        PlayerHandler.getUuidMap().remove(uuid);
 
         //serverSocket.close();
     }
@@ -268,13 +158,17 @@ public class ClientPlayer implements SenderInterface, AutoCloseable {
 
     @Override
     public String toString() {
-        return "[" + getAddress() + "|" + deviceName + "|" + id +"]";
+        return "[" + getAddress() + "|" + deviceName +"]";
     }
 
 
+    /**
+     *
+     * @return the client address
+     */
     public String getAddress() {
         if (channel.remoteAddress() == null) {
-            return "unknown";
+            return null;
         }
 
         InetSocketAddress address = (InetSocketAddress) channel.remoteAddress();
@@ -282,13 +176,17 @@ public class ClientPlayer implements SenderInterface, AutoCloseable {
         return address.getAddress().toString();
     }
 
+    /**
+     * Pings player
+     */
     public void ping() {
-        startTime = System.nanoTime();
+        pingStopWatch.reset();
+        pingStopWatch.start();
         sendObject(new PingPacket(),false);
     }
 
     public static void pingAll() {
-        for(ClientPlayer clientPlayer : PlayerHandler.socketList.values()) {
+        for(ClientPlayer clientPlayer : PlayerHandler.getChannelMap().values()) {
             clientPlayer.ping();
         }
     }
@@ -301,5 +199,14 @@ public class ClientPlayer implements SenderInterface, AutoCloseable {
     @Override
     public String getName() {
         return deviceName;
+    }
+
+    public void finishPing() {
+        pingStopWatch.stop();
+    }
+
+    void finishConstruct(String name, String os) {
+        this.deviceName = name;
+        this.os = os;
     }
 }

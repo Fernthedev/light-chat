@@ -1,7 +1,6 @@
-package com.github.fernthedev.core.encryption.codecs.fastjson;
+package com.github.fernthedev.core.encryption.codecs.deprecated.gson;
 
-import com.alibaba.fastjson.JSON;
-import com.github.fernthedev.core.packets.Packet;
+import com.github.fernthedev.core.StaticHandler;
 import com.github.fernthedev.core.encryption.EncryptedBytes;
 import com.github.fernthedev.core.encryption.EncryptedPacketWrapper;
 import com.github.fernthedev.core.encryption.PacketWrapper;
@@ -10,6 +9,8 @@ import com.github.fernthedev.core.encryption.UnencryptedPacketWrapper;
 import com.github.fernthedev.core.encryption.codecs.AcceptablePacketTypes;
 import com.github.fernthedev.core.encryption.codecs.LineEndStringEncoder;
 import com.github.fernthedev.core.encryption.util.EncryptionUtil;
+import com.github.fernthedev.core.packets.Packet;
+import com.google.gson.Gson;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
@@ -23,9 +24,9 @@ import java.util.List;
  * Converts an object to a encrypted json
  */
 @ChannelHandler.Sharable
-public class EncryptedFastJSONObjectEncoder extends MessageToMessageEncoder<AcceptablePacketTypes> {
+public class EncryptedGSONObjectEncoder extends MessageToMessageEncoder<AcceptablePacketTypes> {
 
-
+    private static final Gson gson = new Gson();
     private final LineEndStringEncoder encoder;
 
     protected IEncryptionKeyHolder encryptionKeyHolder;
@@ -35,7 +36,7 @@ public class EncryptedFastJSONObjectEncoder extends MessageToMessageEncoder<Acce
     /**
      * Creates a new instance with the current system character set.
      */
-    public EncryptedFastJSONObjectEncoder(IEncryptionKeyHolder encryptionKeyHolder) {
+    public EncryptedGSONObjectEncoder(IEncryptionKeyHolder encryptionKeyHolder) {
         this(Charset.defaultCharset(), encryptionKeyHolder);
     }
 
@@ -44,7 +45,7 @@ public class EncryptedFastJSONObjectEncoder extends MessageToMessageEncoder<Acce
      *
      * @param charset
      */
-    public EncryptedFastJSONObjectEncoder(Charset charset, IEncryptionKeyHolder encryptionKeyHolder) {
+    public EncryptedGSONObjectEncoder(Charset charset, IEncryptionKeyHolder encryptionKeyHolder) {
         encoder = new LineEndStringEncoder(charset);
         this.charset = charset;
         this.encryptionKeyHolder = encryptionKeyHolder;
@@ -63,28 +64,33 @@ public class EncryptedFastJSONObjectEncoder extends MessageToMessageEncoder<Acce
     @Override
     protected void encode(ChannelHandlerContext ctx, AcceptablePacketTypes msg, List<Object> out) throws Exception {
 
+        PacketWrapper<?> packetWrapper;
         if (msg instanceof UnencryptedPacketWrapper) {
-
-            String decryptedJSON = JSON.toJSONString(msg);
+            packetWrapper = (PacketWrapper<?>) msg;
+            String decryptedJSON = gson.toJson(msg);
 
             encoder.encode(ctx, decryptedJSON, out); // Just encodes the string
 
         } else {
 
+            if (!(msg instanceof Packet)) {
+                throw new IllegalArgumentException("The object was not a packet instance. ");
+            }
+
             // Encrypting the data
-            String decryptedJSON = JSON.toJSONString(msg);
+            String decryptedJSON = gson.toJson(msg);
             EncryptedBytes encryptedBytes = encrypt(ctx, decryptedJSON);
 
             // Adds the encrypted json in the packet wrapper
-            PacketWrapper packetWrapper = new EncryptedPacketWrapper(encryptedBytes, (Packet) msg);
-            String jsonPacketWrapper = JSON.toJSONString(packetWrapper);
-
+            packetWrapper = new EncryptedPacketWrapper(encryptedBytes, (Packet) msg);
+            String jsonPacketWrapper = gson.toJson(packetWrapper);
 
             // Encodes the string for sending
             encoder.encode(ctx, jsonPacketWrapper, out);
 
         }
 
+        StaticHandler.getCore().getLogger().debug("Sending {}", gson.toJson(packetWrapper));
     }
 
     public EncryptedBytes encrypt(ChannelHandlerContext ctx, String decryptedString) {
@@ -97,8 +103,6 @@ public class EncryptedFastJSONObjectEncoder extends MessageToMessageEncoder<Acce
 
 
         @NonNull SecretKey secretKey = encryptionKeyHolder.getSecretKey(ctx, ctx.channel());
-
-//        System.out.println("Encrypting the message");
         EncryptedBytes encryptedJSON = null;
 
         try {

@@ -10,7 +10,7 @@ import com.github.fernthedev.server.Console;
 import com.github.fernthedev.server.SenderInterface;
 import com.github.fernthedev.server.Server;
 import com.github.fernthedev.server.event.chat.ServerPlugin;
-import com.github.fernthedev.server.settings.Settings;
+import com.github.fernthedev.server.settings.ServerSettings;
 import com.github.fernthedev.terminal.core.CommonUtil;
 import com.github.fernthedev.terminal.core.ConsoleHandler;
 import com.github.fernthedev.terminal.core.TermCore;
@@ -29,16 +29,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ServerTerminal {
 
     @Getter
-    private static Config<Settings> settingsManager;
+    private static Config<ServerSettings> settingsManager;
 
     @Getter
     private static ServerCommandHandler commandHandler;
@@ -102,33 +100,17 @@ public class ServerTerminal {
         }
 
 
-        if (System.console() == null && !StaticHandler.isDebug()) {
-
-            String filename = Server.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6);
-            logger.warn("No console found");
-
-            String[] newArgs = new String[]{"cmd", "/c", "start", "cmd", "/c", "java -jar -Xmx2G -Xms2G \"" + filename + "\""};
-
-            List<String> launchArgs = new ArrayList<>(Arrays.asList(newArgs));
-            launchArgs.addAll(Arrays.asList(args));
-
-            try {
-                Runtime.getRuntime().exec(launchArgs.toArray(new String[]{}));
-                System.exit(0);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }
+        CommonUtil.startSelfInCmd(args);
 
 
-        settingsManager = new GsonConfig<>(new Settings(), new File(getCurrentPath(), "settings.json"));
+        settingsManager = new GsonConfig<>(new ServerSettings(), new File(getCurrentPath(), "settings.json"));
         settingsManager.save();
 
         port = settingsManager.getConfigData().getPort();
 
 
         server = new Server(port);
+        server.addPacketHandler(new TerminalPacketHandler(server));
         server.setSettingsManager(settingsManager);
         commandHandler = new ServerCommandHandler(server);
 

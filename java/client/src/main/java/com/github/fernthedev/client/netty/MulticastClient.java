@@ -1,11 +1,12 @@
 package com.github.fernthedev.client.netty;
 
 
-import com.github.fernthedev.core.exceptions.DebugChainedException;
 import com.github.fernthedev.core.MulticastData;
 import com.github.fernthedev.core.StaticHandler;
+import com.github.fernthedev.core.exceptions.DebugChainedException;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
+import lombok.Getter;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -20,14 +21,15 @@ import java.util.Map;
 
 public class MulticastClient {
 
-    public List<MulticastData> serversAddress = new ArrayList<>();
+    @Getter
+    private final List<MulticastData> serversAddress = new ArrayList<>();
 
     private Map<String, MulticastData> addressServerAddressMap = new HashMap<>();
 
     public void checkServers(int amount) {
         try(MulticastSocket socket = new MulticastSocket(4446)) {
 
-            InetAddress group = InetAddress.getByName(StaticHandler.getMULTICAST_ADDRESS());
+            InetAddress group = InetAddress.getByName(StaticHandler.getMulticastAddress());
 
             socket.joinGroup(group);
 
@@ -48,23 +50,7 @@ public class MulticastClient {
 
                 received = received.replaceAll(" ","");
 
-                try (JsonReader reader = new JsonReader(new StringReader(received))) {
-                    reader.setLenient(true);
-
-                    MulticastData data = new Gson().fromJson(reader, MulticastData.class);
-
-                    String address = (packet.getAddress()).getHostAddress();
-                    data.setAddress(address);
-
-                    if(!addressServerAddressMap.containsKey(address)) {
-                        serversAddress.add(data);
-                        addressServerAddressMap.put(address, data);
-                    }
-                } catch (Exception e) {
-                    if(StaticHandler.isDebug()) {
-                        throw new DebugChainedException(e, "Unable to read packet");
-                    }
-                }
+                parseData(packet, received);
 
             }
 
@@ -73,6 +59,26 @@ public class MulticastClient {
 
         } catch (IOException | DebugChainedException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void parseData(DatagramPacket packet, String received) {
+        try (JsonReader reader = new JsonReader(new StringReader(received))) {
+            reader.setLenient(true);
+
+            MulticastData data = new Gson().fromJson(reader, MulticastData.class);
+
+            String address = (packet.getAddress()).getHostAddress();
+            data.setAddress(address);
+
+            if(!addressServerAddressMap.containsKey(address)) {
+                serversAddress.add(data);
+                addressServerAddressMap.put(address, data);
+            }
+        } catch (Exception e) {
+            if(StaticHandler.isDebug()) {
+                throw new DebugChainedException(e, "Unable to read packet");
+            }
         }
     }
 }

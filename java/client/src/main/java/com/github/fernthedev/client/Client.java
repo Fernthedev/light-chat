@@ -3,10 +3,11 @@ package com.github.fernthedev.client;
 import com.github.fernthedev.client.api.IPacketHandler;
 import com.github.fernthedev.client.netty.ClientHandler;
 import com.github.fernthedev.core.StaticHandler;
+import com.github.fernthedev.core.api.APIUsage;
 import com.github.fernthedev.core.encryption.RSA.IEncryptionKeyHolder;
 import com.github.fernthedev.core.encryption.UnencryptedPacketWrapper;
-import com.github.fernthedev.core.encryption.codecs.gson.EncryptedGSONObjectDecoder;
-import com.github.fernthedev.core.encryption.codecs.gson.EncryptedGSONObjectEncoder;
+import com.github.fernthedev.core.encryption.codecs.general.gson.EncryptedJSONObjectDecoder;
+import com.github.fernthedev.core.encryption.codecs.general.gson.EncryptedJSONObjectEncoder;
 import com.github.fernthedev.core.exceptions.DebugException;
 import com.github.fernthedev.core.packets.Packet;
 import io.netty.bootstrap.Bootstrap;
@@ -19,11 +20,12 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.timeout.ReadTimeoutHandler;
-import io.netty.util.CharsetUtil;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang3.SystemUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,27 +34,47 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 public class Client implements IEncryptionKeyHolder {
-    public boolean registered;
+
+    protected static Logger logger = LoggerFactory.getLogger(Client.class);
+    private static CLogger cLogger;
 
     @Getter
+    protected ClientSettings clientSettings;
+    protected EventListener listener;
+
+    @Getter
+    protected ClientHandler clientHandler;
+
+    protected ChannelFuture future;
+    protected Channel channel;
+    protected EventLoopGroup workerGroup;
+
+    @Getter
+    @Setter(AccessLevel.PACKAGE)
+    private boolean registered;
+
+
+
     @Setter
     private boolean running = false;
 
     @Getter
     private List<IPacketHandler> packetHandlers = new ArrayList<>();
 
-    public void addPacketHandler(IPacketHandler iPacketHandler) {
-        packetHandlers.add(iPacketHandler);
-    }
+    private int port;
+    private String host;
 
-    public void removePacketHandler(IPacketHandler packetHandler) {
-        packetHandlers.remove(packetHandler);
-    }
+    @Getter
+    private String name;
 
-    protected static Logger logger = LoggerFactory.getLogger(Client.class);
+    @Getter
+    private SecretKey secretKey;
+
+    private StopWatch stopWatch = new StopWatch();
 
     public Client(String host, int port) {
         this.host = host;
@@ -63,51 +85,21 @@ public class Client implements IEncryptionKeyHolder {
         initialize(host, port);
     }
 
-
-
-
-
-    @Getter
-    protected IOSCheck osCheck;
-
-    private int port;
-    private String host;
-
-    protected EventListener listener;
-
-    public String name;
-//    public static WaitForCommand waitForCommand;
-
-    private static CLogger cLogger;
-
-
-    @Getter
-    protected ClientHandler clientHandler;
-
-    protected ChannelFuture future;
-    protected Channel channel;
-
-    protected EventLoopGroup workerGroup;
-
 //    @Getter
 //    private Cipher decryptCipher;
 //
 //    @Getter
 //    private Cipher encryptCipher;
 
-    @Getter
-    private SecretKey secretKey;
+    @APIUsage
+    public void addPacketHandler(IPacketHandler iPacketHandler) {
+        packetHandlers.add(iPacketHandler);
+    }
 
-    /**
-     * PingPong delay
-     */
-    public long startTime;
-    public long endTime;
-
-    /**
-     * is nanosecond
-     */
-    public long miliPingDelay;
+    @APIUsage
+    public void removePacketHandler(IPacketHandler packetHandler) {
+        packetHandlers.remove(packetHandler);
+    }
 
     public void setup() {
         registerLogger();
@@ -124,7 +116,6 @@ public class Client implements IEncryptionKeyHolder {
         setup();
         getLogger().info("Initializing");
         StaticHandler.displayVersion();
-
 
 
         registerOSCheck();
@@ -145,18 +136,14 @@ public class Client implements IEncryptionKeyHolder {
 //        waitForCommand = new WaitForCommand(this);
 
 
-
         listener = new EventListener(this);
 
         clientHandler = new ClientHandler(this, listener);
     }
 
 
-
-
-
     protected void registerOSCheck() {
-        osCheck = new DesktopOSCheck();
+        clientSettings = new ClientSettings();
     }
 
     protected void registerLogger() {
@@ -176,7 +163,7 @@ public class Client implements IEncryptionKeyHolder {
         return logger;
     }
 
-    public void connect() {
+    public void connect() throws InterruptedException {
         getLogger().info("Connecting to server.");
 
         Bootstrap b = new Bootstrap();
@@ -184,13 +171,13 @@ public class Client implements IEncryptionKeyHolder {
 
         Class<? extends AbstractChannel> channelClass = NioSocketChannel.class;
 
-        if (SystemUtils.IS_OS_LINUX && osCheck.runNatives()) {
+        if (SystemUtils.IS_OS_LINUX && clientSettings.isRunNatives()) {
             workerGroup = new EpollEventLoopGroup();
 
             channelClass = EpollSocketChannel.class;
         }
 
-        if (SystemUtils.IS_OS_MAC_OSX && osCheck.runNatives()) {
+        if (SystemUtils.IS_OS_MAC_OSX && clientSettings.isRunNatives()) {
             workerGroup = new KQueueEventLoopGroup();
 
             channelClass = KQueueSocketChannel.class;
@@ -203,18 +190,17 @@ public class Client implements IEncryptionKeyHolder {
             b.option(ChannelOption.SO_KEEPALIVE, true);
             b.option(ChannelOption.TCP_NODELAY, true);
 
-            b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 2000);
+            b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, (int) clientSettings.getTimeoutTime());
 
             b.handler(new ChannelInitializer<Channel>() {
                 @Override
-                public void initChannel(Channel ch)
-                        throws Exception {
-                    ch.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(15));
+                public void initChannel(Channel ch) {
+                    ch.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler((int) clientSettings.getTimeoutTime()));
 
                     ch.pipeline().addLast("frameDecoder", new LineBasedFrameDecoder(StaticHandler.LINE_LIMIT));
-                    ch.pipeline().addLast("stringDecoder",new EncryptedGSONObjectDecoder(CharsetUtil.UTF_8, Client.this));
+                    ch.pipeline().addLast("stringDecoder", new EncryptedJSONObjectDecoder(clientSettings.getCharset(), Client.this, clientSettings.getJsonHandler()));
 
-                    ch.pipeline().addLast("stringEncoder", new EncryptedGSONObjectEncoder(CharsetUtil.UTF_8, Client.this));
+                    ch.pipeline().addLast("stringEncoder", new EncryptedJSONObjectEncoder(clientSettings.getCharset(), Client.this, clientSettings.getJsonHandler()));
 
                     ch.pipeline().addLast(clientHandler);
 //                    ch.pipeline().addLast(new ObjectEncoder(),
@@ -228,7 +214,8 @@ public class Client implements IEncryptionKeyHolder {
             channel = future.channel();
 
         } catch (InterruptedException e) {
-            getLogger().error(e.getMessage(), e.getCause());
+            getLogger().error(e.getMessage(), e);
+            throw e;
         }
 
 
@@ -245,33 +232,27 @@ public class Client implements IEncryptionKeyHolder {
     }
 
 
-
-
-
     public void sendObject(@NonNull Packet packet, boolean encrypt) {
         if (encrypt) {
-//            SealedObject sealedObject = encryptObject(packet);
             channel.writeAndFlush(packet);
         } else {
             channel.writeAndFlush(new UnencryptedPacketWrapper(packet));
         }
-
+        StaticHandler.getCore().getLogger().debug("Sending packet {}:{}", packet.getPacketName(), encrypt);
 
     }
 
     public void sendObject(Packet packet) {
-        sendObject(packet,true);
+        sendObject(packet, true);
     }
 
-    public void disconnect() {
+    public void disconnect() throws InterruptedException {
         getLogger().info("Disconnecting from server");
         running = false;
 
-        try {
-            future.channel().closeFuture().sync();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
+        future.channel().closeFuture().sync();
+
 
         workerGroup.shutdownGracefully();
 
@@ -282,94 +263,27 @@ public class Client implements IEncryptionKeyHolder {
         getLogger().info("Closing connection.");
         running = false;
 
-        if(channel != null) {
+        if (channel != null && channel.isActive()) {
             //DISCONNECT FROM SERVER
-            if (channel.isActive()) {
-                if (StaticHandler.isDebug()) {
-                    try {
-                        throw new DebugException();
-                    } catch (DebugException e) {
-                        getLogger().error("Debug stacktrace, not an actual error", e);
-                    }
-                }
-
-                if (channel.isActive()) {
-
-                    channel.closeFuture();
-                    getLogger().info("Closed connection.");
+            if (StaticHandler.isDebug()) {
+                try {
+                    throw new DebugException();
+                } catch (DebugException e) {
+                    getLogger().error("Debug stacktrace, not an actual error", e);
                 }
             }
+
+            if (channel.isActive()) {
+
+                channel.closeFuture();
+                getLogger().info("Closed connection.");
+            }
+
         }
 
         getLogger().info("Closing client!");
         System.exit(0);
     }
-
-
-//    @Deprecated
-//    public Object decryptObject(SealedObject sealedObject) {
-//        if (decryptCipher == null)
-//            throw new IllegalArgumentException("Register cipher with registerDecryptCipher() first");
-//        try {
-//            return sealedObject.getObject(decryptCipher);
-//        } catch (IOException | ClassNotFoundException | IllegalBlockSizeException | BadPaddingException e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
-
-//    @Deprecated
-//    public Cipher registerDecryptCipher(String key) {
-//        try {
-//            byte[] salt = new byte[16];
-//
-//            SecretKeyFactory factory = SecretKeyFactory.getInstance(StaticHandler.getKeyFactoryString());
-//            KeySpec spec = new PBEKeySpec(key.toCharArray(), salt, 65536, 256);
-//            SecretKey tmp = factory.generateSecret(spec);
-//            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKeySpecTransformation());
-//            Cipher cipher = Cipher.getInstance(StaticHandler.getCipherTransformationOld());
-//
-//            cipher.init(Cipher.DECRYPT_MODE, secret);
-//            return cipher;
-//        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | InvalidKeySpecException e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
-//
-//
-//    @Deprecated
-//    public Cipher registerEncryptCipher(String password) {
-//        try {
-//            byte[] salt = new byte[16];
-//
-//            SecretKeyFactory factory = SecretKeyFactory.getInstance(StaticHandler.getKeyFactoryString());
-//            KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 256);
-//            SecretKey tmp = factory.generateSecret(spec);
-//            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), StaticHandler.getKeySpecTransformation());
-//
-//            Cipher cipher = Cipher.getInstance(StaticHandler.getCipherTransformationOld());
-//            cipher.init(Cipher.ENCRYPT_MODE, secret);
-//            return cipher;
-//        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
-
-
-//    @Deprecated
-//    public SealedObject encryptObject(Serializable object) {
-//        try {
-//            if (encryptCipher == null)
-//                throw new IllegalArgumentException("Register cipher with registerEncryptCipher() first");
-//
-//            return new SealedObject(object, encryptCipher);
-//        } catch (IOException | IllegalBlockSizeException e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
 
     @Override
     public SecretKey getSecretKey(ChannelHandlerContext ctx, Channel channel) {
@@ -383,18 +297,23 @@ public class Client implements IEncryptionKeyHolder {
 
     public void setSecretKey(SecretKey secretKey) {
         this.secretKey = secretKey;
-//        try {
-//            encryptCipher = Cipher.getInstance(StaticHandler.getObjecrCipherTrans());
-//            encryptCipher.init(Cipher.ENCRYPT_MODE, secretKey);
-//
-//            decryptCipher = Cipher.getInstance(StaticHandler.getObjecrCipherTrans());
-//            decryptCipher.init(Cipher.DECRYPT_MODE, secretKey);
-//        } catch (NoSuchAlgorithmException e) {
-//            e.printStackTrace();
-//        } catch (NoSuchPaddingException e) {
-//            e.printStackTrace();
-//        } catch (InvalidKeyException e) {
-//            e.printStackTrace();
-//        }
     }
+
+    public boolean isRunning() {
+        return running;
+    }
+
+    void startPingStopwatch() {
+        stopWatch.reset();
+        stopWatch.start();
+    }
+
+    void endPingStopwatch() {
+        stopWatch.stop();
+    }
+
+    public long getPingTime(TimeUnit timeUnit) {
+        return stopWatch.getTime(timeUnit);
+    }
+
 }

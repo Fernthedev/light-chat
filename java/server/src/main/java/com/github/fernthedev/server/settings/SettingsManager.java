@@ -22,11 +22,11 @@ public class SettingsManager {
 
     private boolean canClientAccess = true;
 
-    private Settings settings;
+    private ServerSettings serverSettings;
     private File settingsFile;
 
     static {
-        new File(getCurrentPath(), "settings.json");
+        new File(getCurrentPath(), "serverSettings.json");
     }
 
     public static String getCurrentPath() {
@@ -38,7 +38,7 @@ public class SettingsManager {
     }
 
     public void setup() {
-        settings = new Settings();
+        serverSettings = new ServerSettings();
 
         if(!getSettingsFile().exists()) {
             saveSettings();
@@ -50,14 +50,14 @@ public class SettingsManager {
 
 
     public void load() {
-        if(settings == null) {
-            settings = new Settings();
+        if(serverSettings == null) {
+            serverSettings = new ServerSettings();
             saveSettings();
         }
 
         if (settingsFile.exists()) {
             try {
-                    settings = gson.fromJson(new FileReader(settingsFile), Settings.class);
+                    serverSettings = gson.fromJson(new FileReader(settingsFile), ServerSettings.class);
 
                     saveSettings();
 
@@ -70,12 +70,12 @@ public class SettingsManager {
 
 
                 if (!settingsFile.exists()) {
-                    settings = null;
+                    serverSettings = null;
                     load();
                 }
             }
         } else {
-            Server.getLogger().error("Unable to load settings, seems it is missing");
+            Server.getLogger().error("Unable to load serverSettings, seems it is missing");
         }
     }
 
@@ -89,14 +89,14 @@ public class SettingsManager {
         }
 
         try (FileWriter writer = new FileWriter(settingsFile,false)) {
-            writer.write(gson.toJson(settings));
+            writer.write(gson.toJson(serverSettings));
         } catch (Exception e) {
             Server.getLogger().error(e.getMessage(), e.getCause());
         }
     }
 
-    public Settings getSettings() {
-        return settings;
+    public ServerSettings getServerSettings() {
+        return serverSettings;
     }
 
     public File getSettingsFile() {

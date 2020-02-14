@@ -1,14 +1,18 @@
 package com.github.fernthedev.client;
 
+import com.github.fernthedev.core.api.APIUsage;
+
+@APIUsage
+@SuppressWarnings("unused")
 public interface ILogManager {
 
-    public void log(String log);
+    void log(String log);
 
-    public void logError(String log, Throwable e);
+    void logError(String log, Throwable e);
 
-    public void info(String s);
+    void info(String s);
 
-    public void debug(String s);
+    void debug(String s);
 
     void error(String s);
 }

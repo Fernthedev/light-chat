@@ -4,5 +4,6 @@
   "useMulticast": false,
   "passwordRequiredForLogin": false,
   "useNativeTransport": true,
-  "codecEnum": "GSON"
+  "codecEnum": "GSON",
+  "timeoutTime": 30000
 }

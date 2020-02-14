@@ -12,7 +12,7 @@ public class ClientTermCore extends ClientCore implements TermCore {
 
     @Override
     public void runCommand(String command) {
-        if (client.registered) {
+        if (client.isRegistered()) {
             ClientTerminal.sendMessage(command);
         } else {
             ClientTerminal.getLogger().error("The client has not been registered yet.");

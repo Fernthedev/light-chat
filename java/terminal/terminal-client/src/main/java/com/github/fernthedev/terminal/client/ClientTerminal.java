@@ -18,8 +18,9 @@ import org.fusesource.jansi.AnsiConsole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
 import java.util.logging.Level;
 
 public class ClientTerminal {
@@ -72,26 +73,7 @@ public class ClientTerminal {
         }
 
 
-
-
-        if (System.console() == null && !StaticHandler.isDebug()) {
-
-            String filename = Client.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6);
-            logger.info("No console found. Starting with CMD assuming it's Windows");
-
-            String[] newArgs = new String[]{"cmd", "/c", "start", "cmd", "/c", "java -jar -Xmx2G -Xms2G \"" + filename + "\""};
-
-            List<String> launchArgs = new ArrayList<>(Arrays.asList(newArgs));
-            launchArgs.addAll(Arrays.asList(args));
-
-            try {
-                Runtime.getRuntime().exec(launchArgs.toArray(new String[]{}));
-                System.exit(0);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }
+        CommonUtil.startSelfInCmd(args);
 
         MulticastClient multicastClient;
         Scanner scanner = new Scanner(System.in);
@@ -127,7 +109,11 @@ public class ClientTerminal {
 
         client.addPacketHandler(new PacketHandler());
 
-        client.connect();
+        try {
+            client.connect();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
 
     }
 
@@ -157,11 +143,11 @@ public class ClientTerminal {
         String host = null;
         int port = -1;
 
-        if (!multicastClient.serversAddress.isEmpty()) {
+        if (!multicastClient.getServersAddress().isEmpty()) {
             Map<Integer, MulticastData> servers = new HashMap<>();
             logger.info("Select one of these servers, or use none to skip, refresh to refresh");
             int index = 0;
-            for (MulticastData serverAddress : multicastClient.serversAddress) {
+            for (MulticastData serverAddress : multicastClient.getServersAddress()) {
                 index++;
                 servers.put(index, serverAddress);
 
@@ -236,7 +222,7 @@ public class ClientTerminal {
                     client.sendObject(new MessagePacket(message));
             }
         } catch (IllegalArgumentException e) {
-            logger.error("Unable to send message. Cause: " + e.getMessage() + " {" + e.getClass().getName() + "}");
+            logger.error("Unable to send the message. Cause: {} {{}}", e.getMessage(), e.getClass().getName());
         }
     }
 
