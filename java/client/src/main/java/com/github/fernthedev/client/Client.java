@@ -1,15 +1,18 @@
 package com.github.fernthedev.client;
 
 import com.github.fernthedev.client.api.IPacketHandler;
+import com.github.fernthedev.client.event.ServerDisconnectEvent;
 import com.github.fernthedev.client.netty.ClientHandler;
 import com.github.fernthedev.core.StaticHandler;
 import com.github.fernthedev.core.api.APIUsage;
+import com.github.fernthedev.core.api.plugin.PluginManager;
 import com.github.fernthedev.core.encryption.RSA.IEncryptionKeyHolder;
 import com.github.fernthedev.core.encryption.UnencryptedPacketWrapper;
 import com.github.fernthedev.core.encryption.codecs.general.gson.EncryptedJSONObjectDecoder;
 import com.github.fernthedev.core.encryption.codecs.general.gson.EncryptedJSONObjectEncoder;
 import com.github.fernthedev.core.exceptions.DebugException;
 import com.github.fernthedev.core.packets.Packet;
+import com.github.fernthedev.core.packets.handshake.ConnectedPacket;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollEventLoopGroup;
@@ -26,6 +29,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.time.StopWatch;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,12 +38,15 @@ import javax.crypto.SecretKey;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
-public class Client implements IEncryptionKeyHolder {
+public class Client implements IEncryptionKeyHolder, AutoCloseable {
 
+    @Getter
     protected static Logger logger = LoggerFactory.getLogger(Client.class);
     private static CLogger cLogger;
 
@@ -50,16 +58,21 @@ public class Client implements IEncryptionKeyHolder {
     protected ClientHandler clientHandler;
 
     protected ChannelFuture future;
+
+    @Getter
     protected Channel channel;
+
     protected EventLoopGroup workerGroup;
 
     @Getter
     @Setter(AccessLevel.PACKAGE)
     private boolean registered;
 
-
+    @Getter
+    private PluginManager pluginManager = new PluginManager();
 
     @Setter
+    @Getter
     private boolean running = false;
 
     @Getter
@@ -69,12 +82,29 @@ public class Client implements IEncryptionKeyHolder {
     private String host;
 
     @Getter
-    private String name;
+    @Setter
+    private String name = null;
 
     @Getter
     private SecretKey secretKey;
 
+
     private StopWatch stopWatch = new StopWatch();
+
+    /**
+     * Packet:[ID,lastPacketSentTime]
+     */
+    @NonNull
+    private Map<Class<? extends Packet>, Pair<Integer, Long>> packetIdMap = new HashMap<>();
+
+    @Getter
+    @Setter
+    private int maxPacketId = StaticHandler.DEFAULT_PACKET_ID_MAX;
+
+    public ConnectedPacket buildConnectedPacket() {
+        StaticHandler.getCore().getLogger().debug("Using the name: {}", name);
+        return new ConnectedPacket(getName(), getOSName(), StaticHandler.getVERSION_DATA());
+    }
 
     public Client(String host, int port) {
         this.host = host;
@@ -126,11 +156,13 @@ public class Client implements IEncryptionKeyHolder {
 
 
         try {
-            name = InetAddress.getLocalHost().getHostName();
+            if (name == null) name = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
             getLogger().error(e.getMessage(), e.getCause());
-            close();
+            disconnect();
         }
+
+
 
 
 //        waitForCommand = new WaitForCommand(this);
@@ -157,10 +189,6 @@ public class Client implements IEncryptionKeyHolder {
     public ILogManager getLoggerInterface() {
         if (logger == null) registerLogger();
         return cLogger;
-    }
-
-    public Logger getLogger() {
-        return logger;
     }
 
     public void connect() throws InterruptedException {
@@ -197,7 +225,7 @@ public class Client implements IEncryptionKeyHolder {
                 public void initChannel(Channel ch) {
                     ch.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler((int) clientSettings.getTimeoutTime()));
 
-                    ch.pipeline().addLast("frameDecoder", new LineBasedFrameDecoder(StaticHandler.LINE_LIMIT));
+                    ch.pipeline().addLast("frameDecoder", new LineBasedFrameDecoder(StaticHandler.getLineLimit()));
                     ch.pipeline().addLast("stringDecoder", new EncryptedJSONObjectDecoder(clientSettings.getCharset(), Client.this, clientSettings.getJsonHandler()));
 
                     ch.pipeline().addLast("stringEncoder", new EncryptedJSONObjectEncoder(clientSettings.getCharset(), Client.this, clientSettings.getJsonHandler()));
@@ -232,34 +260,45 @@ public class Client implements IEncryptionKeyHolder {
     }
 
 
-    public void sendObject(@NonNull Packet packet, boolean encrypt) {
-        if (encrypt) {
-            channel.writeAndFlush(packet);
-        } else {
-            channel.writeAndFlush(new UnencryptedPacketWrapper(packet));
+    private Pair<Integer, Long> updatePacketIdPair(Class<? extends Packet> packet, int newId) {
+        Pair<Integer, Long> packetIdPair = getPacketId(packet, null, null);
+
+        if (packetIdPair == null)
+            packetIdPair = new ImmutablePair<>(0, System.currentTimeMillis());
+        else {
+            if (newId == -1) newId = packetIdPair.getKey() + 1;
+            packetIdPair = new ImmutablePair<>(newId, System.currentTimeMillis());
         }
+
+        packetIdMap.put(packet, packetIdPair);
+        return packetIdPair;
+    }
+
+    @APIUsage
+    public ChannelFuture sendObject(@NonNull Packet packet, boolean encrypt) {
         StaticHandler.getCore().getLogger().debug("Sending packet {}:{}", packet.getPacketName(), encrypt);
 
+        Pair<Integer, Long> packetIdPair = updatePacketIdPair(packet.getClass(), -1);
+
+        if (packetIdPair.getLeft() > maxPacketId || System.currentTimeMillis() - packetIdPair.getRight() > 900) updatePacketIdPair(packet.getClass(), 0);
+
+        if (encrypt) {
+            return channel.writeAndFlush(packet);
+        } else {
+            return channel.writeAndFlush(new UnencryptedPacketWrapper(packet, packetIdPair.getKey()));
+        }
     }
 
-    public void sendObject(Packet packet) {
-        sendObject(packet, true);
+    @APIUsage
+    public ChannelFuture sendObject(Packet packet) {
+        return sendObject(packet, true);
     }
 
-    public void disconnect() throws InterruptedException {
-        getLogger().info("Disconnecting from server");
-        running = false;
-
-
-        future.channel().closeFuture().sync();
-
-
-        workerGroup.shutdownGracefully();
-
-        getLogger().info("Disconnected");
+    public void disconnect() {
+        disconnect(ServerDisconnectEvent.DisconnectStatus.DISCONNECTED);
     }
 
-    public void close() {
+    public void disconnect(ServerDisconnectEvent.DisconnectStatus disconnectStatus) {
         getLogger().info("Closing connection.");
         running = false;
 
@@ -281,8 +320,11 @@ public class Client implements IEncryptionKeyHolder {
 
         }
 
-        getLogger().info("Closing client!");
-        System.exit(0);
+        getPluginManager().callEvent(new ServerDisconnectEvent(channel, disconnectStatus));
+
+        workerGroup.shutdownGracefully();
+
+
     }
 
     @Override
@@ -295,12 +337,26 @@ public class Client implements IEncryptionKeyHolder {
         return secretKey != null;
     }
 
-    public void setSecretKey(SecretKey secretKey) {
-        this.secretKey = secretKey;
+    /**
+     * Packet:[ID,lastPacketSentTime]
+     */
+    @Override
+    public Pair<Integer, Long> getPacketId(@NonNull Class<? extends Packet> clazz, ChannelHandlerContext ctx, Channel channel) {
+        packetIdMap.computeIfAbsent(clazz, aClass -> new ImmutablePair<>(0,(long) -1));
+
+        return packetIdMap.get(clazz);
     }
 
-    public boolean isRunning() {
-        return running;
+    /**
+     * Packet:[ID,lastPacketSentTime]
+     */
+    @APIUsage
+    public Pair<Integer, Long> getPacketId(Class<? extends Packet> clazz) {
+        return packetIdMap.get(clazz);
+    }
+
+    public void setSecretKey(SecretKey secretKey) {
+        this.secretKey = secretKey;
     }
 
     void startPingStopwatch() {
@@ -316,4 +372,20 @@ public class Client implements IEncryptionKeyHolder {
         return stopWatch.getTime(timeUnit);
     }
 
+    /**
+     * Closes this stream and releases any system resources associated
+     * with it. If the stream is already closed then invoking this
+     * method has no effect.
+     *
+     * <p> As noted in {@link AutoCloseable#close()}, cases where the
+     * close may fail require careful attention. It is strongly advised
+     * to relinquish the underlying resources and to internally
+     * <em>mark</em> the {@code Closeable} as closed, prior to throwing
+     * the {@code IOException}.
+     *
+     */
+    @Override
+    public void close() {
+        disconnect();
+    }
 }

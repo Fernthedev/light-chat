@@ -14,8 +14,8 @@ public class UnencryptedPacketWrapper extends PacketWrapper<AcceptablePacketType
 
     protected UnencryptedPacketWrapper() {}
 
-    public UnencryptedPacketWrapper(Packet jsonObject) {
-        super(jsonObject, jsonObject.getPacketName());
+    public UnencryptedPacketWrapper(Packet jsonObject, int packetId) {
+        super(jsonObject, jsonObject.getPacketName(), packetId);
 
         if (PacketRegistry.checkIfRegistered(jsonObject) == PacketRegistry.RegisteredReturnValues.NOT_IN_REGISTRY) {
             throw new IllegalArgumentException("The packet trying to be wrapped is not registered. \"" + jsonObject.getClass() + "\"");

@@ -21,7 +21,12 @@ import java.util.*;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StaticHandler {
 
-    public static final int LINE_LIMIT = 8000;
+    public static final int DEFAULT_PACKET_ID_MAX = 10;
+
+    @Getter
+    @Setter
+    private static int lineLimit = 8000;
+
     public static final String END_STRING = "\n\r";
     public static final int KEY_SIZE = 4096;
     public static final int AES_KEY_SIZE = 256;
@@ -71,6 +76,8 @@ public class StaticHandler {
     static {
         VERSION_DATA = new VersionData(gson.fromJson(getFile("variables.json"), VariablesJSON.class));
     }
+
+
 
     public static void setDebug(boolean debug) {
 

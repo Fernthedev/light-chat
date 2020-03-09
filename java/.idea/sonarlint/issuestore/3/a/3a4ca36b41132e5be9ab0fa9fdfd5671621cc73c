@@ -1,0 +1,5 @@
+
+Bsquid:S3077"&Use an "AtomicReferenceArray" instead.(ôìÃýÿÿÿÿÿ
+csquid:HiddenFieldCheckY"<Rename "handlers" which hides the field declared at line 18.(Î’þÿÿÿÿ
+usquid:S2293L"YReplace the type specification in this constructor call with the diamond operator ("<>").(ºÜ¯Œýÿÿÿÿ
+usquid:S2293"YReplace the type specification in this constructor call with the diamond operator ("<>").(¬´‚¾þÿÿÿÿ

@@ -1,4 +1,4 @@
-//apply plugin: 'application'
+//apply com.github.fernthedev.client.plugin: 'application'
 
 dependencies {
     compile project(':core')

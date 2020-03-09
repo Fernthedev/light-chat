@@ -4,6 +4,6 @@ import com.github.fernthedev.core.packets.Packet;
 import com.github.fernthedev.core.packets.PacketInfo;
 
 @PacketInfo(name = "PING_PACKET")
-public class PingPacket extends Packet {
+public class PingPacket extends Packet implements LatencyPacket {
 
 }

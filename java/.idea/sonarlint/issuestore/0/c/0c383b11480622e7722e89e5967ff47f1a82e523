@@ -1,3 +1,4 @@
 
-“"squid:SwitchLastCaseIsDefaultCheck\"YComplete cases by adding the missing enum constants or add a default case to this switch.(Ê§² ùÿÿÿÿ8öÈİòô-
-usquid:S3776"RRefactor this method to reduce its Cognitive Complexity from 21 to the 15 allowed.(Õ´üşÿÿÿÿ8“Ø§è.
+h
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(ø££€
+<	java:S131[""Add a default case to this switch.(Ê§² ùÿÿÿÿ

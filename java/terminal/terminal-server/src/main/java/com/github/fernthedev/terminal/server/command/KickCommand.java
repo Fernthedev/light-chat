@@ -1,9 +1,6 @@
 package com.github.fernthedev.terminal.server.command;
 
-import com.github.fernthedev.server.ClientPlayer;
-import com.github.fernthedev.server.Console;
-import com.github.fernthedev.server.PlayerHandler;
-import com.github.fernthedev.server.SenderInterface;
+import com.github.fernthedev.server.*;
 import com.github.fernthedev.terminal.core.packets.MessagePacket;
 import com.github.fernthedev.terminal.server.ServerTerminal;
 import lombok.NonNull;
@@ -15,9 +12,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class KickCommand extends Command implements TabExecutor {
-    public KickCommand(@NonNull String command) {
+
+    private Server server;
+
+    public KickCommand(@NonNull String command, Server server) {
         super(command);
         setUsage("Used to kick players using id");
+        this.server = server;
     }
 
     @Override
@@ -29,11 +30,11 @@ public class KickCommand extends Command implements TabExecutor {
                 final String[] argName = {""};
                 Arrays.stream(args).forEachOrdered(s -> argName[0] += s);
 
-                for (ClientPlayer clientPlayer : new HashMap<>(PlayerHandler.getChannelMap()).values()) {
-                    if (argName[0].equals(clientPlayer.getName())) {
-                        clientPlayer.sendObject(new MessagePacket("You have been kicked."));
+                for (ClientConnection clientConnection : new HashMap<>(server.getPlayerHandler().getChannelMap()).values()) {
+                    if (argName[0].equals(clientConnection.getName())) {
+                        clientConnection.sendObject(new MessagePacket("You have been kicked."));
 
-                        clientPlayer.close();
+                        clientConnection.close();
                     }
 
                 }
@@ -45,12 +46,12 @@ public class KickCommand extends Command implements TabExecutor {
     public List<String> getCompletions(String[] args) {
 
         String curArg = args[args.length - 1];
-        List<ClientPlayer> completions = PlayerHandler.getUuidMap().values().stream().filter(
+        List<ClientConnection> completions = server.getPlayerHandler().getUuidMap().values().stream().filter(
                 item -> item.getName().startsWith(curArg)).collect(Collectors.toList());
 
         List<String> strings = new ArrayList<>();
-        for (ClientPlayer clientPlayer : completions) {
-            strings.add(clientPlayer.getName());
+        for (ClientConnection clientConnection : completions) {
+            strings.add(clientConnection.getName());
         }
 
         return strings;

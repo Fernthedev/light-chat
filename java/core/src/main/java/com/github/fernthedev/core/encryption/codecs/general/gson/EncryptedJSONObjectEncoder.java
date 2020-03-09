@@ -79,12 +79,14 @@ public class EncryptedJSONObjectEncoder extends MessageToMessageEncoder<Acceptab
                 throw new IllegalArgumentException("The object was not a packet instance. ");
             }
 
+            Packet packet = (Packet) msg;
+
             // Encrypting the data
             String decryptedJSON = jsonHandler.toJson(msg);
             EncryptedBytes encryptedBytes = encrypt(ctx, decryptedJSON);
 
             // Adds the encrypted json in the packet wrapper
-            packetWrapper = new EncryptedPacketWrapper(encryptedBytes, (Packet) msg);
+            packetWrapper = new EncryptedPacketWrapper(encryptedBytes, packet, encryptionKeyHolder.getPacketId(packet.getClass(), ctx, ctx.channel()).getKey());
             String jsonPacketWrapper = jsonHandler.toJson(packetWrapper);
 
             // Encodes the string for sending
@@ -92,7 +94,7 @@ public class EncryptedJSONObjectEncoder extends MessageToMessageEncoder<Acceptab
 
         }
 
-        StaticHandler.getCore().getLogger().debug("Sending {}", jsonHandler.toJson(packetWrapper));
+//        StaticHandler.getCore().getLogger().debug("Sending {}", jsonHandler.toJson(packetWrapper));
     }
 
     public EncryptedBytes encrypt(ChannelHandlerContext ctx, String decryptedString) {

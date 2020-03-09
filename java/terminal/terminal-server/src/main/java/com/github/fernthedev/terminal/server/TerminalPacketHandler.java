@@ -5,7 +5,7 @@ import com.github.fernthedev.core.data.LightCandidate;
 import com.github.fernthedev.core.packets.HashedPasswordPacket;
 import com.github.fernthedev.core.packets.Packet;
 import com.github.fernthedev.core.packets.handshake.ConnectedPacket;
-import com.github.fernthedev.server.ClientPlayer;
+import com.github.fernthedev.server.ClientConnection;
 import com.github.fernthedev.server.Server;
 import com.github.fernthedev.server.api.IPacketHandler;
 import com.github.fernthedev.terminal.core.packets.AutoCompletePacket;
@@ -21,14 +21,14 @@ public class TerminalPacketHandler implements IPacketHandler {
     private Server server;
 
     @Override
-    public void handlePacket(Packet p, ClientPlayer clientPlayer) {
+    public void handlePacket(Packet p, ClientConnection clientConnection, int packetId) {
 
         if (p instanceof ConnectedPacket) {
             if(server.getSettingsManager().getConfigData().isPasswordRequiredForLogin()) {
-                boolean authenticated = ServerTerminal.getAuthenticationManager().authenticate(clientPlayer);
+                boolean authenticated = ServerTerminal.getAuthenticationManager().authenticate(clientConnection);
                 if(!authenticated) {
-                    clientPlayer.sendObject(new MessagePacket("Unable to authenticate"));
-                    clientPlayer.close();
+                    clientConnection.sendObject(new MessagePacket("Unable to authenticate"));
+                    clientConnection.close();
                     return;
                 }
             }
@@ -36,7 +36,7 @@ public class TerminalPacketHandler implements IPacketHandler {
             MessagePacket messagePacket = (MessagePacket) p;
 
             StaticHandler.getCore().getLogger().debug("Handling message {}", messagePacket.getMessage());
-            ChatEvent chatEvent = new ChatEvent(clientPlayer, messagePacket.getMessage(),false,true);
+            ChatEvent chatEvent = new ChatEvent(clientConnection, messagePacket.getMessage(),false,true);
 
             server.getPluginManager().callEvent(chatEvent);
 
@@ -47,7 +47,7 @@ public class TerminalPacketHandler implements IPacketHandler {
 
             String command = packet.getMessage();
 
-            ChatEvent chatEvent = new ChatEvent(clientPlayer,command,true,true);
+            ChatEvent chatEvent = new ChatEvent(clientConnection,command,true,true);
             server.getPluginManager().callEvent(chatEvent);
 
             ServerTerminal.getCommandMessageParser().onCommand(chatEvent);
@@ -56,11 +56,11 @@ public class TerminalPacketHandler implements IPacketHandler {
             List<LightCandidate> candidates = ServerTerminal.getAutoCompleteHandler().handleLine(packet.getWords());
 
             packet.setCandidateList(candidates);
-            clientPlayer.sendObject(packet);
+            clientConnection.sendObject(packet);
         } else if (p instanceof HashedPasswordPacket) {
             ServerTerminal.getAuthenticationManager().attemptAuthenticationHash(
                     ((HashedPasswordPacket) p).getHashedPassword(),
-                    clientPlayer
+                    clientConnection
             );
         }
     }

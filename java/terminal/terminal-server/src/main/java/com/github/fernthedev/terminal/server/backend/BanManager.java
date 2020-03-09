@@ -1,6 +1,6 @@
 package com.github.fernthedev.terminal.server.backend;
 
-import com.github.fernthedev.server.ClientPlayer;
+import com.github.fernthedev.server.ClientConnection;
 import com.github.fernthedev.server.Server;
 import com.github.fernthedev.core.StaticHandler;
 import com.google.gson.Gson;
@@ -20,13 +20,13 @@ public class BanManager {
 
     private List<BannedData> banned = new ArrayList<>();
 
-    public boolean isBanned(@NonNull ClientPlayer clientPlayer) {
-        Server.getLogger().info("Checking ban for " + clientPlayer);
+    public boolean isBanned(@NonNull ClientConnection clientConnection) {
+        Server.getLogger().info("Checking ban for " + clientConnection);
         if(banned.isEmpty()) load();
 
         for(BannedData bannedData : banned) {
-            Server.getLogger().info("Checking " + clientPlayer.getAddress() + " data "+ bannedData);
-            if(bannedData.getIp().equals(clientPlayer.getAddress())) {
+            Server.getLogger().info("Checking " + clientConnection.getAddress() + " data "+ bannedData);
+            if(bannedData.getIp().equals(clientConnection.getAddress())) {
                 Server.getLogger().info("Found banned " + bannedData.getIp());
                 return true;
             }
@@ -47,7 +47,7 @@ public class BanManager {
         load();
     }
 
-    public void addBan(ClientPlayer clientPlayer,BannedData bannedData) {
+    public void addBan(ClientConnection clientConnection, BannedData bannedData) {
         try(FileWriter writer = new FileWriter(bansFile)) {
 
             banned.add(bannedData);
@@ -58,7 +58,7 @@ public class BanManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        clientPlayer.close();
+        clientConnection.close();
         load();
     }
 

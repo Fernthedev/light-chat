@@ -9,7 +9,6 @@ import com.github.fernthedev.light.exceptions.NoPi4JLibsFoundException;
 import com.github.fernthedev.server.Console;
 import com.github.fernthedev.server.SenderInterface;
 import com.github.fernthedev.server.Server;
-import com.github.fernthedev.server.event.chat.ServerPlugin;
 import com.github.fernthedev.server.settings.ServerSettings;
 import com.github.fernthedev.terminal.core.CommonUtil;
 import com.github.fernthedev.terminal.core.ConsoleHandler;
@@ -24,7 +23,6 @@ import com.github.fernthedev.terminal.server.command.Command;
 import com.github.fernthedev.terminal.server.command.LightCommand;
 import com.github.fernthedev.terminal.server.command.SettingsCommand;
 import lombok.Getter;
-import org.fusesource.jansi.AnsiConsole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +39,7 @@ public class ServerTerminal {
     @Getter
     private static ServerCommandHandler commandHandler;
 
-    private static Server server;
+    protected static Server server;
 
     @Getter
     private static BanManager banManager = new BanManager();
@@ -63,41 +61,46 @@ public class ServerTerminal {
 
     private static Logger logger = LoggerFactory.getLogger(ServerTerminal.class);
 
+    protected static boolean lightAllowed = true;
+    protected static boolean allowChangePassword = true;
+    protected static boolean allowTermPackets = true;
+    protected static boolean allowPortArgParse = true;
+    protected static boolean allowDebugArgParse = true;
+    protected static int port = -1;
+
     public static void main(String[] args) {
-        AnsiConsole.systemInstall();
-        java.util.logging.Logger.getLogger("io.netty").setLevel(java.util.logging.Level.OFF);
-        StaticHandler.setupLoggers();
+        CommonUtil.initTerminal();
 
 
         //  Logger.getLogger("io.netty").setLevel(java.util.logging.Level.OFF);
 
-        int port = -1;
 
-        for (int i = 0; i < args.length; i++) {
-            String arg = args[i];
+            for (int i = 0; i < args.length && (allowPortArgParse || allowDebugArgParse || lightAllowed); i++) {
+                String arg = args[i];
 
-            if (arg.equalsIgnoreCase("-port")) {
-                try {
-                    port = Integer.parseInt(args[i + 1]);
-                    if (port < 0) {
-                        logger.error("-port cannot be less than 0");
+                if (arg.equalsIgnoreCase("-port") && allowPortArgParse) {
+                    try {
+                        port = Integer.parseInt(args[i + 1]);
+                        if (port < 0) {
+                            logger.error("-port cannot be less than 0");
+                            port = -1;
+                        } else logger.info("Using port {}", args[i + +1]);
+                    } catch (NumberFormatException | IndexOutOfBoundsException e) {
+                        logger.error("-port is not a number");
                         port = -1;
-                    } else logger.info("Using port {}", args[i + +1]);
-                } catch (NumberFormatException | IndexOutOfBoundsException e) {
-                    logger.error("-port is not a number");
-                    port = -1;
+                    }
+                }
+
+                if (arg.equalsIgnoreCase("-lightmanager") && lightAllowed) {
+                    StaticHandler.setLight(true);
+                }
+
+                if (arg.equalsIgnoreCase("-debug") && allowDebugArgParse) {
+                    StaticHandler.setDebug(true);
+                    logger.debug("Debug enabled");
                 }
             }
 
-            if (arg.equalsIgnoreCase("-lightmanager")) {
-                StaticHandler.setLight(true);
-            }
-
-            if (arg.equalsIgnoreCase("-debug")) {
-                StaticHandler.setDebug(true);
-                logger.debug("Debug enabled");
-            }
-        }
 
 
         CommonUtil.startSelfInCmd(args);
@@ -106,7 +109,7 @@ public class ServerTerminal {
         settingsManager = new GsonConfig<>(new ServerSettings(), new File(getCurrentPath(), "settings.json"));
         settingsManager.save();
 
-        port = settingsManager.getConfigData().getPort();
+        if (port == -1) port = settingsManager.getConfigData().getPort();
 
 
         server = new Server(port);
@@ -117,7 +120,9 @@ public class ServerTerminal {
 
 
         StaticHandler.setCore(new ServerTermCore(server));
-        CommonUtil.registerTerminalPackets();
+
+        if (allowTermPackets)
+            CommonUtil.registerTerminalPackets();
 
         new Thread(() -> {
             logger.info("Type Command: (try help)");
@@ -125,20 +130,21 @@ public class ServerTerminal {
         }, "ConsoleHandler").start();
 
         commandMessageParser = new CommandMessageParser(server);
-        server.getPluginManager().registerEvents(commandMessageParser, new ServerPlugin());
+        server.getPluginManager().registerEvents(commandMessageParser);
 
         registerCommand(new SettingsCommand(server));
 
         ThreadUtils.runAsync(() -> {
             authenticationManager = new AuthenticationManager(server);
-            server.getPluginManager().registerEvents(authenticationManager, new ServerPlugin());
+            server.getPluginManager().registerEvents(authenticationManager);
         });
 
-
-        registerCommand(new AuthCommand("changepassword", server));
+        if (allowChangePassword)
+            registerCommand(new AuthCommand("changepassword", server));
 
         autoCompleteHandler = new ClientAutoCompleteHandler(server);
 
+        if (lightAllowed)
         ThreadUtils.runAsync(() -> {
             if (StaticHandler.OS.equalsIgnoreCase("Linux") || StaticHandler.OS.contains("Linux") || StaticHandler.isLight()) {
                 logger.info("Running LightManager (Note this is for raspberry pies only)");

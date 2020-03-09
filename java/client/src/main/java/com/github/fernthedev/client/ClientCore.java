@@ -30,7 +30,7 @@ public class ClientCore implements Core {
 
     @Override
     public void shutdown() {
-        client.close();
+        client.disconnect();
         System.exit(0);
     }
 }

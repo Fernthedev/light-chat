@@ -1,5 +1,8 @@
 package com.github.fernthedev.client;
 
+import com.github.fernthedev.client.event.ServerConnectFinishEvent;
+import com.github.fernthedev.client.event.ServerConnectHandshakeEvent;
+import com.github.fernthedev.client.event.ServerDisconnectEvent;
 import com.github.fernthedev.core.StaticHandler;
 import com.github.fernthedev.core.VersionData;
 import com.github.fernthedev.core.encryption.util.EncryptionUtil;
@@ -25,11 +28,8 @@ public class EventListener {
         this.client = client;
     }
 
-    public void received(Packet p) {
-        if (p instanceof TestConnectPacket) {
-            TestConnectPacket packet = (TestConnectPacket) p;
-            client.getLogger().info("Connected packet: {}", packet.getMessage());
-        } else if (p instanceof PingPacket) {
+    public void received(Packet p, int packetId) {
+        if (p instanceof PingPacket) {
             client.startPingStopwatch();
 
             client.sendObject(new PongPacket(), false);
@@ -76,37 +76,36 @@ public class EventListener {
             } catch (InvalidKeyException e) {
                 e.printStackTrace();
             }
+
+            client.getPluginManager().callEvent(new ServerConnectHandshakeEvent(client.getChannel()));
         } else if (p instanceof RequestConnectInfoPacket) {
-            ConnectedPacket connectedPacket = client.getClientHandler().getConnectedPacket();
+            ConnectedPacket connectedPacket = client.buildConnectedPacket();
 
             client.sendObject(connectedPacket);
-            client.getLogger().info("Sent the Connect Packet for request");
+            client.getLogger().info("Sent the connection Packet for request");
 
         } else if (p instanceof SelfMessagePacket) {
             switch (((SelfMessagePacket) p).getType()) {
                 case TIMED_OUT_REGISTRATION:
                     client.getLogger().info("Timed out on registering.");
-                    client.close();
+                    client.disconnect(ServerDisconnectEvent.DisconnectStatus.TIMEOUT);
                     break;
 
                 case REGISTER_PACKET:
                     client.setRegistered(true);
                     client.getLogger().info("Successfully connected to server");
+                    client.getPluginManager().callEvent(new ServerConnectFinishEvent(client.getChannel()));
                     break;
 
                 case LOST_SERVER_CONNECTION:
                     client.getLogger().info("Lost connection to server! Must have shutdown!");
-                    try {
-                        client.disconnect();
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    }
+                    client.disconnect(ServerDisconnectEvent.DisconnectStatus.CONNECTION_LOST);
                     break;
             }
 
         }
         ThreadUtils.runForLoopAsync(client.getPacketHandlers(), iPacketHandler -> {
-            iPacketHandler.handlePacket(p);
+            iPacketHandler.handlePacket(p, packetId);
             return null;
         }).runThreads();
     }

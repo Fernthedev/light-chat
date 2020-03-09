@@ -20,6 +20,12 @@ public class PacketWrapper<T> implements Serializable {
     @Getter
     private String packetIdentifier;
 
+    /**
+     * For packet order
+     */
+    @Getter
+    private int packetId;
+
 
     @Override
     public String toString() {
@@ -28,10 +34,11 @@ public class PacketWrapper<T> implements Serializable {
                 '}';
     }
 
-    public PacketWrapper(T object, String packetIdentifier) {
+    public PacketWrapper(T object, String packetIdentifier, int packetId) {
         this.packetIdentifier = packetIdentifier;
         this.jsonObjectInstance = object;
         this.jsonObject = gson.toJson(object);
+        this.packetId = packetId;
     }
 
 //    @Deprecated

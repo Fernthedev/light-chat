@@ -18,9 +18,9 @@
 
     <build>
         <plugins>
-            <plugin>
+            <com.github.fernthedev.client.plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
+                <artifactId>maven-source-com.github.fernthedev.client.plugin</artifactId>
                 <version>3.2.0</version>
                 <executions>
                     <execution>
@@ -31,18 +31,18 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
+            </com.github.fernthedev.client.plugin>
+            <com.github.fernthedev.client.plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
+                <artifactId>maven-compiler-com.github.fernthedev.client.plugin</artifactId>
                 <configuration>
                     <source>8</source>
                     <target>8</target>
                 </configuration>
-            </plugin>
-            <plugin>
+            </com.github.fernthedev.client.plugin>
+            <com.github.fernthedev.client.plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
+                <artifactId>maven-shade-com.github.fernthedev.client.plugin</artifactId>
                 <version>3.2.0</version>
                 <configuration>
                     <minimizeJar>true</minimizeJar>
@@ -158,12 +158,12 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </com.github.fernthedev.client.plugin>
         </plugins>
         <extensions>
             <extension>
                 <groupId>kr.motd.maven</groupId>
-                <artifactId>os-maven-plugin</artifactId>
+                <artifactId>os-maven-com.github.fernthedev.client.plugin</artifactId>
                 <version>1.5.0.Final</version>
             </extension>
         </extensions>

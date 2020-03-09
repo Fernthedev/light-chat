@@ -5,7 +5,6 @@ import com.github.fernthedev.core.VersionData;
 import com.github.fernthedev.core.packets.IllegalConnection;
 import com.github.fernthedev.core.packets.Packet;
 import com.github.fernthedev.core.packets.SelfMessagePacket;
-import com.github.fernthedev.core.packets.TestConnectPacket;
 import com.github.fernthedev.core.packets.handshake.ConnectedPacket;
 import com.github.fernthedev.core.packets.handshake.KeyResponsePacket;
 import com.github.fernthedev.core.packets.handshake.RequestConnectInfoPacket;
@@ -20,39 +19,35 @@ public class EventListener {
 
     private Server server;
 
-    private ClientPlayer clientPlayer;
+    private ClientConnection clientConnection;
     
-    public EventListener(Server server, ClientPlayer clientPlayer) {
+    public EventListener(Server server, ClientConnection clientConnection) {
         this.server = server;
-        this.clientPlayer = clientPlayer;
+        this.clientConnection = clientConnection;
     }
     
-    public void received(Packet p) {
+    public void received(Packet p, int packetId) {
 
-        //Packet p = (Packet) EncryptionHandler.decrypt(pe, clientPlayer.getServerKey());
+        //Packet p = (Packet) EncryptionHandler.decrypt(pe, clientConnection.getServerKey());
 
 
-        // server.logInfo(clientPlayer + " is the sender of packet");
+        // server.logInfo(clientConnection + " is the sender of packet");
         if(p instanceof PongPacket) {
-            clientPlayer.finishPing();
+            clientConnection.finishPing();
 
         } else if (p instanceof KeyResponsePacket) {
             KeyResponsePacket responsePacket = (KeyResponsePacket) p;
             try {
-                clientPlayer.setSecretKey(responsePacket.getSecretKey(clientPlayer.getTempKeyPair().getPrivate()));
-                clientPlayer.sendObject(new RequestConnectInfoPacket());
+                clientConnection.setSecretKey(responsePacket.getSecretKey(clientConnection.getTempKeyPair().getPrivate()));
+                clientConnection.sendObject(new RequestConnectInfoPacket());
             } catch (InvalidKeyException e) {
                 e.printStackTrace();
             }
 
-        } else if (p instanceof TestConnectPacket) {
-            TestConnectPacket packet = (TestConnectPacket) p;
-            server.logInfo("Connected packet: {}", packet.getMessage());
         }
 
         ThreadUtils.runForLoopAsync(server.getPacketHandlers(), iPacketHandler -> {
-            iPacketHandler.handlePacket(p, clientPlayer);
-            return null;
+            iPacketHandler.handlePacket(p, clientConnection, packetId);
         }).runThreads();
 
 
@@ -65,41 +60,42 @@ public class EventListener {
         }
 
 
-        for(ClientPlayer player : PlayerHandler.getUuidMap().values()) {
+        for(ClientConnection player : server.getPlayerHandler().getUuidMap().values()) {
             if(player.getName().equalsIgnoreCase(packet.getName())) {
                 disconnectIllegalName(packet,"Name already in use");
                 return;
             }
         }
 
-        clientPlayer.finishConstruct(packet.getName(), packet.getOS());
+        clientConnection.finishConstruct(packet.getName(), packet.getOS());
 
         VersionData versionData = packet.getVersionData();
 
         StaticHandler.VERSION_RANGE versionRange = StaticHandler.getVersionRangeStatus(versionData);
 
-        if (versionRange == StaticHandler.VERSION_RANGE.MATCH_REQUIREMENTS) server.logInfo("{}'s version range requirements match Server version.", clientPlayer);
+        if (versionRange == StaticHandler.VERSION_RANGE.MATCH_REQUIREMENTS) server.logInfo("{}'s version range requirements match Server version.", clientConnection);
         else {
             // The current version is larger than client's minimum version
             if(versionRange == StaticHandler.VERSION_RANGE.WE_ARE_HIGHER) {
-                server.logInfo("{}'s version ({}) does not meet server's minimum version ({}) requirements. Expect incompatibility issues", clientPlayer, versionData.getVersion(), StaticHandler.getVERSION_DATA().getMinVersion());
+                server.logInfo("{}'s version ({}) does not meet server's minimum version ({}) requirements. Expect incompatibility issues", clientConnection, versionData.getVersion(), StaticHandler.getVERSION_DATA().getMinVersion());
             }
 
 
             // The current version is smaller than the client's required minimum
             if (versionRange == StaticHandler.VERSION_RANGE.WE_ARE_LOWER) {
-                server.logInfo("The server version ({}) does not meet {}'s minimum version ({}) requirements. Expect incompatibility issues", StaticHandler.getVERSION_DATA().getVersion(), clientPlayer, versionData.getMinVersion());
+                server.logInfo("The server version ({}) does not meet {}'s minimum version ({}) requirements. Expect incompatibility issues", StaticHandler.getVERSION_DATA().getVersion(), clientConnection, versionData.getMinVersion());
             }
         }
 
 
-        PlayerHandler.getUuidMap().put(clientPlayer.getUuid(), clientPlayer);
+        server.getPlayerHandler().getUuidMap().put(clientConnection.getUuid(), clientConnection);
 
-        clientPlayer.setRegistered(true);
+        clientConnection.setRegistered(true);
 
-        server.logInfo("{} has connected to the server [{}]", clientPlayer.getName(), clientPlayer.getOs());
-        clientPlayer.sendObject(new SelfMessagePacket(SelfMessagePacket.MessageType.REGISTER_PACKET));
-        server.getPluginManager().callEvent(new PlayerJoinEvent(clientPlayer));
+        server.logInfo("{} has connected to the server [{}]", clientConnection.getName(), clientConnection.getOs());
+        clientConnection.sendObject(new SelfMessagePacket(SelfMessagePacket.MessageType.REGISTER_PACKET));
+        ThreadUtils.runAsync(() -> server.getPluginManager().callEvent(new PlayerJoinEvent(clientConnection, true)));
+
     }
 
     public boolean isAlphaNumeric(String name) {
@@ -107,8 +103,8 @@ public class EventListener {
     }
 
     private void disconnectIllegalName(ConnectedPacket packet,String message) {
-        server.logInfo("{} was disconnected for illegal name. Name: {} Reason: {} ID {}", clientPlayer, packet.getName(), message, clientPlayer.getUuid().getMostSignificantBits());
-        clientPlayer.sendObject(new IllegalConnection("You have been disconnected for an illegal name. Name: " + packet.getName() + " Reason: " + message),false);
-        clientPlayer.close();
+        server.logInfo("{} was disconnected for illegal name. Name: {} Reason: {} ID {}", clientConnection, packet.getName(), message, clientConnection.getUuid().getMostSignificantBits());
+        clientConnection.sendObject(new IllegalConnection("You have been disconnected for an illegal name. Name: " + packet.getName() + " Reason: " + message),false);
+        clientConnection.close();
     }
 }

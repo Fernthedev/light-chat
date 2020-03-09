@@ -1,5 +1,3 @@
 
-Lsquid:S2447”"-Null is returned but a "Boolean" is expected.(¥¹ï8Ôºµã.
-~squid:S00115="ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(ËÓÂ‹ıÿÿÿÿ8³µóâ.
-qsquid:UnusedPrivateMethod‰"?Remove this unused private "getOptionalBooleanProperty" method.(±¡â•øÿÿÿÿ8Ôºµã.
-Lsquid:S2447Œ"-Null is returned but a "Boolean" is expected.(¥¹ï8Ôºµã.
+S
+java:S1133"5Do not forget to remove this deprecated code someday.(´å©¦8Ğ²ËŞ‹.

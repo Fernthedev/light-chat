@@ -15,13 +15,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PlayerHandler implements Runnable {
 
     @Getter
-    private static final Map<Channel, ClientPlayer> channelMap = new ConcurrentHashMap<>();
+    private final Map<Channel, ClientConnection> channelMap = new ConcurrentHashMap<>();
 
     @NonNull
     private Server server;
 
     @Getter
-    private static final Map<UUID, ClientPlayer> uuidMap = new ConcurrentHashMap<>();
+    private final Map<UUID, ClientConnection> uuidMap = new ConcurrentHashMap<>();
 
 
     /**
@@ -37,33 +37,33 @@ public class PlayerHandler implements Runnable {
      */
     @Override
     public void run() {
-        Map<ClientPlayer, TimeoutData> clientPlayerMap = new ConcurrentHashMap<>();
+        Map<ClientConnection, TimeoutData> clientPlayerMap = new ConcurrentHashMap<>();
         while (server.isRunning()) {
-            for (ClientPlayer clientPlayer : channelMap.values()) {
+            for (ClientConnection clientConnection : channelMap.values()) {
 
-                if (!clientPlayerMap.containsKey(clientPlayer)) {
-                    clientPlayerMap.put(clientPlayer, new TimeoutData(0, 0));
+                if (!clientPlayerMap.containsKey(clientConnection)) {
+                    clientPlayerMap.put(clientConnection, new TimeoutData(0, 0));
                 }
 
-                TimeoutData timeoutData = clientPlayerMap.get(clientPlayer);
+                TimeoutData timeoutData = clientPlayerMap.get(clientConnection);
 
                 timeoutData.secondsPassed++;
 
-                if (!clientPlayer.isRegistered() || !clientPlayer.getChannel().isActive()) timeoutData.registerTimeout++;
+                if (!clientConnection.isRegistered() || !clientConnection.getChannel().isActive()) timeoutData.registerTimeout++;
                 else timeoutData.registerTimeout = 0;
 
-                if (timeoutData.registerTimeout >= server.getSettingsManager().getConfigData().getTimeoutTime() / 1000 && !clientPlayer.isRegistered()) {
-                    clientPlayer.sendObject(new SelfMessagePacket(SelfMessagePacket.MessageType.TIMED_OUT_REGISTRATION), false);
+                if (timeoutData.registerTimeout >= server.getSettingsManager().getConfigData().getTimeoutTime() / 1000 && !clientConnection.isRegistered()) {
+                    clientConnection.sendObject(new SelfMessagePacket(SelfMessagePacket.MessageType.TIMED_OUT_REGISTRATION), false);
 
-                    clientPlayer.close();
+                    clientConnection.close();
                 }
 
-                if (!clientPlayer.getChannel().isActive() && timeoutData.registerTimeout >= 30) clientPlayer.close();
+                if (!clientConnection.getChannel().isActive() && timeoutData.registerTimeout >= 30) clientConnection.close();
 
 
 
                 if (timeoutData.secondsPassed >= 5) {
-                    clientPlayer.ping();
+                    clientConnection.ping();
                     timeoutData.secondsPassed = 0;
                 }
             }

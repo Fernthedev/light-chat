@@ -4,6 +4,9 @@ import com.github.fernthedev.config.common.Config;
 import com.github.fernthedev.core.ColorCode;
 import com.github.fernthedev.core.StaticHandler;
 import com.github.fernthedev.core.api.APIUsage;
+import com.github.fernthedev.core.api.ThreadLock;
+import com.github.fernthedev.core.api.event.api.Listener;
+import com.github.fernthedev.core.api.plugin.PluginManager;
 import com.github.fernthedev.core.encryption.codecs.JSONHandler;
 import com.github.fernthedev.core.encryption.codecs.general.gson.EncryptedJSONObjectDecoder;
 import com.github.fernthedev.core.encryption.codecs.general.gson.EncryptedJSONObjectEncoder;
@@ -12,9 +15,10 @@ import com.github.fernthedev.core.packets.SelfMessagePacket;
 import com.github.fernthedev.fernutils.thread.ThreadUtils;
 import com.github.fernthedev.fernutils.thread.single.TaskInfo;
 import com.github.fernthedev.server.api.IPacketHandler;
+import com.github.fernthedev.server.event.ServerShutdownEvent;
+import com.github.fernthedev.server.event.ServerStartupEvent;
 import com.github.fernthedev.server.netty.MulticastServer;
 import com.github.fernthedev.server.netty.ProcessingHandler;
-import com.github.fernthedev.server.plugin.PluginManager;
 import com.github.fernthedev.server.settings.NoFileConfig;
 import com.github.fernthedev.server.settings.ServerSettings;
 import io.netty.bootstrap.ServerBootstrap;
@@ -29,6 +33,7 @@ import io.netty.handler.codec.LineBasedFrameDecoder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import lombok.Synchronized;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
@@ -48,7 +53,6 @@ public class Server implements Runnable {
     @Getter
     private static Logger logger = LoggerFactory.getLogger(Server.class);
 
-    @Getter
     private Thread serverThread;
 
     @Getter
@@ -68,6 +72,43 @@ public class Server implements Runnable {
     private ChannelFuture future;
     private EventLoopGroup bossGroup, workerGroup;
     private ProcessingHandler processingHandler;
+
+    private List<ChannelHandler> channelHandlers = new ArrayList<>();
+
+    @Getter
+    @Setter
+    private int maxPacketId = StaticHandler.DEFAULT_PACKET_ID_MAX;
+
+    /**
+     * @deprecated Might be replaced with {@link ServerShutdownEvent}
+     * Use event system {@link PluginManager#registerEvents(Listener)}
+     *
+     */
+    @Deprecated
+    private List<Runnable> shutdownListeners = new ArrayList<>();
+
+    @Getter
+    private final ThreadLock startupLock = new ThreadLock();
+
+    @Getter
+    private PlayerHandler playerHandler;
+
+    /**
+     * The listener will be called when {@link #shutdownServer()} is called
+     * @param runnable the listener
+     */
+    @APIUsage
+    public void addShutdownListener(Runnable runnable) {
+        shutdownListeners.add(runnable);
+    }
+
+    /**
+     * Add channel handlers for netty functionality
+     */
+    @APIUsage
+    public void addChannelHandler(ChannelHandler channelHandler) {
+        channelHandlers.add(channelHandler);
+    }
 
 
     /**
@@ -96,9 +137,9 @@ public class Server implements Runnable {
 
     public synchronized void sendObjectToAllPlayers(@NonNull Packet packet) {
         new Thread(() -> {
-            for (ClientPlayer clientPlayer : PlayerHandler.getChannelMap().values()) {
-                logger.debug("Sending to all {} to {}", packet.getPacketName(), clientPlayer);
-                clientPlayer.sendObject(packet);
+            for (ClientConnection clientConnection : playerHandler.getChannelMap().values()) {
+                logger.debug("Sending to all {} to {}", packet.getPacketName(), clientConnection);
+                clientConnection.sendObject(packet);
             }
         }).start();
     }
@@ -111,6 +152,10 @@ public class Server implements Runnable {
 
         if (workerGroup != null) workerGroup.shutdownGracefully();
         if (bossGroup != null) bossGroup.shutdownGracefully();
+
+        getPluginManager().callEvent(new ServerShutdownEvent());
+
+        shutdownListeners.parallelStream().forEach(Runnable::run);
     }
 
 
@@ -142,31 +187,33 @@ public class Server implements Runnable {
      */
     @APIUsage
     public void start() {
-        if (serverThread == null) serverThread = Thread.currentThread();
+        synchronized (startupLock) {
+            startupLock.lock();
 
-        if (running) throw new IllegalStateException("Server is already running");
+            if (serverThread == null) serverThread = Thread.currentThread();
 
-        running = true;
-        StaticHandler.displayVersion();
-        List<TaskInfo> tasks = new ArrayList<>();
+            if (running) throw new IllegalStateException("Server is already running");
 
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        check();
+            running = true;
+            StaticHandler.displayVersion();
+            List<TaskInfo> tasks = new ArrayList<>();
+
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+            check();
 
 
+            new Thread(playerHandler = new PlayerHandler(this), "PlayerHandlerThread").start();
 
-        new Thread(new PlayerHandler(this),"PlayerHandlerThread").start();
-
-        tasks.add(ThreadUtils.runAsync(() -> Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            for (ClientPlayer clientPlayer : PlayerHandler.getChannelMap().values()) {
-                if (clientPlayer.getChannel().isOpen()) {
-                    Server.getLogger().info("Gracefully shutting down");
-                    sendObjectToAllPlayers(new SelfMessagePacket(SelfMessagePacket.MessageType.LOST_SERVER_CONNECTION));
-                    clientPlayer.close();
+            tasks.add(ThreadUtils.runAsync(() -> Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                for (ClientConnection clientConnection : playerHandler.getChannelMap().values()) {
+                    if (clientConnection.getChannel().isOpen()) {
+                        Server.getLogger().info("Gracefully shutting down");
+                        sendObjectToAllPlayers(new SelfMessagePacket(SelfMessagePacket.MessageType.LOST_SERVER_CONNECTION));
+                        clientConnection.close();
+                    }
                 }
-            }
-        }))));
+            }))));
 
 
 
@@ -180,35 +227,37 @@ public class Server implements Runnable {
             e.printStackTrace();
         }*/
 
-        tasks.add(ThreadUtils.runAsync(() -> {
-            if (settingsManager.getConfigData().isUseMulticast()) {
-                getLogger().info("Initializing MultiCast Server");
-                try {
-                    multicastServer = new MulticastServer("MultiCast Thread", this, StaticHandler.getMulticastAddress());
-                    multicastServer.start();
-                } catch (IOException e) {
-                    e.printStackTrace();
+            tasks.add(ThreadUtils.runAsync(() -> {
+                if (settingsManager.getConfigData().isUseMulticast()) {
+                    getLogger().info("Initializing MultiCast Server");
+                    try {
+                        multicastServer = new MulticastServer("MultiCast Thread", this, StaticHandler.getMulticastAddress());
+                        multicastServer.start();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        }));
-
-
+            }));
 
 
 //        LoggerManager loggerManager = new LoggerManager();
 //        pluginManager.registerEvents(loggerManager, new ServerPlugin());
 
-        logger.info("Running on [{}]", StaticHandler.OS);
+            logger.info("Running on [{}]", StaticHandler.OS);
 
 
 //        await();
-        tasks.add(ThreadUtils.runAsync(this::initServer));
+            tasks.add(ThreadUtils.runAsync(this::initServer));
 
-        for(TaskInfo taskInfo : tasks) taskInfo.awaitFinish(0);
+            for (TaskInfo taskInfo : tasks) taskInfo.awaitFinish(0);
 
 
+            logger.info("Finished initializing. Took {}ms", stopWatch.getTime(TimeUnit.MILLISECONDS));
 
-        logger.info("Finished initializing. Took {}ms", stopWatch.getTime(TimeUnit.MILLISECONDS));
+            getPluginManager().callEvent(new ServerStartupEvent(true));
+
+            startupLock.notifyAllThreads();
+        }
     }
 
     private void initServer() {
@@ -238,7 +287,7 @@ public class Server implements Runnable {
 
         ServerBootstrap bootstrap = new ServerBootstrap();
 
-        EncryptionKeyFinder keyFinder = new EncryptionKeyFinder();
+        EncryptionKeyFinder keyFinder = new EncryptionKeyFinder(this);
 
         JSONHandler jsonHandler = settingsManager.getConfigData().getCodecEnum().getJsonHandler();
 
@@ -248,12 +297,14 @@ public class Server implements Runnable {
                 .childHandler(new ChannelInitializer<Channel>() {
                     @Override
                     public void initChannel(Channel ch) {
-                        ch.pipeline().addLast("frameDecoder", new LineBasedFrameDecoder(StaticHandler.LINE_LIMIT));
+                        ch.pipeline().addLast("frameDecoder", new LineBasedFrameDecoder(StaticHandler.getLineLimit()));
                         ch.pipeline().addLast("stringDecoder", new EncryptedJSONObjectDecoder(settingsManager.getConfigData().getCharset(), keyFinder, jsonHandler));
 
                         ch.pipeline().addLast("stringEncoder", new EncryptedJSONObjectEncoder(settingsManager.getConfigData().getCharset(), keyFinder, jsonHandler));
 
                         ch.pipeline().addLast(processingHandler);
+
+                        ch.pipeline().addLast(channelHandlers.toArray(new ChannelHandler[0]));
                     }
                 }).option(ChannelOption.SO_BACKLOG, 128)
                 .option(ChannelOption.RCVBUF_ALLOCATOR, new AdaptiveRecvByteBufAllocator(512, 512, 64 * 1024))
@@ -299,6 +350,12 @@ public class Server implements Runnable {
         objects.addAll(Arrays.asList(os));
 
         getLogger().info("[{}] " + o, objects.toArray());
+    }
+
+    @APIUsage
+    @Synchronized
+    public Thread getServerThread() {
+        return serverThread;
     }
 
     public String getName() {

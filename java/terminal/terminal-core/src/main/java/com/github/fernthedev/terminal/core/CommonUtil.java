@@ -3,6 +3,8 @@ package com.github.fernthedev.terminal.core;
 import com.github.fernthedev.core.PacketRegistry;
 import com.github.fernthedev.core.StaticHandler;
 import com.github.fernthedev.terminal.core.packets.MessagePacket;
+import org.apache.commons.lang3.SystemUtils;
+import org.fusesource.jansi.AnsiConsole;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,12 +16,17 @@ import java.util.List;
 public class CommonUtil {
 
     public static void registerTerminalPackets() {
-        PacketRegistry.registerPacketPackageFromPacket(new MessagePacket(""));
+        PacketRegistry.registerPacketPackageFromClass(MessagePacket.class);
     }
 
+    public static void initTerminal() {
+        AnsiConsole.systemInstall();
+        java.util.logging.Logger.getLogger("io.netty").setLevel(java.util.logging.Level.OFF);
+        StaticHandler.setupLoggers();
+    }
 
     public static void startSelfInCmd(String[] args) {
-        if (System.console() == null && !StaticHandler.isDebug()) {
+        if (System.console() == null && !StaticHandler.isDebug() && SystemUtils.IS_OS_WINDOWS) {
 
             String filename = null;
 

@@ -67,7 +67,13 @@ public class PacketRegistry {
         registerPacketPackageFromClass(packet.getClass());
     }
 
-    public static void registerPacketPackageFromClass(Class<?> packet) {
+    /**
+     * Preferably the best choice since it guarantees it will use the package name
+     * from the class rather than manually typing it in.
+     * It's to avoid human errors in code
+     * @param packet
+     */
+    public static void registerPacketPackageFromClass(Class<? extends Packet> packet) {
         registerPacketPackage(packet.getPackage().getName());
     }
 

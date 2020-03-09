@@ -1,10 +1,10 @@
 package com.github.fernthedev.terminal.server;
 
 import com.github.fernthedev.core.ColorCode;
+import com.github.fernthedev.core.api.event.api.Listener;
 import com.github.fernthedev.server.Console;
 import com.github.fernthedev.server.SenderInterface;
 import com.github.fernthedev.server.Server;
-import com.github.fernthedev.server.event.api.Listener;
 import com.github.fernthedev.terminal.server.command.Command;
 import com.github.fernthedev.terminal.server.events.ChatEvent;
 import lombok.NonNull;

@@ -1,9 +1,9 @@
 package com.github.fernthedev.terminal.server.events;
 
+import com.github.fernthedev.core.api.event.api.Cancellable;
+import com.github.fernthedev.core.api.event.api.Event;
+import com.github.fernthedev.core.api.event.api.HandlerList;
 import com.github.fernthedev.server.SenderInterface;
-import com.github.fernthedev.server.event.api.Cancellable;
-import com.github.fernthedev.server.event.api.Event;
-import com.github.fernthedev.server.event.api.HandlerList;
 
 public class ChatEvent extends Event implements Cancellable {
     private boolean cancel = false;
@@ -43,10 +43,10 @@ public class ChatEvent extends Event implements Cancellable {
     }
 
     /**
-     * Gets the cancellation state of this event. A cancelled event will not
+     * Gets the cancellation state of this com.github.fernthedev.client.event. A cancelled com.github.fernthedev.client.event will not
      * be executed in the server, but will still pass to other plugins
      *
-     * @return true if this event is cancelled
+     * @return true if this com.github.fernthedev.client.event is cancelled
      */
     @Override
     public boolean isCancelled() {
@@ -54,10 +54,10 @@ public class ChatEvent extends Event implements Cancellable {
     }
 
     /**
-     * Sets the cancellation state of this event. A cancelled event will not
+     * Sets the cancellation state of this com.github.fernthedev.client.event. A cancelled com.github.fernthedev.client.event will not
      * be executed in the server, but will still pass to other plugins.
      *
-     * @param cancel true if you wish to cancel this event
+     * @param cancel true if you wish to cancel this com.github.fernthedev.client.event
      */
     @Override
     public void setCancelled(boolean cancel) {

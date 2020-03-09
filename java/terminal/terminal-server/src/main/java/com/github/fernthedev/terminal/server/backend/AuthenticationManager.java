@@ -1,15 +1,15 @@
 package com.github.fernthedev.terminal.server.backend;
 
 import com.github.fernthedev.core.ColorCode;
+import com.github.fernthedev.core.api.event.api.EventHandler;
+import com.github.fernthedev.core.api.event.api.Listener;
 import com.github.fernthedev.core.data.HashedPassword;
 import com.github.fernthedev.core.encryption.util.EncryptionUtil;
 import com.github.fernthedev.core.packets.SelfMessagePacket;
-import com.github.fernthedev.server.ClientPlayer;
+import com.github.fernthedev.server.ClientConnection;
 import com.github.fernthedev.server.Console;
 import com.github.fernthedev.server.SenderInterface;
 import com.github.fernthedev.server.Server;
-import com.github.fernthedev.server.event.api.EventHandler;
-import com.github.fernthedev.server.event.api.Listener;
 import com.github.fernthedev.terminal.server.ServerTerminal;
 import com.github.fernthedev.terminal.server.events.ChatEvent;
 
@@ -42,10 +42,10 @@ public class AuthenticationManager implements Listener {
 
 
 
-        if (sender instanceof ClientPlayer) {
+        if (sender instanceof ClientConnection) {
             playerInfo.mode = Mode.AUTHENTICATE;
-            ClientPlayer clientPlayer = (ClientPlayer) sender;
-            clientPlayer.sendObject(new SelfMessagePacket(SelfMessagePacket.MessageType.FILL_PASSWORD),false);
+            ClientConnection clientConnection = (ClientConnection) sender;
+            clientConnection.sendObject(new SelfMessagePacket(SelfMessagePacket.MessageType.FILL_PASSWORD),false);
             ServerTerminal.sendMessage(sender, "Type in password:");
         }
 
@@ -67,8 +67,8 @@ public class AuthenticationManager implements Listener {
             event.setCancelled(true);
             PlayerInfo playerInfo = checking.get(event.getSender());
 
-            if(event.getSender() instanceof ClientPlayer) {
-                ClientPlayer clientPlayer = (ClientPlayer) event.getSender();
+            if(event.getSender() instanceof ClientConnection) {
+                ClientConnection clientConnection = (ClientConnection) event.getSender();
 
                 if(playerInfo.mode == Mode.AUTHENTICATE) {
                     if(server.getSettingsManager().getConfigData().getPassword().equals(event.getMessage())) {
@@ -80,7 +80,7 @@ public class AuthenticationManager implements Listener {
                             ServerTerminal.sendMessage(event.getSender(), ColorCode.RED + "Incorrect password");
                             playerInfo.tries++;
                         }else{
-                            Server.getLogger().warn(event.getSender().getName() + ":" + clientPlayer.getAddress() + " tried to authenticate but failed 2 times");
+                            Server.getLogger().warn(event.getSender().getName() + ":" + clientConnection.getAddress() + " tried to authenticate but failed 2 times");
 //                            LoggerManager.getInstance().log();
                             checking.remove(event.getSender());
                         }
@@ -114,8 +114,8 @@ public class AuthenticationManager implements Listener {
         if(checking.containsKey(sender)) {
             PlayerInfo playerInfo = checking.get(sender);
 
-            if(sender instanceof ClientPlayer) {
-                ClientPlayer clientPlayer = (ClientPlayer) sender;
+            if(sender instanceof ClientConnection) {
+                ClientConnection clientConnection = (ClientConnection) sender;
                 if(playerInfo.mode == Mode.AUTHENTICATE) {
 
                     String rightPass = EncryptionUtil.makeSHA256Hash(server.getSettingsManager().getConfigData().getPassword());
@@ -129,7 +129,7 @@ public class AuthenticationManager implements Listener {
                             sender.sendPacket(new SelfMessagePacket(SelfMessagePacket.MessageType.INCORRECT_PASSWORD_ATTEMPT));
                             playerInfo.tries++;
                         } else {
-                            Server.getLogger().warn("{}:{} tried to authenticate but failed 2 times", sender.getName(), clientPlayer.getAddress());
+                            Server.getLogger().warn("{}:{} tried to authenticate but failed 2 times", sender.getName(), clientConnection.getAddress());
                             sender.sendPacket(new SelfMessagePacket(SelfMessagePacket.MessageType.INCORRECT_PASSWORD_FAILURE));
                             checking.remove(sender);
                         }

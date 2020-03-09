@@ -1,11 +1,11 @@
 package com.github.fernthedev.server.api;
 
 import com.github.fernthedev.core.packets.Packet;
-import com.github.fernthedev.server.ClientPlayer;
+import com.github.fernthedev.server.ClientConnection;
 
 @FunctionalInterface
 public interface IPacketHandler {
 
-    void handlePacket(Packet packet, ClientPlayer clientPlayer);
+    void handlePacket(Packet packet, ClientConnection clientConnection, int packetId);
 
 }

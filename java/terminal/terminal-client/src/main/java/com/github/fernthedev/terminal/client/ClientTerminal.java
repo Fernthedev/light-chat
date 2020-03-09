@@ -14,14 +14,12 @@ import lombok.Getter;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.fusesource.jansi.AnsiConsole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.logging.Level;
 
 public class ClientTerminal {
 
@@ -33,9 +31,7 @@ public class ClientTerminal {
     private static Client client;
 
     public static void main(String[] args) {
-        AnsiConsole.systemInstall();
-        java.util.logging.Logger.getLogger("io.netty").setLevel(Level.OFF);
-        StaticHandler.setupLoggers();
+        CommonUtil.initTerminal();
 
         String host = null;
         int port = -1;
@@ -107,7 +103,9 @@ public class ClientTerminal {
 
         ConsoleHandler.startConsoleHandlerAsync((TermCore) StaticHandler.getCore(), autoCompleteHandler);
 
-        client.addPacketHandler(new PacketHandler());
+        PacketHandler packetHandler = new PacketHandler();
+        client.addPacketHandler(packetHandler);
+        client.getPluginManager().registerEvents(packetHandler);
 
         try {
             client.connect();

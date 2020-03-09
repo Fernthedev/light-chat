@@ -4,14 +4,14 @@ import com.github.fernthedev.core.StaticHandler;
 import com.github.fernthedev.core.packets.Packet;
 import com.github.fernthedev.core.packets.handshake.ConnectedPacket;
 import com.github.fernthedev.core.packets.handshake.InitialHandshakePacket;
-import com.github.fernthedev.server.ClientPlayer;
+import com.github.fernthedev.server.ClientConnection;
 import com.github.fernthedev.server.EventListener;
-import com.github.fernthedev.server.PlayerHandler;
 import com.github.fernthedev.server.Server;
 import com.github.fernthedev.server.event.PlayerDisconnectEvent;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -26,19 +26,20 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) {
-        ClientPlayer clientPlayer = PlayerHandler.getChannelMap().get(ctx.channel());
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        ClientConnection clientConnection = server.getPlayerHandler().getChannelMap().get(ctx.channel());
 
-        if (clientPlayer == null) return;
+        if (clientConnection == null) return;
 
-        if (PlayerHandler.getUuidMap().containsValue(clientPlayer) && ctx.isRemoved()) {
+        if (server.getPlayerHandler().getUuidMap().containsValue(clientConnection) && ctx.isRemoved()) {
 
 
-            PlayerHandler.getUuidMap().remove(clientPlayer.getUuid());
-            clientPlayer.close();
+            server.getPlayerHandler().getUuidMap().remove(clientConnection.getUuid());
+            clientConnection.close();
         }
 
-        //clientPlayer.close();
+        super.channelInactive(ctx);
+        //clientConnection.close();
     }
 
     /**
@@ -56,57 +57,61 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         if (cause instanceof IOException || cause.getCause() instanceof IOException) {
             Server.getLogger().info("The channel {} has been closed from the client side.", ctx.channel());
 
-            ClientPlayer clientPlayer = PlayerHandler.getChannelMap().get(ctx.channel());
+            ClientConnection clientConnection = server.getPlayerHandler().getChannelMap().get(ctx.channel());
 
-            if (clientPlayer == null) return;
+            if (clientConnection == null) return;
 
-            if (clientPlayer.getName() != null && clientPlayer.isRegistered()) {
-                server.getPluginManager().callEvent(new PlayerDisconnectEvent(clientPlayer));
-                server.logInfo("[{}] has disconnected from the server", clientPlayer.getName());
+            if (clientConnection.getName() != null && clientConnection.isRegistered()) {
+                server.getPluginManager().callEvent(new PlayerDisconnectEvent(clientConnection));
+                server.logInfo("[{}] has disconnected from the server", clientConnection.getName());
             }
 
-            if (PlayerHandler.getUuidMap().containsValue(clientPlayer)) {
+            if (server.getPlayerHandler().getUuidMap().containsValue(clientConnection)) {
 
 
-                PlayerHandler.getUuidMap().remove(clientPlayer.getUuid());
-                clientPlayer.close();
+                server.getPlayerHandler().getUuidMap().remove(clientConnection.getUuid());
+                clientConnection.close();
             }
         } else super.exceptionCaught(ctx, cause);
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 
         try {
 
-            EventListener eventListener = PlayerHandler.getChannelMap().get(ctx.channel()).getEventListener();
+            EventListener eventListener = server.getPlayerHandler().getChannelMap().get(ctx.channel()).getEventListener();
 
-            if (msg instanceof ConnectedPacket) {
-                eventListener.handleConnect((ConnectedPacket) msg);
-            } else {
-                if (!PlayerHandler.getChannelMap().containsKey(ctx.channel())) {
-                    // Discard the received data silently.
-                    ((ByteBuf) msg).release();
+            if (msg instanceof Pair) {
+                Pair<? extends Packet, Integer> pair = (Pair<? extends Packet, Integer>) msg;
+                if (pair.getKey() instanceof ConnectedPacket) {
+                    eventListener.handleConnect((ConnectedPacket) pair.getKey());
+                } else {
+                    if (!server.getPlayerHandler().getChannelMap().containsKey(ctx.channel())) {
+                        // Discard the received data silently.
+                        ((ByteBuf) msg).release();
 
-                } else if (msg instanceof Packet) {
-                    StaticHandler.getCore().getLogger().debug("Received the packet {} from {}", ((Packet) msg).getPacketName(), ctx.channel());
-                    eventListener.received((Packet) msg);
+                    } else if (pair.getKey() != null) {
+                        StaticHandler.getCore().getLogger().debug("Received the packet {} from {}", pair.getLeft().getPacketName(), ctx.channel());
+                        eventListener.received(pair.getKey(), pair.getRight());
+                    }
                 }
             }
-
         } finally {
             ReferenceCountUtil.release(msg);
         }
+        super.channelRead(ctx, msg);
     }
 
     @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) {
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         ctx.flush();
         ctx.fireChannelReadComplete();
+        super.channelReadComplete(ctx);
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) {
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
         if (!ctx.channel().isActive()) {
             ctx.close();
         }
@@ -118,25 +123,27 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
             UUID uuid = UUID.randomUUID();
 
             // Prevent duplicate UUIDs
-            while (PlayerHandler.getUuidMap().containsKey(uuid)) {
+            while (server.getPlayerHandler().getUuidMap().containsKey(uuid)) {
                 uuid = UUID.randomUUID();
             }
 
-            ClientPlayer clientPlayer = new ClientPlayer(server, channel, uuid);
+            ClientConnection clientConnection = new ClientConnection(server, channel, uuid);
 
-            //Server.getLogger().info("Registering " + clientPlayer.getNameAddress());
+            //Server.getLogger().info("Registering " + clientConnection.getNameAddress());
 
-            PlayerHandler.getChannelMap().put(channel, clientPlayer);
+            server.getPlayerHandler().getChannelMap().put(channel, clientConnection);
 
-            clientPlayer.awaitKeys();
+            clientConnection.awaitKeys();
 
-            clientPlayer.sendObject(new InitialHandshakePacket(clientPlayer.getTempKeyPair().getPublic(), StaticHandler.getVERSION_DATA()), false);
+            clientConnection.sendObject(new InitialHandshakePacket(clientConnection.getTempKeyPair().getPublic(), StaticHandler.getVERSION_DATA()), false);
 
-            Server.getLogger().info("[{}] established", clientPlayer.getAddress());
+            Server.getLogger().info("[{}] established", clientConnection.getAddress());
         } else {
             Server.getLogger().info("Channel is null");
             throw new NullPointerException();
         }
+
+        super.channelActive(ctx);
     }
 
 }

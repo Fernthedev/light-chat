@@ -64,9 +64,9 @@ public class ServerCommandHandler {
                     ServerTerminal.sendMessage(sender, "Exiting");
                     server.shutdownServer();
                     System.exit(0);
-                } else if (sender instanceof ClientPlayer) {
-                    ClientPlayer clientPlayer = (ClientPlayer) sender;
-                    clientPlayer.close();
+                } else if (sender instanceof ClientConnection) {
+                    ClientConnection clientConnection = (ClientConnection) sender;
+                    clientConnection.close();
                 }
             }
         }).setUsage("Safely closes the server.");
@@ -103,12 +103,12 @@ public class ServerCommandHandler {
             @Override
             public void onCommand(SenderInterface sender, String[] args) {
                 if (sender instanceof Console) {
-                    ClientPlayer.pingAll();
+                    server.getPlayerHandler().getChannelMap().forEach((channel, connection) -> connection.ping());
                 }
 
-                if (sender instanceof ClientPlayer) {
-                    ClientPlayer clientPlayer = (ClientPlayer) sender;
-                    clientPlayer.ping();
+                if (sender instanceof ClientConnection) {
+                    ClientConnection clientConnection = (ClientConnection) sender;
+                    clientConnection.ping();
                 }
             }
         }).setUsage("Sends a ping packet to all clients");
@@ -117,22 +117,22 @@ public class ServerCommandHandler {
             @Override
             public void onCommand(SenderInterface sender, String[] args) {
                 if (sender instanceof Console) {
-                    ServerTerminal.sendMessage(sender, "Players: (" + (PlayerHandler.getUuidMap().size()) + ")");
+                    ServerTerminal.sendMessage(sender, "Players: (" + (server.getPlayerHandler().getUuidMap().size()) + ")");
 
-                    for (ClientPlayer clientPlayer : new HashMap<>(PlayerHandler.getChannelMap()).values()) {
-                        ServerTerminal.sendMessage(sender, clientPlayer.getName() + " :" + clientPlayer.getUuid() + " { " + clientPlayer.getAddress() + "} Ping:" + clientPlayer.getPingDelay(TimeUnit.MILLISECONDS) + "ms");
+                    for (ClientConnection clientConnection : new HashMap<>(server.getPlayerHandler().getChannelMap()).values()) {
+                        ServerTerminal.sendMessage(sender, clientConnection.getName() + " :" + clientConnection.getUuid() + " { " + clientConnection.getAddress() + "} Ping:" + clientConnection.getPingDelay(TimeUnit.MILLISECONDS) + "ms");
                     }
                 }
 
-                if (sender instanceof ClientPlayer) {
-                    String message = "Players: (" + (PlayerHandler.getUuidMap().size() - 1) + ")";
+                if (sender instanceof ClientConnection) {
+                    String message = "Players: (" + (server.getPlayerHandler().getUuidMap().size() - 1) + ")";
 
-                    for (ClientPlayer clientPlayer : new HashMap<>(PlayerHandler.getChannelMap()).values()) {
-                        if (clientPlayer == null) continue;
+                    for (ClientConnection clientConnection : new HashMap<>(server.getPlayerHandler().getChannelMap()).values()) {
+                        if (clientConnection == null) continue;
 
-                        message = "\n" + clientPlayer.getName() + " Ping:" + clientPlayer.getPingDelay(TimeUnit.MILLISECONDS) + "ms";
+                        message = "\n" + clientConnection.getName() + " Ping:" + clientConnection.getPingDelay(TimeUnit.MILLISECONDS) + "ms";
 
-                        // ServerTerminal.sendMessage(sender, clientPlayer.getName() + " :" + clientPlayer.getId() + " Ping:" + clientPlayer.getDelayTime() + "ms");
+                        // ServerTerminal.sendMessage(sender, clientConnection.getName() + " :" + clientConnection.getId() + " Ping:" + clientConnection.getDelayTime() + "ms");
                     }
 
                     ServerTerminal.sendMessage(sender, message);
@@ -141,7 +141,7 @@ public class ServerCommandHandler {
 
         }).setUsage("Lists all players with ip, id and name");
 
-        ServerTerminal.registerCommand(new KickCommand("kick"));
+        ServerTerminal.registerCommand(new KickCommand("kick", server));
 
         ServerTerminal.registerCommand(new Command("ban") {
             @Override
@@ -154,8 +154,8 @@ public class ServerCommandHandler {
                         final String[] argName = {""};
                         Arrays.stream(args).forEachOrdered(s -> argName[0] += s);
 
-                        for (ClientPlayer clientPlayer : new HashMap<>(PlayerHandler.getChannelMap()).values()) {
-                            if (clientPlayer.getName().equals(argName[0])) {
+                        for (ClientConnection clientConnection : new HashMap<>(server.getPlayerHandler().getChannelMap()).values()) {
+                            if (clientConnection.getName().equals(argName[0])) {
 
 
                                 StringBuilder message = new StringBuilder();
@@ -169,10 +169,10 @@ public class ServerCommandHandler {
                                     }
                                 }
 
-                                ServerTerminal.getBanManager().addBan(clientPlayer, new BannedData(clientPlayer.getAddress()));
+                                ServerTerminal.getBanManager().addBan(clientConnection, new BannedData(clientConnection.getAddress()));
 
-                                clientPlayer.sendObject(new MessagePacket("Banned: " + message));
-                                clientPlayer.close();
+                                clientConnection.sendObject(new MessagePacket("Banned: " + message));
+                                clientConnection.close();
                                 break;
                             }
                         }

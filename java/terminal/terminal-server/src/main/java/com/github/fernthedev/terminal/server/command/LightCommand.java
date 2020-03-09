@@ -1,7 +1,7 @@
 package com.github.fernthedev.terminal.server.command;
 
 import com.github.fernthedev.light.LightFileFormatter;
-import com.github.fernthedev.server.ClientPlayer;
+import com.github.fernthedev.server.ClientConnection;
 import com.github.fernthedev.server.Console;
 import com.github.fernthedev.server.SenderInterface;
 import com.github.fernthedev.server.Server;
@@ -27,7 +27,7 @@ public class LightCommand extends Command implements TabExecutor {
         if(args.length > 0) {
             boolean authenticated = false;
 
-            if(sender instanceof ClientPlayer) {
+            if(sender instanceof ClientConnection) {
                 authenticated = ServerTerminal.getAuthenticationManager().authenticate(sender);
             }
 

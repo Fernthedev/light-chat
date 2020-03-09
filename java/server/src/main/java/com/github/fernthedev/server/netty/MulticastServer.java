@@ -3,7 +3,6 @@ package com.github.fernthedev.server.netty;
 
 import com.github.fernthedev.core.MulticastData;
 import com.github.fernthedev.core.StaticHandler;
-import com.github.fernthedev.server.PlayerHandler;
 import com.github.fernthedev.server.Server;
 import com.google.gson.Gson;
 
@@ -44,7 +43,7 @@ public class MulticastServer extends QuoteServerThread {
                 byte[] buf;
                 // don't wait for request...just send a quote
 
-                MulticastData dataSend = new MulticastData(server.getPort(), StaticHandler.getVERSION_DATA().getVariablesJSON().getVersion(), StaticHandler.getVERSION_DATA().getVariablesJSON().getMinVersion(), PlayerHandler.getUuidMap().size());
+                MulticastData dataSend = new MulticastData(server.getPort(), StaticHandler.getVERSION_DATA().getVariablesJSON().getVersion(), StaticHandler.getVERSION_DATA().getVariablesJSON().getMinVersion(), server.getPlayerHandler().getUuidMap().size());
 
                 buf = new Gson().toJson(dataSend).getBytes();
 

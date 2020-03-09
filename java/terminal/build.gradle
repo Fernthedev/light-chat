@@ -5,10 +5,10 @@
 //plugins {
 //    id 'application'
 //}
-//apply plugin: 'com.github.johnrengelman.shadow'
+//apply com.github.fernthedev.client.plugin: 'com.github.johnrengelman.shadow'
 
 subprojects {
-//    apply plugin: 'application'
+//    apply com.github.fernthedev.client.plugin: 'application'
     group = "${project.parent.group}.terminal"
     version = "1.0.0-$protocol_ver"
 

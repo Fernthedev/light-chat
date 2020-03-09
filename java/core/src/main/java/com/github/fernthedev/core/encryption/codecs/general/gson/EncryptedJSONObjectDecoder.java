@@ -1,7 +1,6 @@
 package com.github.fernthedev.core.encryption.codecs.general.gson;
 
 import com.github.fernthedev.core.PacketRegistry;
-import com.github.fernthedev.core.StaticHandler;
 import com.github.fernthedev.core.encryption.EncryptedBytes;
 import com.github.fernthedev.core.encryption.EncryptedPacketWrapper;
 import com.github.fernthedev.core.encryption.PacketWrapper;
@@ -15,6 +14,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.string.StringDecoder;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.Charset;
@@ -66,7 +67,7 @@ public class EncryptedJSONObjectDecoder extends StringDecoder {
         super.decode(ctx, msg, tempDecodeList);
 
         String decodedStr = (String) tempDecodeList.get(0);
-        StaticHandler.getCore().getLogger().debug("Decoding the string {}", decodedStr);
+//        StaticHandler.getCore().getLogger().debug("Decoding the string {}", decodedStr);
         PacketWrapper<?> packetWrapper = jsonHandler.fromJson(decodedStr, PacketWrapper.class);
 
         String decryptedJSON;
@@ -85,7 +86,7 @@ public class EncryptedJSONObjectDecoder extends StringDecoder {
             throw new IllegalArgumentException("Unable to parse string: " + decodedStr, e);
         }
 
-        out.add(getParsedObject(packetWrapper.getPacketIdentifier(), decryptedJSON));
+        out.add(getParsedObject(packetWrapper.getPacketIdentifier(), decryptedJSON, packetWrapper.getPacketId()));
     }
 
     /**
@@ -94,11 +95,11 @@ public class EncryptedJSONObjectDecoder extends StringDecoder {
      * @param jsonObject
      * @return
      */
-    public Object getParsedObject(String packetIdentifier, String jsonObject) {
+    public Pair<? extends Packet, Integer> getParsedObject(String packetIdentifier, String jsonObject, int packetId) {
         Class<? extends Packet> aClass = PacketRegistry.getPacketClassFromRegistry(packetIdentifier);
 
         try {
-            return jsonHandler.fromJson(jsonObject, aClass);
+            return new ImmutablePair<>(jsonHandler.fromJson(jsonObject, aClass), packetId);
         } catch (Exception e) {
             throw new IllegalArgumentException("Attempting to parse packet " + packetIdentifier + " (" + aClass.getName() + ") with string\n" + jsonObject, e);
         }

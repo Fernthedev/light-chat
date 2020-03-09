@@ -2,14 +2,15 @@ package com.github.fernthedev.client.netty;
 
 import com.github.fernthedev.client.Client;
 import com.github.fernthedev.client.EventListener;
+import com.github.fernthedev.client.event.ServerConnectFinishEvent;
+import com.github.fernthedev.client.event.ServerDisconnectEvent;
 import com.github.fernthedev.core.StaticHandler;
 import com.github.fernthedev.core.packets.Packet;
-import com.github.fernthedev.core.packets.handshake.ConnectedPacket;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.*;
 import io.netty.handler.timeout.ReadTimeoutException;
-import lombok.Getter;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.io.IOException;
 
 @ChannelHandler.Sharable
 public class ClientHandler extends ChannelInboundHandlerAdapter {
@@ -18,27 +19,35 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
     protected Client client;
 
-    @Getter
-    protected ConnectedPacket connectedPacket;
-
     public ClientHandler(Client client, EventListener listener) {
         this.listener = listener;
         this.client = client;
-        String os = client.getOSName();
+    }
 
-        connectedPacket = new ConnectedPacket(client.getName(), os, StaticHandler.getVERSION_DATA());
+    /**
+     * Calls {@link ChannelHandlerContext#fireChannelRegistered()} to forward
+     * to the next {@link ChannelInboundHandler} in the {@link ChannelPipeline}.
+     * <p>
+     * Sub-classes may override this method to change behavior.
+     *
+     * @param ctx
+     */
+    @Override
+    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+        client.getPluginManager().callEvent(new ServerConnectFinishEvent(ctx.channel()));
+        super.channelRegistered(ctx);
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        Packet packet;
+        Pair<Packet, Integer> packet;
 
         StaticHandler.getCore().getLogger().debug("Received the packet {} from {}", msg.getClass().getName(), ctx.channel());
 
-        if (msg instanceof Packet) {
-            packet = (Packet) msg;
+        if (msg instanceof Pair) {
+            packet = (Pair<Packet, Integer>) msg;
 
-            listener.received(packet);
+            listener.received(packet.getKey(), packet.getValue());
 
         }
 
@@ -49,7 +58,9 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
         client.getLoggerInterface().info("Lost connection to server.");
-        client.close();
+
+        client.disconnect(ServerDisconnectEvent.DisconnectStatus.CONNECTION_LOST);
+
         super.channelUnregistered(ctx);
     }
 
@@ -60,10 +71,14 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
             if (StaticHandler.isDebug()) StaticHandler.getCore().getLogger().error(cause.getMessage(), cause);
 
-            client.close();
+            client.disconnect(ServerDisconnectEvent.DisconnectStatus.TIMEOUT);
+        } else if (cause instanceof IOException) {
+            client.disconnect(ServerDisconnectEvent.DisconnectStatus.EXCEPTION);
+            cause.printStackTrace();
         } else {
             cause.printStackTrace();
         }
+
         super.exceptionCaught(ctx, cause);
     }
 }
