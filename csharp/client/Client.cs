@@ -96,10 +96,10 @@ namespace com.github.fernthedev.lightchat.client
             {
                 encoder.Encode(packet, outList);
             } else {
-                encoder.Encode(new UnencryptedPacketWrapper(packet), outList);
+                encoder.Encode(new UnencryptedPacketWrapper(packet, -1 /* TODO: Insert packet id implemantion (Follow Java implementation)*/), outList);
             }
            
-            outList.ForEach(o => Write(o));
+            outList.ForEach(o => Write(o as byte[]));
         }
 
         public void close()

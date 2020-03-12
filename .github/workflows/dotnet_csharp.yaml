@@ -1,12 +1,26 @@
-name: .NET C# ci
+name: .NET C# CI
 
 on: [push]
 
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        include:
+          - os: ubuntu-latest
+            output-name: client-linux
+            and: '&&'
+          - os: macOS-latest
+            output-name: client-mac
+            and: '&&'
+          - os: windows-latest
+            output-name: client-windows.exe
+            and: ';'
+    
     steps:
     - uses: actions/checkout@v1
     - name: Setup .NET Core
@@ -14,4 +28,4 @@ jobs:
       with:
         dotnet-version: 2.2.108
     - name: Build with dotnet
-      run: cd csharp && dotnet build --configuration Release
+      run: cd csharp/client ${{ matrix.and }} dotnet build --configuration Release

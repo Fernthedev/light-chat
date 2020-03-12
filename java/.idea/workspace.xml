@@ -2,204 +2,24 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="74a9c842-9768-484a-b6c1-feb6a74ad587" name="Default Changelist" comment="- Decoupling Client and Server to become it's own standalone API and terminal support and other features are being moved to terminal module">
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/0/8/082876ac13535380fab7c2fc93538372f38ece0a" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/0/c/0c146214222e74623304f3c68afbf7617ddec411" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/0/c/0ca69618a51a2053ca624f5c4825d6a3d4ae7b3c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/0/d/0d71ce93410c57b4f8001931cdd9bd95fcee0d23" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/7/17b159ec9ca77d7eef95fa3890fc20bf7e9ba0a4" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/8/1874a2d6124a681f76ed07d727d8e75b43de6afc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/a/1a7b5db576445500dca08ebaef9b2047913d950d" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/b/1b294fa53abc0efaaa59958e15d3cc3108125287" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/d/1d93f43f947e3f8c2b6ed27a31731c610ed914be" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/2/1/210c9176ce673a101ecf9b1add3a8ba96626dab1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/2/4/242b7c277c259035641da6b54729821e8cdce50b" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/2/7/271e951b8b92702cb0388c0515fec5f417f163fb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/2/7/2720a793de9184c0983a40c25d7e694a25c4dbc1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/3/2/32ce4758d457dbfed975c6654c87e8c45d1a98d5" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/3/4/342515e00046cea71f5177af6de4779778447ba0" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/3/5/35e427890d3a4afb8a68ebaa972cabfe27563376" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/3/a/3a4ca36b41132e5be9ab0fa9fdfd5671621cc73c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/3/a/3a8a3fa45b8e1b7106cea4865c7390c07e975524" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/3/c/3cfbb7934821724d2f6dc15bcbc3ddd33be05061" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/4/8/487073280d48901aba99cc716724449c3ef221d5" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/4/8/48a038d33548ae3bca11043c4d093607546e9923" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/4/a/4a5a1611f75de46b632437bf7cd66033891a0c21" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/4/c/4c71f2b319eede16f4081a0ef5bc44d8f6bc1b9c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/5/4/5404ffde61b9c4974e3432bf5b47f010a1687832" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/5/5/555ea2072b296c626e9f54a86be0baa8b7a12cbf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/5/f/5fbd2c0d732ff7cbd0538fc9cae5d27317419d3e" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/6/5/65388e2ed66ac55fc97ae6181aee34c92496f8ab" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/6/9/69b0da5b805f1ea92a85fb6510ff2c571cb6f5cf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/6/d/6daddc0662283539f0a995c10788aed29c9b532f" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/7/8/785df942c37ae041116b49c567cf0dd9de36fbad" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/7/d/7d6e002bf0ca62f0a1aa5f847d4666b282fc4a10" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/7/e/7e5959704e53d0038b352e2812f7d33cf5996210" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/7/e/7eaecd9fdef52e4d84cb2dd27b59378e6d248914" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/0/801dfd94806122d5552ee0bbbe22481234522d02" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/0/80423b35b19a3dcef8b2a34725b2d8fd5ec4fc66" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/0/807d2cc43275f2fc2f0719316d4375e1f199577f" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/0/80db0a63c13fa8484510c896598a78635accaf0e" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/7/875f3d9f7bf4cdec1616d9b99cea219eb892f26c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/8/8892f5f7970842b2a15f36623c8074f738d37c18" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/d/8db8e5204baab15938a1f6c0735847fb4f4d2ef2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/f/8f953378499520004836b525f082840ad6889bd1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/9/2/9216de389b137ab6c8fa59217165942f7c713845" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/9/2/927611e1396f133af8c0425ec8ff33c88bf002dc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/9/3/935d6a703fc552c3481defbaef332308fb359576" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/9/5/95d480eb456a9c1f1d6d87e86ce09a229a23ed85" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/9/6/9699706405c58a0b99ed807425c4be3de0ed1b65" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/9/7/97de52feb2dfebecdd562a91bb2cb1527ccc69ff" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/9/9/99fbe49b4e40d92c5b8b061530442622d7464f60" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/9/c/9caba48d204dd3bbb1a83abe32ef08e9b6985aeb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/a/4/a4f38d4a0b2bcfed2e064aa32f92fe3daa41f7f0" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/a/6/a6b3e28f838366247ffa58bdb036a55b39cfe3d4" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/b/2/b2ea469437f8add9c14f4f97c723aebc0d0453fd" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/b/3/b3ffbf5016bcec9d4f529534dca1d6cabcb7381a" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/b/9/b99e147da1cf74eef294475354863650feeb01b1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/b/a/ba3e3d277d4815cd7e798158e5e755a500e6bd44" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/b/b/bb1a1b5b8fdaa7848141000e871bb5e3bfeea9ec" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/c/1/c1a87b241bb9bf9c24dc5f213240af7d588f79cd" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/c/5/c5586f42724c8a1ffef45138e53dc207919d983f" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/c/7/c7ba7ff69f85d84cf0142489d1b5328bb5adde2e" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/c/b/cb7461413ce2481b9b3941ee38d326fc8f47620e" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/c/b/cbecc2707cc71068f8cbc2ec65f57d8ea317b45f" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/c/e/ce2cb49fc3d016b6045252e17f28014543887beb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/d/1/d11f890a961f14b5518ffa54aa9b28d1914df2e6" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/d/c/dc22cee0f4a19a9af848ef511c57555f144fb94a" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/d/e/de0d45da2b8f16ea8999996095f3bc1f4ae4fccd" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/d/e/de4067fb02c40250c3b7d908cb92e5818119fef6" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/e/1/e142265644bed8d12c37967eb664b16bc3aac1eb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/e/2/e2234e4d7e6078f1694b81a719aae289e9eacf2a" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/e/e/ee9ced3bd1b06dc01c8ac26b35e12ff2c1f74602" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/e/f/ef0d18187845b275c3b6fb4b826e89b49d37bef1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/e/f/ef865c4e7e4a574ef231b317b0d313183356202f" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/3/f316f970732356305cb722554f50fb2f9b4f363b" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/5/f565b2421dbc8181f162427240946892028b1e49" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/5/f58520bbccee20dc98403ec4329ceaa42726fc1d" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/b/fb83b9a71fe42476ec664aa41b7e4cb030e652c0" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/b/fbec5a24cc65a7cef043a966e8419e28d76eca82" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/c/fc1aaf257a7eb7916911577ae8bb460d90f5d3e5" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/e/fe5ec54b977a8fe14f69c06779dd0ecdaa35d9bf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/event/ServerConnectFinishEvent.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/event/ServerConnectHandshakeEvent.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/event/ServerDisconnectEvent.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/ThreadLock.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/event/api/Cancellable.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/event/api/Event.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/PluginLoadOrder.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/functional/EventListenerFunction.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/latency/LatencyPacket.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/event/ServerShutdownEvent.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/event/ServerStartupEvent.java" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/terminal/banned.json" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/terminal/settings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/cache.properties" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/cache.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/workspace-id.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/workspace-id.txt.lock" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/0/7/078b8d36db9499ff209f6791bad1924ab9c43142" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/0/7/078b8d36db9499ff209f6791bad1924ab9c43142" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/0/c/0c383b11480622e7722e89e5967ff47f1a82e523" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/0/c/0c383b11480622e7722e89e5967ff47f1a82e523" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/1/112190cd7a957f36bef860cbe9328574421a5d96" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/1/112190cd7a957f36bef860cbe9328574421a5d96" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/2/12b320c91431ae2ce2a3a7bddaa13db13cb23216" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/2/12b320c91431ae2ce2a3a7bddaa13db13cb23216" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/8/183218f5c2a1272d6bcfdde5bbd0961764fc82ea" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/8/183218f5c2a1272d6bcfdde5bbd0961764fc82ea" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/d/1d62d92bada34e9582c63d34bb896b8abddf92ba" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/d/1d62d92bada34e9582c63d34bb896b8abddf92ba" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/2/6/269ef774062d5a5b90f27decbbdf6a90d1c7fd98" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/4/1/416b7f7b093e4534d27020a02ef0c4778d700331" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/5/0/5090d0f397b2ba9d25e4c686dca71f0ba40b17a2" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/5/0/5090d0f397b2ba9d25e4c686dca71f0ba40b17a2" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/5/7/571b621a507586299777c5feb1a605e986ae6040" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/5/7/571b621a507586299777c5feb1a605e986ae6040" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/6/4/6425b56f3691a96a38c8b63f6c69ca497ddecb82" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/6/4/6425b56f3691a96a38c8b63f6c69ca497ddecb82" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/7/5/75f4c3fbf8518ffbc54e770587c6143b0936b2e9" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/c/8cc0b216a9b77bd1e52bd820f61be0f590f48854" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/c/8cc0b216a9b77bd1e52bd820f61be0f590f48854" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/a/3/a32db5d4ce0c450f37a33a40b9582084f8d2f061" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/a/7/a78f0ac1573186e7c6bd6c9ad03b8825223ce767" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/a/7/a78f0ac1573186e7c6bd6c9ad03b8825223ce767" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/a/b/ab508ca9a84b1b6631d209e3b570c5a56eccc75f" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/a/f/af4213104951442ee31d8ca165c0a92746a5ced4" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/c/0/c036605a4e35940091a73947439856d0e02613fe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/c/4/c46250d0811c02408657a23815062cf86a7b248a" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/c/4/c4a46e5dda63da22945137a4f0a5d0ae703a399e" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/c/4/c4a46e5dda63da22945137a4f0a5d0ae703a399e" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/d/c/dc84eda248bcc582fcecf621708959d79179072b" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/d/c/dc84eda248bcc582fcecf621708959d79179072b" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/e/5/e5e8610982f37efa6046e94060f264e2e310fcd1" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/6/f679f3dca19f76305f8a44f20df3f1faa6831d9f" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/7/f7121d2b27d2aedfc2d25f688c157a111e292b94" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/7/f78d4bb5f1fac45ffbd1f8b12d29232e918a5c41" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/7/f78d4bb5f1fac45ffbd1f8b12d29232e918a5c41" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/f/fffb0d9b2550a43e2971077075c0c4519af984ec" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/d/1d93f43f947e3f8c2b6ed27a31731c610ed914be" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/d/1d93f43f947e3f8c2b6ed27a31731c610ed914be" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/3/a/3a8a3fa45b8e1b7106cea4865c7390c07e975524" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/0/80db0a63c13fa8484510c896598a78635accaf0e" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/0/80db0a63c13fa8484510c896598a78635accaf0e" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/b/a/ba3e3d277d4815cd7e798158e5e755a500e6bd44" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/b/b/bb1a1b5b8fdaa7848141000e871bb5e3bfeea9ec" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/c/b/cbecc2707cc71068f8cbc2ec65f57d8ea317b45f" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/c/b/cbecc2707cc71068f8cbc2ec65f57d8ea317b45f" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/d/1/d11f890a961f14b5518ffa54aa9b28d1914df2e6" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/d/1/d11f890a961f14b5518ffa54aa9b28d1914df2e6" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/e/1/e142265644bed8d12c37967eb664b16bc3aac1eb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/e/1/e142265644bed8d12c37967eb664b16bc3aac1eb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/b/fb83b9a71fe42476ec664aa41b7e4cb030e652c0" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/b/fb83b9a71fe42476ec664aa41b7e4cb030e652c0" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/c/fc1aaf257a7eb7916911577ae8bb460d90f5d3e5" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/Client.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/ClientCore.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/ClientCore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/EventListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/EventListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/api/IPacketHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/api/IPacketHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/netty/ClientHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/netty/ClientHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/PacketRegistry.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/PacketRegistry.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/StaticHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/StaticHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/EncryptedPacketWrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/EncryptedPacketWrapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/PacketWrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/PacketWrapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/RSA/IEncryptionKeyHolder.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/RSA/IEncryptionKeyHolder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/UnencryptedPacketWrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/UnencryptedPacketWrapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/deprecated/fastjson/EncryptedFastJSONObjectDecoder.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/deprecated/fastjson/EncryptedFastJSONObjectDecoder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/deprecated/fastjson/EncryptedFastJSONObjectEncoder.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/deprecated/fastjson/EncryptedFastJSONObjectEncoder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/deprecated/gson/EncryptedGSONObjectDecoder.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/deprecated/gson/EncryptedGSONObjectDecoder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/deprecated/gson/EncryptedGSONObjectEncoder.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/deprecated/gson/EncryptedGSONObjectEncoder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/general/gson/EncryptedJSONObjectDecoder.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/general/gson/EncryptedJSONObjectDecoder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/general/gson/EncryptedJSONObjectEncoder.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/general/gson/EncryptedJSONObjectEncoder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/TestConnectPacket.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/latency/PingPacket.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/latency/PingPacket.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/latency/PingReceive.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/latency/PingReceive.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/latency/PongPacket.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/latency/PongPacket.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/client/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/old/client/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/old/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/server/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/old/server/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/server/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/ClientPlayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/ClientConnection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/EncryptionKeyFinder.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/EncryptionKeyFinder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/EventListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/EventListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/PlayerHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/PlayerHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/Server.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/api/IPacketHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/api/IPacketHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/event/PlayerDisconnectEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/event/PlayerDisconnectEvent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/event/PlayerJoinEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/event/PlayerJoinEvent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/event/api/Cancellable.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/event/api/Event.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/event/api/EventException.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/event/api/EventException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/event/api/EventExecutor.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/event/api/EventExecutor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/event/api/EventHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/event/api/EventHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/event/api/EventPriority.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/event/api/EventPriority.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/event/api/HandlerList.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/event/api/HandlerList.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/event/api/Listener.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/event/api/Listener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/event/api/RegisteredListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/event/api/RegisteredListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/event/chat/ServerPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/CorePlugin.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/netty/MulticastServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/netty/MulticastServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/netty/ProcessingHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/netty/ProcessingHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/plugin/Plugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/Plugin.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/plugin/PluginAwareness.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/PluginAwareness.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/plugin/PluginDescriptionFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/PluginDescriptionFile.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/plugin/PluginLoadOrder.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/plugin/PluginLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/PluginLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/plugin/PluginManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/PluginManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/plugin/exception/IllegalPluginAccessException.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/exception/IllegalPluginAccessException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/plugin/exception/InvalidDescriptionException.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/exception/InvalidDescriptionException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/plugin/exception/InvalidPluginException.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/exception/InvalidPluginException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/plugin/exception/UnknownDependencyException.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/exception/UnknownDependencyException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/plugin/java/JavaPluginLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/java/JavaPluginLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/plugin/java/PluginClassLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/java/PluginClassLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-client/src/main/java/com/github/fernthedev/terminal/client/ClientTerminal.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-client/src/main/java/com/github/fernthedev/terminal/client/ClientTerminal.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-client/src/main/java/com/github/fernthedev/terminal/client/PacketHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-client/src/main/java/com/github/fernthedev/terminal/client/PacketHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-core/src/main/java/com/github/fernthedev/terminal/core/CommonUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-core/src/main/java/com/github/fernthedev/terminal/core/CommonUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/CommandMessageParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/CommandMessageParser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/ServerCommandHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/ServerCommandHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/ServerTerminal.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/ServerTerminal.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/TerminalPacketHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/TerminalPacketHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/backend/AuthenticationManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/backend/AuthenticationManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/backend/BanManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/backend/BanManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/command/KickCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/command/KickCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/command/LightCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/command/LightCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/events/ChatEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/events/ChatEvent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/deprecated/fastjson/EncryptedFastJSONObjectDecoder.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/deprecated/fastjson/EncryptedFastJSONObjectDecoder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/deprecated/fastjson/EncryptedFastJSONObjectEncoder.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/deprecated/fastjson/EncryptedFastJSONObjectEncoder.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -731,7 +551,14 @@
       <option name="project" value="LOCAL" />
       <updated>1581723247590</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="New events for both client and event Listener&#10;Packets now have a corresponding ID based on time taken to send and receive">
+      <created>1583791858868</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1583791858868</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -797,7 +624,8 @@
     <MESSAGE value="- Decoupling Client and Server to become it's own standalone API and terminal support is being moved to terminal module" />
     <MESSAGE value="- Decoupling Client and Server to become it's own standalone API and terminal support and other features are being moved to terminal module" />
     <MESSAGE value="Cleaned lots of old code. Most of the old redundant code has been refactored, optimized and removed for better efficiency and consistency.&#10;- Decoupling Client and Server to become it's own standalone API and terminal support and other features are being moved to terminal module" />
-    <option name="LAST_COMMIT_MESSAGE" value="Cleaned lots of old code. Most of the old redundant code has been refactored, optimized and removed for better efficiency and consistency.&#10;- Decoupling Client and Server to become it's own standalone API and terminal support and other features are being moved to terminal module" />
+    <MESSAGE value="New events for both client and event Listener&#10;Packets now have a corresponding ID based on time taken to send and receive" />
+    <option name="LAST_COMMIT_MESSAGE" value="New events for both client and event Listener&#10;Packets now have a corresponding ID based on time taken to send and receive" />
   </component>
   <component name="WindowStateProjectService">
     <state x="674" y="167" key="#Client" timestamp="1580674642429">
@@ -883,20 +711,21 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="155" y="58" width="778" height="891" key="#xdebugger.evaluate/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577565585451" />
-    <state x="0" y="55" width="1602" height="896" key="CommitChangelistDialog2" timestamp="1581723223396">
+    <state x="0" y="55" width="1602" height="896" key="CommitChangelistDialog2" timestamp="1583791789405">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="383" y="0" key="CommitChangelistDialog2/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1575751083540" />
     <state x="165" y="91" width="1602" height="896" key="CommitChangelistDialog2/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1578779607118" />
     <state x="0" y="57" key="CommitChangelistDialog2/0.0.1920.1040/1920.317.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1581453747196" />
     <state x="0" y="55" key="CommitChangelistDialog2/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581723223396" />
-    <state x="0" y="57" key="CommitChangelistDialog2/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581039946770" />
+    <state x="0" y="55" key="CommitChangelistDialog2/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583791789405" />
     <state x="142" y="15" key="CommitChangelistDialog2/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577855771405" />
     <state x="0" y="57" key="CommitChangelistDialog2/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580676276382" />
-    <state x="184" y="91" key="DiffContextDialog" timestamp="1578776978734">
+    <state x="184" y="91" width="1536" height="861" key="DiffContextDialog" timestamp="1583791908040">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="184" y="91" key="DiffContextDialog/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1578776978734" />
+    <state x="184" y="91" width="1536" height="861" key="DiffContextDialog/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583791908040" />
     <state x="694" y="268" key="EnvironmentVariablesDialog" timestamp="1583179229966">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -916,47 +745,47 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="818" y="451" key="Github.Dialog.Accounts.Choose/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577571097799" />
-    <state width="1877" height="261" key="GridCell.Tab.0.bottom" timestamp="1583791648791">
+    <state width="1877" height="261" key="GridCell.Tab.0.bottom" timestamp="1583802083362">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1323" height="158" key="GridCell.Tab.0.bottom/0.0.1366.728@0.0.1366.728" timestamp="1583266580001" />
     <state width="1877" height="261" key="GridCell.Tab.0.bottom/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1576980013836" />
     <state width="1877" height="261" key="GridCell.Tab.0.bottom/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1582582485353" />
     <state width="1877" height="261" key="GridCell.Tab.0.bottom/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581723774690" />
-    <state width="1877" height="261" key="GridCell.Tab.0.bottom/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583791648791" />
+    <state width="1877" height="261" key="GridCell.Tab.0.bottom/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583802083362" />
     <state width="1877" height="261" key="GridCell.Tab.0.bottom/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583194609746" />
     <state width="1877" height="261" key="GridCell.Tab.0.bottom/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577976847470" />
     <state width="1877" height="261" key="GridCell.Tab.0.bottom/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580680527129" />
-    <state width="1877" height="261" key="GridCell.Tab.0.center" timestamp="1583791648791">
+    <state width="1877" height="261" key="GridCell.Tab.0.center" timestamp="1583802083362">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1323" height="158" key="GridCell.Tab.0.center/0.0.1366.728@0.0.1366.728" timestamp="1583266580001" />
     <state width="1877" height="261" key="GridCell.Tab.0.center/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1576980013835" />
     <state width="1877" height="261" key="GridCell.Tab.0.center/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1582582485353" />
     <state width="1877" height="261" key="GridCell.Tab.0.center/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581723774690" />
-    <state width="1877" height="261" key="GridCell.Tab.0.center/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583791648791" />
+    <state width="1877" height="261" key="GridCell.Tab.0.center/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583802083362" />
     <state width="1877" height="261" key="GridCell.Tab.0.center/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583194609746" />
     <state width="1877" height="261" key="GridCell.Tab.0.center/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577976847469" />
     <state width="1877" height="261" key="GridCell.Tab.0.center/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580680527129" />
-    <state width="1877" height="261" key="GridCell.Tab.0.left" timestamp="1583791648791">
+    <state width="1877" height="261" key="GridCell.Tab.0.left" timestamp="1583802083361">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1323" height="158" key="GridCell.Tab.0.left/0.0.1366.728@0.0.1366.728" timestamp="1583266580001" />
     <state width="1877" height="261" key="GridCell.Tab.0.left/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1576980013835" />
     <state width="1877" height="261" key="GridCell.Tab.0.left/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1582582485353" />
     <state width="1877" height="261" key="GridCell.Tab.0.left/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581723774689" />
-    <state width="1877" height="261" key="GridCell.Tab.0.left/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583791648791" />
+    <state width="1877" height="261" key="GridCell.Tab.0.left/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583802083361" />
     <state width="1877" height="261" key="GridCell.Tab.0.left/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583194609746" />
     <state width="1877" height="261" key="GridCell.Tab.0.left/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577976847468" />
     <state width="1877" height="261" key="GridCell.Tab.0.left/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580680527129" />
-    <state width="1877" height="261" key="GridCell.Tab.0.right" timestamp="1583791648791">
+    <state width="1877" height="261" key="GridCell.Tab.0.right" timestamp="1583802083362">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1323" height="158" key="GridCell.Tab.0.right/0.0.1366.728@0.0.1366.728" timestamp="1583266580001" />
     <state width="1877" height="261" key="GridCell.Tab.0.right/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1576980013835" />
     <state width="1877" height="261" key="GridCell.Tab.0.right/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1582582485353" />
     <state width="1877" height="261" key="GridCell.Tab.0.right/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581723774690" />
-    <state width="1877" height="261" key="GridCell.Tab.0.right/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583791648791" />
+    <state width="1877" height="261" key="GridCell.Tab.0.right/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583802083362" />
     <state width="1877" height="261" key="GridCell.Tab.0.right/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583194609746" />
     <state width="1877" height="261" key="GridCell.Tab.0.right/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577976847470" />
     <state width="1877" height="261" key="GridCell.Tab.0.right/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580680527129" />
@@ -1022,14 +851,14 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="807" y="428" key="VCS.ChangelistChooser/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577570995041" />
-    <state x="552" y="248" key="Vcs.Push.Dialog.v2" timestamp="1581723252528">
+    <state x="552" y="248" key="Vcs.Push.Dialog.v2" timestamp="1583791863756">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="552" y="248" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1575750295872" />
     <state x="552" y="248" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577572314822" />
     <state x="552" y="248" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.317.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1581453923645" />
     <state x="552" y="248" key="Vcs.Push.Dialog.v2/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581723252528" />
-    <state x="552" y="248" key="Vcs.Push.Dialog.v2/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581039966754" />
+    <state x="552" y="248" key="Vcs.Push.Dialog.v2/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583791863756" />
     <state x="552" y="248" key="Vcs.Push.Dialog.v2/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577855777263" />
     <state x="552" y="248" key="Vcs.Push.Dialog.v2/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580676281460" />
     <state x="723" y="196" key="com.intellij.testIntegration.createTest.CreateTestDialog" timestamp="1583108689920">

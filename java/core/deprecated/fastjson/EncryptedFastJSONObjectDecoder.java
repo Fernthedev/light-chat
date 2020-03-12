@@ -2,7 +2,6 @@ package com.github.fernthedev.core.encryption.codecs.deprecated.fastjson;
 
 import com.alibaba.fastjson.JSON;
 import com.github.fernthedev.core.PacketRegistry;
-import com.github.fernthedev.core.packets.Packet;
 import com.github.fernthedev.core.encryption.EncryptedBytes;
 import com.github.fernthedev.core.encryption.EncryptedPacketWrapper;
 import com.github.fernthedev.core.encryption.PacketWrapper;
@@ -10,6 +9,7 @@ import com.github.fernthedev.core.encryption.RSA.IEncryptionKeyHolder;
 import com.github.fernthedev.core.encryption.RSA.NoSecretKeyException;
 import com.github.fernthedev.core.encryption.UnencryptedPacketWrapper;
 import com.github.fernthedev.core.encryption.util.EncryptionUtil;
+import com.github.fernthedev.core.packets.Packet;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
