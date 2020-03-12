@@ -14,7 +14,7 @@ The packet schema is as follows:
 
 ### Unencrypted data
 
-```json
+```json5
 {
   "ENCRYPT": false, // Used to check if the jsonObject field is encrypted
   "jsonObject": "", // The packet object as a JSON string
@@ -25,7 +25,7 @@ The packet schema is as follows:
 
 ### Encrypted data
 
-```json
+```json5
 {
   "ENCRYPT": true, // Used to check if the jsonObject field is encrypted
   "jsonObject": "{
@@ -122,7 +122,7 @@ public class EncryptedPacketWrapper extends PacketWrapper<EncryptedBytes> {
 
 A real-world example of this is as follows
 
-```json
+```json5
 {
   "ENCRYPT": false,
   "jsonObject": "{\"publicKey\":\"MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAty110pSGwvJyzzK6P0mx6Qoc96VkQiXrSmEMfWpXbN+qBu+3W6fTR5N2MrtFlB3LI5xhagHi662k3RHL+rPbQBqcivE6pAa2O3GrDKIUL+3KCVQQ553va7aLgEQy9H4gZnKTk7nyf5y6uKuJQj6lg8PxWd2pCUMqWOa5JGGvX2LYFUUEKq7vR1bZHAoVwC2i15JBJP8VhlsqZ2brFU1kRzHLlEUH+bwIve6Auvyuw947kxQOnA/KGQUlgdTWXKwtPq2dFr3cteLLrBboYH0ODp7gLnhO4Mp5M4u9VAd6zWorbK5dBNgELPDAViznHMpN2eCbzk8+O2q/qACT2z+gm3kj7s1uPhJ7wuUOgAWYUVrXihdqXhfa3x33r78EfZdT4vh/iTdT9wSMlRv1QlsproOwe44+BlD/F8DLzUi2fheK4seqftPvQepd8MlMLPAI7HoT7NmT0Gz6ozXdDZG0WSXQFMaKEyxtxsT2OiSRNBsr09VGH+eVx4UNb5SEUhNHoPn93qs1w8d4aOUqJsqJ5Fxna+RLY9URoD2FfP0RwIC7S1lfSWfErQTMEepxaMIliR1s/7TQn4g9RiUhgb08dTOAtMOUWaLagEiulBrLXH3VNX1bUHYdraYXHpdt2b6enlujw0GjJOxWrRBHZYiFSdLL/4P6gfaai82dkeXW7dECAwEAAQ\\u003d\\u003d\",\"versionData\":{\"version\":\"1.5.3\",\"minVersion\":\"1.5.3\"}}",
@@ -171,7 +171,7 @@ This packet is used by the server to initiate the encryption handshake.
 
 JSON:
 
-```json
+```json5
 {
   "publicKey": "RSA_PUBLIC_KEY_HERE",
   "versionData": {
@@ -187,7 +187,7 @@ This packet is used to send the AES 256 bit key encrypted by the server's RSA 40
 
 JSON:
 
-```json
+```json5
 {
   "secretKeyEncrypted": ["BYTES_HERE", 21, 21, 32]
 }
@@ -199,7 +199,7 @@ This packet is used by the client to send the required information to the server
 
 JSON:
 
-```json
+```json5
 {
   "name": "Client-Name", // The client's name
   "os": "Windows/Linux etc.", // The sender's OS,
@@ -223,7 +223,7 @@ The self message packet is a packet used to call events. The events as of the da
 
 JSON:
 
-```json
+```json5
 {
   "type": "REGISTER_PACKET"
 }
@@ -236,7 +236,7 @@ The password is expected to be hashed and the packet wrapper is highly recommend
 
 JSON:
 
-```json
+```json5
 {
   "hashedPassword": {
     "password": "SHA-256-hashedPassword"
