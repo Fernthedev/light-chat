@@ -1,12 +1,0 @@
-
-vsquid:S3776˜"RRefactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.(Šõä„ùÿÿÿÿ8ÙÜæ«„.
-vsquid:S3776 "RRefactor this method to reduce its Cognitive Complexity from 27 to the 15 allowed.(µáÂøÿÿÿÿ8ÙÜæ«„.
-Ssquid:S1133W"5Do not forget to remove this deprecated code someday.(Ï×ÑÊ8ÙÜæ«„.
-ssquid:S2068 "V'password' detected in this expression, review this potentially hard-coded credential.(£ÉZ8§§Ş«„.
-isquid:S1301I"KReplace this "switch" statement by "if" statements to increase readability.(×¹ï¯8ÙÜæ«„.
-nsquid:S13013"KReplace this "switch" statement by "if" statements to increase readability.(˜ôàÜùÿÿÿÿ8ÙÜæ«„.
-\squid:MissingDeprecatedCheck/"(Add the missing @deprecated Javadoc tag.(ŠÑøÓûÿÿÿÿ8ÙÜæ«„.
-usquid:S3776k"RRefactor this method to reduce its Cognitive Complexity from 27 to the 15 allowed.(ùı“úÿÿÿÿ8ÙÜæ«„.
-\"squid:SwitchLastCaseIsDefaultCheck3""Add a default case to this switch.(˜ôàÜùÿÿÿÿ8ÙÜæ«„.
-Xsquid:S1133/"5Do not forget to remove this deprecated code someday.(ŠÑøÓûÿÿÿÿ8ÙÜæ«„.
-qsquid:S3776â"RRefactor this method to reduce its Cognitive Complexity from 31 to the 15 allowed.(“Ç©8ÙÜæ«„.

@@ -1,7 +1,0 @@
-
-usquid:S3776@"RRefactor this method to reduce its Cognitive Complexity from 19 to the 15 allowed.(”ş”¡úÿÿÿÿ8êÕù¶‚.
-usquid:S3776q"RRefactor this method to reduce its Cognitive Complexity from 19 to the 15 allowed.(¬ÒÅÿøÿÿÿÿ8êÕù¶‚.
-dsquid:S21427"FEither re-interrupt this method or rethrow the "InterruptedException".(ä ¹€8êÕù¶‚.
-Xsquid:S2209^"5Change this instance-reference to a static reference.(ğµÕªúÿÿÿÿ8êÕù¶‚.
-dsquid:S3457S"AFormat specifiers should be used instead of string concatenation.(¸Òâùÿÿÿÿ8êÕù¶‚.
-dsquid:S3457^"AFormat specifiers should be used instead of string concatenation.(ğµÕªúÿÿÿÿ8êÕù¶‚.
