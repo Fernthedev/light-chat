@@ -67,6 +67,7 @@ namespace com.github.fernthedev.lightchat.core.codecs
 
         private LineEndStringEncoder stringEncoder;
         private JsonHandler jsonHandler;
+        private 
         
 
         public override void Encode(IAcceptablePacketTypes msg, List<object> outList)
@@ -91,6 +92,11 @@ namespace com.github.fernthedev.lightchat.core.codecs
                 // Encodes the string for sending
                 encoder.encode(ctx, jsonPacketWrapper, out);
             }
+        }
+
+        private EncryptedBytes encrypt(object ctx, string decryptedJSON)
+        {
+            throw new NotImplementedException();
         }
     }
 

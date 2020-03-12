@@ -6,7 +6,7 @@ namespace com.github.fernthedev.lightchat.core.encryption
 {
     interface IEncryptionKeyHolder
     {
-        SecretKey getSecretKey(ChannelHandlerContext ctx, Channel channel);
+        object getSecretKey(ChannelHandlerContext ctx, Channel channel);
 
         boolean isEncryptionKeyRegistered(ChannelHandlerContext ctx, Channel channel);
 
