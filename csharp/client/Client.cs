@@ -31,7 +31,10 @@ namespace com.github.fernthedev.lightchat.client
         private string host;
         private int port;
 
-        private string name = Environment.MachineName;
+        private string Name {
+            get;
+            set;
+        } = Environment.MachineName;
 
         private ProtocolType protocolType = ProtocolType.Tcp;
         private EventListener eventListener;

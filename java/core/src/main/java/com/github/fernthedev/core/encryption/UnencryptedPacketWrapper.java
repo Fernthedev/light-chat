@@ -1,17 +1,13 @@
 package com.github.fernthedev.core.encryption;
 
-import com.github.fernthedev.core.packets.Packet;
 import com.github.fernthedev.core.PacketRegistry;
 import com.github.fernthedev.core.encryption.codecs.AcceptablePacketTypes;
-import com.google.gson.Gson;
+import com.github.fernthedev.core.packets.Packet;
 
 /**
  * Wraps a packet not meant to be encrypted
  */
 public class UnencryptedPacketWrapper extends PacketWrapper<AcceptablePacketTypes> implements AcceptablePacketTypes {
-
-    private static final Gson gson = new Gson();
-
     protected UnencryptedPacketWrapper() {}
 
     public UnencryptedPacketWrapper(Packet jsonObject, int packetId) {

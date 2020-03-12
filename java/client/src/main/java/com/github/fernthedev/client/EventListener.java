@@ -40,8 +40,9 @@ public class EventListener {
 
             client.getLogger().debug("Ping: {}", (client.getPingTime(TimeUnit.MILLISECONDS)) + "ms");
 
-        } else if (p instanceof IllegalConnection) {
-            client.getLogger().info(((IllegalConnection) p).getMessage());
+        } else if (p instanceof IllegalConnectionPacket) {
+            client.getLogger().info(((IllegalConnectionPacket) p).getMessage());
+            client.disconnect(ServerDisconnectEvent.DisconnectStatus.CONNECTION_LOST);
         } else if (p instanceof InitialHandshakePacket) {
             // Handles object encryption key sharing
             InitialHandshakePacket packet = (InitialHandshakePacket) p;

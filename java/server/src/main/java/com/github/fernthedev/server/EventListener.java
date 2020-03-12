@@ -2,12 +2,13 @@ package com.github.fernthedev.server;
 
 import com.github.fernthedev.core.StaticHandler;
 import com.github.fernthedev.core.VersionData;
-import com.github.fernthedev.core.packets.IllegalConnection;
+import com.github.fernthedev.core.packets.IllegalConnectionPacket;
 import com.github.fernthedev.core.packets.Packet;
 import com.github.fernthedev.core.packets.SelfMessagePacket;
 import com.github.fernthedev.core.packets.handshake.ConnectedPacket;
 import com.github.fernthedev.core.packets.handshake.KeyResponsePacket;
 import com.github.fernthedev.core.packets.handshake.RequestConnectInfoPacket;
+import com.github.fernthedev.core.packets.latency.PingReceive;
 import com.github.fernthedev.core.packets.latency.PongPacket;
 import com.github.fernthedev.fernutils.thread.ThreadUtils;
 import com.github.fernthedev.server.event.PlayerJoinEvent;
@@ -34,6 +35,8 @@ public class EventListener {
         // server.logInfo(clientConnection + " is the sender of packet");
         if(p instanceof PongPacket) {
             clientConnection.finishPing();
+
+            clientConnection.sendObject(new PingReceive());
 
         } else if (p instanceof KeyResponsePacket) {
             KeyResponsePacket responsePacket = (KeyResponsePacket) p;
@@ -104,7 +107,7 @@ public class EventListener {
 
     private void disconnectIllegalName(ConnectedPacket packet,String message) {
         server.logInfo("{} was disconnected for illegal name. Name: {} Reason: {} ID {}", clientConnection, packet.getName(), message, clientConnection.getUuid().getMostSignificantBits());
-        clientConnection.sendObject(new IllegalConnection("You have been disconnected for an illegal name. Name: " + packet.getName() + " Reason: " + message),false);
+        clientConnection.sendObject(new IllegalConnectionPacket("You have been disconnected for an illegal name. Name: " + packet.getName() + " Reason: " + message),false);
         clientConnection.close();
     }
 }

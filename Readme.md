@@ -18,6 +18,9 @@ This is a network platform in which I hope to soon become a multi-language/cross
 
 - API is still not implemented nor fully planned yet. It is something I hope to accomplish in the future.
 
+# Specifications:
+The specifications can be found [here](docs/specs.md)
+
 # Features:
 
 - Uses JSON for packet wrapping and allows cross-platform usage

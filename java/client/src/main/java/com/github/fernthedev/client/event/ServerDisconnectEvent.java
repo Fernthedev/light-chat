@@ -4,6 +4,7 @@ package com.github.fernthedev.client.event;
 import com.github.fernthedev.client.Client;
 import com.github.fernthedev.core.api.event.api.Event;
 import com.github.fernthedev.core.api.event.api.HandlerList;
+import com.github.fernthedev.core.packets.IllegalConnectionPacket;
 import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,11 @@ public class ServerDisconnectEvent extends Event  {
          * The connection has been lost
          */
         CONNECTION_LOST,
+
+        /**
+         * When the server sends an {@link IllegalConnectionPacket}
+         */
+        ILLEGAL_CONNECTION,
 
         /**
          * Connection timed out

@@ -1,11 +1,11 @@
 package com.github.fernthedev.core.packets;
 
-@PacketInfo(name = "ILLEGAL_CONNECTION")
-public class IllegalConnection extends Packet {
+@PacketInfo(name = "ILLEGAL_CONNECTION_PACKET")
+public class IllegalConnectionPacket extends Packet {
 
     private String message;
 
-    public IllegalConnection(String message) {
+    public IllegalConnectionPacket(String message) {
         this.message = message;
     }
 

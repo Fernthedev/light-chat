@@ -41,12 +41,6 @@ public class PacketWrapper<T> implements Serializable {
         this.packetId = packetId;
     }
 
-//    @Deprecated
-//    public PacketWrapper(@NonNull Object object) {
-//        this.jsonObject = gson.toJson(object);
-//        this.aClass = object.getClass().getName();
-//    }
-
     public boolean encrypt() {
         return ENCRYPT;
     }

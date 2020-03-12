@@ -2,9 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="74a9c842-9768-484a-b6c1-feb6a74ad587" name="Default Changelist" comment="- Decoupling Client and Server to become it's own standalone API and terminal support and other features are being moved to terminal module">
-      <change beforePath="$PROJECT_DIR$/../.github/workflows/dotnet_csharp.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../.github/workflows/dotnet_csharp.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.github/workflows/gradle.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../.github/workflows/gradle.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Readme.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../csharp/CSharpLightChat/CSharpLightChat/CSharpLightChat.sln" beforeDir="false" afterPath="$PROJECT_DIR$/../csharp/CSharpLightChat/CSharpLightChat/CSharpLightChat.sln" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../csharp/client/Client.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../csharp/client/Client.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/EventListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/EventListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/event/ServerDisconnectEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/event/ServerDisconnectEvent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/PacketWrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/PacketWrapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/UnencryptedPacketWrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/UnencryptedPacketWrapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/IllegalConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/IllegalConnectionPacket.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/EventListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/EventListener.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
