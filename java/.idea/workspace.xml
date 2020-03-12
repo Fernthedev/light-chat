@@ -2,24 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="74a9c842-9768-484a-b6c1-feb6a74ad587" name="Default Changelist" comment="- Decoupling Client and Server to become it's own standalone API and terminal support and other features are being moved to terminal module">
-      <change afterPath="$PROJECT_DIR$/terminal/banned.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/terminal/settings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/0/7/078b8d36db9499ff209f6791bad1924ab9c43142" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/0/7/078b8d36db9499ff209f6791bad1924ab9c43142" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/0/c/0c383b11480622e7722e89e5967ff47f1a82e523" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/0/c/0c383b11480622e7722e89e5967ff47f1a82e523" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/d/1d93f43f947e3f8c2b6ed27a31731c610ed914be" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/1/d/1d93f43f947e3f8c2b6ed27a31731c610ed914be" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/3/a/3a8a3fa45b8e1b7106cea4865c7390c07e975524" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/0/80db0a63c13fa8484510c896598a78635accaf0e" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/0/80db0a63c13fa8484510c896598a78635accaf0e" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/b/a/ba3e3d277d4815cd7e798158e5e755a500e6bd44" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/b/b/bb1a1b5b8fdaa7848141000e871bb5e3bfeea9ec" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/c/b/cbecc2707cc71068f8cbc2ec65f57d8ea317b45f" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/c/b/cbecc2707cc71068f8cbc2ec65f57d8ea317b45f" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/d/1/d11f890a961f14b5518ffa54aa9b28d1914df2e6" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/d/1/d11f890a961f14b5518ffa54aa9b28d1914df2e6" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/e/1/e142265644bed8d12c37967eb664b16bc3aac1eb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/e/1/e142265644bed8d12c37967eb664b16bc3aac1eb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/b/fb83b9a71fe42476ec664aa41b7e4cb030e652c0" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/b/fb83b9a71fe42476ec664aa41b7e4cb030e652c0" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/c/fc1aaf257a7eb7916911577ae8bb460d90f5d3e5" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.github/workflows/dotnet_csharp.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../.github/workflows/dotnet_csharp.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.github/workflows/gradle.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../.github/workflows/gradle.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/deprecated/fastjson/EncryptedFastJSONObjectDecoder.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/deprecated/fastjson/EncryptedFastJSONObjectDecoder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/deprecated/fastjson/EncryptedFastJSONObjectEncoder.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/deprecated/fastjson/EncryptedFastJSONObjectEncoder.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

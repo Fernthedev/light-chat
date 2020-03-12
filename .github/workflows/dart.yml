@@ -1,6 +1,9 @@
 name: Dart Client
 
-on: [push]
+on:
+  push:
+    paths:
+      - 'dart/*'
 
 # jobs:
 #   build:

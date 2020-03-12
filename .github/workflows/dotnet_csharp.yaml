@@ -1,7 +1,9 @@
 name: .NET C# CI
 
-on: [push]
-
+on:
+  push:
+    paths:
+      - 'csharp/*'
 jobs:
   build:
 
