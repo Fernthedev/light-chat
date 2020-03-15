@@ -1,4 +1,5 @@
-﻿using com.github.fernthedev.lightchat.core.packets;
+﻿using com.github.fernthedev.lightchat.core;
+using com.github.fernthedev.lightchat.core.packets;
 using DotNetty.Transport.Channels;
 using System;
 using System.Collections.Generic;
