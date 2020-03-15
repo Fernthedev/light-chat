@@ -24,7 +24,7 @@ public class RSAEncryptionUtil {
      */
     public static byte[] encryptKey(SecretKey secretKey, PublicKey publicKey) throws InvalidKeyException {
         try {
-            Cipher rsaCipher = Cipher.getInstance("RSA");
+            Cipher rsaCipher = Cipher.getInstance(StaticHandler.RSA_CIPHER_TRANSFORMATION);
             rsaCipher.init(Cipher.ENCRYPT_MODE, publicKey);
 
             return rsaCipher.doFinal(secretKey.getEncoded());
@@ -43,7 +43,7 @@ public class RSAEncryptionUtil {
      */
     public static SecretKey decryptKey(byte[] secretKey, PrivateKey privateKey) throws InvalidKeyException {
         try {
-            Cipher rsaCipher = Cipher.getInstance("RSA");
+            Cipher rsaCipher = Cipher.getInstance(StaticHandler.RSA_CIPHER_TRANSFORMATION);
             rsaCipher.init(Cipher.DECRYPT_MODE, privateKey);
 
 //            Cipher aesCipher = Cipher.getInstance("AES");

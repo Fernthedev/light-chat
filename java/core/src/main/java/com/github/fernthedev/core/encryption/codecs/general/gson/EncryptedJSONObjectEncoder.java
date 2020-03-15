@@ -101,7 +101,7 @@ public class EncryptedJSONObjectEncoder extends MessageToMessageEncoder<Acceptab
 
         if (decryptedString == null) return null;
 
-        if (decryptedString.length() == 0) {
+        if (decryptedString.isEmpty()) {
             return null;
         }
 

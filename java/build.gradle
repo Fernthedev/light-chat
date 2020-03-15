@@ -79,7 +79,14 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
     }
 
 
+    test {
+        useJUnitPlatform()
+    }
+
     dependencies {
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
+
         compile "io.netty:netty-all:$netty_ver"
         compile "io.netty:netty-transport-native-epoll:$netty_ver"
         compile "io.netty:netty-transport-native-kqueue:$netty_ver"
@@ -140,8 +147,8 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
     jar.dependsOn(shadowJar)
     jar.classifier = 'old'
     shadowJar {
-        project.configurations.implementation.canBeResolved = true
-        configurations = [project.configurations.implementation]
+//        project.configurations.implementation.canBeResolved = true
+//        configurations = [project.configurations.implementation]
         classifier = ''
         transform(Log4j2PluginsCacheFileTransformer)
 //        transform(Log4j2PluginsCacheFileTransformer)

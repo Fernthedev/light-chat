@@ -289,7 +289,7 @@ public class Server implements Runnable {
 
         EncryptionKeyFinder keyFinder = new EncryptionKeyFinder(this);
 
-        JSONHandler jsonHandler = settingsManager.getConfigData().getCodecEnum().getJsonHandler();
+        JSONHandler jsonHandler = settingsManager.getConfigData().getCodec();
 
 
         bootstrap.group(bossGroup, workerGroup)

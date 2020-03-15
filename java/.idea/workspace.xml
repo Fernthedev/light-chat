@@ -2,16 +2,23 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="74a9c842-9768-484a-b6c1-feb6a74ad587" name="Default Changelist" comment="- Decoupling Client and Server to become it's own standalone API and terminal support and other features are being moved to terminal module">
-      <change beforePath="$PROJECT_DIR$/../Readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Readme.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../csharp/CSharpLightChat/CSharpLightChat/CSharpLightChat.sln" beforeDir="false" afterPath="$PROJECT_DIR$/../csharp/CSharpLightChat/CSharpLightChat/CSharpLightChat.sln" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../csharp/client/Client.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../csharp/client/Client.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../csharp/core/JsonHandler.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../csharp/core/StaticHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../csharp/core/StaticHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../csharp/core/codecs/Codecs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../csharp/core/codecs/Codecs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../csharp/core/encryption/EncryptedBytes.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../csharp/core/encryption/EncryptedBytes.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/EventListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/EventListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/event/ServerDisconnectEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/event/ServerDisconnectEvent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/PacketWrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/PacketWrapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/UnencryptedPacketWrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/UnencryptedPacketWrapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/IllegalConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/IllegalConnectionPacket.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/EventListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/EventListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/ClientSettings.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/ClientSettings.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/CoreSettings.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/CoreSettings.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/StaticHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/StaticHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/general/gson/EncryptedJSONObjectEncoder.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/general/gson/EncryptedJSONObjectEncoder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/util/EncryptionUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/util/EncryptionUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/util/RSAEncryptionUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/util/RSAEncryptionUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/Server.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/settings/ServerSettings.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/settings/ServerSettings.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -147,11 +154,11 @@
       <command value="gradle client:dependencies" />
     </option>
   </component>
-  <component name="RunManager" selected="Gradle.Gradle Build">
+  <component name="RunManager" selected="Application.Client">
     <configuration name="Client" type="Application" factoryName="Application" temporary="true">
       <option name="MAIN_CLASS_NAME" value="com.github.fernthedev.terminal.client.ClientTerminal" />
       <module name="light-chat.terminal.terminal-client.main" />
-      <option name="PROGRAM_PARAMETERS" value="-host localhost -port 2000" />
+      <option name="PROGRAM_PARAMETERS" value="-host localhost -port 2000 -debug" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="com.github.fernthedev.client.api.*" />
@@ -165,6 +172,7 @@
     <configuration name="ServerTerminal" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.github.fernthedev.terminal.server.ServerTerminal" />
       <module name="light-chat.terminal.terminal-server.main" />
+      <option name="PROGRAM_PARAMETERS" value="-debug" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="com.github.fernthedev.terminal.server.backend.*" />
@@ -624,10 +632,6 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="674" y="167" key="#Client/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580674642429" />
-    <state x="552" y="177" key="#Notifications" timestamp="1575144798794">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="552" y="177" key="#Notifications/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1575144798794" />
     <state x="674" y="155" width="587" height="730" key="#Server" timestamp="1577376669949">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -636,8 +640,8 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="552" y="179" key="#Updates/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1578765341583" />
-    <state x="274" y="37" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1583263922440">
-      <screen x="0" y="0" width="1366" height="728" />
+    <state x="385" y="53" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1584290375885">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="274" y="37" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1366.728@0.0.1366.728" timestamp="1583263922440" />
     <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1576960854972" />
@@ -647,6 +651,7 @@
     <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583179230493" />
     <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577856546436" />
     <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580676107201" />
+    <state x="385" y="53" key="#com.intellij.execution.impl.EditConfigurationsDialog/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584290375885" />
     <state x="765" y="222" key="#com.intellij.ide.util.MemberChooser" timestamp="1583784392157">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -663,13 +668,14 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="803" y="409" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580672970186" />
-    <state x="640" y="248" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1583583151416">
+    <state x="640" y="248" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1584289938570">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="640" y="248" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1578765178520" />
     <state x="640" y="248" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581709659579" />
     <state x="640" y="248" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583583151416" />
     <state x="640" y="248" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577969938152" />
+    <state x="640" y="248" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584289938570" />
     <state x="464" y="437" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog" timestamp="1583178688659">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -737,7 +743,7 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="818" y="451" key="Github.Dialog.Accounts.Choose/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577571097799" />
-    <state width="1877" height="261" key="GridCell.Tab.0.bottom" timestamp="1583802083362">
+    <state width="1877" height="261" key="GridCell.Tab.0.bottom" timestamp="1584290454426">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1323" height="158" key="GridCell.Tab.0.bottom/0.0.1366.728@0.0.1366.728" timestamp="1583266580001" />
@@ -748,7 +754,8 @@
     <state width="1877" height="261" key="GridCell.Tab.0.bottom/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583194609746" />
     <state width="1877" height="261" key="GridCell.Tab.0.bottom/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577976847470" />
     <state width="1877" height="261" key="GridCell.Tab.0.bottom/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580680527129" />
-    <state width="1877" height="261" key="GridCell.Tab.0.center" timestamp="1583802083362">
+    <state width="1877" height="261" key="GridCell.Tab.0.bottom/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584290454426" />
+    <state width="1877" height="261" key="GridCell.Tab.0.center" timestamp="1584290454426">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1323" height="158" key="GridCell.Tab.0.center/0.0.1366.728@0.0.1366.728" timestamp="1583266580001" />
@@ -759,7 +766,8 @@
     <state width="1877" height="261" key="GridCell.Tab.0.center/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583194609746" />
     <state width="1877" height="261" key="GridCell.Tab.0.center/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577976847469" />
     <state width="1877" height="261" key="GridCell.Tab.0.center/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580680527129" />
-    <state width="1877" height="261" key="GridCell.Tab.0.left" timestamp="1583802083361">
+    <state width="1877" height="261" key="GridCell.Tab.0.center/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584290454426" />
+    <state width="1877" height="261" key="GridCell.Tab.0.left" timestamp="1584290454425">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1323" height="158" key="GridCell.Tab.0.left/0.0.1366.728@0.0.1366.728" timestamp="1583266580001" />
@@ -770,7 +778,8 @@
     <state width="1877" height="261" key="GridCell.Tab.0.left/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583194609746" />
     <state width="1877" height="261" key="GridCell.Tab.0.left/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577976847468" />
     <state width="1877" height="261" key="GridCell.Tab.0.left/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580680527129" />
-    <state width="1877" height="261" key="GridCell.Tab.0.right" timestamp="1583802083362">
+    <state width="1877" height="261" key="GridCell.Tab.0.left/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584290454425" />
+    <state width="1877" height="261" key="GridCell.Tab.0.right" timestamp="1584290454426">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1323" height="158" key="GridCell.Tab.0.right/0.0.1366.728@0.0.1366.728" timestamp="1583266580001" />
@@ -781,6 +790,7 @@
     <state width="1877" height="261" key="GridCell.Tab.0.right/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583194609746" />
     <state width="1877" height="261" key="GridCell.Tab.0.right/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577976847470" />
     <state width="1877" height="261" key="GridCell.Tab.0.right/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580680527129" />
+    <state width="1877" height="261" key="GridCell.Tab.0.right/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584290454426" />
     <state width="1877" height="326" key="GridCell.Tab.1.bottom" timestamp="1581201867909">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -824,7 +834,6 @@
     <state x="540" y="254" key="IDE.errors.dialog" timestamp="1577665911633">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="540" y="254" key="IDE.errors.dialog/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1575144755479" />
     <state x="540" y="254" key="IDE.errors.dialog/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577665911633" />
     <state x="734" y="146" key="RollbackChangesDialog" timestamp="1575751719435">
       <screen x="0" y="0" width="1920" height="1040" />
@@ -864,7 +873,6 @@
     <state x="685" y="292" key="git4idea.merge.GitPullDialog" timestamp="1577571319969">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="685" y="292" key="git4idea.merge.GitPullDialog/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1575144769840" />
     <state x="685" y="292" key="git4idea.merge.GitPullDialog/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577571319969" />
     <state x="342" y="84" key="new project wizard" timestamp="1581790090549">
       <screen x="0" y="0" width="1920" height="1040" />

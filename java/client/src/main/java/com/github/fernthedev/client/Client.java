@@ -226,9 +226,9 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
                     ch.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler((int) clientSettings.getTimeoutTime()));
 
                     ch.pipeline().addLast("frameDecoder", new LineBasedFrameDecoder(StaticHandler.getLineLimit()));
-                    ch.pipeline().addLast("stringDecoder", new EncryptedJSONObjectDecoder(clientSettings.getCharset(), Client.this, clientSettings.getJsonHandler()));
+                    ch.pipeline().addLast("stringDecoder", new EncryptedJSONObjectDecoder(clientSettings.getCharset(), Client.this, clientSettings.getCodec()));
 
-                    ch.pipeline().addLast("stringEncoder", new EncryptedJSONObjectEncoder(clientSettings.getCharset(), Client.this, clientSettings.getJsonHandler()));
+                    ch.pipeline().addLast("stringEncoder", new EncryptedJSONObjectEncoder(clientSettings.getCharset(), Client.this, clientSettings.getCodec()));
 
                     ch.pipeline().addLast(clientHandler);
 //                    ch.pipeline().addLast(new ObjectEncoder(),

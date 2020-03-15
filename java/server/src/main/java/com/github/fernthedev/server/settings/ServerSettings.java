@@ -41,7 +41,7 @@ public class ServerSettings extends CoreSettings {
     private boolean useNativeTransport = true;
 
     @SettingValue(name = "codec")
-    private CodecEnum codecEnum = CodecEnum.GSON;
+    protected CodecEnum jsonCodec = DEFAULT_CODEC;
 
     @Deprecated
     public void setNewValue(@NonNull String oldValue, @NonNull String newValue) {

@@ -38,8 +38,8 @@ public class StaticHandler {
     public static final Charset CHARSET_FOR_STRING = CharsetUtil.UTF_8;
     public static final String OS = System.getProperty("os.name");
 
-    @SuppressWarnings("unused")
-    public static final String RSA_CIPHER_TRANSFORMATION = "RSA/ECB/PKCS1Padding";
+
+    public static final String RSA_CIPHER_TRANSFORMATION = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
 
     private static final Gson gson = new Gson();
 

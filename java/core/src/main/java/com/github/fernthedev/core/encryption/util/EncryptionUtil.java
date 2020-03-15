@@ -40,6 +40,7 @@ public class EncryptionUtil {
      * @param secret Password to use for encryption
      * @return Encrypted version of object
      */
+    @Deprecated
     public static SealedObject encrypt(Serializable object, SecretKey secret) {
         try {
             Cipher cipher = Cipher.getInstance(StaticHandler.AES_CIPHER_TRANSFORMATION);
