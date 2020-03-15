@@ -29,13 +29,13 @@ namespace com.github.fernthedev.lightchat.core.encryption
 
         public T getJsonObjectInstance => _jsonObjectInstance;
 
-        private string packetIdentifier { get; }
+        public string packetIdentifier { get; }
 
         public PacketWrapper(T jsonObject, string packetIdentifier, int packetId)
         {
             this.packetIdentifier = packetIdentifier;
             this._jsonObjectInstance = jsonObject;
-            this.jsonObject = JsonConvert.SerializeObject(jsonObject);
+            this.jsonObject = StaticHandler.defaultJsonHandler.toJson(jsonObject);
             this.packetId = packetId;
             
         }
@@ -43,9 +43,13 @@ namespace com.github.fernthedev.lightchat.core.encryption
 
     public class EncryptedPacketWrapper : PacketWrapper<EncryptedBytes>
     {
-        public EncryptedPacketWrapper(EncryptedBytes jsonObject, string packetIdentifier, int packetId) : base(jsonObject, packetIdentifier, packetId)
+        public EncryptedPacketWrapper(EncryptedBytes jsonObject, Packet packet, int packetId) : base(jsonObject, packet?.PacketName, packetId)
         {
             ENCRYPT = true;
+            if (PacketRegistry.checkIfRegistered(packet) == PacketRegistry.RegisteredReturnValues.NOT_IN_REGISTRY)
+            {
+                throw new InvalidOperationException("The packet trying to be wrapped is not registered. \"" + packet.GetType().FullName + "\"");
+            }
         }
     }
 

@@ -1,9 +1,0 @@
-{
-  "port": 2000,
-  "password": "password",
-  "useMulticast": false,
-  "passwordRequiredForLogin": false,
-  "useNativeTransport": true,
-  "codecEnum": "GSON",
-  "timeoutTime": 30000
-}

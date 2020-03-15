@@ -3,61 +3,50 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
 using com.github.fernthedev.lightchat.core.packets;
 using com.github.fernthedev.lightchat.core.codecs;
 using System.Collections.Generic;
-using System.Collections;
 using com.github.fernthedev.lightchat.core.encryption;
+using System.Threading.Tasks;
+using DotNetty.Transport.Bootstrapping;
+using DotNetty.Transport.Channels;
+using DotNetty.Transport.Channels.Sockets;
+using DotNetty.Codecs;
+using com.github.fernthedev.lightchat.core.util;
 
 namespace com.github.fernthedev.lightchat.client
 {
-    // State object for receiving data from remote device.  
-    public class StateObject
+
+    public class ClientSettings : CoreSettings
     {
-        // Client socket.  
-        public Socket workSocket = null;
-        // Size of receive buffer.  
-        public const int BufferSize = 256;
-        // Receive buffer.  
-        public byte[] buffer = new byte[BufferSize];
-        // Received data string.  
-        public StringBuilder sb = new StringBuilder();
+
     }
 
-
-    public class Client
+    public class Client : IEncryptionKeyHolder
     {
         private string host;
         private int port;
 
-        private string Name {
-            get;
-            set;
-        } = Environment.MachineName;
+        public string Name { get; set; } = Environment.MachineName;
 
-        private ProtocolType protocolType = ProtocolType.Tcp;
         private EventListener eventListener;
 
-        // ManualResetEvent instances signal completion.  
-        private static ManualResetEvent connectDone =
-            new ManualResetEvent(false);
-        private static ManualResetEvent sendDone =
-            new ManualResetEvent(false);
-        private static ManualResetEvent receiveDone =
-            new ManualResetEvent(false);
+        public ClientSettings settings { get; set; } = new ClientSettings();
 
-        // The response from the remote device.  
-        private static String response = String.Empty;
-        private Socket client;
+        private IEventLoopGroup group;
 
-        private Encoder<IAcceptablePacketTypes> encoder { get; set; }
-        private Decoder<Packet> decoder { get; set; }
+        private ClientHandler clientHandler;
+        private EventListener listener;
+
+        private IChannel channel;
 
         public Client(string host, int port)
         {
             this.host = host;
             this.port = port;
+
+            listener = new EventListener(this);
+            clientHandler = new ClientHandler(this, listener);
         }
 
         public void reInitialize(string host, int port)
@@ -66,50 +55,87 @@ namespace com.github.fernthedev.lightchat.client
             this.port = port;
         }
 
-        private void connect()
+        public async Task Connect()
         {
-            StaticHandler.WriteInfo("Connecting to server.");
+
+            group = new MultithreadEventLoopGroup();
+
+
+
+            StaticHandler.core.logger.Info("Connecting to server.");
 
             // Establish the remote endpoint for the socket.  
             IPHostEntry ipHostInfo = Dns.GetHostEntry(host);
             IPAddress ipAddress = ipHostInfo.AddressList[0];
             IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
 
+
+
+            var bootstrap = new Bootstrap();
+
+            bootstrap.Group(group)
+                .Channel<TcpSocketChannel>()
+                .Option(ChannelOption.TcpNodelay, true)
+                .Option(ChannelOption.SoKeepalive, true)
+                .Option(ChannelOption.ConnectTimeout, TimeSpan.FromMilliseconds(settings.TimeoutMS))
+                .Handler(new ActionChannelInitializer<ISocketChannel>(channel =>
+                {
+                    IChannelPipeline pipeLine = channel.Pipeline;
+
+                    pipeLine.AddLast("frameDecoder", new LineBasedFrameDecoder(StaticHandler.LineLimit));
+                    pipeLine.AddLast("jsonDecoder", new EncryptedJSONDecoder(this, settings.jsonCodec));
+                    pipeLine.AddLast("jsonEncoder", new EncryptedJSONEncoder(this, settings.jsonCodec));
+
+
+
+                    pipeLine.AddLast(clientHandler);
+                }));
+
+
+            channel = await bootstrap.ConnectAsync(remoteEP).ConfigureAwait(true);
+
+            if (channel.Open)
+            {
+                StaticHandler.core.logger.Info("Sucessfully connected");
+            }
+
+
             // Create a TCP/IP socket.  
-            client = new Socket(ipAddress.AddressFamily,
-                SocketType.Stream, protocolType);
+            /*            client = new Socket(ipAddress.AddressFamily,
+                            SocketType.Stream, protocolType);
 
-            // Connect to the remote endpoint.  
-            client.BeginConnect(remoteEP,
-                new AsyncCallback(ConnectCallback), client);
-            connectDone.WaitOne();
+                        // Connect to the remote endpoint.  
+                        client.BeginConnect(remoteEP,
+                            new AsyncCallback(ConnectCallback), client);
+                        connectDone.WaitOne();
 
-            // Receive the response from the remote device.  
-            Receive(client);
-            receiveDone.WaitOne();
+                        // Receive the response from the remote device.  
+                        Receive(client);
+                        receiveDone.WaitOne();*/
 
             // Write the response to the console.  
-            Console.WriteLine("Response received : {0}", response);
+            /*            Console.WriteLine("Response received : {0}", response);*/
         }
 
-        public void send(Packet packet, bool encrypt = true)
+        public async Task disconnect()
+        {
+            await channel.CloseAsync().ConfigureAwait(true);
+
+            await group.ShutdownGracefullyAsync(TimeSpan.FromMilliseconds(100), TimeSpan.FromSeconds(1)).ConfigureAwait(true);
+        }
+
+        public async Task send(Packet packet, bool encrypt = true)
         {
             List<object> outList = new List<object>();
             if (encrypt)
             {
-                encoder.Encode(packet, outList);
-            } else {
-                encoder.Encode(new UnencryptedPacketWrapper(packet, -1 /* TODO: Insert packet id implemantion (Follow Java implementation)*/), outList);
-            }
-           
-            outList.ForEach(o => Write(o as byte[]));
-        }
+                await channel.WriteAndFlushAsync(packet).ConfigureAwait(true);
 
-        public void close()
-        {
-            // Release the socket.  
-            client.Shutdown(SocketShutdown.Both);
-            client.Close();
+            }
+            else
+            {
+                await channel.WriteAndFlushAsync(new UnencryptedPacketWrapper(packet, -1 /* TODO: Insert packet id implemantion (Follow Java implementation)*/)).ConfigureAwait(true);
+            }
         }
 
         private static void ConnectCallback(IAsyncResult ar)
@@ -196,7 +222,8 @@ namespace com.github.fernthedev.lightchat.client
             if (data is byte[])
             {
                 byteData = data as byte[];
-            } else
+            }
+            else
             {
                 throw new InvalidCastException("Data must be string or byte[]");
             }
@@ -225,6 +252,21 @@ namespace com.github.fernthedev.lightchat.client
             {
                 Console.WriteLine(e.ToString());
             }
+        }
+
+        public object getSecretKey(IChannelHandlerContext ctx, IChannel channel)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool isEncryptionKeyRegistered(IChannelHandlerContext ctx, IChannel channel)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Tuple<int, long> getPacketId<T>(GenericType<T> clazz, IChannelHandlerContext ctx, IChannel channel) where T : Packet
+        {
+            throw new NotImplementedException();
         }
     }
 }

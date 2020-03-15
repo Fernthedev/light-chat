@@ -844,3 +844,5 @@ java/terminal/banned.json
 java/terminal/settings.json
 
 java/.idea/sonarlint/
+
+java/settings.json

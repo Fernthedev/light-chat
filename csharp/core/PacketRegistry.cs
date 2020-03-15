@@ -21,7 +21,7 @@ namespace com.github.fernthedev.lightchat.core
 
         private static readonly Dictionary<string, GenericType<Packet>> PACKET_REGISTRY = new Dictionary<string, GenericType<Packet>>();
 
-        public static GenericType<Packet> getPacketClassFromRegistry(String name)
+        public static GenericType<Packet> getPacketClassFromRegistry(string name)
         {
 
 

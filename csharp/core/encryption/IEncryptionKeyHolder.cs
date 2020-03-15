@@ -1,16 +1,23 @@
-﻿using System;
+﻿using com.github.fernthedev.lightchat.core.packets;
+using com.github.fernthedev.lightchat.core.util;
+using DotNetty.Transport.Channels;
+using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace com.github.fernthedev.lightchat.core.encryption
 {
-    interface IEncryptionKeyHolder
+    public interface IEncryptionKeyHolder
     {
-        object getSecretKey(ChannelHandlerContext ctx, Channel channel);
+        RijndaelManaged getSecretKey(IChannelHandlerContext ctx, IChannel channel);
 
-        boolean isEncryptionKeyRegistered(ChannelHandlerContext ctx, Channel channel);
+        bool isEncryptionKeyRegistered(IChannelHandlerContext ctx, IChannel channel);
 
-        Pair<Integer, Long> getPacketId(Class<? extends Packet> clazz, ChannelHandlerContext ctx, Channel channel);
+        /**
+         * Packet:[ID,lastPacketSentTime]
+         */
+        Tuple<int, long> getPacketId<T>(GenericType<T> clazz, IChannelHandlerContext ctx, IChannel channel) where T: Packet;
 
     }
 }
