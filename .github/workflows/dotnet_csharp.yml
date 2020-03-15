@@ -30,9 +30,11 @@ jobs:
     
     steps:
     - uses: actions/checkout@v2
-    - name: Setup .NET Core
+    - name: Setup .NET Core SDK
       uses: actions/setup-dotnet@v1.4.0
       with:
         dotnet-version: 3.1.102
-    - name: Build with dotnet
-      run: cd csharp/client ${{ matrix.and }} dotnet build --configuration Release
+    - name: Build and restore core
+      run: cd csharp/core ${{ matrix.and }} dotnet build
+    - name: Build
+        - cd csharp/client ${{ matrix.and }} dotnet build --configuration Release
