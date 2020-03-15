@@ -4,7 +4,7 @@ This is basically just a fork of my chatroom program that allows turning on and 
 | :--------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------: |
 |                            **Java Server/Client**                            |      ![Java CI](https://github.com/Fernthedev/light-chat/workflows/Java%20CI/badge.svg)       |
 |             **Dart Client CI (Ubuntu 18.04/MacOS/Windows 1909)**             | ![Dart Client CI](https://github.com/Fernthedev/light-chat/workflows/Dart%20Client/badge.svg) |
-| **C# .NET Client CI (Ubuntu 18.04/MacOS/Windows 1909) [ALPHA & INCOMPLETE]** | ![.NET C# CI](https://github.com/Fernthedev/light-chat/workflows/.NET%20C%23%20CI/badge.svg)  |
+| **C# .NET Client CI (Ubuntu 18.04/MacOS/Windows 1909) [ALPHA & INCOMPLETE]** | ![DotNET CSharp CI](https://github.com/Fernthedev/light-chat/workflows/DotNET%20CSharp%20CI/badge.svg)  |
 
 # Backstory and Future plans
 
