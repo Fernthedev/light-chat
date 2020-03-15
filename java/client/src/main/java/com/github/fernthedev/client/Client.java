@@ -5,6 +5,7 @@ import com.github.fernthedev.client.event.ServerDisconnectEvent;
 import com.github.fernthedev.client.netty.ClientHandler;
 import com.github.fernthedev.core.StaticHandler;
 import com.github.fernthedev.core.api.APIUsage;
+import com.github.fernthedev.core.api.Async;
 import com.github.fernthedev.core.api.plugin.PluginManager;
 import com.github.fernthedev.core.encryption.RSA.IEncryptionKeyHolder;
 import com.github.fernthedev.core.encryption.UnencryptedPacketWrapper;
@@ -191,7 +192,9 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
         return cLogger;
     }
 
-    public void connect() throws InterruptedException {
+    @APIUsage
+    @Async
+    public ChannelFuture connect() throws InterruptedException {
         getLogger().info("Connecting to server.");
 
         Bootstrap b = new Bootstrap();
@@ -238,24 +241,29 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
             });
 
             getLogger().info("Establishing connection");
-            future = b.connect(host, port).await().sync();
-            channel = future.channel();
+            future = b.connect(host, port).await();
 
-        } catch (InterruptedException e) {
-            getLogger().error(e.getMessage(), e);
-            throw e;
-        }
+            return future.addListener(newFuture -> {
 
+                channel = future.channel();
 
-        if (future.isSuccess() && future.channel().isActive()) {
+                if (future.isSuccess() && future.channel().isActive()) {
 
 
-            running = true;
-            // getLogger().info("NEW WAIT FOR COMMAND THREAD");
+                    running = true;
+                    // getLogger().info("NEW WAIT FOR COMMAND THREAD");
 //                waitThread = new Thread(waitForCommand, "CommandThread");
 //                waitThread.start();
 
 
+                }
+            });
+
+
+
+        } catch (InterruptedException e) {
+            getLogger().error(e.getMessage(), e);
+            throw e;
         }
     }
 
