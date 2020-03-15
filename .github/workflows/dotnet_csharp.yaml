@@ -1,4 +1,4 @@
-name: .NET C# CI
+name: DotNET CSharp CI
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
             and: ';'
     
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
