@@ -2,24 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="74a9c842-9768-484a-b6c1-feb6a74ad587" name="Default Changelist" comment="- Decoupling Client and Server to become it's own standalone API and terminal support and other features are being moved to terminal module">
-      <change beforePath="$PROJECT_DIR$/../csharp/client/Client.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../csharp/client/Client.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../csharp/core/JsonHandler.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../csharp/core/StaticHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../csharp/core/StaticHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../csharp/core/codecs/Codecs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../csharp/core/codecs/Codecs.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../csharp/core/encryption/EncryptedBytes.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../csharp/core/encryption/EncryptedBytes.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../csharp/client/ClientHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../csharp/client/ClientHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../csharp/client/client.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/../csharp/client/client.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../csharp/core/core.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/../csharp/core/core.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/Client.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/ClientSettings.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/ClientSettings.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/CoreSettings.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/CoreSettings.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/StaticHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/StaticHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/general/gson/EncryptedJSONObjectEncoder.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/general/gson/EncryptedJSONObjectEncoder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/util/EncryptionUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/util/EncryptionUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/util/RSAEncryptionUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/util/RSAEncryptionUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/Server.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/settings/ServerSettings.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/settings/ServerSettings.java" afterDir="false" />
     </list>
+    <list id="3573a8f5-87af-4aa5-8e37-aaa9023d1393" name="CSharp" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -61,9 +50,9 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Enum" />
-        <option value="AnnotationType" />
         <option value="Class" />
         <option value="Interface" />
+        <option value="AnnotationType" />
       </list>
     </option>
   </component>
@@ -357,6 +346,7 @@
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="74a9c842-9768-484a-b6c1-feb6a74ad587" name="Default Changelist" comment="" />
+      <changelist id="3573a8f5-87af-4aa5-8e37-aaa9023d1393" name="CSharp" comment="" />
       <created>1569626764568</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -558,7 +548,21 @@
       <option name="project" value="LOCAL" />
       <updated>1583791858868</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="Added JUnit 5 Testing dependencies&#10;Using RSA OAEP SHA 256 for encryption now">
+      <created>1584290594318</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1584290594318</updated>
+    </task>
+    <task id="LOCAL-00030" summary="New Async.java annotation&#10;Client.connect is now async and returns a future if synchronized is required">
+      <created>1584291888146</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1584291888146</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -600,8 +604,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Big changes, though small to the average user.&#10;&#10;- Refactored lots of code&#10;- Fixed lots of bugs with terminal usage&#10;- Added color support&#10;- Updated libraries such as JANSI and Jline&#10;- Still needs lots more refactoring of code&#10;- Settings now uses reflection and annotations to point to setting values, making less hard coded and static values and cleaner code&#10;- SettingsManager has been replaced by GsonConfig&lt;&gt;&#10;- Moved more threads async and attempted to fix more spaghetti code (Make less code dependant on each other and more modular)" />
-    <MESSAGE value="- Did a lot refractoring of code&#10;- Uses JSON (with encryption) while wrapping around an unencrypted JSON block&#10;- Uses RSA for handshake encryption&#10;- While messing with code, I saw the old encryption method was redundant because the key was given in plain text. This was fixed while also using JSON for sending packets. The packets are now wrapped around a JSON packet wrapper that converts the object into it's own JSON object.&#10;- Attempted to lower some latency with more async code &#10;- Added some changes to the LightReader API which is planned to become it's own github repo soon. (And so will PiAnimation) &#10;- The LightReader API uses annotations for defining it's command name and required arguments." />
     <MESSAGE value="- Flutter" />
     <MESSAGE value="- Does not allow the server to work correctly" />
     <MESSAGE value="Preparing for release" />
@@ -625,7 +627,9 @@
     <MESSAGE value="- Decoupling Client and Server to become it's own standalone API and terminal support and other features are being moved to terminal module" />
     <MESSAGE value="Cleaned lots of old code. Most of the old redundant code has been refactored, optimized and removed for better efficiency and consistency.&#10;- Decoupling Client and Server to become it's own standalone API and terminal support and other features are being moved to terminal module" />
     <MESSAGE value="New events for both client and event Listener&#10;Packets now have a corresponding ID based on time taken to send and receive" />
-    <option name="LAST_COMMIT_MESSAGE" value="New events for both client and event Listener&#10;Packets now have a corresponding ID based on time taken to send and receive" />
+    <MESSAGE value="Added JUnit 5 Testing dependencies&#10;Using RSA OAEP SHA 256 for encryption now" />
+    <MESSAGE value="New Async.java annotation&#10;Client.connect is now async and returns a future if synchronized is required" />
+    <option name="LAST_COMMIT_MESSAGE" value="New Async.java annotation&#10;Client.connect is now async and returns a future if synchronized is required" />
   </component>
   <component name="WindowStateProjectService">
     <state x="674" y="167" key="#Client" timestamp="1580674642429">
@@ -709,7 +713,7 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="155" y="58" width="778" height="891" key="#xdebugger.evaluate/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577565585451" />
-    <state x="0" y="55" width="1602" height="896" key="CommitChangelistDialog2" timestamp="1583791789405">
+    <state x="0" y="55" width="1602" height="896" key="CommitChangelistDialog2" timestamp="1584291880567">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="383" y="0" key="CommitChangelistDialog2/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1575751083540" />
@@ -719,6 +723,7 @@
     <state x="0" y="55" key="CommitChangelistDialog2/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583791789405" />
     <state x="142" y="15" key="CommitChangelistDialog2/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577855771405" />
     <state x="0" y="57" key="CommitChangelistDialog2/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580676276382" />
+    <state x="0" y="55" key="CommitChangelistDialog2/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584291880567" />
     <state x="184" y="91" width="1536" height="861" key="DiffContextDialog" timestamp="1583791908040">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -743,7 +748,7 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="818" y="451" key="Github.Dialog.Accounts.Choose/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577571097799" />
-    <state width="1877" height="261" key="GridCell.Tab.0.bottom" timestamp="1584290454426">
+    <state width="1877" height="261" key="GridCell.Tab.0.bottom" timestamp="1584296417414">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1323" height="158" key="GridCell.Tab.0.bottom/0.0.1366.728@0.0.1366.728" timestamp="1583266580001" />
@@ -754,8 +759,8 @@
     <state width="1877" height="261" key="GridCell.Tab.0.bottom/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583194609746" />
     <state width="1877" height="261" key="GridCell.Tab.0.bottom/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577976847470" />
     <state width="1877" height="261" key="GridCell.Tab.0.bottom/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580680527129" />
-    <state width="1877" height="261" key="GridCell.Tab.0.bottom/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584290454426" />
-    <state width="1877" height="261" key="GridCell.Tab.0.center" timestamp="1584290454426">
+    <state width="1877" height="261" key="GridCell.Tab.0.bottom/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584296417414" />
+    <state width="1877" height="261" key="GridCell.Tab.0.center" timestamp="1584296417414">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1323" height="158" key="GridCell.Tab.0.center/0.0.1366.728@0.0.1366.728" timestamp="1583266580001" />
@@ -766,8 +771,8 @@
     <state width="1877" height="261" key="GridCell.Tab.0.center/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583194609746" />
     <state width="1877" height="261" key="GridCell.Tab.0.center/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577976847469" />
     <state width="1877" height="261" key="GridCell.Tab.0.center/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580680527129" />
-    <state width="1877" height="261" key="GridCell.Tab.0.center/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584290454426" />
-    <state width="1877" height="261" key="GridCell.Tab.0.left" timestamp="1584290454425">
+    <state width="1877" height="261" key="GridCell.Tab.0.center/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584296417414" />
+    <state width="1877" height="261" key="GridCell.Tab.0.left" timestamp="1584296417414">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1323" height="158" key="GridCell.Tab.0.left/0.0.1366.728@0.0.1366.728" timestamp="1583266580001" />
@@ -778,8 +783,8 @@
     <state width="1877" height="261" key="GridCell.Tab.0.left/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583194609746" />
     <state width="1877" height="261" key="GridCell.Tab.0.left/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577976847468" />
     <state width="1877" height="261" key="GridCell.Tab.0.left/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580680527129" />
-    <state width="1877" height="261" key="GridCell.Tab.0.left/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584290454425" />
-    <state width="1877" height="261" key="GridCell.Tab.0.right" timestamp="1584290454426">
+    <state width="1877" height="261" key="GridCell.Tab.0.left/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584296417414" />
+    <state width="1877" height="261" key="GridCell.Tab.0.right" timestamp="1584296417414">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1323" height="158" key="GridCell.Tab.0.right/0.0.1366.728@0.0.1366.728" timestamp="1583266580001" />
@@ -790,7 +795,7 @@
     <state width="1877" height="261" key="GridCell.Tab.0.right/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583194609746" />
     <state width="1877" height="261" key="GridCell.Tab.0.right/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577976847470" />
     <state width="1877" height="261" key="GridCell.Tab.0.right/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580680527129" />
-    <state width="1877" height="261" key="GridCell.Tab.0.right/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584290454426" />
+    <state width="1877" height="261" key="GridCell.Tab.0.right/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584296417414" />
     <state width="1877" height="326" key="GridCell.Tab.1.bottom" timestamp="1581201867909">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -848,11 +853,12 @@
     <state x="461" y="163" key="SettingsEditor/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583108845473" />
     <state x="461" y="163" key="SettingsEditor/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577651244965" />
     <state x="461" y="163" key="SettingsEditor/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580674042162" />
-    <state x="807" y="428" key="VCS.ChangelistChooser" timestamp="1577570995041">
+    <state x="807" y="428" key="VCS.ChangelistChooser" timestamp="1584290539521">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="807" y="428" key="VCS.ChangelistChooser/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577570995041" />
-    <state x="552" y="248" key="Vcs.Push.Dialog.v2" timestamp="1583791863756">
+    <state x="807" y="428" key="VCS.ChangelistChooser/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584290539521" />
+    <state x="552" y="248" key="Vcs.Push.Dialog.v2" timestamp="1584291889929">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="552" y="248" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1575750295872" />
@@ -862,6 +868,7 @@
     <state x="552" y="248" key="Vcs.Push.Dialog.v2/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583791863756" />
     <state x="552" y="248" key="Vcs.Push.Dialog.v2/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577855777263" />
     <state x="552" y="248" key="Vcs.Push.Dialog.v2/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580676281460" />
+    <state x="552" y="248" key="Vcs.Push.Dialog.v2/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584291889929" />
     <state x="723" y="196" key="com.intellij.testIntegration.createTest.CreateTestDialog" timestamp="1583108689920">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>

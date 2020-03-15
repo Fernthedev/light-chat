@@ -113,6 +113,9 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
         StaticHandler.setCore(new ClientCore(this));
         registerLogger();
 
+        listener = new EventListener(this);
+        clientHandler = new ClientHandler(this, listener);
+
         initialize(host, port);
     }
 
@@ -169,9 +172,9 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
 //        waitForCommand = new WaitForCommand(this);
 
 
-        listener = new EventListener(this);
 
-        clientHandler = new ClientHandler(this, listener);
+
+
     }
 
 
