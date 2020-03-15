@@ -37,4 +37,4 @@ jobs:
     - name: Build and restore core
       run: cd csharp/core ${{ matrix.and }} dotnet build
     - name: Build
-        - cd csharp/client ${{ matrix.and }} dotnet build --configuration Release
+      run: cd csharp/client ${{ matrix.and }} dotnet build --configuration Release
