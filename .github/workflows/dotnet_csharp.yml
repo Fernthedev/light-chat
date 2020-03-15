@@ -3,9 +3,13 @@ name: DotNET CSharp CI
 on:
   push:
     paths:
+      - 'csharp/**'
       - 'csharp/*'
+      - 'csharp/'
   pull_request:
-    paths: 'csharp/*'
+      - 'csharp/**'
+      - 'csharp/*'
+      - 'csharp/'
   release:
     types: # This configuration does not affect the page_build event above
       - created
