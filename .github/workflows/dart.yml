@@ -3,7 +3,17 @@ name: Dart Client
 on:
   push:
     paths:
+      - 'dart/**'
       - 'dart/*'
+      - 'dart/' 
+  pull_request:
+      paths:
+      - 'dart/**'
+      - 'dart/*'
+      - 'dart/'
+  release:
+      types: # This configuration does not affect the page_build event above
+        - created
 
 # jobs:
 #   build:

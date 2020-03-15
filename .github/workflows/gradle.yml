@@ -3,7 +3,17 @@ name: Java CI
 on:
   push:
     paths:
+      - 'java/**'
       - 'java/*'
+      - 'java/' 
+  pull_request:
+      paths:
+      - 'java/**'
+      - 'java/*'
+      - 'java/'
+  release:
+      types: # This configuration does not affect the page_build event above
+        - created
 
 jobs:
   build:
