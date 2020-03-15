@@ -4,6 +4,11 @@ on:
   push:
     paths:
       - 'csharp/*'
+  pull_request:
+    paths: 'csharp/*'
+  release:
+    types: # This configuration does not affect the page_build event above
+      - created
 jobs:
   build:
 
@@ -26,7 +31,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v1.4.0
       with:
         dotnet-version: 2.2.108
     - name: Build with dotnet
