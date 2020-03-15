@@ -14,7 +14,7 @@ namespace com.github.fernthedev.lightchat.client
             this.client = client;
         }
 
-        public void Received(Packet packet)
+        public void Received(Packet packet, int packetId)
         {
 
         }

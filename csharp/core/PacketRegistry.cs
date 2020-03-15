@@ -82,7 +82,7 @@ namespace com.github.fernthedev.lightchat.core
             GenericType<Packet>[] packetClasses = classes.Where(t => t.IsAssignableFrom(typeof(Packet))).Select(t => new GenericType<Packet>(t)).ToArray();
 
             foreach (GenericType<Packet> packetClass in packetClasses) {
-                StaticHandler.WriteDebug("Registering the class {0}", packetClass.Typee.FullName);
+                StaticHandler.core.logger.Debug("Registering the class {0}", packetClass.Typee.FullName);
                 registerPacket(packetClass);
 
             }
