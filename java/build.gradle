@@ -95,7 +95,7 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
         compile 'com.github.Fernthedev:fern-configmanager:1.1.4'
         compile 'com.google.guava:guava:28.2-jre'
         compile 'com.googlecode.json-simple:json-simple:1.1.1'
-        compile 'com.google.code.gson:gson:2.8.1'
+        compile 'com.google.code.gson:gson:2.8.6'
         compile 'com.github.Fernthedev:FernUtils:1.2.0'
         compileOnly 'org.projectlombok:lombok:1.18.4'
         compile group: 'org.apache.maven', name: 'maven-artifact', version: '3.6.3'
