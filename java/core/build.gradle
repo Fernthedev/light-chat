@@ -6,6 +6,6 @@ dependencies {
     compile 'commons-io:commons-io:2.6'
     compile 'commons-codec:commons-codec:1.14'
     compile 'com.alibaba:fastjson:1.2.61'
-    compile 'org.reflections:reflections:0.9.11'
+    compile 'org.reflections:reflections:0.9.12'
 
 }
