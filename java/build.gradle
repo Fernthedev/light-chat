@@ -93,7 +93,7 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
         compile 'com.lmax:disruptor:3.4.2'
         compile 'org.apache.commons:commons-lang3:3.8.1'
         compile 'com.github.Fernthedev:fern-configmanager:1.1.4'
-        compile 'com.google.guava:guava:27.0-jre'
+        compile 'com.google.guava:guava:28.2-jre'
         compile 'com.googlecode.json-simple:json-simple:1.1.1'
         compile 'com.google.code.gson:gson:2.8.1'
         compile 'com.github.Fernthedev:FernUtils:1.2.0'
