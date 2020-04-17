@@ -1,4 +1,4 @@
-package com.github.fernthedev.core.packets.latency;
+package com.github.fernthedev.lightchat.core.packets.latency;
 
 public interface LatencyPacket {
 }

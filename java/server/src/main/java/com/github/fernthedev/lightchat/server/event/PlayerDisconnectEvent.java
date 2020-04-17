@@ -1,9 +1,9 @@
-package com.github.fernthedev.server.event;
+package com.github.fernthedev.lightchat.server.event;
 
 import com.github.fernthedev.lightchat.core.api.event.api.Cancellable;
 import com.github.fernthedev.lightchat.core.api.event.api.Event;
 import com.github.fernthedev.lightchat.core.api.event.api.HandlerList;
-import com.github.fernthedev.server.ClientConnection;
+import com.github.fernthedev.lightchat.server.ClientConnection;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

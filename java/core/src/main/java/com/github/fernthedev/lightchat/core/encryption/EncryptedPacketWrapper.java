@@ -6,4 +6,8 @@ public class EncryptedPacketWrapper extends PacketWrapper<EncryptedBytes> {
 
     public EncryptedPacketWrapper(EncryptedBytes encryptedBytes, Packet packet, int packetId) {
         super(encryptedBytes, packet.getPacketName(), packetId);
-        ENCRYPT = t
+        ENCRYPT = true;
+    }
+
+
+}

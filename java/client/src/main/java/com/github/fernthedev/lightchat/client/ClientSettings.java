@@ -1,6 +1,6 @@
-package com.github.fernthedev.client;
+package com.github.fernthedev.lightchat.client;
 
-import com.github.fernthedev.core.CoreSettings;
+import com.github.fernthedev.lightchat.core.CoreSettings;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

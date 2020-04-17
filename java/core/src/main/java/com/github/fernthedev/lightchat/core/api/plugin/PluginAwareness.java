@@ -1,4 +1,4 @@
-package com.github.fernthedev.core.api.plugin;
+package com.github.fernthedev.lightchat.core.api.plugin;
 
 import java.util.Set;
 

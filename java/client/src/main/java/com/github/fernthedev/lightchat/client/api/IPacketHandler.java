@@ -1,6 +1,6 @@
-package com.github.fernthedev.client.api;
+package com.github.fernthedev.lightchat.client.api;
 
-import com.github.fernthedev.core.packets.Packet;
+import com.github.fernthedev.lightchat.core.packets.Packet;
 
 @FunctionalInterface
 public interface IPacketHandler {

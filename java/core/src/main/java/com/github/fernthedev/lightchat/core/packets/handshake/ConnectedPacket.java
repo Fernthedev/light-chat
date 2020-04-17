@@ -49,4 +49,7 @@ public class ConnectedPacket extends Packet {
     }
 
 
-    public String g
+    public String getOS() {
+        return os;
+    }
+}

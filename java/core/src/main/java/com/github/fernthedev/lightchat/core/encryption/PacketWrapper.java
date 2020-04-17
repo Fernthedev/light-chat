@@ -47,4 +47,5 @@ public class PacketWrapper<T> implements Serializable {
 
 
 
-    protected PacketWrapper
+    protected PacketWrapper() {}
+}

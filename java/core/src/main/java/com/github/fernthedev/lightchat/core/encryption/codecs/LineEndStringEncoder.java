@@ -26,4 +26,6 @@ public class LineEndStringEncoder extends StringEncoder {
 
     @Override
     public void encode(ChannelHandlerContext ctx, CharSequence msg, List<Object> out) throws Exception {
-        super.encode(ctx, msg + StaticHandler.END_STRIN
+        super.encode(ctx, msg + StaticHandler.END_STRING, out);
+    }
+}

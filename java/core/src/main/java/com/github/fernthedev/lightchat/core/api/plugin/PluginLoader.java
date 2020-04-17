@@ -1,10 +1,10 @@
-package com.github.fernthedev.core.api.plugin;
+package com.github.fernthedev.lightchat.core.api.plugin;
 
-import com.github.fernthedev.core.api.event.api.Event;
-import com.github.fernthedev.core.api.event.api.Listener;
-import com.github.fernthedev.core.api.event.api.RegisteredListener;
-import com.github.fernthedev.core.api.plugin.exception.InvalidPluginException;
-import com.github.fernthedev.core.api.plugin.exception.UnknownDependencyException;
+import com.github.fernthedev.lightchat.core.api.event.api.Event;
+import com.github.fernthedev.lightchat.core.api.event.api.Listener;
+import com.github.fernthedev.lightchat.core.api.event.api.RegisteredListener;
+import com.github.fernthedev.lightchat.core.api.plugin.exception.InvalidPluginException;
+import com.github.fernthedev.lightchat.core.api.plugin.exception.UnknownDependencyException;
 
 import java.io.File;
 import java.util.Map;

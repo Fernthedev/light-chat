@@ -34,4 +34,6 @@ public abstract class Packet implements AcceptablePacketTypes {
     protected Packet() {
         if (!getClass().isAnnotationPresent(PacketInfo.class)) throw new IllegalStateException("Packet must have a packet info annotation");
 
-        packetName = getClass().getAnnotation(PacketInfo.class)
+        packetName = getClass().getAnnotation(PacketInfo.class).name();
+    }
+}

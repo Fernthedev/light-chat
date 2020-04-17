@@ -1,6 +1,6 @@
-package com.github.fernthedev.core.data;
+package com.github.fernthedev.lightchat.core.data;
 
-import com.github.fernthedev.core.encryption.util.EncryptionUtil;
+import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil;
 import lombok.Getter;
 
 import java.io.Serializable;

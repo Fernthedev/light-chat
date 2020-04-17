@@ -1,7 +1,7 @@
-package com.github.fernthedev.core.api.plugin;
+package com.github.fernthedev.lightchat.core.api.plugin;
 
-import com.github.fernthedev.core.StaticHandler;
-import com.github.fernthedev.core.api.event.api.*;
+import com.github.fernthedev.lightchat.core.StaticHandler;
+import com.github.fernthedev.lightchat.core.api.event.api.*;
 import org.apache.commons.lang3.Validate;
 
 import java.lang.reflect.InvocationTargetException;

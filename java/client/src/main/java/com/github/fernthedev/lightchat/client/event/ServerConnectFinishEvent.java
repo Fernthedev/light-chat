@@ -1,8 +1,8 @@
-package com.github.fernthedev.client.event;
+package com.github.fernthedev.lightchat.client.event;
 
 
-import com.github.fernthedev.core.api.event.api.Event;
-import com.github.fernthedev.core.api.event.api.HandlerList;
+import com.github.fernthedev.lightchat.core.api.event.api.Event;
+import com.github.fernthedev.lightchat.core.api.event.api.HandlerList;
 import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

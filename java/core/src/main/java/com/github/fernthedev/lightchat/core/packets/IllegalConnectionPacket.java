@@ -1,4 +1,4 @@
-package com.github.fernthedev.core.packets;
+package com.github.fernthedev.lightchat.core.packets;
 
 @PacketInfo(name = "ILLEGAL_CONNECTION_PACKET")
 public class IllegalConnectionPacket extends Packet {

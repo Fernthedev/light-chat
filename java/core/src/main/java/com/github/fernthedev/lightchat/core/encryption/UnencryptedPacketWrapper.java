@@ -1,8 +1,8 @@
-package com.github.fernthedev.core.encryption;
+package com.github.fernthedev.lightchat.core.encryption;
 
-import com.github.fernthedev.core.PacketRegistry;
-import com.github.fernthedev.core.encryption.codecs.AcceptablePacketTypes;
-import com.github.fernthedev.core.packets.Packet;
+import com.github.fernthedev.lightchat.core.PacketRegistry;
+import com.github.fernthedev.lightchat.core.encryption.codecs.AcceptablePacketTypes;
+import com.github.fernthedev.lightchat.core.packets.Packet;
 
 /**
  * Wraps a packet not meant to be encrypted

@@ -1,4 +1,4 @@
-package com.github.fernthedev.server.event;
+package com.github.fernthedev.lightchat.server.event;
 
 import com.github.fernthedev.lightchat.core.api.event.api.Event;
 import com.github.fernthedev.lightchat.core.api.event.api.HandlerList;

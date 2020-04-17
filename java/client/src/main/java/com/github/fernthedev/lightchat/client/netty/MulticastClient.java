@@ -1,9 +1,9 @@
-package com.github.fernthedev.client.netty;
+package com.github.fernthedev.lightchat.client.netty;
 
 
-import com.github.fernthedev.core.MulticastData;
-import com.github.fernthedev.core.StaticHandler;
-import com.github.fernthedev.core.exceptions.DebugChainedException;
+import com.github.fernthedev.lightchat.core.MulticastData;
+import com.github.fernthedev.lightchat.core.StaticHandler;
+import com.github.fernthedev.lightchat.core.exceptions.DebugChainedException;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import lombok.Getter;

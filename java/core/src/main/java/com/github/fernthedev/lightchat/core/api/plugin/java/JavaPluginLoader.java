@@ -1,14 +1,14 @@
-package com.github.fernthedev.core.api.plugin.java;
+package com.github.fernthedev.lightchat.core.api.plugin.java;
 
 
-import com.github.fernthedev.core.StaticHandler;
-import com.github.fernthedev.core.api.event.api.*;
-import com.github.fernthedev.core.api.plugin.Plugin;
-import com.github.fernthedev.core.api.plugin.PluginDescriptionFile;
-import com.github.fernthedev.core.api.plugin.PluginLoader;
-import com.github.fernthedev.core.api.plugin.exception.InvalidDescriptionException;
-import com.github.fernthedev.core.api.plugin.exception.InvalidPluginException;
-import com.github.fernthedev.core.api.plugin.exception.UnknownDependencyException;
+import com.github.fernthedev.lightchat.core.StaticHandler;
+import com.github.fernthedev.lightchat.core.api.plugin.Plugin;
+import com.github.fernthedev.lightchat.core.api.plugin.PluginDescriptionFile;
+import com.github.fernthedev.lightchat.core.api.plugin.PluginLoader;
+import com.github.fernthedev.lightchat.core.api.plugin.exception.InvalidDescriptionException;
+import com.github.fernthedev.lightchat.core.api.plugin.exception.InvalidPluginException;
+import com.github.fernthedev.lightchat.core.api.plugin.exception.UnknownDependencyException;
+import com.github.fernthedev.lightchat.core.api.event.api.*;
 import org.apache.commons.lang3.Validate;
 
 import java.io.File;

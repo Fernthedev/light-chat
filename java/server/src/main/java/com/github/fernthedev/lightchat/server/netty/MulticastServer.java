@@ -1,9 +1,9 @@
-package com.github.fernthedev.server.netty;
+package com.github.fernthedev.lightchat.server.netty;
 
 
 import com.github.fernthedev.lightchat.core.MulticastData;
 import com.github.fernthedev.lightchat.core.StaticHandler;
-import com.github.fernthedev.server.Server;
+import com.github.fernthedev.lightchat.server.Server;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -55,7 +55,7 @@ public class MulticastServer extends QuoteServerThread {
                 try {
                     sleep((long) (Math.random() * 200));
                 } catch (InterruptedException ignored) {
-                    Thread.currentThread().interrupt();
+                    currentThread().interrupt();
                 }
             }
             catch (IOException e) {
@@ -63,9 +63,9 @@ public class MulticastServer extends QuoteServerThread {
                 moreQuotes = false;
             }
             try {
-                Thread.sleep(15);
+                sleep(15);
             } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+                currentThread().interrupt();
             }
         }
         Server.getLogger().info("Closing MultiCast Server");

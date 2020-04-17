@@ -1,7 +1,7 @@
-package com.github.fernthedev.core.api.plugin;
+package com.github.fernthedev.lightchat.core.api.plugin;
 
 
-import com.github.fernthedev.core.api.plugin.exception.InvalidDescriptionException;
+import com.github.fernthedev.lightchat.core.api.plugin.exception.InvalidDescriptionException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;

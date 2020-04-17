@@ -13,4 +13,6 @@ public class FastJSONHandler implements JSONHandler {
 
     @Override
     public String toJson(Object src) {
-        return JSON.
+        return JSON.toJSONString(src);
+    }
+}

@@ -111,4 +111,10 @@ public class EncryptedJSONObjectEncoder extends MessageToMessageEncoder<Acceptab
 
         try {
             encryptedJSON = EncryptionUtil.encrypt(decryptedString, secretKey);
- 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return encryptedJSON;
+    }
+}

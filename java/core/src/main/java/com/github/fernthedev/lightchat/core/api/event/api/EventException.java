@@ -1,4 +1,4 @@
-package com.github.fernthedev.core.api.event.api;
+package com.github.fernthedev.lightchat.core.api.event.api;
 
 public class EventException extends Exception {
     private static final long serialVersionUID = 3532808232324183999L;

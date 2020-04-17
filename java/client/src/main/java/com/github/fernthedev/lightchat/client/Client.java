@@ -1,19 +1,19 @@
-package com.github.fernthedev.client;
+package com.github.fernthedev.lightchat.client;
 
-import com.github.fernthedev.client.api.IPacketHandler;
-import com.github.fernthedev.client.event.ServerDisconnectEvent;
-import com.github.fernthedev.client.netty.ClientHandler;
-import com.github.fernthedev.core.StaticHandler;
-import com.github.fernthedev.core.api.APIUsage;
-import com.github.fernthedev.core.api.Async;
-import com.github.fernthedev.core.api.plugin.PluginManager;
-import com.github.fernthedev.core.encryption.RSA.IEncryptionKeyHolder;
-import com.github.fernthedev.core.encryption.UnencryptedPacketWrapper;
-import com.github.fernthedev.core.encryption.codecs.general.gson.EncryptedJSONObjectDecoder;
-import com.github.fernthedev.core.encryption.codecs.general.gson.EncryptedJSONObjectEncoder;
-import com.github.fernthedev.core.exceptions.DebugException;
-import com.github.fernthedev.core.packets.Packet;
-import com.github.fernthedev.core.packets.handshake.ConnectedPacket;
+import com.github.fernthedev.lightchat.client.api.IPacketHandler;
+import com.github.fernthedev.lightchat.client.event.ServerDisconnectEvent;
+import com.github.fernthedev.lightchat.client.netty.ClientHandler;
+import com.github.fernthedev.lightchat.core.StaticHandler;
+import com.github.fernthedev.lightchat.core.api.APIUsage;
+import com.github.fernthedev.lightchat.core.api.Async;
+import com.github.fernthedev.lightchat.core.api.plugin.PluginManager;
+import com.github.fernthedev.lightchat.core.encryption.RSA.IEncryptionKeyHolder;
+import com.github.fernthedev.lightchat.core.encryption.UnencryptedPacketWrapper;
+import com.github.fernthedev.lightchat.core.encryption.codecs.general.gson.EncryptedJSONObjectDecoder;
+import com.github.fernthedev.lightchat.core.encryption.codecs.general.gson.EncryptedJSONObjectEncoder;
+import com.github.fernthedev.lightchat.core.exceptions.DebugException;
+import com.github.fernthedev.lightchat.core.packets.Packet;
+import com.github.fernthedev.lightchat.core.packets.handshake.ConnectedPacket;
 import com.google.common.base.Stopwatch;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -97,7 +97,7 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
      * Packet:[ID,lastPacketSentTime]
      */
     @NonNull
-    private Map<Class<? extends Packet>, Pair<Integer, Long>> packetIdMap = new HashMap<>();
+    private final Map<Class<? extends Packet>, Pair<Integer, Long>> packetIdMap = new HashMap<>();
 
     @Getter
     @Setter

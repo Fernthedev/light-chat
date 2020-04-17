@@ -12,4 +12,6 @@ public class ErrorMessageException extends Exception {
 
     public ErrorMessageException(String s,Exception ex) {
         super(s,ex);
-  
+    }
+
+}

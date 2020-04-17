@@ -1,4 +1,4 @@
-package com.github.fernthedev.core.data;
+package com.github.fernthedev.lightchat.core.data;
 
 import lombok.Getter;
 

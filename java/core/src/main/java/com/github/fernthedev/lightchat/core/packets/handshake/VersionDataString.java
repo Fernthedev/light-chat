@@ -1,4 +1,4 @@
-package com.github.fernthedev.core.packets.handshake;
+package com.github.fernthedev.lightchat.core.packets.handshake;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

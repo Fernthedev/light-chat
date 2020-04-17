@@ -1,4 +1,4 @@
-package com.github.fernthedev.core.api.plugin.exception;
+package com.github.fernthedev.lightchat.core.api.plugin.exception;
 
 /**
  * Thrown when attempting to load an invalid PluginDescriptionFile

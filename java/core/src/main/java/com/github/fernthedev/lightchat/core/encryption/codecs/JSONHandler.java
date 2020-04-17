@@ -1,4 +1,4 @@
-package com.github.fernthedev.core.encryption.codecs;
+package com.github.fernthedev.lightchat.core.encryption.codecs;
 
 public interface JSONHandler {
     <T> T fromJson(String decodedStr, Class<T> packetWrapperClass);

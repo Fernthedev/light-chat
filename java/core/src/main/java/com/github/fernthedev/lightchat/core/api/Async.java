@@ -1,4 +1,4 @@
-package com.github.fernthedev.core.api;
+package com.github.fernthedev.lightchat.core.api;
 
 import java.lang.annotation.*;
 

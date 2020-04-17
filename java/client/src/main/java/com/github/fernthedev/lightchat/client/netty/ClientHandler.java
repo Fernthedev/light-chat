@@ -1,11 +1,11 @@
-package com.github.fernthedev.client.netty;
+package com.github.fernthedev.lightchat.client.netty;
 
-import com.github.fernthedev.client.Client;
-import com.github.fernthedev.client.EventListener;
-import com.github.fernthedev.client.event.ServerConnectFinishEvent;
-import com.github.fernthedev.client.event.ServerDisconnectEvent;
-import com.github.fernthedev.core.StaticHandler;
-import com.github.fernthedev.core.packets.Packet;
+import com.github.fernthedev.lightchat.client.Client;
+import com.github.fernthedev.lightchat.client.EventListener;
+import com.github.fernthedev.lightchat.client.event.ServerConnectFinishEvent;
+import com.github.fernthedev.lightchat.client.event.ServerDisconnectEvent;
+import com.github.fernthedev.lightchat.core.StaticHandler;
+import com.github.fernthedev.lightchat.core.packets.Packet;
 import io.netty.channel.*;
 import io.netty.handler.timeout.ReadTimeoutException;
 import org.apache.commons.lang3.tuple.Pair;

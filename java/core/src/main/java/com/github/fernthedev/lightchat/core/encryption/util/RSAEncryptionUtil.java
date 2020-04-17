@@ -1,6 +1,6 @@
-package com.github.fernthedev.core.encryption.util;
+package com.github.fernthedev.lightchat.core.encryption.util;
 
-import com.github.fernthedev.core.StaticHandler;
+import com.github.fernthedev.lightchat.core.StaticHandler;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;

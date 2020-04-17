@@ -1,4 +1,4 @@
-package com.github.fernthedev.core.encryption.RSA;
+package com.github.fernthedev.lightchat.core.encryption.RSA;
 
 public class NoSecretKeyException extends EncryptionException {
     /**

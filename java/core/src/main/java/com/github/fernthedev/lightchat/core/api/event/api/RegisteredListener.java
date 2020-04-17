@@ -1,7 +1,7 @@
-package com.github.fernthedev.core.api.event.api;
+package com.github.fernthedev.lightchat.core.api.event.api;
 
 
-import com.github.fernthedev.core.api.plugin.Plugin;
+import com.github.fernthedev.lightchat.core.api.plugin.Plugin;
 
 /**
  * Stores relevant information for plugin listeners

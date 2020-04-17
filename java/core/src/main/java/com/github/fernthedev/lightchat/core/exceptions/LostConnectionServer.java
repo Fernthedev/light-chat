@@ -1,4 +1,4 @@
-package com.github.fernthedev.core.exceptions;
+package com.github.fernthedev.lightchat.core.exceptions;
 
 public class LostConnectionServer extends Exception {
 

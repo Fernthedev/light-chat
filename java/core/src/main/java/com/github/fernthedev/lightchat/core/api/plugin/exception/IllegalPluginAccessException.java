@@ -1,4 +1,4 @@
-package com.github.fernthedev.core.api.plugin.exception;
+package com.github.fernthedev.lightchat.core.api.plugin.exception;
 
 /**
  * Thrown when a com.github.fernthedev.client.plugin attempts to interact with the server when it is not

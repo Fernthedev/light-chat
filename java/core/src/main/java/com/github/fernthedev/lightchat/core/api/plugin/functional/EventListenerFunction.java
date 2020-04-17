@@ -1,8 +1,8 @@
-package com.github.fernthedev.core.api.plugin.functional;
+package com.github.fernthedev.lightchat.core.api.plugin.functional;
 
-import com.github.fernthedev.core.api.event.api.Event;
-import com.github.fernthedev.core.api.event.api.EventHandler;
-import com.github.fernthedev.core.api.event.api.Listener;
+import com.github.fernthedev.lightchat.core.api.event.api.Event;
+import com.github.fernthedev.lightchat.core.api.event.api.EventHandler;
+import com.github.fernthedev.lightchat.core.api.event.api.Listener;
 
 /**
  * Use for functional programming

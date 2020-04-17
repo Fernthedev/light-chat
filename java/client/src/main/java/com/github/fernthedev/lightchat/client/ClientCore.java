@@ -1,6 +1,6 @@
-package com.github.fernthedev.client;
+package com.github.fernthedev.lightchat.client;
 
-import com.github.fernthedev.core.Core;
+import com.github.fernthedev.lightchat.core.Core;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

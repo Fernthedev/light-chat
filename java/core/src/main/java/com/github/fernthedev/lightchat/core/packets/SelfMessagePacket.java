@@ -20,3 +20,5 @@ public class SelfMessagePacket extends Packet {
         LOST_SERVER_CONNECTION,
         REGISTER_PACKET,
         TIMED_OUT_REGISTRATION
+    }
+}

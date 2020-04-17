@@ -1,13 +1,13 @@
-package com.github.fernthedev.server.netty;
+package com.github.fernthedev.lightchat.server.netty;
 
 import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.core.packets.Packet;
 import com.github.fernthedev.lightchat.core.packets.handshake.ConnectedPacket;
 import com.github.fernthedev.lightchat.core.packets.handshake.InitialHandshakePacket;
-import com.github.fernthedev.server.ClientConnection;
-import com.github.fernthedev.server.EventListener;
-import com.github.fernthedev.server.Server;
-import com.github.fernthedev.server.event.PlayerDisconnectEvent;
+import com.github.fernthedev.lightchat.server.ClientConnection;
+import com.github.fernthedev.lightchat.server.EventListener;
+import com.github.fernthedev.lightchat.server.Server;
+import com.github.fernthedev.lightchat.server.event.PlayerDisconnectEvent;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
