@@ -91,7 +91,7 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
         compile "io.netty:netty-transport-native-epoll:$netty_ver"
         compile "io.netty:netty-transport-native-kqueue:$netty_ver"
         compile 'com.lmax:disruptor:3.4.2'
-        compile 'org.apache.commons:commons-lang3:3.9'
+        compile 'org.apache.commons:commons-lang3:3.10'
         compile 'com.github.Fernthedev:fern-configmanager:1.1.4'
         compile 'com.google.guava:guava:29.0-jre'
         compile 'com.googlecode.json-simple:json-simple:1.1.1'
