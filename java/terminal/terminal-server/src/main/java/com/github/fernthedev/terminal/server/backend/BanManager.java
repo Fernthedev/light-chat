@@ -1,8 +1,8 @@
 package com.github.fernthedev.terminal.server.backend;
 
-import com.github.fernthedev.server.ClientConnection;
-import com.github.fernthedev.server.Server;
-import com.github.fernthedev.core.StaticHandler;
+import com.github.fernthedev.lightchat.server.ClientConnection;
+import com.github.fernthedev.lightchat.server.Server;
+import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.google.gson.Gson;
 import lombok.NonNull;
 

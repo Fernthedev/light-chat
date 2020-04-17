@@ -1,8 +1,8 @@
 package com.github.fernthedev.terminal.client;
 
-import com.github.fernthedev.client.Client;
+import com.github.fernthedev.lightchat.client.Client;
 import com.github.fernthedev.terminal.core.packets.AutoCompletePacket;
-import com.github.fernthedev.core.data.LightCandidate;
+import com.github.fernthedev.lightchat.core.data.LightCandidate;
 import com.github.fernthedev.terminal.core.CandidateUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

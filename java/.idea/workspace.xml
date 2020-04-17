@@ -1,12 +1,227 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:dependabot" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:dependabot" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:gradle" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:dependabot" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:gradle" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:java" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:dependabot" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:nuget" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:dependabot" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:nuget" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:csharp" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:dependabot" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:nuget" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:csharp" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:client" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:dependabot" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:nuget" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:csharp" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:core" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="74a9c842-9768-484a-b6c1-feb6a74ad587" name="Default Changelist" comment="- Decoupling Client and Server to become it's own standalone API and terminal support and other features are being moved to terminal module">
+      <change afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/event/api/Cancellable.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/event/api/Event.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/plugin/CorePlugin.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/packets/handshake/RequestConnectInfoPacket.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/packets/latency/PongPacket.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../csharp/client/Client.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../csharp/client/Client.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../csharp/client/ClientHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../csharp/client/ClientHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../csharp/client/client.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/../csharp/client/client.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../csharp/core/core.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/../csharp/core/core.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../csharp/client/EventListener.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../csharp/client/EventListener.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/CLogger.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/lightchat/client/CLogger.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/lightchat/client/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/ClientCore.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/lightchat/client/ClientCore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/ClientSettings.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/lightchat/client/ClientSettings.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/EventListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/lightchat/client/EventListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/ILogManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/lightchat/client/ILogManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/WaitForCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/lightchat/client/WaitForCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/api/IPacketHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/lightchat/client/api/IPacketHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/event/ServerConnectFinishEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/lightchat/client/event/ServerConnectFinishEvent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/event/ServerConnectHandshakeEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/lightchat/client/event/ServerConnectHandshakeEvent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/event/ServerDisconnectEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/lightchat/client/event/ServerDisconnectEvent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/netty/ClientHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/lightchat/client/netty/ClientHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/client/netty/MulticastClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/lightchat/client/netty/MulticastClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/ColorCode.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/ColorCode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/Core.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/Core.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/CoreSettings.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/CoreSettings.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/MulticastData.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/MulticastData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/PacketRegistry.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/PacketRegistry.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/StaticHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/StaticHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/VariablesJSON.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/VariablesJSON.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/VersionData.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/VersionData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/APIUsage.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/APIUsage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/Async.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/Async.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/ThreadLock.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/ThreadLock.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/event/api/Cancellable.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/event/api/Event.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/event/api/EventException.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/event/api/EventException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/event/api/EventExecutor.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/event/api/EventExecutor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/event/api/EventHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/event/api/EventHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/event/api/EventPriority.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/event/api/EventPriority.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/event/api/HandlerList.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/event/api/HandlerList.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/event/api/Listener.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/event/api/Listener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/event/api/RegisteredListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/event/api/RegisteredListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/CorePlugin.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/Plugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/plugin/Plugin.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/PluginAwareness.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/plugin/PluginAwareness.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/PluginDescriptionFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/plugin/PluginDescriptionFile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/PluginLoadOrder.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/plugin/PluginLoadOrder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/PluginLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/plugin/PluginLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/PluginManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/plugin/PluginManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/exception/IllegalPluginAccessException.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/plugin/exception/IllegalPluginAccessException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/exception/InvalidDescriptionException.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/plugin/exception/InvalidDescriptionException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/exception/InvalidPluginException.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/plugin/exception/InvalidPluginException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/exception/UnknownDependencyException.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/plugin/exception/UnknownDependencyException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/functional/EventListenerFunction.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/plugin/functional/EventListenerFunction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/java/JavaPluginLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/plugin/java/JavaPluginLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/api/plugin/java/PluginClassLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/api/plugin/java/PluginClassLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/data/HashedPassword.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/data/HashedPassword.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/data/LightCandidate.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/data/LightCandidate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/EncryptedBytes.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/encryption/EncryptedBytes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/EncryptedPacketWrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/encryption/EncryptedPacketWrapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/PacketWrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/encryption/PacketWrapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/RSA/EncryptionException.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/encryption/RSA/EncryptionException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/RSA/IEncryptionKeyHolder.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/encryption/RSA/IEncryptionKeyHolder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/RSA/NoSecretKeyException.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/encryption/RSA/NoSecretKeyException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/UnencryptedPacketWrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/encryption/UnencryptedPacketWrapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/AcceptablePacketTypes.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/encryption/codecs/AcceptablePacketTypes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/CodecEnum.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/encryption/codecs/CodecEnum.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/JSONHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/encryption/codecs/JSONHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/LineEndStringEncoder.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/encryption/codecs/LineEndStringEncoder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/general/gson/EncryptedJSONObjectDecoder.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/encryption/codecs/general/gson/EncryptedJSONObjectDecoder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/general/gson/EncryptedJSONObjectEncoder.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/encryption/codecs/general/gson/EncryptedJSONObjectEncoder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/json/FastJSONHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/encryption/codecs/json/FastJSONHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/codecs/json/GSONHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/encryption/codecs/json/GSONHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/util/EncryptionUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/encryption/util/EncryptionUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/encryption/util/RSAEncryptionUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/encryption/util/RSAEncryptionUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/exceptions/DebugChainedException.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/exceptions/DebugChainedException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/exceptions/DebugException.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/exceptions/DebugException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/exceptions/ErrorMessageException.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/exceptions/ErrorMessageException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/exceptions/LostConnectionServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/exceptions/LostConnectionServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/exceptions/PacketNotInRegistryException.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/exceptions/PacketNotInRegistryException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/exceptions/PacketRegistryException.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/exceptions/PacketRegistryException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/HashedPasswordPacket.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/packets/HashedPasswordPacket.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/IllegalConnectionPacket.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/packets/IllegalConnectionPacket.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/Packet.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/packets/Packet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/PacketInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/packets/PacketInfo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/SelfMessagePacket.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/packets/SelfMessagePacket.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/handshake/ConnectedPacket.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/packets/handshake/ConnectedPacket.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/handshake/InitialHandshakePacket.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/packets/handshake/InitialHandshakePacket.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/handshake/KeyResponsePacket.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/packets/handshake/KeyResponsePacket.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/handshake/RequestConnectInfoPacket.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/handshake/VersionDataString.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/packets/handshake/VersionDataString.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/latency/LatencyPacket.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/packets/latency/LatencyPacket.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/latency/PingPacket.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/packets/latency/PingPacket.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/latency/PingReceive.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/packets/latency/PingReceive.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/core/packets/latency/PongPacket.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/ClientConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/ClientConnection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/Console.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/Console.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/EncryptionKeyFinder.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/EncryptionKeyFinder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/EventListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/EventListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/PlayerHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/PlayerHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/SenderInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/SenderInterface.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/Server.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/ServerCore.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/ServerCore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/api/IPacketHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/api/IPacketHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/event/PlayerDisconnectEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/event/PlayerDisconnectEvent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/event/PlayerJoinEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/event/PlayerJoinEvent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/event/ServerShutdownEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/event/ServerShutdownEvent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/event/ServerStartupEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/event/ServerStartupEvent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/netty/MulticastServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/netty/MulticastServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/netty/ProcessingHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/netty/ProcessingHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/netty/QuoteServerThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/netty/QuoteServerThread.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/settings/NoFileConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/settings/NoFileConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/settings/ServerSettings.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/settings/ServerSettings.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/server/settings/SettingsManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/settings/SettingsManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-client/src/main/java/com/github/fernthedev/terminal/client/AutoCompleteHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-client/src/main/java/com/github/fernthedev/terminal/client/AutoCompleteHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-client/src/main/java/com/github/fernthedev/terminal/client/ClientTermCore.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-client/src/main/java/com/github/fernthedev/terminal/client/ClientTermCore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-client/src/main/java/com/github/fernthedev/terminal/client/ClientTerminal.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-client/src/main/java/com/github/fernthedev/terminal/client/ClientTerminal.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-client/src/main/java/com/github/fernthedev/terminal/client/PacketHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-client/src/main/java/com/github/fernthedev/terminal/client/PacketHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-core/src/main/java/com/github/fernthedev/terminal/core/CandidateUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-core/src/main/java/com/github/fernthedev/terminal/core/CandidateUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-core/src/main/java/com/github/fernthedev/terminal/core/CommonUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-core/src/main/java/com/github/fernthedev/terminal/core/CommonUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-core/src/main/java/com/github/fernthedev/terminal/core/ConsoleHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-core/src/main/java/com/github/fernthedev/terminal/core/ConsoleHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-core/src/main/java/com/github/fernthedev/terminal/core/TermCore.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-core/src/main/java/com/github/fernthedev/terminal/core/TermCore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-core/src/main/java/com/github/fernthedev/terminal/core/packets/AutoCompletePacket.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-core/src/main/java/com/github/fernthedev/terminal/core/packets/AutoCompletePacket.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-core/src/main/java/com/github/fernthedev/terminal/core/packets/CommandPacket.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-core/src/main/java/com/github/fernthedev/terminal/core/packets/CommandPacket.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-core/src/main/java/com/github/fernthedev/terminal/core/packets/MessagePacket.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-core/src/main/java/com/github/fernthedev/terminal/core/packets/MessagePacket.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/CommandMessageParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/CommandMessageParser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/CommandWorkerThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/CommandWorkerThread.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/ServerCommandHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/ServerCommandHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/ServerTermCore.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/ServerTermCore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/ServerTerminal.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/ServerTerminal.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/TerminalPacketHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/TerminalPacketHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/backend/AuthenticationManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/backend/AuthenticationManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/backend/AutoCompleteHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/backend/AutoCompleteHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/backend/BanManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/backend/BanManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/backend/ClientAutoCompleteHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/backend/ClientAutoCompleteHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/backend/PlayerInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/backend/PlayerInfo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/command/AuthCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/command/AuthCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/command/Command.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/command/Command.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/command/KickCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/command/KickCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/command/LightCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/command/LightCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/command/SettingsCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/command/SettingsCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/events/ChatEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/terminal/server/events/ChatEvent.java" afterDir="false" />
     </list>
     <list id="3573a8f5-87af-4aa5-8e37-aaa9023d1393" name="CSharp" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -60,19 +275,11 @@
     <option name="PUSH_AUTO_UPDATE" value="true" />
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="IgnoredFileRootStore">
-    <option name="generatedRoots">
-      <set>
-        <option value="C:\Users\fernr\IdeaProjects\lighttest\java\.idea" />
-      </set>
-    </option>
-  </component>
   <component name="MavenImportPreferences">
     <option name="importingSettings">
       <MavenImportingSettings>
         <option name="downloadDocsAutomatically" value="true" />
         <option name="downloadSourcesAutomatically" value="true" />
-        <option name="importAutomatically" value="true" />
       </MavenImportingSettings>
     </option>
   </component>
@@ -82,20 +289,20 @@
   </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="Git.Branch.Popup.ShowAllRemotes" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="SONARLINT_PRECOMMIT_ANALYSIS" value="true" />
     <property name="add_unversioned_files" value="$PROJECT_DIR$/server/settings.json" />
     <property name="android.sdk.path" value="$USER_HOME$/AppData/Local/Android/Sdk" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../lightreader" />
     <property name="project.structure.last.edited" value="SDKs" />
     <property name="project.structure.proportion" value="0.1528965" />
     <property name="project.structure.side.proportion" value="0.3693901" />
-    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.project.gradle" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
     <property name="show.migrate.to.gradle.popup" value="false" />
     <property name="show.unlinked.gradle.project.popup" value="true" />
   </component>
@@ -143,7 +350,7 @@
       <command value="gradle client:dependencies" />
     </option>
   </component>
-  <component name="RunManager" selected="Application.Client">
+  <component name="RunManager" selected="Gradle.Gradle Build">
     <configuration name="Client" type="Application" factoryName="Application" temporary="true">
       <option name="MAIN_CLASS_NAME" value="com.github.fernthedev.terminal.client.ClientTerminal" />
       <module name="light-chat.terminal.terminal-client.main" />
@@ -316,18 +523,6 @@
         <item itemvalue="Gradle.java [dependencies]" />
       </list>
     </recent_temporary>
-  </component>
-  <component name="ServiceViewManager">
-    <option name="viewStates">
-      <list>
-        <serviceView>
-          <treeState>
-            <expand />
-            <select />
-          </treeState>
-        </serviceView>
-      </list>
-    </option>
   </component>
   <component name="StructuralSearchPlugin">
     <searchConfiguration name="user defined" created="1583622866889" text="System.exit(0);" recursive="true" caseInsensitive="true" type="JAVA" pattern_context="default" scope_type="PROJECT" scope_descriptor="" history="1">
@@ -580,9 +775,7 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State>
-              <option name="COLUMN_ORDER" />
-            </State>
+            <State />
           </value>
         </entry>
       </map>
@@ -601,6 +794,7 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
@@ -636,34 +830,27 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="674" y="167" key="#Client/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580674642429" />
-    <state x="674" y="155" width="587" height="730" key="#Server" timestamp="1577376669949">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="674" y="155" width="587" height="730" key="#Server/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577376669949" />
     <state x="552" y="179" key="#Updates" timestamp="1578765341583">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="552" y="179" key="#Updates/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1578765341583" />
-    <state x="385" y="53" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1584290375885">
+    <state x="385" y="53" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1586883023497">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="274" y="37" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1366.728@0.0.1366.728" timestamp="1583263922440" />
-    <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1576960854972" />
-    <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577564664448" />
+    <state x="385" y="53" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1586883023497" />
     <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581719458240" />
     <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581030465284" />
     <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583179230493" />
-    <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577856546436" />
     <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580676107201" />
     <state x="385" y="53" key="#com.intellij.execution.impl.EditConfigurationsDialog/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584290375885" />
-    <state x="765" y="222" key="#com.intellij.ide.util.MemberChooser" timestamp="1583784392157">
+    <state x="765" y="222" key="#com.intellij.ide.util.MemberChooser" timestamp="1586883595369">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="765" y="222" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577568824225" />
+    <state x="765" y="222" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1586883595369" />
     <state x="765" y="222" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581717258889" />
     <state x="765" y="222" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583784392157" />
     <state x="765" y="222" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583194075468" />
-    <state x="765" y="222" key="#com.intellij.ide.util.MemberChooser/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1578001621387" />
     <state x="689" y="304" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1581200529788">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -678,7 +865,6 @@
     <state x="640" y="248" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1578765178520" />
     <state x="640" y="248" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581709659579" />
     <state x="640" y="248" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583583151416" />
-    <state x="640" y="248" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577969938152" />
     <state x="640" y="248" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584289938570" />
     <state x="464" y="437" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog" timestamp="1583178688659">
       <screen x="0" y="0" width="1920" height="1040" />
@@ -696,32 +882,24 @@
     <state x="466" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1583109290272">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="466" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577565959664" />
     <state x="466" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581713925808" />
     <state x="466" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583109290272" />
     <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1583194308973">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577562761667" />
     <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581711044869" />
     <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583194308973" />
     <state x="488" y="339" width="943" height="362" key="#com.intellij.structuralsearch.plugin.ui.StructuralSearchDialog" timestamp="1583622866881">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="488" y="339" width="943" height="362" key="#com.intellij.structuralsearch.plugin.ui.StructuralSearchDialog/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583622866881" />
-    <state x="155" y="58" width="778" height="891" key="#xdebugger.evaluate" timestamp="1577565585451">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="155" y="58" width="778" height="891" key="#xdebugger.evaluate/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577565585451" />
     <state x="0" y="55" width="1602" height="896" key="CommitChangelistDialog2" timestamp="1584291880567">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="383" y="0" key="CommitChangelistDialog2/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1575751083540" />
     <state x="165" y="91" width="1602" height="896" key="CommitChangelistDialog2/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1578779607118" />
     <state x="0" y="57" key="CommitChangelistDialog2/0.0.1920.1040/1920.317.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1581453747196" />
     <state x="0" y="55" key="CommitChangelistDialog2/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581723223396" />
     <state x="0" y="55" key="CommitChangelistDialog2/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583791789405" />
-    <state x="142" y="15" key="CommitChangelistDialog2/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577855771405" />
     <state x="0" y="57" key="CommitChangelistDialog2/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580676276382" />
     <state x="0" y="55" key="CommitChangelistDialog2/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584291880567" />
     <state x="184" y="91" width="1536" height="861" key="DiffContextDialog" timestamp="1583791908040">
@@ -733,177 +911,121 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="694" y="268" key="EnvironmentVariablesDialog/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583179229966" />
-    <state x="740" y="275" key="FileChooserDialogImpl" timestamp="1583071239107">
+    <state x="740" y="275" key="FileChooserDialogImpl" timestamp="1584367922818">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="740" y="275" key="FileChooserDialogImpl/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1576958816576" />
     <state x="740" y="275" key="FileChooserDialogImpl/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1582582477429" />
     <state x="740" y="275" key="FileChooserDialogImpl/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581031863858" />
     <state x="740" y="275" key="FileChooserDialogImpl/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583071239107" />
-    <state x="310" y="315" key="GitRewordDialog" timestamp="1577570646134">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="310" y="315" key="GitRewordDialog/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577570646134" />
-    <state x="818" y="451" key="Github.Dialog.Accounts.Choose" timestamp="1577571097799">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="818" y="451" key="Github.Dialog.Accounts.Choose/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577571097799" />
-    <state width="1877" height="261" key="GridCell.Tab.0.bottom" timestamp="1584296417414">
+    <state x="740" y="275" key="FileChooserDialogImpl/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584367922818" />
+    <state width="1877" height="274" key="GridCell.Tab.0.bottom" timestamp="1587160142098">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1323" height="158" key="GridCell.Tab.0.bottom/0.0.1366.728@0.0.1366.728" timestamp="1583266580001" />
-    <state width="1877" height="261" key="GridCell.Tab.0.bottom/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1576980013836" />
     <state width="1877" height="261" key="GridCell.Tab.0.bottom/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1582582485353" />
+    <state width="1877" height="274" key="GridCell.Tab.0.bottom/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1587160142098" />
     <state width="1877" height="261" key="GridCell.Tab.0.bottom/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581723774690" />
     <state width="1877" height="261" key="GridCell.Tab.0.bottom/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583802083362" />
     <state width="1877" height="261" key="GridCell.Tab.0.bottom/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583194609746" />
-    <state width="1877" height="261" key="GridCell.Tab.0.bottom/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577976847470" />
     <state width="1877" height="261" key="GridCell.Tab.0.bottom/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580680527129" />
-    <state width="1877" height="261" key="GridCell.Tab.0.bottom/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584296417414" />
-    <state width="1877" height="261" key="GridCell.Tab.0.center" timestamp="1584296417414">
+    <state width="1877" height="261" key="GridCell.Tab.0.bottom/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584378074176" />
+    <state width="1877" height="274" key="GridCell.Tab.0.center" timestamp="1587160142098">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1323" height="158" key="GridCell.Tab.0.center/0.0.1366.728@0.0.1366.728" timestamp="1583266580001" />
-    <state width="1877" height="261" key="GridCell.Tab.0.center/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1576980013835" />
     <state width="1877" height="261" key="GridCell.Tab.0.center/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1582582485353" />
+    <state width="1877" height="274" key="GridCell.Tab.0.center/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1587160142098" />
     <state width="1877" height="261" key="GridCell.Tab.0.center/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581723774690" />
     <state width="1877" height="261" key="GridCell.Tab.0.center/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583802083362" />
     <state width="1877" height="261" key="GridCell.Tab.0.center/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583194609746" />
-    <state width="1877" height="261" key="GridCell.Tab.0.center/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577976847469" />
     <state width="1877" height="261" key="GridCell.Tab.0.center/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580680527129" />
-    <state width="1877" height="261" key="GridCell.Tab.0.center/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584296417414" />
-    <state width="1877" height="261" key="GridCell.Tab.0.left" timestamp="1584296417414">
+    <state width="1877" height="261" key="GridCell.Tab.0.center/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584378074176" />
+    <state width="1877" height="274" key="GridCell.Tab.0.left" timestamp="1587160142098">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1323" height="158" key="GridCell.Tab.0.left/0.0.1366.728@0.0.1366.728" timestamp="1583266580001" />
-    <state width="1877" height="261" key="GridCell.Tab.0.left/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1576980013835" />
     <state width="1877" height="261" key="GridCell.Tab.0.left/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1582582485353" />
+    <state width="1877" height="274" key="GridCell.Tab.0.left/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1587160142098" />
     <state width="1877" height="261" key="GridCell.Tab.0.left/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581723774689" />
     <state width="1877" height="261" key="GridCell.Tab.0.left/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583802083361" />
     <state width="1877" height="261" key="GridCell.Tab.0.left/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583194609746" />
-    <state width="1877" height="261" key="GridCell.Tab.0.left/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577976847468" />
     <state width="1877" height="261" key="GridCell.Tab.0.left/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580680527129" />
-    <state width="1877" height="261" key="GridCell.Tab.0.left/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584296417414" />
-    <state width="1877" height="261" key="GridCell.Tab.0.right" timestamp="1584296417414">
+    <state width="1877" height="261" key="GridCell.Tab.0.left/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584378074176" />
+    <state width="1877" height="274" key="GridCell.Tab.0.right" timestamp="1587160142098">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1323" height="158" key="GridCell.Tab.0.right/0.0.1366.728@0.0.1366.728" timestamp="1583266580001" />
-    <state width="1877" height="261" key="GridCell.Tab.0.right/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1576980013835" />
     <state width="1877" height="261" key="GridCell.Tab.0.right/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1582582485353" />
+    <state width="1877" height="274" key="GridCell.Tab.0.right/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1587160142098" />
     <state width="1877" height="261" key="GridCell.Tab.0.right/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581723774690" />
     <state width="1877" height="261" key="GridCell.Tab.0.right/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583802083362" />
     <state width="1877" height="261" key="GridCell.Tab.0.right/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583194609746" />
-    <state width="1877" height="261" key="GridCell.Tab.0.right/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577976847470" />
     <state width="1877" height="261" key="GridCell.Tab.0.right/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580680527129" />
-    <state width="1877" height="261" key="GridCell.Tab.0.right/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584296417414" />
+    <state width="1877" height="261" key="GridCell.Tab.0.right/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584378074176" />
     <state width="1877" height="326" key="GridCell.Tab.1.bottom" timestamp="1581201867909">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="326" key="GridCell.Tab.1.bottom/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577572213063" />
     <state width="1877" height="326" key="GridCell.Tab.1.bottom/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581201867909" />
     <state width="1877" height="326" key="GridCell.Tab.1.bottom/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581031875141" />
     <state width="1877" height="326" key="GridCell.Tab.1.center" timestamp="1581201867909">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="326" key="GridCell.Tab.1.center/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577572213063" />
     <state width="1877" height="326" key="GridCell.Tab.1.center/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581201867909" />
     <state width="1877" height="326" key="GridCell.Tab.1.center/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581031875141" />
     <state width="1877" height="326" key="GridCell.Tab.1.left" timestamp="1581201867909">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="326" key="GridCell.Tab.1.left/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577572213062" />
     <state width="1877" height="326" key="GridCell.Tab.1.left/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581201867909" />
     <state width="1877" height="326" key="GridCell.Tab.1.left/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581031875141" />
     <state width="1877" height="326" key="GridCell.Tab.1.right" timestamp="1581201867909">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="326" key="GridCell.Tab.1.right/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577572213063" />
     <state width="1877" height="326" key="GridCell.Tab.1.right/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581201867909" />
     <state width="1877" height="326" key="GridCell.Tab.1.right/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581031875141" />
-    <state width="1877" height="326" key="GridCell.Tab.2.bottom" timestamp="1577547930898">
+    <state x="461" y="163" key="SettingsEditor" timestamp="1587157066929">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="326" key="GridCell.Tab.2.bottom/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577547930898" />
-    <state width="1877" height="326" key="GridCell.Tab.2.center" timestamp="1577547930898">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="1877" height="326" key="GridCell.Tab.2.center/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577547930898" />
-    <state width="1877" height="326" key="GridCell.Tab.2.left" timestamp="1577547930898">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="1877" height="326" key="GridCell.Tab.2.left/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577547930898" />
-    <state width="1877" height="326" key="GridCell.Tab.2.right" timestamp="1577547930898">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="1877" height="326" key="GridCell.Tab.2.right/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577547930898" />
-    <state x="540" y="254" key="IDE.errors.dialog" timestamp="1577665911633">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="540" y="254" key="IDE.errors.dialog/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577665911633" />
-    <state x="734" y="146" key="RollbackChangesDialog" timestamp="1575751719435">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="734" y="146" key="RollbackChangesDialog/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1575751719435" />
-    <state x="461" y="163" key="SettingsEditor" timestamp="1583583037959">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="461" y="163" key="SettingsEditor/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577022802234" />
     <state x="461" y="163" key="SettingsEditor/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1579452319129" />
+    <state x="461" y="163" key="SettingsEditor/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1587157066929" />
     <state x="461" y="163" key="SettingsEditor/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583583037959" />
     <state x="461" y="163" key="SettingsEditor/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583108845473" />
-    <state x="461" y="163" key="SettingsEditor/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577651244965" />
     <state x="461" y="163" key="SettingsEditor/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580674042162" />
     <state x="807" y="428" key="VCS.ChangelistChooser" timestamp="1584290539521">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="807" y="428" key="VCS.ChangelistChooser/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577570995041" />
     <state x="807" y="428" key="VCS.ChangelistChooser/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584290539521" />
-    <state x="552" y="248" key="Vcs.Push.Dialog.v2" timestamp="1584291889929">
+    <state x="552" y="248" width="816" height="537" key="Vcs.Push.Dialog.v2" timestamp="1586882451301">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="248" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1575750295872" />
-    <state x="552" y="248" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577572314822" />
+    <state x="552" y="248" width="816" height="537" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1586882451301" />
     <state x="552" y="248" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.317.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1581453923645" />
     <state x="552" y="248" key="Vcs.Push.Dialog.v2/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581723252528" />
     <state x="552" y="248" key="Vcs.Push.Dialog.v2/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583791863756" />
-    <state x="552" y="248" key="Vcs.Push.Dialog.v2/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577855777263" />
     <state x="552" y="248" key="Vcs.Push.Dialog.v2/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580676281460" />
     <state x="552" y="248" key="Vcs.Push.Dialog.v2/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584291889929" />
+    <state x="767" y="431" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1584376266207">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="767" y="431" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584376266207" />
     <state x="723" y="196" key="com.intellij.testIntegration.createTest.CreateTestDialog" timestamp="1583108689920">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="723" y="196" key="com.intellij.testIntegration.createTest.CreateTestDialog/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583108689920" />
-    <state x="756" y="300" key="git4idea.merge.GitMergeDialog" timestamp="1577571776000">
+    <state x="342" y="84" key="new project wizard" timestamp="1584367944049">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="756" y="300" key="git4idea.merge.GitMergeDialog/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577571776000" />
-    <state x="685" y="292" key="git4idea.merge.GitPullDialog" timestamp="1577571319969">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="685" y="292" key="git4idea.merge.GitPullDialog/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577571319969" />
-    <state x="342" y="84" key="new project wizard" timestamp="1581790090549">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="342" y="84" key="new project wizard/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577191649589" />
     <state x="342" y="84" key="new project wizard/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1581790090549" />
     <state x="342" y="84" key="new project wizard/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1581032399200" />
+    <state x="342" y="84" key="new project wizard/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584367944049" />
     <state x="616" y="240" width="672" height="677" key="run.anything.popup" timestamp="1583784995454">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="616" y="240" width="672" height="677" key="run.anything.popup/0.0.1920.1040/1920.0.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1576960188452" />
-    <state x="616" y="240" width="672" height="677" key="run.anything.popup/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577567420620" />
     <state x="616" y="240" width="672" height="677" key="run.anything.popup/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583784995454" />
     <state x="616" y="240" width="672" height="677" key="run.anything.popup/0.0.1920.1040/3286.10.1920.1040/1920.318.1366.728@0.0.1920.1040" timestamp="1580940781325" />
     <state x="616" y="240" width="672" height="677" key="run.anything.popup/0.0.1920.1040/3286.10.1920.1040/1920.319.1366.728@0.0.1920.1040" timestamp="1583181239632" />
-    <state x="740" y="325" key="save.file.as.template.dialog" timestamp="1577570572739">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="740" y="325" key="save.file.as.template.dialog/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577570572739" />
     <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1581713771480">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1577546510922" />
     <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581713771480" />
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/1920.309.1366.728/3286.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1577970741019" />
   </component>
 </project>

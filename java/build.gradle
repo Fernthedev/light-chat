@@ -27,8 +27,8 @@ apply plugin: 'kotlin'
 allprojects {
     group = 'com.github.Fernthedev'
 
-    project.ext.protocol_ver = "1.5.3" // Build version
-    project.ext.protocol_ver_min = "1.5.3" // Minimum build
+    project.ext.protocol_ver = "1.6.0" // Build version
+    project.ext.protocol_ver_min = "1.6.0" // Minimum build
 
     version = project.ext.protocol_ver
 

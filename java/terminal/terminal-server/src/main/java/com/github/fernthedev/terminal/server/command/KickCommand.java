@@ -1,6 +1,9 @@
 package com.github.fernthedev.terminal.server.command;
 
-import com.github.fernthedev.server.*;
+import com.github.fernthedev.lightchat.server.ClientConnection;
+import com.github.fernthedev.lightchat.server.Console;
+import com.github.fernthedev.lightchat.server.SenderInterface;
+import com.github.fernthedev.lightchat.server.Server;
 import com.github.fernthedev.terminal.core.packets.MessagePacket;
 import com.github.fernthedev.terminal.server.ServerTerminal;
 import lombok.NonNull;

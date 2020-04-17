@@ -11,7 +11,7 @@
         <module name="light-chat.terminal.terminal-server.main" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
+    <bytecodeTargetLevel target="11">
       <module name="client-api.main" target="1.8" />
       <module name="client-api.test" target="1.8" />
       <module name="light-chat.api.main" target="1.8" />

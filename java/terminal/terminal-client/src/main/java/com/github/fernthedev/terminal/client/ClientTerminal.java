@@ -1,18 +1,21 @@
 package com.github.fernthedev.terminal.client;
 
-import com.github.fernthedev.client.Client;
-import com.github.fernthedev.client.netty.MulticastClient;
-import com.github.fernthedev.core.MulticastData;
-import com.github.fernthedev.core.StaticHandler;
-import com.github.fernthedev.core.VersionData;
+import com.github.fernthedev.lightchat.client.Client;
+import com.github.fernthedev.lightchat.client.netty.MulticastClient;
+import com.github.fernthedev.lightchat.core.MulticastData;
+import com.github.fernthedev.lightchat.core.StaticHandler;
+import com.github.fernthedev.lightchat.core.VersionData;
 import com.github.fernthedev.terminal.core.CommonUtil;
 import com.github.fernthedev.terminal.core.ConsoleHandler;
 import com.github.fernthedev.terminal.core.TermCore;
 import com.github.fernthedev.terminal.core.packets.CommandPacket;
 import com.github.fernthedev.terminal.core.packets.MessagePacket;
+import com.google.common.base.Stopwatch;
 import lombok.Getter;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +32,9 @@ public class ClientTerminal {
     @Getter
     private static AutoCompleteHandler autoCompleteHandler;
     private static Client client;
+
+    @Getter
+    private static Stopwatch messageDelay = Stopwatch.createUnstarted();
 
     public static void main(String[] args) {
         CommonUtil.initTerminal();
@@ -64,6 +70,7 @@ public class ClientTerminal {
 
             if (arg.equalsIgnoreCase("-debug")) {
                 StaticHandler.setDebug(true);
+                Configurator.setLevel(getLogger().getName(), Level.DEBUG);
                 logger.debug("Debug enabled");
             }
         }

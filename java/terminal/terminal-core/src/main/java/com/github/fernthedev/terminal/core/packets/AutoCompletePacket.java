@@ -1,8 +1,8 @@
 package com.github.fernthedev.terminal.core.packets;
 
-import com.github.fernthedev.core.data.LightCandidate;
-import com.github.fernthedev.core.packets.Packet;
-import com.github.fernthedev.core.packets.PacketInfo;
+import com.github.fernthedev.lightchat.core.data.LightCandidate;
+import com.github.fernthedev.lightchat.core.packets.Packet;
+import com.github.fernthedev.lightchat.core.packets.PacketInfo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;

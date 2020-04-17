@@ -1,6 +1,6 @@
 package com.github.fernthedev.terminal.server.backend;
 
-import com.github.fernthedev.server.SenderInterface;
+import com.github.fernthedev.lightchat.server.SenderInterface;
 
 public class PlayerInfo {
 

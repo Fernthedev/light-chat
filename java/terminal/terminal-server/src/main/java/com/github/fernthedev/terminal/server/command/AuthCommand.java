@@ -1,7 +1,7 @@
 package com.github.fernthedev.terminal.server.command;
 
-import com.github.fernthedev.server.SenderInterface;
-import com.github.fernthedev.server.Server;
+import com.github.fernthedev.lightchat.server.SenderInterface;
+import com.github.fernthedev.lightchat.server.Server;
 import com.github.fernthedev.terminal.server.ServerTerminal;
 import com.github.fernthedev.terminal.server.backend.AuthenticationManager;
 import lombok.NonNull;

@@ -1,9 +1,9 @@
 package com.github.fernthedev.terminal.server.events;
 
-import com.github.fernthedev.core.api.event.api.Cancellable;
-import com.github.fernthedev.core.api.event.api.Event;
-import com.github.fernthedev.core.api.event.api.HandlerList;
-import com.github.fernthedev.server.SenderInterface;
+import com.github.fernthedev.lightchat.core.api.event.api.Cancellable;
+import com.github.fernthedev.lightchat.core.api.event.api.Event;
+import com.github.fernthedev.lightchat.core.api.event.api.HandlerList;
+import com.github.fernthedev.lightchat.server.SenderInterface;
 
 public class ChatEvent extends Event implements Cancellable {
     private boolean cancel = false;

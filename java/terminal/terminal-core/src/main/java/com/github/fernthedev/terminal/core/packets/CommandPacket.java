@@ -1,7 +1,7 @@
 package com.github.fernthedev.terminal.core.packets;
 
-import com.github.fernthedev.core.packets.Packet;
-import com.github.fernthedev.core.packets.PacketInfo;
+import com.github.fernthedev.lightchat.core.packets.Packet;
+import com.github.fernthedev.lightchat.core.packets.PacketInfo;
 
 @PacketInfo(name = "COMMAND_PACKET")
 public class CommandPacket extends Packet {

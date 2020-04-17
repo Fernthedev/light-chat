@@ -1,13 +1,13 @@
 package com.github.fernthedev.terminal.server;
 
-import com.github.fernthedev.core.StaticHandler;
-import com.github.fernthedev.core.data.LightCandidate;
-import com.github.fernthedev.core.packets.HashedPasswordPacket;
-import com.github.fernthedev.core.packets.Packet;
-import com.github.fernthedev.core.packets.handshake.ConnectedPacket;
-import com.github.fernthedev.server.ClientConnection;
-import com.github.fernthedev.server.Server;
-import com.github.fernthedev.server.api.IPacketHandler;
+import com.github.fernthedev.lightchat.core.StaticHandler;
+import com.github.fernthedev.lightchat.core.data.LightCandidate;
+import com.github.fernthedev.lightchat.core.packets.HashedPasswordPacket;
+import com.github.fernthedev.lightchat.core.packets.Packet;
+import com.github.fernthedev.lightchat.core.packets.handshake.ConnectedPacket;
+import com.github.fernthedev.lightchat.server.ClientConnection;
+import com.github.fernthedev.lightchat.server.Server;
+import com.github.fernthedev.lightchat.server.api.IPacketHandler;
 import com.github.fernthedev.terminal.core.packets.AutoCompletePacket;
 import com.github.fernthedev.terminal.core.packets.CommandPacket;
 import com.github.fernthedev.terminal.core.packets.MessagePacket;

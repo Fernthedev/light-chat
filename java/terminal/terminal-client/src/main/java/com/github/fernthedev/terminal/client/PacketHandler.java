@@ -1,16 +1,18 @@
 package com.github.fernthedev.terminal.client;
 
-import com.github.fernthedev.client.api.IPacketHandler;
-import com.github.fernthedev.client.event.ServerDisconnectEvent;
-import com.github.fernthedev.core.ColorCode;
-import com.github.fernthedev.core.StaticHandler;
-import com.github.fernthedev.core.api.event.api.EventHandler;
-import com.github.fernthedev.core.api.event.api.Listener;
-import com.github.fernthedev.core.packets.Packet;
-import com.github.fernthedev.core.packets.SelfMessagePacket;
+import com.github.fernthedev.lightchat.client.api.IPacketHandler;
+import com.github.fernthedev.lightchat.client.event.ServerDisconnectEvent;
+import com.github.fernthedev.lightchat.core.ColorCode;
+import com.github.fernthedev.lightchat.core.StaticHandler;
+import com.github.fernthedev.lightchat.core.api.event.api.EventHandler;
+import com.github.fernthedev.lightchat.core.api.event.api.Listener;
+import com.github.fernthedev.lightchat.core.packets.Packet;
+import com.github.fernthedev.lightchat.core.packets.SelfMessagePacket;
 import com.github.fernthedev.terminal.core.packets.AutoCompletePacket;
 import com.github.fernthedev.terminal.core.packets.MessagePacket;
 import lombok.AllArgsConstructor;
+
+import java.util.concurrent.TimeUnit;
 
 @AllArgsConstructor
 public class PacketHandler implements IPacketHandler, Listener {
@@ -23,6 +25,10 @@ public class PacketHandler implements IPacketHandler, Listener {
         } else if (p instanceof MessagePacket) {
             MessagePacket messagePacket = (MessagePacket) p;
             ClientTerminal.getLogger().info(messagePacket.getMessage());
+
+            ClientTerminal.getMessageDelay().stop();
+            ClientTerminal.getLogger().debug("Time taken for message: {}", ClientTerminal.getMessageDelay().elapsed(TimeUnit.MILLISECONDS));
+
         } else if (p instanceof SelfMessagePacket) {
             SelfMessagePacket selfMessagePacket = (SelfMessagePacket) p;
 

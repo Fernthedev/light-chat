@@ -1,6 +1,6 @@
 package com.github.fernthedev.terminal.core;
 
-import com.github.fernthedev.core.data.LightCandidate;
+import com.github.fernthedev.lightchat.core.data.LightCandidate;
 import org.jline.reader.Candidate;
 
 public class CandidateUtil {

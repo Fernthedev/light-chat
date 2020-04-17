@@ -1,10 +1,10 @@
 package com.github.fernthedev.terminal.server.command;
 
 import com.github.fernthedev.light.LightFileFormatter;
-import com.github.fernthedev.server.ClientConnection;
-import com.github.fernthedev.server.Console;
-import com.github.fernthedev.server.SenderInterface;
-import com.github.fernthedev.server.Server;
+import com.github.fernthedev.lightchat.server.ClientConnection;
+import com.github.fernthedev.lightchat.server.Console;
+import com.github.fernthedev.lightchat.server.SenderInterface;
+import com.github.fernthedev.lightchat.server.Server;
 import com.github.fernthedev.terminal.server.ServerTerminal;
 
 import java.io.File;

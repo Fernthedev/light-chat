@@ -1,7 +1,7 @@
 package com.github.fernthedev.terminal.core;
 
-import com.github.fernthedev.core.PacketRegistry;
-import com.github.fernthedev.core.StaticHandler;
+import com.github.fernthedev.lightchat.core.PacketRegistry;
+import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.terminal.core.packets.MessagePacket;
 import org.apache.commons.lang3.SystemUtils;
 import org.fusesource.jansi.AnsiConsole;

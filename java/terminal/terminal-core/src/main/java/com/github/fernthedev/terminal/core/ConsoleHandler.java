@@ -1,6 +1,6 @@
 package com.github.fernthedev.terminal.core;
 
-import com.github.fernthedev.core.StaticHandler;
+import com.github.fernthedev.lightchat.core.StaticHandler;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

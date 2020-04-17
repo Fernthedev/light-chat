@@ -1,15 +1,15 @@
 package com.github.fernthedev.terminal.server.backend;
 
-import com.github.fernthedev.core.ColorCode;
-import com.github.fernthedev.core.api.event.api.EventHandler;
-import com.github.fernthedev.core.api.event.api.Listener;
-import com.github.fernthedev.core.data.HashedPassword;
-import com.github.fernthedev.core.encryption.util.EncryptionUtil;
-import com.github.fernthedev.core.packets.SelfMessagePacket;
-import com.github.fernthedev.server.ClientConnection;
-import com.github.fernthedev.server.Console;
-import com.github.fernthedev.server.SenderInterface;
-import com.github.fernthedev.server.Server;
+import com.github.fernthedev.lightchat.core.ColorCode;
+import com.github.fernthedev.lightchat.core.api.event.api.EventHandler;
+import com.github.fernthedev.lightchat.core.api.event.api.Listener;
+import com.github.fernthedev.lightchat.core.data.HashedPassword;
+import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil;
+import com.github.fernthedev.lightchat.core.packets.SelfMessagePacket;
+import com.github.fernthedev.lightchat.server.ClientConnection;
+import com.github.fernthedev.lightchat.server.Console;
+import com.github.fernthedev.lightchat.server.SenderInterface;
+import com.github.fernthedev.lightchat.server.Server;
 import com.github.fernthedev.terminal.server.ServerTerminal;
 import com.github.fernthedev.terminal.server.events.ChatEvent;
 
