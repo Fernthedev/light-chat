@@ -14,6 +14,8 @@ using DotNetty.Transport.Channels.Sockets;
 using DotNetty.Codecs;
 using com.github.fernthedev.lightchat.core.util;
 using System.Security.Cryptography;
+using com.github.fernthedev.lightchat.client.events;
+using com.github.fernthedev.lightchat.core.events;
 
 namespace com.github.fernthedev.lightchat.client
 {
@@ -30,23 +32,32 @@ namespace com.github.fernthedev.lightchat.client
 
         public string Name { get; set; } = Environment.MachineName;
 
-        private EventListener eventListener;
+        private PacketEventListener eventListener;
 
         public ClientSettings settings { get; set; } = new ClientSettings();
 
         private IEventLoopGroup group;
 
         private ClientHandler clientHandler;
-        private EventListener listener;
+        private PacketEventListener listener;
 
         private IChannel channel;
+
+        private RijndaelManaged secretKey;
+
+        public event EventHandler<IEvent> eventHandler;
+
+        /**
+         * Packet:[ID,lastPacketSentTime]
+         */
+    private readonly Dictionary<GenericType<Packet>, Tuple<int, long>> packetIdMap = new Dictionary<GenericType<Packet>, Tuple<int, long>>();
 
         public Client(string host, int port)
         {
             this.host = host;
             this.port = port;
 
-            listener = new EventListener(this);
+            listener = new PacketEventListener(this);
             clientHandler = new ClientHandler(this, listener);
         }
 
@@ -118,9 +129,12 @@ namespace com.github.fernthedev.lightchat.client
             /*            Console.WriteLine("Response received : {0}", response);*/
         }
 
-        public async Task disconnect()
+        public async Task disconnect(ServerDisconnectEvent.DisconnectStatus status = ServerDisconnectEvent.DisconnectStatus.DISCONNECTED)
         {
+            
             await channel.CloseAsync().ConfigureAwait(true);
+
+            callEvent(new ServerDisconnectEvent(channel, status));
 
             await group.ShutdownGracefullyAsync(TimeSpan.FromMilliseconds(100), TimeSpan.FromSeconds(1)).ConfigureAwait(true);
         }
@@ -139,19 +153,43 @@ namespace com.github.fernthedev.lightchat.client
             }
         }
 
+        private Tuple<int, long> UpdatePacketIdPair(GenericType<Packet> packet, int newId)
+        {
+            Tuple<int, long> packetIdPair = getPacketId(packet, null, null);
+
+            if (packetIdPair == null)
+                packetIdPair = new Tuple<int, long>(0, JavaUtil.CurrentTimeMillis());
+            else
+            {
+                if (newId == -1) newId = packetIdPair.Item1 + 1;
+                packetIdPair = new Tuple<int, long>(newId, JavaUtil.CurrentTimeMillis());
+            }
+
+            packetIdMap.Add(packet, packetIdPair);
+            return packetIdPair;
+        }
+
+
         public RijndaelManaged getSecretKey(IChannelHandlerContext ctx, IChannel channel)
         {
-            throw new NotImplementedException();
+            return secretKey;
         }
 
         public bool isEncryptionKeyRegistered(IChannelHandlerContext ctx, IChannel channel)
         {
-            throw new NotImplementedException();
+            return secretKey != null;
         }
 
-        public Tuple<int, long> getPacketId<T>(GenericType<T> clazz, IChannelHandlerContext ctx, IChannel channel) where T : Packet
+        public Tuple<int, long> getPacketId(GenericType<Packet> clazz, IChannelHandlerContext ctx, IChannel channel)
         {
-            throw new NotImplementedException();
+            return packetIdMap[clazz];
         }
+
+        public T callEvent<T>(T e) where T : IEvent
+        {
+            eventHandler?.Invoke(this, e);
+
+            return e;
+        } 
     }
 }

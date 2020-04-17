@@ -5,11 +5,11 @@ using System.Text;
 
 namespace com.github.fernthedev.lightchat.client
 {
-    public class EventListener
+    public class PacketEventListener
     {
         private Client client;
 
-        public EventListener(Client client)
+        public PacketEventListener(Client client)
         {
             this.client = client;
         }

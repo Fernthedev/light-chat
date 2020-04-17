@@ -17,7 +17,7 @@ namespace com.github.fernthedev.lightchat.core.encryption
         /**
          * Packet:[ID,lastPacketSentTime]
          */
-        Tuple<int, long> getPacketId<T>(GenericType<T> clazz, IChannelHandlerContext ctx, IChannel channel) where T: Packet;
+        Tuple<int, long> getPacketId(GenericType<Packet> clazz, IChannelHandlerContext ctx, IChannel channel);
 
     }
 }

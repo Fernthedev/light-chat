@@ -11,10 +11,10 @@ namespace com.github.fernthedev.lightchat.client
     public class ClientHandler : ChannelHandlerAdapter
     {
 
-        protected EventListener listener;
+        protected PacketEventListener listener;
         protected Client client;
 
-        public ClientHandler(Client client, EventListener listener)
+        public ClientHandler(Client client, PacketEventListener listener)
         {
             this.listener = listener;
             this.client = client;
