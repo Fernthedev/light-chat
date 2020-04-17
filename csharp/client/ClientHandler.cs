@@ -1,4 +1,5 @@
-﻿using com.github.fernthedev.lightchat.core;
+﻿using com.github.fernthedev.lightchat.client.events;
+using com.github.fernthedev.lightchat.core;
 using com.github.fernthedev.lightchat.core.packets;
 using DotNetty.Transport.Channels;
 using System;
@@ -59,7 +60,7 @@ namespace com.github.fernthedev.lightchat.client
         {
             StaticHandler.core.logger.Info("Lost connection to server.");
 
-            client.disconnect(ServerDisconnectEvent.DisconnectStatus.CONNECTION_LOST);
+            client.disconnect(ServerDisconnectEvent.DisconnectStatus.CONNECTION_LOST).ConfigureAwait(true);
 
             base.ChannelUnregistered(ctx);
         }

@@ -7,7 +7,7 @@ namespace com.github.fernthedev.lightchat.client
     /**
      * This starts the program
      */
-    class MainClient
+    class Program
     {
         static void Main(string[] args)
         {
@@ -25,16 +25,16 @@ namespace com.github.fernthedev.lightchat.client
                         port = int.Parse(args[i + 1], CultureInfo.CurrentCulture);
                         if (port < 0)
                         {
-                            StaticHandler.WriteError("-port cannot be less than 0");
+                            StaticHandler.core.logger.Error("-port cannot be less than 0");
                             port = -1;
                         }
-                        else StaticHandler.WriteInfo("Using port {0}", args[i + +1]);
+                        else StaticHandler.core.logger.Info("Using port {0}", args[i + +1]);
                     }
                     catch (Exception ex)
                     {
                         if (ex is FormatException || ex is IndexOutOfRangeException)
                         {
-                            StaticHandler.WriteError("-port is not a number");
+                            StaticHandler.core.logger.Error("-port is not a number");
                             port = -1;
                         }
                         else throw;
@@ -46,11 +46,11 @@ namespace com.github.fernthedev.lightchat.client
                         try
                         {
                             host = args[i + 1];
-                            StaticHandler.WriteError("Using host {0}", args[i + +1]);
+                            StaticHandler.core.logger.Error("Using host {0}", args[i + +1]);
                         }
                         catch (IndexOutOfRangeException)
                         {
-                            StaticHandler.WriteError("Cannot find argument for -host");
+                            StaticHandler.core.logger.Error("Cannot find argument for -host");
                             host = null;
                         }
                     }
@@ -58,7 +58,7 @@ namespace com.github.fernthedev.lightchat.client
                     if (arg.Equals("-debug"))
                     {
                         StaticHandler.Debug = true;
-                        StaticHandler.WriteDebug("Debug enabled");
+                        StaticHandler.core.logger.Debug("Debug enabled");
                     }
                 }
             }
@@ -73,16 +73,17 @@ namespace com.github.fernthedev.lightchat.client
             }
 
             Client client = new Client(host, port);
+            client.Connect().ConfigureAwait(true);
         }
 
         private static int readInt(string v)
         {
-            StaticHandler.WriteInfo(v);
+            StaticHandler.core.logger.Info(v);
             string re = Console.ReadLine();
 
             if (!int.TryParse(re, out int retu))
             {
-                StaticHandler.WriteWarn("Input is not numeric");
+                StaticHandler.core.logger.Warn("Input is not numeric");
                 return readInt(v);
             }
 
@@ -91,7 +92,7 @@ namespace com.github.fernthedev.lightchat.client
 
         private static string readLine(string v)
         {
-            StaticHandler.WriteInfo(v);
+            StaticHandler.core.logger.Info(v);
             return Console.ReadLine();
         }
     }
