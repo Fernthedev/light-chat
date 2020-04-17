@@ -171,7 +171,12 @@ namespace com.github.fernthedev.lightchat.core.encryption
         private static byte[] GetRandomData(int bits)
         {
             var result = new byte[bits / 8];
-            RandomNumberGenerator.Create().GetBytes(result);
+
+            var gen = RandomNumberGenerator.Create();
+            gen.GetBytes(result);
+
+            gen.Dispose();
+
             return result;
         }
     }
