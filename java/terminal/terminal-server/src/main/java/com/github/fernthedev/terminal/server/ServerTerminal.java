@@ -170,7 +170,10 @@ public class ServerTerminal {
             }
         });
 
-        new Thread(server, "ServerMainThread").start();
+        new Thread(() -> {
+            server.run();
+            server.bind();
+        }, "ServerMainStartupThread").start();
     }
 
     public static Command registerCommand(Command command) {

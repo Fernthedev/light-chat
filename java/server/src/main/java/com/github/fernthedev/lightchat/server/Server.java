@@ -316,11 +316,6 @@ public class Server implements Runnable {
 
         logger.info("Server socket registered");
 
-        try {
-            logger.info("Server started successfully at localhost (Connect with {}) using port {}", InetAddress.getLocalHost().getHostAddress(), port);
-        } catch (UnknownHostException e) {
-            logger.error(e.getMessage(), e);
-        }
 
         return this;
     }
@@ -330,14 +325,20 @@ public class Server implements Runnable {
 
         return bootstrap.bind(port)
                 .addListener((ChannelFutureListener) future -> {
-            if (!future.isSuccess()) {
-                logger.info("Failed to bind port");
-                isPortBind = false;
-            } else {
-                logger.info("Bind port on {}", future.channel().localAddress());
-                isPortBind = true;
-            }
-        });
+                    if (future.isSuccess()) {
+                        try {
+                            logger.info("Server started successfully at localhost (Connect with {}) using port {}", InetAddress.getLocalHost().getHostAddress(), port);
+                        } catch (UnknownHostException e) {
+                            logger.error(e.getMessage(), e);
+                        }
+
+                        logger.info("Bind port on {}", future.channel().localAddress());
+                        isPortBind = true;
+                    } else {
+                        logger.info("Failed to bind port");
+                        isPortBind = false;
+                    }
+                });
     }
 
     private void check() {

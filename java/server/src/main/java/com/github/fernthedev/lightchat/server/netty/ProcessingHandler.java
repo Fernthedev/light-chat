@@ -19,7 +19,7 @@ import java.util.UUID;
 @ChannelHandler.Sharable
 public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 
-    private Server server;
+    private final Server server;
 
     public ProcessingHandler(Server server) {
         this.server = server;
@@ -112,10 +112,6 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        if (!ctx.channel().isActive()) {
-            ctx.close();
-        }
-
         // Server.getLogger().info("Channel Registering");
         Channel channel = ctx.channel();
 

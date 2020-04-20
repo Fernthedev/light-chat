@@ -34,7 +34,7 @@ public class StaticHandler {
     public static final String AES_CIPHER_TRANSFORMATION = "AES/CBC/PKCS5Padding";
 
 
-    public static final String PACKET_PACKAGE = "com.github.fernthedev.core.packets";
+    public static final String PACKET_PACKAGE = "com.github.fernthedev.lightchat.core.packets";
     public static final Charset CHARSET_FOR_STRING = CharsetUtil.UTF_8;
     public static final String OS = System.getProperty("os.name");
 
