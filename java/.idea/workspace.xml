@@ -21,6 +21,7 @@
   <component name="ChangeListManager">
     <list default="true" id="74a9c842-9768-484a-b6c1-feb6a74ad587" name="Default Changelist" comment="">
       <change afterPath="$PROJECT_DIR$/../flutter/lib/assets/themed_widget.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../csharp/client/Client.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../csharp/client/Client.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../dart/client/lib/client.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/client/lib/client.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../dart/client/lib/data/packetdata.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/client/lib/data/packetdata.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../dart/client/lib/data/packetdata.g.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/client/lib/data/packetdata.g.dart" afterDir="false" />
@@ -31,8 +32,10 @@
       <change beforePath="$PROJECT_DIR$/../dart/client/lib/packets/latency_packets.g.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/client/lib/packets/latency_packets.g.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../dart/client/lib/packets/other_packets.g.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/client/lib/packets/other_packets.g.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../dart/client/lib/packets/packets.g.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/client/lib/packets/packets.g.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dart/client/lib/transport/codecs/codecs.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/client/lib/transport/codecs/codecs.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../dart/client/lib/transport/packetwrapper.g.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/client/lib/transport/packetwrapper.g.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../dart/client/lib/util/encryption/encryption.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/client/lib/util/encryption/encryption.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dart/client/lib/variables.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/client/lib/variables.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../flutter/ios/Flutter/Debug.xcconfig" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/ios/Flutter/Debug.xcconfig" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../flutter/ios/Flutter/Release.xcconfig" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/ios/Flutter/Release.xcconfig" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../flutter/ios/Runner.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/ios/Runner.xcodeproj/project.pbxproj" afterDir="false" />
@@ -46,9 +49,6 @@
       <change beforePath="$PROJECT_DIR$/../flutter/lib/util/filehandler.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/lib/util/filehandler.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../flutter/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/pubspec.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../flutter/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/pubspec.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <list id="3573a8f5-87af-4aa5-8e37-aaa9023d1393" name="CSharp" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -596,7 +596,14 @@
       <option name="project" value="LOCAL" />
       <updated>1587385106148</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="Fix Mac incompatibility with names.">
+      <created>1587422001168</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1587422001168</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -637,7 +644,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="- Does not allow the server to work correctly" />
     <MESSAGE value="Preparing for release" />
     <MESSAGE value="- Changed to a PacketRegistry system to allow for cross platform usage (packetname : packet.class)&#10;- Fixed a bug that caused the client to print an exception when sending a message before it was successfully registered&#10;- Added FASTJSON support (config setting)" />
     <MESSAGE value="- Changed to a PacketRegistry system to allow for cross platform usage (packetname : packet.class)&#10;- Fixed a bug that caused the client to print an exception when sending a message before it was successfully registered&#10;- Added Alibaba FAST_JSON support (config setting) Gson is still default&#10;- Added MultiCast gracefully shut down." />
@@ -662,17 +668,14 @@
     <MESSAGE value="Added JUnit 5 Testing dependencies&#10;Using RSA OAEP SHA 256 for encryption now" />
     <MESSAGE value="New Async.java annotation&#10;Client.connect is now async and returns a future if synchronized is required" />
     <MESSAGE value="Fix server port not binding and packets not registering." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix server port not binding and packets not registering." />
+    <MESSAGE value="Fix Mac incompatibility with names." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix Mac incompatibility with names." />
   </component>
   <component name="WindowStateProjectService">
     <state x="674" y="167" key="#Client" timestamp="1580674642429">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="674" y="167" key="#Client/3286.0.1920.1040/0.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1580674642429" />
-    <state x="552" y="179" key="#Updates" timestamp="1578765341583">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="552" y="179" key="#Updates/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1578765341583" />
     <state x="385" y="53" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1586883023497">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -701,7 +704,6 @@
     <state x="640" y="248" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1584289938570">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="640" y="248" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1578765178520" />
     <state x="640" y="248" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581709659579" />
     <state x="640" y="248" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583583151416" />
     <state x="640" y="248" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584289938570" />
@@ -735,7 +737,6 @@
     <state x="0" y="55" width="1602" height="896" key="CommitChangelistDialog2" timestamp="1584291880567">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="165" y="91" width="1602" height="896" key="CommitChangelistDialog2/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1578779607118" />
     <state x="0" y="57" key="CommitChangelistDialog2/0.0.1920.1040/1920.317.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1581453747196" />
     <state x="0" y="55" key="CommitChangelistDialog2/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581723223396" />
     <state x="0" y="55" key="CommitChangelistDialog2/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583791789405" />
@@ -744,7 +745,6 @@
     <state x="184" y="91" width="1536" height="861" key="DiffContextDialog" timestamp="1583791908040">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="184" y="91" key="DiffContextDialog/0.0.1920.1040/1920.309.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1578776978734" />
     <state x="184" y="91" width="1536" height="861" key="DiffContextDialog/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583791908040" />
     <state x="694" y="268" key="EnvironmentVariablesDialog" timestamp="1583179229966">
       <screen x="0" y="0" width="1920" height="1040" />
@@ -846,10 +846,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="512" y="432" key="VCS.EditChangelistDialog/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1587383640386" />
-    <state x="552" y="248" width="816" height="537" key="Vcs.Push.Dialog.v2" timestamp="1587385182006">
+    <state x="552" y="248" width="816" height="537" key="Vcs.Push.Dialog.v2" timestamp="1587422004604">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="248" width="816" height="537" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1587385182006" />
+    <state x="552" y="248" width="816" height="537" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1587422004604" />
     <state x="552" y="248" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.317.1366.728/3286.0.1920.1040@0.0.1920.1040" timestamp="1581453923645" />
     <state x="552" y="248" key="Vcs.Push.Dialog.v2/0.0.1920.1040/3286.0.1920.1040/1920.309.1366.728@0.0.1920.1040" timestamp="1581723252528" />
     <state x="552" y="248" key="Vcs.Push.Dialog.v2/0.0.1920.1040/3286.0.1920.1040/1920.317.1366.728@0.0.1920.1040" timestamp="1583791863756" />

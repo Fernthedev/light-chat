@@ -99,15 +99,15 @@ public class EncryptedJSONObjectEncoder extends MessageToMessageEncoder<Acceptab
 
     public EncryptedBytes encrypt(ChannelHandlerContext ctx, String decryptedString) {
 
-        if (decryptedString == null) return null;
 
-        if (decryptedString.isEmpty()) {
-            return null;
-        }
+
+
 
 
         @NonNull SecretKey secretKey = encryptionKeyHolder.getSecretKey(ctx, ctx.channel());
         EncryptedBytes encryptedJSON = null;
+
+        if (decryptedString == null || decryptedString.isEmpty()) decryptedString = "";
 
         try {
             encryptedJSON = EncryptionUtil.encrypt(decryptedString, secretKey);
