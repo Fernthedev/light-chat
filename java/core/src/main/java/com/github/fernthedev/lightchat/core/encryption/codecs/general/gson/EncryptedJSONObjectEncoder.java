@@ -98,12 +98,6 @@ public class EncryptedJSONObjectEncoder extends MessageToMessageEncoder<Acceptab
     }
 
     public EncryptedBytes encrypt(ChannelHandlerContext ctx, String decryptedString) {
-
-
-
-
-
-
         @NonNull SecretKey secretKey = encryptionKeyHolder.getSecretKey(ctx, ctx.channel());
         EncryptedBytes encryptedJSON = null;
 
