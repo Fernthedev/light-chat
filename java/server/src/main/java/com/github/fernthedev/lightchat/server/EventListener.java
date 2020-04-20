@@ -58,7 +58,7 @@ public class EventListener {
 
     public void handleConnect(ConnectedPacket packet) {
         if (!isAlphaNumeric(packet.getName())) {
-            disconnectIllegalName(packet, "Name requires alphanumeric characters only");
+            disconnectIllegalName(packet, "Name requires alphanumeric characters only. (dashes, periods and @ symbols are allowed)");
             return;
         }
 
@@ -103,7 +103,10 @@ public class EventListener {
     }
 
     public boolean isAlphaNumeric(String name) {
-        return StringUtils.isAlphanumericSpace(name.replace('-', ' '));
+        return StringUtils.isAlphanumericSpace(name.replace('-', ' ')
+                .replace(".", "")
+                .replace("'","")
+                .replace("@",""));
     }
 
     private void disconnectIllegalName(ConnectedPacket packet, String message) {
