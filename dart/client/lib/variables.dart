@@ -2,9 +2,20 @@ import 'data/packetdata.dart';
 
 class Variables {
   static final VersionData versionData =
-      VersionData.fromString('1.5.3', '1.5.3');
+      VersionData.fromString('1.6.0', '1.6.0');
 
-  static bool debug = false;
+  static bool _debug = false;
+
+  static bool get debug => _debug;
+
+  static set debug(bool debug) {
+    print('Debug mode: $debug');
+    _debug = debug;
+  }
+
+  static void printDebug(Object o) {
+    if (Variables.debug) print(o);
+  }
 
   static String multicastIP;
 }

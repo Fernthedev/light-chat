@@ -18,13 +18,16 @@ class InitialHandshakePacket extends Packet {
   String publicKey;
   VersionDataString versionData;
 
-  RSAPublicKey get publicKeyAsKey => EncryptionUtil.rsaPublicKeyFromString(publicKey);
+  RSAPublicKey get publicKeyAsKey =>
+      EncryptionUtil.rsaPublicKeyFromString(publicKey);
 
   InitialHandshakePacket() : super.setName('INITIAL_HANDSHAKE_PACKET');
 
-  factory InitialHandshakePacket.create(RSAPublicKey publicKey, VersionData versionData) {
+  factory InitialHandshakePacket.create(
+      RSAPublicKey publicKey, VersionData versionData) {
     var packet = InitialHandshakePacket();
-    if(publicKey != null) packet.publicKey = EncryptionUtil.rsaAsymmetricKeyToString(publicKey);
+    if (publicKey != null)
+      packet.publicKey = EncryptionUtil.rsaAsymmetricKeyToString(publicKey);
     packet.versionData = versionData.toDataString();
     return packet;
   }
@@ -32,7 +35,8 @@ class InitialHandshakePacket extends Packet {
   /// A necessary factory constructor for creating a new User instance
   /// from a map. Pass the map to the generated `_$UserFromJson()` constructor.
   /// The constructor is named after the source class, in this case, User.
-  factory InitialHandshakePacket.fromJson(Map<String, dynamic> json) => _$InitialHandshakePacketFromJson(json);
+  factory InitialHandshakePacket.fromJson(Map<String, dynamic> json) =>
+      _$InitialHandshakePacketFromJson(json);
 
   @override
   JsonSerializableClass fromJson(Map<String, dynamic> json) {
@@ -49,13 +53,12 @@ class InitialHandshakePacket extends Packet {
 @JsonSerializable(explicitToJson: true)
 @ToString()
 class ConnectedPacket extends Packet {
-
   static final ConnectedPacket constant = ConnectedPacket();
-
 
   ConnectedPacket() : super.setName('CONNECTED_PACKET');
 
-  factory ConnectedPacket.create(String name, String os, VersionData versionData)  {
+  factory ConnectedPacket.create(
+      String name, String os, VersionData versionData) {
     var connectedPacket = ConnectedPacket();
     connectedPacket.os = os;
     connectedPacket.name = name;
@@ -67,11 +70,11 @@ class ConnectedPacket extends Packet {
   String os;
   VersionDataString versionData;
 
-
   /// A necessary factory constructor for creating a new User instance
   /// from a map. Pass the map to the generated `_$UserFromJson()` constructor.
   /// The constructor is named after the source class, in this case, User.
-  factory ConnectedPacket.fromJson(Map<String, dynamic> json) => _$ConnectedPacketFromJson(json);
+  factory ConnectedPacket.fromJson(Map<String, dynamic> json) =>
+      _$ConnectedPacketFromJson(json);
 
   @override
   JsonSerializableClass fromJson(Map<String, dynamic> json) {
@@ -87,20 +90,21 @@ class ConnectedPacket extends Packet {
 
 @JsonSerializable(explicitToJson: true, createFactory: false)
 class KeyResponsePacket extends Packet {
-
   static final KeyResponsePacket constant = KeyResponsePacket();
 
   KeyResponsePacket() : super.setName('KEY_RESPONSE_PACKET');
 
   factory KeyResponsePacket.create(Uint8List key, RSAPublicKey publicKey) {
     var keyPacket = KeyResponsePacket();
-    keyPacket.secretKeyEncrypted = EncryptionUtil.encryptSecretKey(publicKey, key);
+    keyPacket.secretKeyEncrypted =
+        EncryptionUtil.encryptSecretKey(publicKey, key);
     return keyPacket;
   }
 
   Uint8List secretKeyEncrypted;
 
-  KeyResponsePacket.fromJson(Map<String, dynamic> json) : secretKeyEncrypted = json['secretKeyEncrypted'];
+  KeyResponsePacket.fromJson(Map<String, dynamic> json)
+      : secretKeyEncrypted = json['secretKeyEncrypted'];
 
   @override
   JsonSerializableClass fromJson(Map<String, dynamic> json) {
@@ -117,9 +121,7 @@ class KeyResponsePacket extends Packet {
 @JsonSerializable()
 @ToString()
 class RequestConnectInfoPacket extends Packet {
-
   static final RequestConnectInfoPacket constant = RequestConnectInfoPacket();
-
 
   RequestConnectInfoPacket() : super.setName('REQUEST_CONNECT_INFO_PACKET');
 
@@ -132,7 +134,8 @@ class RequestConnectInfoPacket extends Packet {
   /// A necessary factory constructor for creating a new User instance
   /// from a map. Pass the map to the generated `_$UserFromJson()` constructor.
   /// The constructor is named after the source class, in this case, User.
-  factory RequestConnectInfoPacket.fromJson(Map<String, dynamic> json) => _$RequestConnectInfoPacketFromJson(json);
+  factory RequestConnectInfoPacket.fromJson(Map<String, dynamic> json) =>
+      _$RequestConnectInfoPacketFromJson(json);
 
   @override
   JsonSerializableClass fromJson(Map<String, dynamic> json) {
@@ -145,4 +148,3 @@ class RequestConnectInfoPacket extends Packet {
   @override
   Map<String, dynamic> toJson() => _$RequestConnectInfoPacketToJson(this);
 }
-

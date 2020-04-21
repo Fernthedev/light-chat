@@ -39,7 +39,7 @@ public class StaticHandler {
     public static final String OS = System.getProperty("os.name");
 
 
-    public static final String RSA_CIPHER_TRANSFORMATION = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
+    public static final String RSA_CIPHER_TRANSFORMATION = "RSA/ECB/PKCS1Padding";
 
     private static final Gson gson = new Gson();
 

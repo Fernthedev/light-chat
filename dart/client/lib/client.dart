@@ -31,12 +31,19 @@ class Client implements IKeyEncriptionHolder {
   int milliPingDelay;
   ServerData _serverData;
 
+  bool _disconnecting = false;
+
   ServerData get serverData => _serverData;
 
   final List<PacketListener> futureList = <PacketListener>[];
   final List<Function> _registerCallBackList = <Function(ServerData)>[];
   final List<Function(ServerData)> _connectCallBackList =
       <Function(ServerData)>[];
+
+  final List<Function(ServerData)> _disconnectCallBackList =
+      <Function(ServerData)>[];
+
+  final List<Function> _errorCallBackList = <Function>[];
 
   /// True when the server sucessfully establishes the connection and the server registered the info.
   bool _registered = false;
@@ -77,7 +84,7 @@ class Client implements IKeyEncriptionHolder {
 
     print('Attempt connection $ip:$port');
 
-    await Socket.connect(ip, port).then((Socket sock) {
+    var s = Socket.connect(ip, port).then((Socket sock) {
       print('Connected');
       connected = true;
       socket = sock;
@@ -88,10 +95,14 @@ class Client implements IKeyEncriptionHolder {
 
       socket.listen(onReceive, onError: (e) {
         print('Server error: $e');
-      }, onDone: onDoneEvent, cancelOnError: false);
+        _runErrorCallbacks();
+        throw e;
+      }, onDone: onDoneEvent, cancelOnError: Variables.debug);
     });
 
-    return Future.value();
+    unawaited(s.catchError((e) => _runErrorCallbacks()));
+
+    return s;
   }
 
   void onRegister(Function(ServerData) callback) {
@@ -110,10 +121,42 @@ class Client implements IKeyEncriptionHolder {
     _connectCallBackList.remove(callback);
   }
 
+  void onDisconnect(Function(ServerData) callback) {
+    _disconnectCallBackList.add(callback);
+  }
+
+  void removeOnDisconnect(Function(ServerData) callback) {
+    _disconnectCallBackList.remove(callback);
+  }
+
+  void onError(Function callback) {
+    _errorCallBackList.add(callback);
+  }
+
+  void removeOnError(Function callback) {
+    _errorCallBackList.remove(callback);
+  }
+
+  void _runErrorCallbacks() async {
+    for (var callback in _errorCallBackList) {
+      if (Variables.debug) print('Running the callback');
+      unawaited(runCallback(callback));
+    }
+  }
+
   void _runConnectCallbacks() async {
     for (var callback in _connectCallBackList) {
       if (Variables.debug) print('Running the callback');
       unawaited(runCallback(callback, arguments: serverData));
+    }
+  }
+
+  void _runDisconnectCallbacks() async {
+    if (!_disconnecting) {
+      for (var callback in _disconnectCallBackList) {
+        if (Variables.debug) print('Running the callback');
+        unawaited(runCallback(callback, arguments: serverData));
+      }
     }
   }
 
@@ -135,7 +178,10 @@ class Client implements IKeyEncriptionHolder {
 
       var decodedObjects = <Object>[];
       await _decoder.decode(list, decodedObjects);
-      eventHandler.received(decodedObjects[0]);
+
+      for (Packet packet in decodedObjects) {
+        eventHandler.received(packet);
+      }
 
       //Object msgObject = bd.getUint8(0);
 
@@ -186,11 +232,11 @@ class Client implements IKeyEncriptionHolder {
     }
 
     for (var data in dataList) {
-      if (Variables.debug) {
-        ('The sent data is ${utf8.decode(data)}');
-      }
       socket.add(data);
     }
+
+    // await socket.flush();
+
     return Future.value();
   }
 
@@ -201,6 +247,11 @@ class Client implements IKeyEncriptionHolder {
     //     flush();
     //   });
     // } else {
+
+    if (packet == null) throw ArgumentError.notNull('packet');
+
+    Variables.printDebug('Sending $packet');
+
     await write(packet, encrypt);
     // await flush();
     // }
@@ -233,8 +284,13 @@ class Client implements IKeyEncriptionHolder {
   }
 
   void close() async {
+    _disconnecting = true;
+
     print('Closing socket');
     await socket.close();
     print('Closed');
+
+    _disconnecting = false;
+    _runDisconnectCallbacks();
   }
 }

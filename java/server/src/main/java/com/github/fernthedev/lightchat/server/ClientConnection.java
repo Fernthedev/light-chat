@@ -6,6 +6,7 @@ import com.github.fernthedev.lightchat.core.api.APIUsage;
 import com.github.fernthedev.lightchat.core.encryption.UnencryptedPacketWrapper;
 import com.github.fernthedev.lightchat.core.encryption.util.RSAEncryptionUtil;
 import com.github.fernthedev.lightchat.core.packets.Packet;
+import com.github.fernthedev.lightchat.core.packets.latency.LatencyPacket;
 import com.github.fernthedev.lightchat.core.packets.latency.PingPacket;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -163,7 +164,8 @@ public class ClientConnection implements SenderInterface, AutoCloseable {
      */
     @APIUsage
     public ChannelFuture sendObject(@NonNull Packet packet, boolean encrypt) {
-        StaticHandler.getCore().getLogger().debug("Sending packet {}:{}", packet.getPacketName(), encrypt);
+        if (!(packet instanceof LatencyPacket))
+            StaticHandler.getCore().getLogger().debug("Sending packet {}:{}", packet.getPacketName(), encrypt);
 
         Pair<Integer, Long> packetIdPair = updatePacketIdPair(packet.getClass(), -1);
 
@@ -251,7 +253,8 @@ public class ClientConnection implements SenderInterface, AutoCloseable {
     }
 
     public void finishPing() {
-        pingStopWatch.stop();
+        if (!pingStopWatch.isStopped())
+            pingStopWatch.stop();
     }
 
     /**

@@ -59,7 +59,7 @@ class PingReceive extends Packet {
 
   @override
   JsonSerializableClass fromJson(Map<String, dynamic> json) {
-    return PingPacket.fromJson(json);
+    return PingReceive.fromJson(json);
   }
 
   /// `toJson` is the convention for a class to declare support for serialization

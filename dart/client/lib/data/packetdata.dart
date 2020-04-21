@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:light_chat_client/transport/packetwrapper.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:light_chat_client/util/encryption/encryption.dart';
 import 'package:lombok/lombok.dart';
 import 'package:version/version.dart';
 
@@ -91,16 +92,16 @@ enum VersionRange {
 }
 
 @JsonSerializable(explicitToJson: true, nullable: false)
-class HashedPassword extends JsonSerializableClass{
+class HashedPassword extends JsonSerializableClass {
   String password;
 
   HashedPassword.fromHash(this.password);
 
   HashedPassword(String password) {
-    password = sha256.convert(utf8.encode(password)).toString();
+    password = EncryptionUtil.toSha256(password);
   }
 
-    /// A necessary factory constructor for creating a new User instance
+  /// A necessary factory constructor for creating a new User instance
   /// from a map. Pass the map to the generated `_$UserFromJson()` constructor.
   /// The constructor is named after the source class, in this case, User.
   factory HashedPassword.fromJson(Map<String, dynamic> json) =>

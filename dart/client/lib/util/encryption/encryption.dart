@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
-
 import 'package:basic_utils/basic_utils.dart';
+import 'package:crypto/crypto.dart';
 import 'package:light_chat_client/transport/packetwrapper.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:pointycastle/api.dart';
@@ -18,7 +18,8 @@ class EncryptionUtil {
   static final Random _random = Random.secure();
 
   static Uint8List createRandomBytes([int length = 32]) {
-    return Uint8List.fromList(List<int>.generate(length, (i) => _random.nextInt(256)));
+    return Uint8List.fromList(
+        List<int>.generate(length, (i) => _random.nextInt(256)));
   }
 
   static String createCryptoRandomString([int length = 32]) {
@@ -55,18 +56,26 @@ class EncryptionUtil {
       PKCS7Padding(),
       CBCBlockCipher(AESFastEngine()),
     )..init(
-      true /*encrypt*/,
-      PaddedBlockCipherParameters<CipherParameters, CipherParameters>(
-        ParametersWithIV<KeyParameter>(KeyParameter(key), iv),
-        null,
-      ),
-    );
+        true /*encrypt*/,
+        PaddedBlockCipherParameters<CipherParameters, CipherParameters>(
+          ParametersWithIV<KeyParameter>(KeyParameter(key), iv),
+          null,
+        ),
+      );
     var plainBytes = utf8.encode(plainText);
-    var cipherTextBytes = cipher.process(plainBytes);
 
-    return EncryptedBytes(cipherTextBytes, params,
-        'AES' /// Is hardcoded because this is what Java can recognize. This method might be modularized to use a Cipher parameter and a algorithm parameter that java recognizes later on
-    );
+    var cipherTextBytes;
+
+    if (plainText == null || plainText == '') {
+      cipherTextBytes = plainBytes;
+    } else {
+      cipherTextBytes = cipher.process(plainBytes);
+    }
+
+    return EncryptedBytes(cipherTextBytes, params, 'AES'
+
+        /// Is hardcoded because this is what Java can recognize. This method might be modularized to use a Cipher parameter and a algorithm parameter that java recognizes later on
+        );
   }
 
   /// Code given by Richard Heap at https://stackoverflow.com/questions/59523956/how-to-encrypt-and-decrypt-using-aes-cbc-256bit-and-pkcs5padding-in-dart-and-als
@@ -100,18 +109,22 @@ class EncryptionUtil {
   /// Code given by Richard Heap at https://stackoverflow.com/questions/59546025/how-to-import-randomly-generated-4096bit-java-rsa-public-key-from-string
   static RSAPublicKey rsaPublicKeyFromString(String key) {
     var pem =
-    '-----BEGIN RSA PUBLIC KEY-----\n$key\n-----END RSA PUBLIC KEY-----';
+        '-----BEGIN RSA PUBLIC KEY-----\n$key\n-----END RSA PUBLIC KEY-----';
 
     var public = X509Utils.publicKeyFromPem(pem);
 
     return public;
   }
-}
 
-class MyPadding extends PKCS7Padding {
-  @override
-  int padCount(Uint8List data) {
-    print(data);
-    return 0;
+  static String toSha256(String hashedPassword) {
+    return sha256.convert(utf8.encode(hashedPassword)).toString();
   }
 }
+
+// class MyPadding extends PKCS7Padding {
+//   @override
+//   int padCount(Uint8List data) {
+//     print(data);
+//     return 0;
+//   }
+// }

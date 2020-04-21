@@ -5,10 +5,26 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Dart",
+            "name": "Release",
             "program": "bin/main.dart",
             "request": "launch",
             "args": ["-ip","localhost", "-port", "2000", "-name", "Fern"],
+            "type": "dart",
+            "console": "terminal"
+        },
+        {
+            "name": "Debug",
+            "program": "bin/main.dart",
+            "request": "launch",
+            "args": [
+                "-ip",
+                "localhost",
+                "-port",
+                "2000",
+                "-name",
+                "FernDebug",
+                "-debug"
+            ],
             "type": "dart",
             "console": "terminal"
         }

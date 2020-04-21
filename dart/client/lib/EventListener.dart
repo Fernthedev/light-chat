@@ -23,12 +23,6 @@ class PacketEventHandler {
   void received(Packet p) async {
     Object result;
     switch (p.runtimeType) {
-      case PingPacket:
-        client.startTime = DateTime.now();
-
-        await client.send(PongPacket(), false);
-        break;
-
       case PingReceive:
         client.endTime = DateTime.now();
 
@@ -39,6 +33,13 @@ class PacketEventHandler {
 
         print('Ping delay: ${client.milliPingDelay}');
         break;
+
+      case PingPacket:
+        client.startTime = DateTime.now();
+
+        await client.send(PongPacket.create(), false);
+        break;
+
       case MessagePacket:
         MessagePacket packet = p;
         print('${packet.message}');
@@ -54,7 +55,7 @@ class PacketEventHandler {
       case InitialHandshakePacket:
         InitialHandshakePacket packet = p;
 
-        if(Variables.debug) print('Data of packet: ${p.toJson()}');
+        if (Variables.debug) print('Data of packet: ${p.toJson()}');
 
         var versionData = VersionData.fromVersionDataString(packet.versionData);
         var range =
@@ -93,7 +94,7 @@ class PacketEventHandler {
         break;
       case SelfMessagePacket:
         SelfMessagePacket packet = p;
-        switch (packet.messageType) {
+        switch (packet.type) {
           case MessageType.LOST_SERVER_CONNECTION:
             client.close();
             print('Lost server connection');
@@ -112,9 +113,12 @@ class PacketEventHandler {
                   HashedPassword.fromHash(client.serverData.hashedPassword)));
             }
             break;
+          default:
+            Variables.printDebug('Ignoring self message ${packet.type}');
+            break;
         }
 
-        result = packet.messageType;
+        result = packet.type;
         break;
     }
 

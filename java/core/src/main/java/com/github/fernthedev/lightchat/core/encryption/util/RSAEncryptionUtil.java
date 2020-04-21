@@ -41,7 +41,7 @@ public class RSAEncryptionUtil {
      * @return Decrypted key key
      * @throws InvalidKeyException The key is not valid
      */
-    public static SecretKey decryptKey(byte[] secretKey, PrivateKey privateKey) throws InvalidKeyException {
+    public static SecretKey decryptKey(byte[] secretKey, PrivateKey privateKey) throws InvalidKeyException, BadPaddingException, NoSuchAlgorithmException {
         try {
             Cipher rsaCipher = Cipher.getInstance(StaticHandler.RSA_CIPHER_TRANSFORMATION);
             rsaCipher.init(Cipher.DECRYPT_MODE, privateKey);
@@ -52,7 +52,7 @@ public class RSAEncryptionUtil {
             byte[] decryptedKey = rsaCipher.doFinal(secretKey);
 
             return new SecretKeySpec(decryptedKey,  StaticHandler.AES_KEY_MODE);
-        } catch (NoSuchPaddingException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException e) {
+        } catch (NoSuchPaddingException | IllegalBlockSizeException e) {
             e.printStackTrace();
         }
         return null;

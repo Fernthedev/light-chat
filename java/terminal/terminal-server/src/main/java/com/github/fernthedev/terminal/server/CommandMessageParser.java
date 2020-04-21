@@ -104,7 +104,7 @@ public class CommandMessageParser implements Listener {
     }
 
     private static void handleMessage(SenderInterface sender, String message) {
-        ServerTerminal.broadcast("[" + sender.getName() + "] :" + message);
+        ServerTerminal.broadcast("[" + sender.getName() + "] : " + message);
     }
 
 }

@@ -11,6 +11,7 @@ import com.github.fernthedev.lightchat.core.encryption.codecs.JSONHandler;
 import com.github.fernthedev.lightchat.core.encryption.codecs.LineEndStringEncoder;
 import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil;
 import com.github.fernthedev.lightchat.core.packets.Packet;
+import com.github.fernthedev.lightchat.core.util.ExceptionUtil;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
@@ -94,7 +95,8 @@ public class EncryptedJSONObjectEncoder extends MessageToMessageEncoder<Acceptab
 
         }
 
-//        StaticHandler.getCore().getLogger().debug("Sending {}", jsonHandler.toJson(packetWrapper));
+//        if (!(packetWrapper.getJsonObjectInstance() instanceof LatencyPacket))
+            StaticHandler.getCore().getLogger().debug("Sending {}", jsonHandler.toJson(packetWrapper));
     }
 
     public EncryptedBytes encrypt(ChannelHandlerContext ctx, String decryptedString) {
@@ -105,8 +107,9 @@ public class EncryptedJSONObjectEncoder extends MessageToMessageEncoder<Acceptab
 
         try {
             encryptedJSON = EncryptionUtil.encrypt(decryptedString, secretKey);
+
         } catch (Exception e) {
-            e.printStackTrace();
+             throw ExceptionUtil.throwParsePacketException(e, decryptedString);
         }
 
         return encryptedJSON;

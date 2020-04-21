@@ -4,8 +4,10 @@ import com.github.fernthedev.lightchat.core.packets.Packet;
 import com.github.fernthedev.lightchat.core.encryption.util.RSAEncryptionUtil;
 import com.github.fernthedev.lightchat.core.packets.PacketInfo;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.SecretKey;
 import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
@@ -18,7 +20,7 @@ public class KeyResponsePacket extends Packet {
     
     private final byte[] secretKeyEncrypted;
 
-    public SecretKey getSecretKey(PrivateKey privateKey) throws InvalidKeyException {
+    public SecretKey getSecretKey(PrivateKey privateKey) throws InvalidKeyException, BadPaddingException, NoSuchAlgorithmException {
         return RSAEncryptionUtil.decryptKey(secretKeyEncrypted, privateKey);
     }
     

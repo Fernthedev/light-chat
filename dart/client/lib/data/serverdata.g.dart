@@ -11,7 +11,7 @@ ServerData _$ServerDataFromJson(Map<String, dynamic> json) {
     json['ip'] as String,
     json['port'] as int,
     json['hashedPassword'] as String,
-  );
+  )..uuid = json['uuid'] as String;
 }
 
 Map<String, dynamic> _$ServerDataToJson(ServerData instance) =>
@@ -19,6 +19,7 @@ Map<String, dynamic> _$ServerDataToJson(ServerData instance) =>
       'ip': instance.ip,
       'port': instance.port,
       'hashedPassword': instance.hashedPassword,
+      'uuid': instance.uuid,
     };
 
 // **************************************************************************
@@ -29,8 +30,10 @@ abstract class _$ServerDataLombok {
   /// Field
   String ip;
   int port;
-  String hashedPassword;
+  String _hashedPassword;
   String _uuid;
+  dynamic hashedPassword;
+  String hashedPasswordDoHash;
   String uuid;
 
   /// Setter
@@ -43,12 +46,24 @@ abstract class _$ServerDataLombok {
     this.port = port;
   }
 
-  void setHashedPassword(String hashedPassword) {
-    this.hashedPassword = hashedPassword;
+  void set_hashedPassword(String _hashedPassword) {
+    this._hashedPassword = _hashedPassword;
   }
 
   void set_uuid(String _uuid) {
     this._uuid = _uuid;
+  }
+
+  void setHashedPassword(dynamic hashedPassword) {
+    this.hashedPassword = hashedPassword;
+  }
+
+  void setHashedPasswordDoHash(String hashedPasswordDoHash) {
+    this.hashedPasswordDoHash = hashedPasswordDoHash;
+  }
+
+  void setUuid(String uuid) {
+    this.uuid = uuid;
   }
 
   /// Getter
@@ -60,12 +75,20 @@ abstract class _$ServerDataLombok {
     return port;
   }
 
-  String getHashedPassword() {
-    return hashedPassword;
+  String get_hashedPassword() {
+    return _hashedPassword;
   }
 
   String get_uuid() {
     return _uuid;
+  }
+
+  dynamic getHashedPassword() {
+    return hashedPassword;
+  }
+
+  String getHashedPasswordDoHash() {
+    return hashedPasswordDoHash;
   }
 
   String getUuid() {

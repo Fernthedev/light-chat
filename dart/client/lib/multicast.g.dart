@@ -8,52 +8,40 @@ part of 'multicast.dart';
 
 abstract class _$MulticastDataLombok {
   /// Field
-  String _address;
-  String _version;
-  int _port;
-  int _clientNumbers;
-  List<String> _clients;
+  String address;
+  String version;
+  int port;
+  int clientNumbers;
+  List<String> clients;
 
   /// Setter
 
-  void set_address(String _address) {
-    this._address = _address;
+  void setClientNumbers(int clientNumbers) {
+    this.clientNumbers = clientNumbers;
   }
 
-  void set_version(String _version) {
-    this._version = _version;
-  }
-
-  void set_port(int _port) {
-    this._port = _port;
-  }
-
-  void set_clientNumbers(int _clientNumbers) {
-    this._clientNumbers = _clientNumbers;
-  }
-
-  void set_clients(List<String> _clients) {
-    this._clients = _clients;
+  void setClients(List<String> clients) {
+    this.clients = clients;
   }
 
   /// Getter
-  String get_address() {
-    return _address;
+  String getAddress() {
+    return address;
   }
 
-  String get_version() {
-    return _version;
+  String getVersion() {
+    return version;
   }
 
-  int get_port() {
-    return _port;
+  int getPort() {
+    return port;
   }
 
-  int get_clientNumbers() {
-    return _clientNumbers;
+  int getClientNumbers() {
+    return clientNumbers;
   }
 
-  List<String> get_clients() {
-    return _clients;
+  List<String> getClients() {
+    return clients;
   }
 }

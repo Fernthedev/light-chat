@@ -1,6 +1,7 @@
 package com.github.fernthedev.lightchat.core.encryption.codecs.general.gson;
 
 import com.github.fernthedev.lightchat.core.PacketRegistry;
+import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.core.encryption.EncryptedBytes;
 import com.github.fernthedev.lightchat.core.encryption.EncryptedPacketWrapper;
 import com.github.fernthedev.lightchat.core.encryption.PacketWrapper;
@@ -67,7 +68,7 @@ public class EncryptedJSONObjectDecoder extends StringDecoder {
         super.decode(ctx, msg, tempDecodeList);
 
         String decodedStr = (String) tempDecodeList.get(0);
-//        StaticHandler.getCore().getLogger().debug("Decoding the string {}", decodedStr);
+        StaticHandler.getCore().getLogger().debug("Decoding the string {}", decodedStr);
         PacketWrapper<?> packetWrapper = jsonHandler.fromJson(decodedStr, PacketWrapper.class);
 
         String decryptedJSON;

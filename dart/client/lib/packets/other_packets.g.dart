@@ -35,13 +35,12 @@ Map<String, dynamic> _$MessagePacketToJson(MessagePacket instance) =>
 
 SelfMessagePacket _$SelfMessagePacketFromJson(Map<String, dynamic> json) {
   return SelfMessagePacket()
-    ..messageType =
-        _$enumDecodeNullable(_$MessageTypeEnumMap, json['messageType']);
+    ..type = _$enumDecodeNullable(_$MessageTypeEnumMap, json['type']);
 }
 
 Map<String, dynamic> _$SelfMessagePacketToJson(SelfMessagePacket instance) =>
     <String, dynamic>{
-      'messageType': _$MessageTypeEnumMap[instance.messageType],
+      'type': _$MessageTypeEnumMap[instance.type],
     };
 
 T _$enumDecode<T>(
@@ -78,6 +77,8 @@ T _$enumDecodeNullable<T>(
 
 const _$MessageTypeEnumMap = {
   MessageType.FILL_PASSWORD: 'FILL_PASSWORD',
+  MessageType.INCORRECT_PASSWORD_ATTEMPT: 'INCORRECT_PASSWORD_ATTEMPT',
+  MessageType.INCORRECT_PASSWORD_FAILURE: 'INCORRECT_PASSWORD_FAILURE',
   MessageType.LOST_SERVER_CONNECTION: 'LOST_SERVER_CONNECTION',
   MessageType.REGISTER_PACKET: 'REGISTER_PACKET',
   MessageType.TIMED_OUT_REGISTRATION: 'TIMED_OUT_REGISTRATION',

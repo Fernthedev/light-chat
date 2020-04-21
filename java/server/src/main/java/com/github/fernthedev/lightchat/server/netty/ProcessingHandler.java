@@ -4,6 +4,7 @@ import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.core.packets.Packet;
 import com.github.fernthedev.lightchat.core.packets.handshake.ConnectedPacket;
 import com.github.fernthedev.lightchat.core.packets.handshake.InitialHandshakePacket;
+import com.github.fernthedev.lightchat.core.packets.latency.LatencyPacket;
 import com.github.fernthedev.lightchat.server.ClientConnection;
 import com.github.fernthedev.lightchat.server.EventListener;
 import com.github.fernthedev.lightchat.server.Server;
@@ -92,7 +93,9 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
                         ((ByteBuf) msg).release();
 
                     } else if (pair.getKey() != null) {
-                        StaticHandler.getCore().getLogger().debug("Received the packet {} from {}", pair.getLeft().getPacketName(), ctx.channel());
+                        if (!(pair.getLeft() instanceof LatencyPacket))
+                            StaticHandler.getCore().getLogger().debug("Received the packet {} from {}", pair.getLeft().getPacketName(), ctx.channel());
+
                         eventListener.received(pair.getKey(), pair.getRight());
                     }
                 }

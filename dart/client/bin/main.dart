@@ -49,6 +49,10 @@ void main(List<String> arguments) {
     print('Initialized connection sucessfully');
   });
 
+  client.onDisconnect((s) {
+    exit(0);
+  });
+
   // client.onConnect(readCmdLine);
   // client.onConnect(f);
 }
@@ -63,7 +67,8 @@ class PacketListenerConsole extends PacketListener {
       case SelfMessagePacket:
         SelfMessagePacket packet = p;
         // print('Message Type: ${p.toString()}');
-        switch (packet.messageType) {
+        switch (packet.type) {
+          case MessageType.INCORRECT_PASSWORD_ATTEMPT:
           case MessageType.FILL_PASSWORD:
             print('Reading console input');
             var line = stdin.readLineSync();
@@ -80,6 +85,9 @@ class PacketListenerConsole extends PacketListener {
           case MessageType.REGISTER_PACKET:
             break;
           case MessageType.TIMED_OUT_REGISTRATION:
+            break;
+          case MessageType.INCORRECT_PASSWORD_FAILURE:
+            print('Unable to authenticate with password');
             break;
         }
         break;

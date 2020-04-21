@@ -77,6 +77,8 @@ public class EncryptionUtil {
             String paramAlgorithm = cipher.getParameters().getAlgorithm();
 
             return new EncryptedBytes(encodedData, params, paramAlgorithm);
+        } catch (InvalidKeyException e) {
+            throw e;
         } catch (NoSuchAlgorithmException | IllegalBlockSizeException | NoSuchPaddingException | BadPaddingException | IOException e) {
             e.printStackTrace();
         }
