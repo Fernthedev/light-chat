@@ -1,46 +1,51 @@
 import 'dart:io';
 
-
 import 'package:flutter/material.dart';
 import 'package:light_chat_client/data/serverdata.dart';
+import 'package:light_chat_client/util/encryption/encryption.dart';
+import 'package:light_chat_client_flutter/assets/colors.dart';
 import 'package:light_chat_client_flutter/main.dart';
-
 
 class ServerEditPage extends StatelessWidget {
   ServerData _serverData;
   ServerData _originalServerData;
-  int index;
   static bool difModified = false;
 
+  TextEditingController _ipDataController = new TextEditingController();
+
+  TextEditingController _portDataController = new TextEditingController();
+
+  TextEditingController _passDataController = new TextEditingController();
+
   static const routeName = "/servereditpage";
+
+  var _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     // Extract the arguments from the current ModalRoute settings and cast
     // them as ScreenArguments.
     final List<Object> objects = ModalRoute.of(context).settings.arguments;
+    _serverData = (Main.fileHandler.serverDataMap)[objects[0]];
 
-    index = objects[0];
-    _serverData = objects[1];
-    _originalServerData = _serverData;
+    if (_serverData == null)
+      throw ArgumentError(
+          "Uuid ${objects[0]} does not seem to be assigned to server data.");
 
-    index = getList().indexOf(_serverData);
-    print(index);
+    _originalServerData = ServerData.fromServer(_serverData);
 
+    _ipDataController.text = _originalServerData.ip;
     TextFormField ipField = TextFormField(
       decoration: const InputDecoration(
         hintText: '192.168.2.*',
         labelText: 'IP Address',
       ),
-      initialValue: _serverData.ip,
       onSaved: (String value) {
-        if(value != _originalServerData.ip) {
-          difModified = true;
-        }else difModified = false;
         _serverData.ip = value;
         // This optional block of code can be used to run
         // code when the user saves the form.
       },
+      controller: _ipDataController,
       validator: (String value) {
         if (value.isEmpty) {
           return 'Please enter an ip address';
@@ -66,16 +71,14 @@ class ServerEditPage extends StatelessWidget {
       autocorrect: false,
     );
 
+    _portDataController.text = _serverData.port.toString();
     TextFormField portField = TextFormField(
       decoration: const InputDecoration(
         hintText: '2000',
         labelText: 'Port',
       ),
+      controller: _portDataController,
       onSaved: (String value) {
-        if(int.parse(value) != _originalServerData.port) {
-          difModified = true;
-        }else difModified = false;
-
         _serverData.port = int.parse(value);
         // This optional block of code can be used to run
         // code when the user saves the form.
@@ -84,24 +87,27 @@ class ServerEditPage extends StatelessWidget {
         return isNumeric(value) == false ? 'Not a valid port' : null;
       },
       keyboardType: TextInputType.number,
-      initialValue: _serverData.port.toString(),
     );
+
+    _passDataController.text = _serverData.hashedPassword;
 
     TextFormField passwordField = TextFormField(
       decoration: const InputDecoration(
         hintText: 'Password (Optional)',
         labelText: 'Password',
       ),
+      controller: _passDataController,
       onSaved: (String value) {
-        if(value != _originalServerData.hashedPassword) {
-          difModified = true;
-        }else difModified = false;
         _serverData.hashedPassword = value;
         // This optional block of code can be used to run
         // code when the user saves the form.
       },
       obscureText: true,
-      initialValue: _serverData.hashedPassword,
+      autocorrect: false,
+      enableInteractiveSelection: true,
+      validator: (String val) {
+        return null;
+      },
     );
 
     Color color = Theme.of(context).primaryColor;
@@ -115,6 +121,8 @@ class ServerEditPage extends StatelessWidget {
     );
 
     return MaterialApp(
+      theme: buildLightTheme(),
+      darkTheme: buildDarkTheme(),
       // Provide a function to handle named routes. Use this function to
       // identify the named route being pushed and create the correct
       // Screen.
@@ -124,16 +132,15 @@ class ServerEditPage extends StatelessWidget {
           // Cast the arguments to the correct type: ScreenArguments.
           final List<Object> args = settings.arguments;
 
-          int index = args[0];
-          ServerData serverData = args[1];
+          ServerData serverData = args[0];
 
           // Then, extract the required data from the arguments and
           // pass the data to the correct screen.
           return MaterialPageRoute(
             builder: (context) {
               ServerEditPage page = ServerEditPage();
-             // page.index = index;
-             // page._serverData = serverData;
+              // page.index = index;
+              // page._serverData = serverData;
               return page;
             },
           );
@@ -142,13 +149,13 @@ class ServerEditPage extends StatelessWidget {
 
       title: 'Edit server',
       home: Scaffold(
+          key: _scaffoldKey,
           appBar: AppBar(
             title: Text('Edit server'),
             actions: <Widget>[
               IconButton(
                 onPressed: () {
-
-                  if(difModified) {
+                  if (isModified()) {
                     return showDialog<void>(
                       context: context,
                       barrierDismissible: true, //must tap = false
@@ -223,34 +230,54 @@ class ServerEditPage extends StatelessWidget {
                 )
               ],
             )),
-          )),
+          )
+      ),
     );
   }
 
   void saveFile() {
-    index = getDataIndex(_serverData);
+//    index = Main.fileHandler.getDataIndex(_serverData);
+//
+//    if (index == -2) {
+//      Utilities.showInfoDialogue(
+//          _scaffoldKey.currentContext,
+//          "Serverdata index is -2 which means it cannot be found on the list",
+//          [Text("The server data is not in the list")]);
+//      return;
+//    }
+//
+//    getList().insert(index, _serverData)
 
-    getList().insert(index, _serverData);
-    Main.fileHandler.writeServerData(getList());
+    _serverData.ip = _ipDataController.value.text;
+    _serverData.port = int.parse(_portDataController.value.text);
+
+    var pass = _passDataController.value.text;
+
+    if (_serverData.hashedPassword != _passDataController.text) {
+      if (pass == "" || pass == null)
+        _serverData.hashedPassword = "";
+      else
+        _serverData.hashedPasswordDoHash = pass;
+    }
+
+    print(
+        "Saving from edit $_serverData with hash ${_serverData.hashedPassword}");
+
+    Main.fileHandler.updateServerData(_serverData);
+    _originalServerData = ServerData.fromServer(_serverData);
+
+    Main.fileHandler.saveData();
   }
 
-  List<ServerData> getList() {
-    return Main.getServerList();
+  bool isModified() {
+    return _ipDataController.text == _originalServerData.ip ||
+        int.parse(_portDataController.text) == _originalServerData.port ||
+        EncryptionUtil.toSha256(_passDataController.text) ==
+            _originalServerData.hashedPassword;
   }
 
   void cancel(BuildContext context) {
     Navigator.pop(context);
-  }
-
-  int getDataIndex(ServerData serverData) {
-    List<ServerData> serverDataList = getList();
-    for(ServerData f in serverDataList) {
-      if(f.uuid == serverData.uuid) {
-        return serverDataList.indexOf(f);
-      }
-    }
-
-    return -2;
   }
 }
 

@@ -46,7 +46,7 @@ class CommandPacket extends Packet {
 class IllegalConnection extends Packet {
   static final IllegalConnection constant = IllegalConnection();
 
-  IllegalConnection() : super.setName('ILLEGAL_CONNECTION');
+  IllegalConnection() : super.setName('ILLEGAL_CONNECTION_PACKET');
 
   String message;
 

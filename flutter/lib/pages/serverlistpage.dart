@@ -1,8 +1,9 @@
-
-import 'package:light_chat_client/data/serverdata.dart';
-import 'package:light_chat_client_flutter/main.dart';
-import 'package:light_chat_client_flutter/util/filehandler.dart';
 import 'package:flutter/material.dart';
+import 'package:light_chat_client/data/serverdata.dart';
+import 'package:light_chat_client_flutter/assets/colors.dart';
+import 'package:light_chat_client_flutter/main.dart';
+
+import 'ServerEditPage.dart';
 
 class ServerPage extends StatefulWidget {
   static const routeName = "/serverpage";
@@ -14,54 +15,31 @@ class ServerPage extends StatefulWidget {
 }
 
 class ServerPageState extends State<ServerPage> {
-  List<ServerData> getList() {
-    return Main.getServerList();
-  }
-
-  List<ServerData> serverDataList;
+  Map<String, ServerData> serverDataList;
 
   @override
   Widget build(BuildContext context) {
+    Main.fileHandler.reloadData();
+    serverDataList = new Map.from(Main.fileHandler.serverDataMap);
 
-    FileHandler fileHandler = Main.fileHandler;
-
-    serverDataList = getList();
-
-    final Iterable<ListTile> tiles = getList().map<ListTile>(
+    final Iterable<ListTile> tiles = serverDataList.values.map<ListTile>(
       (ServerData serverData) {
         return ListTile(
           title: Text(
             serverData.ip,
           ),
           subtitle: Text(serverData.port.toString()),
-          /*trailing: InkWell(
+          trailing: InkWell(
               onTap: () {
-                int index = fileHandler.getDataIndex(serverData);
-                print("Index of building is $index");
-                print("UUID is $serverData");
-                print("UUID2adaw22 is $serverData");
-                // When the user taps the button, navigate to a named route
-                // and provide the arguments as an optional parameter.
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ServerEditPage(),
-                    // Pass the arguments as part of the RouteSettings. The
-                    // ExtractArgumentScreen reads the arguments from these
-                    // settings.
-                    settings: RouteSettings(arguments: [index,serverData]),
-                  ),
-                );
+                editServer(serverData);
               },
-              child: Column(
-                children: [Icon(
+              child: Column(children: [
+                Icon(
                   // Add the lines from here...
                   Icons.edit,
                   color: Colors.grey,
                 ),
-                ]
-              )
-          ),*/
+              ])),
           onTap: () {
             // When the user taps the button, navigate to a named route
             // and provide the arguments as an optional parameter.
@@ -86,6 +64,8 @@ class ServerPageState extends State<ServerPage> {
     ).toList();
 
     return MaterialApp(
+      theme: buildLightTheme(),
+      darkTheme: buildDarkTheme(),
       title: 'Saved Servers',
       home: Scaffold(
           appBar: AppBar(
@@ -101,16 +81,25 @@ class ServerPageState extends State<ServerPage> {
           ),
           body: Container(
             child: ListView.builder(
-                itemCount: getList().length,
+                itemCount: serverDataList.length,
                 itemBuilder: (context, index) {
+                  String key = serverDataList.keys.elementAt(index);
+                  ServerData serverData = serverDataList[key];
+
                   return Dismissible(
                     background: stackBehindDismiss(),
-                    key: ObjectKey(getList()[index]),
+                    key: Key(serverData.uuid),
                     child: divided[index],
                     onDismissed: (direction) {
-                      var item = getList()[index];
-                      //To delete
-                      deleteItem(item);
+                      setState(() {
+
+                        //To delete
+                        deleteItem(serverData);
+
+                        serverDataList = Map.from(Main.fileHandler.serverDataMap);
+                        serverDataList.remove(key);
+                      });
+
                       //To show a snackbar with the UNDO button
                       Scaffold.of(context).showSnackBar(SnackBar(
                           content: Text("Item deleted"),
@@ -118,15 +107,21 @@ class ServerPageState extends State<ServerPage> {
                               label: "UNDO",
                               onPressed: () {
                                 //To undo deletion
-                                undoDeletion(index, item);
+                                undoDeletion(serverData);
                               })));
-                      setState(() {
-                        serverDataList = getList();
-                      });
+
                     },
                   );
                 }),
-          )),
+          ),
+        floatingActionButton: FloatingActionButton(
+        tooltip: 'Send', // used by assistive technologies
+        child: Icon(Icons.add),
+        onPressed: () {
+          addItem(ServerData("ip", 2000, null));
+        },
+      ),
+      ),
     );
   }
 
@@ -142,29 +137,57 @@ class ServerPageState extends State<ServerPage> {
     );
   }
 
-  int deleteItem(ServerData data) {
+  String addItem(ServerData data) {
     /*
     By implementing this method, it ensures that upon being dismissed from our widget tree,
     the item is removed from our list of items and our list is updated, hence
     preventing the "Dismissed widget still in widget tree error" when we reload.
     */
     setState(() {
-      int index = getList().indexOf(data);
-      getList().removeAt(index);
-      Main.fileHandler.writeServerData(getList());
-      return index;
+      Main.fileHandler.addServerData(data);
+      Main.fileHandler.saveData();
+      editServer(data);
+
+      return data.uuid;
     });
   }
 
-  void undoDeletion(int index, ServerData item) {
+  void deleteItem(ServerData data) {
+    /*
+    By implementing this method, it ensures that upon being dismissed from our widget tree,
+    the item is removed from our list of items and our list is updated, hence
+    preventing the "Dismissed widget still in widget tree error" when we reload.
+    */
+    setState(() {
+      Main.fileHandler.removeServerData(data);
+      Main.fileHandler.saveData();
+    });
+  }
+
+  void undoDeletion(ServerData item) {
     /*
     This method accepts the parameters index and item and re-inserts the {item} at
     index {index}
     */
     setState(() {
-      getList().insert(index, item);
-      Main.fileHandler.writeServerData(getList());
+      Main.fileHandler.addServerData(item);
+      Main.fileHandler.saveData();
     });
+  }
+
+  void editServer(ServerData serverData) {
+    // When the user taps the button, navigate to a named route
+    // and provide the arguments as an optional parameter.
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ServerEditPage(),
+        // Pass the arguments as part of the RouteSettings. The
+        // ExtractArgumentScreen reads the arguments from these
+        // settings.
+        settings: RouteSettings(arguments: [serverData.uuid]),
+      ),
+    );
   }
 }
 

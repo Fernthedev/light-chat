@@ -190,17 +190,19 @@ class Client implements IKeyEncriptionHolder {
     }
   }
 
-  void sendMessage(String line) {
+  Future<void> sendMessage(String line) async {
     Packet messagePacket = MessagePacket.create(line);
 
     if (line.startsWith('/')) {
-      line = line.substring(line.indexOf('/'));
+      line = line.substring(line.indexOf('/' ) + 1);
       messagePacket = CommandPacket.create(line);
     }
 
     if (line == '' || line.isEmpty) return;
 
-    send(messagePacket);
+    await send(messagePacket);
+
+    return Future.value();
   }
 
   void onDoneEvent() {}
@@ -283,7 +285,7 @@ class Client implements IKeyEncriptionHolder {
     }
   }
 
-  void close() async {
+  Future<void> close() async {
     _disconnecting = true;
 
     print('Closing socket');
@@ -292,5 +294,7 @@ class Client implements IKeyEncriptionHolder {
 
     _disconnecting = false;
     _runDisconnectCallbacks();
+
+    return Future.value();
   }
 }

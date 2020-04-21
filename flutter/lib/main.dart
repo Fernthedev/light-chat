@@ -2,10 +2,9 @@ import 'dart:collection';
 import 'dart:io';
 
 import 'package:device_info/device_info.dart';
+import 'package:flutter/material.dart';
 import 'package:light_chat_client/client.dart';
 import 'package:light_chat_client/data/serverdata.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:light_chat_client/multicast.dart';
 import 'package:light_chat_client/packets/handshake_packets.dart';
 import 'package:light_chat_client/variables.dart';
@@ -18,6 +17,12 @@ import 'assets/colors.dart';
 void main() => runApp(Main());
 
 class Main extends StatelessWidget {
+  Main() {
+    Variables.debug = true; // TODO: Remove when finish debugging
+
+    print("Main debug mode: ${Variables.debug}");
+  }
+
   static FileHandler _fileHandler;
   static GlobalKey _mainKey;
 
@@ -27,10 +32,11 @@ class Main extends StatelessWidget {
   static DeviceInfoPlugin deviceInfo;
 
   static Future<String> getDeviceName() async {
-    if (Platform.isAndroid) return await deviceInfo.androidInfo.then((info) => info.androidId);
-    if (Platform.isIOS) return await deviceInfo.iosInfo.then((info) => info.model);
+    if (Platform.isAndroid)
+      return await deviceInfo.androidInfo.then((info) => info.androidId);
 
-    Variables.debug = true; // TODO: Remove when finish debugging
+    if (Platform.isIOS)
+      return await deviceInfo.iosInfo.then((info) => info.model);
 
     throw "Not running on a device";
   }
@@ -38,30 +44,13 @@ class Main extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _fileHandler = new FileHandler();
+    _fileHandler.getFiles().then((_) {
+      _fileHandler.setToDefaultIfNecessary();
+    });
+
     deviceInfo = DeviceInfoPlugin();
 
-
     return LoginForm(null);
-  }
-
-  static List<ServerData> getServerList() {
-    if (fileHandler.serverData == null) {
-      fileHandler.serverData = new List<ServerData>();
-      fileHandler.serverData
-          .add(ServerData("192.168.0.17", 2000, "test1"));
-      fileHandler.serverData.add(ServerData("192.168.3.11", 2005, "no u"));
-      fileHandler.serverData
-          .add(ServerData("192.168.5.11", 1942, "test2"));
-    }
-
-    if (fileHandler.serverData.isEmpty) {
-      fileHandler.serverData = new List<ServerData>();
-      fileHandler.serverData
-          .add(ServerData("192.168.0.17", 2000, "no wawwasu"));
-      fileHandler.serverData.add(ServerData("192.168.3.11", 2005, "no u"));
-    }
-
-    return fileHandler.serverData;
   }
 
   static GlobalKey get mainKey => _mainKey;
@@ -98,10 +87,12 @@ class LoginFormState extends State<LoginForm> {
       _ip = serverData.ip;
       _port = serverData.port;
       _password = serverData.hashedPassword;
+
+      print("Password is $_password");
     }
   }
 
-  Visibility _animationVisibility;
+
 
   String _ip = "192.168.0.17";
   int _port = 2000;
@@ -110,8 +101,6 @@ class LoginFormState extends State<LoginForm> {
   set ip(String value) {
     _ip = value;
   }
-
-
 
   Future<void> _performLogin() async {
     // Validate will return true if the form is valid, or false if
@@ -122,9 +111,15 @@ class LoginFormState extends State<LoginForm> {
 
     ServerData serverData = ServerData(_ip, _port, _password);
 
-    Main.client = Client(ConnectedPacket.create(await Main.getDeviceName(), Platform.operatingSystem, Variables.versionData));
+    Main.client = Client(ConnectedPacket.create(await Main.getDeviceName(),
+        Platform.operatingSystem, Variables.versionData));
     try {
-      Main.client.initializeConnection(serverData);
+      Main.client.onError((e) => {
+            setState(() {
+              showAnimation = false;
+            })
+          });
+      Main.client.initializeConnection(serverData).catchError((e) => {throw e});
       setState(() {
         showAnimation = true;
       });
@@ -143,10 +138,8 @@ class LoginFormState extends State<LoginForm> {
       showAnimation = false;
     });
     Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ChatPage(serverData)
-        ),
+      context,
+      MaterialPageRoute(builder: (context) => ChatPage(serverData)),
     );
   }
 
@@ -167,7 +160,10 @@ class LoginFormState extends State<LoginForm> {
     if (ModalRoute.of(context) != null) {
       // Extract the arguments from the current ModalRoute settings and cast
       // them as ScreenArguments.
-      final ServerData args = ModalRoute.of(context).settings.arguments;
+      final ServerData args = ModalRoute
+          .of(context)
+          .settings
+          .arguments;
 
       setState(() {
         _ip = args.ip;
@@ -176,59 +172,61 @@ class LoginFormState extends State<LoginForm> {
       });
     }
 
-    Widget ipField =
-         TextFormField(
-          decoration: const InputDecoration(
-            hintText: '192.168.0.*',
-            labelText: 'IP Address',
-            border: OutlineInputBorder(),
-          ),
-          initialValue: _ip,
-          onSaved: (String value) {
-            _ip = value;
-            // This optional block of code can be used to run
-            // code when the user saves the form.
-          },
-          validator: (String value) {
-            if (value.isEmpty) {
-              return 'Please enter an ip address';
-            }
+    Widget ipField = TextFormField(
+      decoration: const InputDecoration(
+        hintText: '192.168.0.*',
+        labelText: 'IP Address',
+        border: OutlineInputBorder(),
+      ),
+      initialValue: _ip,
+      onSaved: (String value) {
+        _ip = value;
+        // This optional block of code can be used to run
+        // code when the user saves the form.
+      },
+      validator: (String value) {
+        if (value.isEmpty) {
+          return 'Please enter an ip address';
+        }
 
-            if (!isNumeric(value.replaceAll('.', ""))) {
-              return 'Numeric only';
-            }
+        if (value == "localhost") return null;
 
-            try {
-              InternetAddress address = InternetAddress(value);
-              if (address.host == null) {
-                return 'Not a valid ip address';
-              }
-            } on ArgumentError {
-              return 'Not a valid ip address';
-            }
-          },
-          keyboardType:
-              TextInputType.numberWithOptions(signed: false, decimal: true),
-          autocorrect: false,
-        );
+        try {
+          InternetAddress address = InternetAddress(value);
+          if (address.host == null) {
+            return 'Not a valid ip address';
+          }
+        } on ArgumentError {
+          return 'Not a valid ip address';
+        }
+
+        if (!isNumeric(value.replaceAll('.', ""))) {
+          return 'Numeric only';
+        }
+        return null;
+      },
+      keyboardType:
+      TextInputType.numberWithOptions(signed: false, decimal: true),
+      autocorrect: false,
+    );
 
     Widget portField = TextFormField(
-          decoration: const InputDecoration(
-            hintText: '2000',
-            labelText: 'Port',
-            border: OutlineInputBorder(),
-          ),
-          onSaved: (String value) {
-            _port = int.parse(value);
-            // This optional block of code can be used to run
-            // code when the user saves the form.
-          },
-          validator: (String value) {
-            return isNumeric(value) == false ? 'Not a valid port' : null;
-          },
-          keyboardType: TextInputType.number,
-          initialValue: _port.toString(),
-        );
+      decoration: const InputDecoration(
+        hintText: '2000',
+        labelText: 'Port',
+        border: OutlineInputBorder(),
+      ),
+      onSaved: (String value) {
+        _port = int.parse(value);
+        // This optional block of code can be used to run
+        // code when the user saves the form.
+      },
+      validator: (String value) {
+        return isNumeric(value) == false ? 'Not a valid port' : null;
+      },
+      keyboardType: TextInputType.number,
+      initialValue: _port.toString(),
+    );
 
     Widget passwordField = TextFormField(
       decoration: const InputDecoration(
@@ -245,8 +243,8 @@ class LoginFormState extends State<LoginForm> {
       initialValue: _password,
     );
 
-    Color color = _buildLightTheme().buttonColor;
-    Color textColor = _buildLightTheme().primaryTextTheme.display1.color;
+    Color color = buildLightTheme().buttonColor;
+    Color textColor = buildLightTheme().primaryTextTheme.display1.color;
 
     RaisedButton connectButton = new RaisedButton(
       padding: const EdgeInsets.all(8.0),
@@ -256,21 +254,17 @@ class LoginFormState extends State<LoginForm> {
       child: new Text("Connect"),
     );
 
-    SpinKitCubeGrid animation = SpinKitCubeGrid(
-      color: color,
-      size: 50.0,
-    );
-
-    _animationVisibility = Visibility(
+    CircularProgressIndicator animation = CircularProgressIndicator();
+    Visibility _animationVisibility = Visibility(
       child: animation,
       visible: showAnimation,
     );
 
     HashMap buttonMap = HashMap<String, Function()>();
 
-
     buttonMap["Search for servers on network"] = Multicast().startChecking;
     buttonMap["Saved servers"] = ServerPageRunnable().run;
+
     /// This is for debugging
 //    buttonMap["Chat page"] = () {
 //      BuildContext context = Main.mainKey.currentState.context;
@@ -312,9 +306,9 @@ class LoginFormState extends State<LoginForm> {
 
     return MaterialApp(
 
-        // Provide a function to handle named routes. Use this function to
-        // identify the named route being pushed and create the correct
-        // Screen.
+      // Provide a function to handle named routes. Use this function to
+      // identify the named route being pushed and create the correct
+      // Screen.
         onGenerateRoute: (settings) {
           // If you push the PassArguments route
           if (settings.name == ServerPage.routeName) {
@@ -330,38 +324,47 @@ class LoginFormState extends State<LoginForm> {
             );
           }
         },
-        theme: _buildLightTheme(),
-        darkTheme: _buildDarkTheme(),
+        theme: buildLightTheme(),
+        darkTheme: buildDarkTheme(),
         title: 'ServerLogin',
         key: currentKey,
         home: Scaffold(
-          key: loginFormHomeKey,
-          appBar: AppBar(
-            title: Text('Server Login'),
-            actions: <Widget>[
-              // Add 3 lines from here...
-              popupMenuButton,
-            ],
-          ),
-          body: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Form(
-                key: formKey,
-                child: ListView(
-                  children: [
-                    SizedBox(height: 10.0),
-                    ipField,
-                    SizedBox(height: 12.0),
-                    portField,
-                    SizedBox(height: 12.0),
-                    passwordField,
-                    SizedBox(height: 12.0),
-                    connectButton,
-                    _animationVisibility
-                  ],
-                ),
-              )),
-        ));
+            key: loginFormHomeKey,
+            appBar: AppBar(
+              title: Text('Server Login'),
+              actions: <Widget>[
+                // Add 3 lines from here...
+                popupMenuButton,
+              ],
+            ),
+            body: Stack(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Form(
+                      key: formKey,
+                      child: ListView(
+                        children: [
+                          SizedBox(height: 10.0),
+                          ipField,
+                          SizedBox(height: 12.0),
+                          portField,
+                          SizedBox(height: 12.0),
+                          passwordField,
+                          SizedBox(height: 12.0),
+                          connectButton,
+                        ],
+                      ),
+                    ),
+                  ),
+                  Align(
+                    child: _animationVisibility,
+                    alignment: FractionalOffset.center,
+                  )
+                ]
+            )
+        )
+    );
   }
 
   void setServerState(ServerData serverData) {
@@ -379,66 +382,6 @@ class LoginFormState extends State<LoginForm> {
   set password(String value) {
     _password = value;
   }
-}
-
-ThemeData _buildLightTheme() {
-  final ThemeData base = ThemeData.light();
-  return base.copyWith(
-    primaryColor: kBlue,
-    primaryTextTheme: _buildTextTheme(base.primaryTextTheme, kBrown),
-    primaryIconTheme: base.iconTheme.copyWith(color: kBrown),
-    buttonColor: kBlue,
-    accentColor: kBrown,
-    scaffoldBackgroundColor: kWhite,
-    cardColor: Colors.white,
-    textSelectionColor: kBlue,
-    errorColor: kError,
-    buttonTheme: ButtonThemeData(
-      textTheme: ButtonTextTheme.accent,
-    ),
-    textSelectionHandleColor: kBlue,
-    accentTextTheme: _buildTextTheme(base.accentTextTheme, kBrown),
-    textTheme: _buildTextTheme(base.textTheme, kBrown),
-  );
-}
-
-TextTheme _buildTextTheme(TextTheme base, Color color) {
-  return base
-      .copyWith(
-        headline: base.headline.copyWith(
-          fontWeight: FontWeight.w500,
-        ),
-        title: base.title.copyWith(fontSize: 18.0),
-        caption: base.caption.copyWith(
-          fontWeight: FontWeight.w400,
-          fontSize: 14.0,
-        ),
-      )
-      .apply(
-        fontFamily: 'Rubik',
-        displayColor: color,
-        bodyColor: color,
-      );
-}
-
-ThemeData _buildDarkTheme() {
-  final ThemeData base = ThemeData.dark();
-  return base.copyWith(
-    primaryColor: kShrinePurple,
-    primaryTextTheme: _buildTextTheme(base.primaryTextTheme, kShrinePurple),
-    primaryIconTheme: base.iconTheme.copyWith(color: kShrineGreen),
-    buttonColor: kShrineGreen,
-    accentColor: kShrinePurple,
-    cardColor: Colors.white,
-    textSelectionColor: kWhite,
-    errorColor: kError,
-    buttonTheme: ButtonThemeData(
-      textTheme: ButtonTextTheme.accent,
-    ),
-    textSelectionHandleColor: kShrinePurple,
-    accentTextTheme: _buildTextTheme(base.accentTextTheme, kShrinePurple),
-    textTheme: _buildTextTheme(base.textTheme, kShrinePurple),
-  );
 }
 
 abstract class Runnable {

@@ -71,18 +71,21 @@ public class CommandMessageParser implements Listener {
             }
         }
 
-        command = splitString[0];
+        String mainCommand = splitString[0];
 
         boolean found = false;
 
 
-        command = command.replaceAll(" {2}", " ");
+        mainCommand = mainCommand.replaceAll(" {2}", " ");
 
         if (!command.equals("")) {
             try {
 
+                if (!(sender instanceof Console))
+                    Server.getLogger().info("[{}] /{}", sender.getName(), command);
+
                 for (Command serverCommand : ServerTerminal.getCommands()) {
-                    if (serverCommand.getName().equalsIgnoreCase(command)) {
+                    if (serverCommand.getName().equalsIgnoreCase(mainCommand)) {
                         found = true;
                         String[] args = new String[arguments.size()];
                         args = arguments.toArray(args);
@@ -95,6 +98,7 @@ public class CommandMessageParser implements Listener {
                 }
             } catch (Exception e) {
                 Server.getLogger().error(e.getMessage(), e.getCause());
+                ServerTerminal.sendMessage(sender, ColorCode.RED + "Command exception occurred. Error: " + e.getMessage());
             }
 
             if (!found) {
@@ -104,7 +108,7 @@ public class CommandMessageParser implements Listener {
     }
 
     private static void handleMessage(SenderInterface sender, String message) {
-        ServerTerminal.broadcast("[" + sender.getName() + "] : " + message);
+        ServerTerminal.broadcast("[" + sender.getName() + "]: " + message);
     }
 
 }

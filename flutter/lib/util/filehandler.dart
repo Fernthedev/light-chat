@@ -1,13 +1,23 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:light_chat_client/data/serverdata.dart';
 import 'package:path_provider/path_provider.dart';
 
 class FileHandler {
+  Future<void> getFiles() async {
+    if (_cachedServersFile == null) _cachedServersFile = (await _serversFile);
+
+    return Future.value();
+  }
+
+  File _cachedServersFile;
+  File get cachedServersFile => _cachedServersFile;
+
   Future<String> get _localPath async {
     final Directory directory = await getApplicationDocumentsDirectory();
 
-    if(!await directory.exists()) {
+    if (!await directory.exists()) {
       await directory.create(recursive: true);
     }
 
@@ -18,76 +28,121 @@ class FileHandler {
     final path = await _localPath;
     File file = File('$path/servers.txt');
 
-    if(!await file.exists()) {
+    if (!await file.exists()) {
       file = await file.create(recursive: true);
     }
-
-    bool t = await file.exists();
-
-    print("$file $t");
 
     return file;
   }
 
-  Future<File> writeServerData(List<ServerData> serverData) async {
-    final file = await _serversFile;
+  void setToDefaultIfNecessary() {
+    bool necessary = !cachedServersFile.existsSync();
+
+    var data;
+
+    try {
+      data = readServerData();
+    } on Exception {
+      data = null;
+    }
+
+    necessary = necessary || data == null;
+
+    if (necessary) {
+      print("Setting defaults");
+
+      createDefaults();
+      saveData();
+    }
+  }
+
+  void writeServerData(Map<String, ServerData> serverData) {
+    final file = cachedServersFile;
 
     // Write the file
-    return file.writeAsString(jsonEncode(serverData));
+    file.writeAsStringSync(jsonEncode(serverData), flush: true);
   }
 
-  Future<File> addServerData(ServerData serverDataE) async {
-    List<ServerData> serverDataList = serverData;
+  void addServerData(ServerData serverDataE) async {
+    if (_serverDataList.containsKey(serverDataE.uuid))
+      throw ArgumentError(
+          "Serverdata is already added. Overwrite using updateServerData()");
 
-    serverDataList.add(serverDataE);
-    return writeServerData(serverDataList);
+    print("Saving ${serverDataE.uuid} to memory");
+
+    _serverDataList[serverDataE.uuid] = serverDataE;
   }
 
-  Future<File> removeServerData(ServerData serverDataE) async {
-    List<ServerData> serverDataList = serverData;
+  void updateServerData(ServerData serverDataE) async {
+    if (!_serverDataList.containsKey(serverDataE.uuid))
+      throw ArgumentError(
+          "Serverdata not is already added. Add using addServerData()");
 
-    serverDataList.remove(serverDataE);
-    return writeServerData(serverDataList);
+    _serverDataList.update(serverDataE.uuid, (_) => serverDataE);
   }
-  List<ServerData> _serverDataList;
 
-  List<ServerData> get serverData {
-    if(_serverDataList == null) {
-      reloadData();
-    }
+  void removeServerData(ServerData serverDataE) async {
+    _serverDataList.remove(serverDataE.uuid);
+  }
+
+  Map<String, ServerData> _serverDataList;
+
+  Map<String, ServerData> get serverDataMap {
     return _serverDataList;
   }
 
-
-  set serverData(List<ServerData> value) {
-    _serverDataList = value;
-  }
-
-  void reloadData() async {
-    _serverDataList = await readServerData();
-    writeServerData(_serverDataList);
-  }
-
-  void saveData() async {
-    writeServerData(_serverDataList);
-  }
-
-  Future<List<ServerData>> readServerData() async {
-    try {
-      final file = await _serversFile;
-
-      // Read the file
-      String contents = await file.readAsString() ?? "";
-
-      Iterable l = json.decode(contents) ?? [];
-      List<ServerData> serverDataList = l.map((f)=> ServerData.fromJson(f)).toList() ?? [];
-
-
-      return serverDataList;
-    } catch (e) {
-      // If encountering an error, return 0
-      return null;
+  Map<String, ServerData> createDefaults() {
+    if (_serverDataList == null) {
+      _serverDataList = new Map<String, ServerData>();
+      addServerData(ServerData("192.168.0.17", 2000, "test1"));
+      addServerData(ServerData("192.168.3.11", 2005, "no u"));
+      addServerData(ServerData("192.168.5.11", 1942, "test2"));
     }
+
+    if (_serverDataList.isEmpty) {
+      _serverDataList = new Map<String, ServerData>();
+      addServerData(ServerData("192.168.0.17", 2000, "no wawwasu"));
+      addServerData(ServerData("192.168.3.11", 2005, "no u"));
+    }
+
+    return _serverDataList;
+  }
+
+  reloadData() {
+    _serverDataList = readServerData();
+    saveData();
+  }
+
+  saveData() {
+    writeServerData(_serverDataList);
+    Map<String, ServerData> writtenMap = readServerData();
+    if (writtenMap == null)
+      throw "The server data was not written or read correctly.";
+  }
+
+  Map<String, ServerData> readServerData() {
+    print("Reading");
+    File file = cachedServersFile;
+
+    // Read the file
+    String contents = file.readAsStringSync() ?? "";
+
+    Map<String, dynamic> l = json.decode(contents) ?? [];
+
+//      List<ServerData> serverDataList =
+//          l.map((f) => ServerData.fromJson(f)).toList() ?? [];
+
+    Map<String, ServerData> map = l.map(
+        (uuid, serverData) => MapEntry(uuid, ServerData.fromJson(serverData)));
+
+    for (var uuid in map.keys) {
+      if (map[uuid].uuid != uuid)
+        throw "UUIDs are not equal $uuid vs ${map[uuid].uuid}";
+    }
+
+    return map;
+
+//      serverDataList.forEach((f) => {map[f.uuid] = f});
   }
 
   Future clearAppFolder() async {
@@ -95,17 +150,25 @@ class FileHandler {
     new Directory(appDir).delete(recursive: true);
   }
 
-  int getDataIndex(ServerData serverDataVar) {
+  bool containsServerData(ServerData serverData) =>
+      _serverDataList.containsKey(serverData.uuid) &&
+      _serverDataList[serverData.uuid] == serverData;
 
-    print("Going to check $_serverDataList");
-    for(ServerData f in _serverDataList) {
-      print("Checking $f.uuid and $serverDataVar.uuid");
-      if(f.uuid == serverDataVar.uuid) {
-        print("Found");
-        return _serverDataList.indexOf(f);
-      }
-    }
-
-    return -2;
-  }
+//  int getDataIndex(ServerData serverDataVar) {
+//    print("Going to check $_serverDataList");
+//    for (var uuid in _serverDataList.keys) {
+//      var f = _serverDataList[uuid];
+//      print("Checking $f.uuid and $serverDataVar.uuid");
+//      if (f.uuid == serverDataVar.uuid) {
+//        print("Found");
+//        return _serverDataList.indexOf(f);
+//      },
+//    }
+//
+//    _serverDataList.forEach((uuid, f) => {
+//
+//    });
+//
+//    return -2;
+//  }
 }

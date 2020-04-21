@@ -239,24 +239,30 @@ public class ServerSettings extends CoreSettings {
                             throw new IllegalArgumentException("You cannot edit a value which is not editable");
                         }
 
-                        Object wrappedVal = null;
+                        Object wrappedVal;
 
-                        if (!field.getClass().isPrimitive() && !field.getClass().isInstance(String.class)) {
+                        if (!field.getType().isPrimitive() && !String.class.isAssignableFrom(field.getType())) {
                             throw new IllegalArgumentException("Setting value is not primitive type or string which is not supported.");
                         }
 
-                        if (boolean.class.equals(field.getType())) {
+                        if (boolean.class.equals(field.getType()) || Boolean.class.isAssignableFrom(field.getType())) {
+
                             wrappedVal = Boolean.parseBoolean(val);
-                        } else if (int.class.equals(field.getType())) {
+                            if (!wrappedVal.toString().equalsIgnoreCase(val)) throw new IllegalArgumentException("Value cannot be " + val + " must be true/false");
+
+                        } else if (int.class.equals(field.getType()) || Integer.class.isAssignableFrom(field.getType())) {
                             wrappedVal = Integer.parseInt(val);
-                        } else if (long.class.equals(field.getType())) {
+                        } else if (long.class.equals(field.getType()) || Long.class.isAssignableFrom(field.getType())) {
                             wrappedVal = Long.parseLong(val);
-                        } else if (double.class.equals(field.getType())) {
+                        } else if (double.class.equals(field.getType()) || Double.class.isAssignableFrom(field.getType())) {
                             wrappedVal = Double.parseDouble(val);
-                        } else if (short.class.equals(field.getType())) {
+                        } else if (short.class.equals(field.getType()) || Short.class.isAssignableFrom(field.getType())) {
                             wrappedVal = Short.parseShort(val);
-                        } else if (String.class.equals(field.getType())) {
+                        } else if (String.class.equals(field.getType()) || String.class.isAssignableFrom(field.getType())) {
                             wrappedVal = val;
+                        } else {
+                            throw new IllegalArgumentException("Value must be of type " + field.getType()
+                                    + " e.g if boolean then true or a number if int");
                         }
 
                         Validate.notNull(wrappedVal);

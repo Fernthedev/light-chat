@@ -14,25 +14,25 @@ description: A network client in Flutter for my Light-Chat java server
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.2.0 <3.0.0"
+  sdk: '>=2.7.0 <3.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
   device_info: ^0.4.1+4
-  flutter_spinkit: "^3.1.0"
+#  flutter_spinkit: "^3.1.0"
   path_provider: ^0.5.0+1
-  english_words: ^3.1.0
+#  english_words: ^3.1.0
   json_annotation: ^3.0.0
-  multicast_lock: any
+#  multicast_lock: any
   lombok: ^0.0.5
   encrypt: ^4.0.0
   pointycastle: ^1.0.2
   asn1lib: ^0.5.15
   #  adhara_socket_io: ^0.1.10
-  web_socket_channel: ^1.0.12
-  byte_array: ^0.1.6
-  cipher2: 0.3.0
+#  web_socket_channel: ^1.0.12
+#  byte_array: ^0.1.6
+#  cipher2: 0.3.0
   uuid: ^2.0.1
   version: ^1.0.0
   basic_utils: ^2.4.3

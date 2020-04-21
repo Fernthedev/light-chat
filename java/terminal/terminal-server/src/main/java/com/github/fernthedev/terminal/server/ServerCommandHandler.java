@@ -94,7 +94,7 @@ public class ServerCommandHandler {
 
                         String message = argString.toString();
 
-                        ServerTerminal.broadcast("[Server] :" + message);
+                        ServerTerminal.broadcast("[Server]: " + message);
                     } else {
                         ServerTerminal.sendMessage(sender, "No message?");
                     }
