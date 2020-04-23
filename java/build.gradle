@@ -56,7 +56,7 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
     apply plugin: 'maven-publish'
     apply plugin: 'com.github.johnrengelman.shadow'
 
-    ext.netty_ver = "4.1.48.Final"
+    ext.netty_ver = "4.1.49.Final"
     ext.jline_ver = "3.14.1"
     ext.log4j_ver = "2.13.1"
 
