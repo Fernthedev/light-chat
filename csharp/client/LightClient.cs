@@ -7,6 +7,7 @@ using com.github.fernthedev.lightchat.core.packets;
 using com.github.fernthedev.lightchat.core.codecs;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using com.github.fernthedev.lightchat.core.encryption;
 using System.Threading.Tasks;
 using DotNetty.Transport.Bootstrapping;
@@ -26,7 +27,7 @@ namespace com.github.fernthedev.lightchat.client
     {
     }
 
-    public class Client : IEncryptionKeyHolder
+    public class LightClient : IEncryptionKeyHolder
     {
         private string host;
         private int port;
@@ -43,6 +44,8 @@ namespace com.github.fernthedev.lightchat.client
         private PacketEventListener listener;
 
         public bool registered { get; internal set; }
+
+        public bool running { get; internal set; } = false;
 
         public IChannel Channel { get; private set; }
 
@@ -87,14 +90,14 @@ namespace com.github.fernthedev.lightchat.client
         /**
          * Packet:[ID,lastPacketSentTime]
          */
-        private readonly Dictionary<GenericType<Packet>, Tuple<int, long>> packetIdMap =
-            new Dictionary<GenericType<Packet>, Tuple<int, long>>();
+        private readonly Dictionary<Type, Tuple<int, long>> packetIdMap =
+            new Dictionary<Type, Tuple<int, long>>();
 
         public static Logger Logger => StaticHandler.Core.Logger;
 
         public Logger LoggerInstance => Logger;
 
-        public Client(string host, int port)
+        public LightClient(string host, int port)
         {
 
             StaticHandler.Core = new ClientCore();
@@ -114,6 +117,7 @@ namespace com.github.fernthedev.lightchat.client
 
         public async Task Connect()
         {
+            running = true;
             registered = false;
             group = new MultithreadEventLoopGroup();
 
@@ -128,17 +132,17 @@ namespace com.github.fernthedev.lightchat.client
             bootstrap.Group(group)
                 .Channel<TcpSocketChannel>()
                 .Option(ChannelOption.TcpNodelay, true)
-                // .Option(ChannelOption.SoKeepalive, true)
-                // .Option(ChannelOption.ConnectTimeout, TimeSpan.FromMilliseconds(settings.TimeoutMS))
-                .Handler(new ActionChannelInitializer<IChannel>(channel =>
+                .Option(ChannelOption.SoKeepalive, true)
+                .Option(ChannelOption.ConnectTimeout, TimeSpan.FromMilliseconds(settings.TimeoutMS))
+                .Handler(new ActionChannelInitializer<ISocketChannel>(channel =>
                 {
                     var pipeLine = channel.Pipeline;
 
-                    pipeLine.AddLast(new LoggingHandler(LogLevel.INFO));
+                    // pipeLine.AddLast(new LoggingHandler(LogLevel.INFO));
 
                     pipeLine.AddLast("frameDecoder", new LineBasedFrameDecoder(StaticHandler.LineLimit));
                     pipeLine.AddLast("jsonDecoder", new EncryptedJSONDecoder(this, settings.jsonCodec));
-                    pipeLine.AddLast("jsonEncoder", new EncryptedJSONEncoder(this, settings.jsonCodec));
+                    pipeLine.AddLast("jsonEncoder", new EncryptedJsonEncoder(this, settings.jsonCodec));
 
 
                     pipeLine.AddLast(clientHandler);
@@ -147,9 +151,8 @@ namespace com.github.fernthedev.lightchat.client
 
             var futureChannel = bootstrap.ConnectAsync(remoteEp);
 
+
             Channel = await futureChannel.ConfigureAwait(false);
-
-
 
             if (futureChannel.IsCompletedSuccessfully || Channel.Open || Channel.Active || Channel.Registered)
             {
@@ -181,6 +184,7 @@ namespace com.github.fernthedev.lightchat.client
         public async Task disconnect(
             ServerDisconnectEvent.DisconnectStatus status = ServerDisconnectEvent.DisconnectStatus.DISCONNECTED)
         {
+            running = false;
             registered = false;
 
             await Channel.CloseAsync().ConfigureAwait(true);
@@ -193,22 +197,26 @@ namespace com.github.fernthedev.lightchat.client
 
         public async Task sendObject(Packet packet, bool encrypt = true)
         {
-            var packetIdPair = UpdatePacketIdPair(new GenericType<Packet>(packet.GetType()), -1);
+            StaticHandler.Core.Logger.Debug("Sending packet {0}:{1}", packet._PacketName, encrypt.ToString());
 
-            if (packetIdPair.Item1 > MaxPacketId || JavaUtil.CurrentTimeMillis() - packetIdPair.Item2 > 900) UpdatePacketIdPair(new GenericType<Packet>( packet.GetType()), 0);
+            var (id, lastPacketSentTime) = UpdatePacketIdPair(packet.GetType(), -1);
+
+            if (id > MaxPacketId || JavaUtil.CurrentTimeMillis() - lastPacketSentTime > 900) UpdatePacketIdPair(packet.GetType(), 0);
 
             if (encrypt)
             {
-                await Channel.WriteAndFlushAsync(packet).ConfigureAwait(true);
+                await Channel.WriteAndFlushAsync(packet).ConfigureAwait(false);
             }
             else
             {
                 await Channel.WriteAndFlushAsync(new UnencryptedPacketWrapper(packet,
-                    -1 /* TODO: Insert packet id implemantion (Follow Java implementation)*/)).ConfigureAwait(true);
+                    id)).ConfigureAwait(false);
             }
+
+
         }
 
-        private Tuple<int, long> UpdatePacketIdPair(GenericType<Packet> packet, int newId)
+        private Tuple<int, long> UpdatePacketIdPair(Type packet, int newId)
         {
             var packetIdPair = getPacketId(packet, null, null);
 
@@ -220,7 +228,9 @@ namespace com.github.fernthedev.lightchat.client
                 packetIdPair = new Tuple<int, long>(newId, JavaUtil.CurrentTimeMillis());
             }
 
-            packetIdMap.Add(packet, packetIdPair);
+            if (packetIdMap.ContainsKey(packet)) packetIdMap[packet] = packetIdPair;
+            else packetIdMap.Add(packet, packetIdPair);
+
             return packetIdPair;
         }
 
@@ -245,9 +255,9 @@ namespace com.github.fernthedev.lightchat.client
             return secretKey != null;
         }
 
-        public Tuple<int, long> getPacketId(GenericType<Packet> clazz, IChannelHandlerContext ctx, IChannel channel)
+        public Tuple<int, long> getPacketId(Type clazz, IChannelHandlerContext ctx, IChannel channel)
         {
-            return packetIdMap[clazz];
+            return !packetIdMap.ContainsKey(clazz) ? null : packetIdMap[clazz];
         }
 
         public T callEvent<T>(T e) where T : IEvent
@@ -259,7 +269,7 @@ namespace com.github.fernthedev.lightchat.client
 
         public ConnectedPacket buildConnectedPacket()
         {
-            return new ConnectedPacket(Name, Environment.OSVersion.ToString(), StaticHandler.VERSION_DATA);
+            return new ConnectedPacket(Name, Environment.OSVersion.ToString(), StaticHandler.VERSION_DATA, "C# " + Environment.Version + " " + RuntimeInformation.FrameworkDescription);
         }
 
         public void setSecretKey(AesCryptoServiceProvider aesCryptoServiceProvider)

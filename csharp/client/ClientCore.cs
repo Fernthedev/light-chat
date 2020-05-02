@@ -1,7 +1,9 @@
-﻿namespace com.github.fernthedev.lightchat.client
+﻿using com.github.fernthedev.lightchat.core;
+
+namespace com.github.fernthedev.lightchat.client
 {
-    public class ClientCore
+    public class ClientCore : Core
     {
-        
+
     }
 }

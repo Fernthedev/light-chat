@@ -41,7 +41,7 @@ void main(List<String> arguments) {
   name = setValIfNull(name, 'Name:');
 
   client = Client(ConnectedPacket.create(
-      name, Platform.operatingSystem, Variables.versionData));
+      name, Platform.operatingSystem, Variables.versionData, Variables.defaultLangFramework));
 
   client.addPacketListener(PacketListenerConsole());
 

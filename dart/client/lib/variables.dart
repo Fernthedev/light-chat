@@ -1,10 +1,9 @@
-import 'dart:html';
+import 'package:version/version.dart';
 
 import 'data/packetdata.dart';
 
 class Variables {
-
-  static String defaultLangFramework = "Dart " + 
+  static String defaultLangFramework = "Dart";
 
   static final VersionData versionData =
       VersionData.fromString('1.6.0', '1.6.0');
