@@ -32,3 +32,14 @@ The specifications can be found [here](docs/specs.md)
 - Is built on using async code with Netty and the server/client core itself.
 - Authentication system for restrictive access.
 - Ban System with IPs and names
+
+# Compiling and debugging
+
+## Java
+Java has six modules, three of which are terminal-based (inside the terminal folder) and three are the main cores of the program. To debug, you would prefer to use the terminal-based implementations as they show logs and you must use the "-debug" flag for the program to not exit immidietely when using any Intellij-based IDEs.
+
+## C# (Dotnet) 
+Dotnet follows a similar philosophy Java follows with modules, except the "-debug" flag is not required though it is recommended since it shows extra information.
+
+## Dart
+Dart only has the client module for now though most of the code will be moved to different modules later on.
