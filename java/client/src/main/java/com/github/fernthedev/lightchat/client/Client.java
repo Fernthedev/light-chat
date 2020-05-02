@@ -105,7 +105,9 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
 
     public ConnectedPacket buildConnectedPacket() {
         StaticHandler.getCore().getLogger().debug("Using the name: {}", name);
-        return new ConnectedPacket(getName(), getOSName(), StaticHandler.getVERSION_DATA());
+        String javaVersion = System.getProperty("java.version") + " (" + SystemUtils.JAVA_VM_NAME + ")";
+
+        return new ConnectedPacket(getName(), getOSName(), StaticHandler.getVERSION_DATA(), "Java " + javaVersion);
     }
 
     public Client(String host, int port) {

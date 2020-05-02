@@ -47,6 +47,9 @@ public class ClientConnection implements SenderInterface, AutoCloseable {
     @Getter
     private String os;
 
+    @Getter
+    private String langFramework;
+
     @EqualsAndHashCode.Include()
     @Getter
     private final UUID uuid;
@@ -267,8 +270,9 @@ public class ClientConnection implements SenderInterface, AutoCloseable {
     }
 
 
-    void finishConstruct(String name, String os) {
+    void finishConstruct(String name, String os, String langFramework) {
         this.deviceName = name;
         this.os = os;
+        this.langFramework = langFramework;
     }
 }

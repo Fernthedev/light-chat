@@ -54,18 +54,18 @@ public class EventListener {
 
                 VersionData versionData = packet.getVersionData();
 
-                StaticHandler.VERSION_RANGE versionRange = StaticHandler.getVersionRangeStatus(versionData);
+                StaticHandler.VersionRange versionRange = StaticHandler.getVersionRangeStatus(versionData);
 
-                if (versionRange == StaticHandler.VERSION_RANGE.MATCH_REQUIREMENTS)
+                if (versionRange == StaticHandler.VersionRange.MATCH_REQUIREMENTS)
                     client.getLogger().info("Version range requirements match Server version.");
                 else {
                     // Current version is smaller than the server's required minimum
-                    if (versionRange == StaticHandler.VERSION_RANGE.WE_ARE_LOWER) {
+                    if (versionRange == StaticHandler.VersionRange.WE_ARE_LOWER) {
                         client.getLogger().info("The client version ({}) does not meet server's minimum version ({}) requirements. Expect incompatibility issues", StaticHandler.getVERSION_DATA().getVersion(), versionData.getMinVersion());
                     }
 
                     // Current version is larger than server's minimum version
-                    if (versionRange == StaticHandler.VERSION_RANGE.WE_ARE_HIGHER) {
+                    if (versionRange == StaticHandler.VersionRange.WE_ARE_HIGHER) {
                         client.getLogger().info("The server version ({}) does not meet client's minimum version ({}) requirements. Expect incompatibility issues", versionData.getVersion(), StaticHandler.getVERSION_DATA().getMinVersion());
                     }
 

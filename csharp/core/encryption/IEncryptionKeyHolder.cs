@@ -10,14 +10,17 @@ namespace com.github.fernthedev.lightchat.core.encryption
 {
     public interface IEncryptionKeyHolder
     {
-        RijndaelManaged getSecretKey(IChannelHandlerContext ctx, IChannel channel);
+        AesCryptoServiceProvider getSecretKey(IChannelHandlerContext ctx, IChannel channel);
+
+        ICryptoTransform getSecretKeyEncryptor(IChannelHandlerContext ctx, IChannel channel);
+        ICryptoTransform getSecretKeyDecryptor(IChannelHandlerContext ctx, IChannel channel);
 
         bool isEncryptionKeyRegistered(IChannelHandlerContext ctx, IChannel channel);
 
         /**
          * Packet:[ID,lastPacketSentTime]
          */
-        Tuple<int, long> getPacketId(GenericType<Packet> clazz, IChannelHandlerContext ctx, IChannel channel);
+        Tuple<int, long> getPacketId(Type clazz, IChannelHandlerContext ctx, IChannel channel);
 
     }
 }

@@ -13,12 +13,12 @@ namespace com.github.fernthedev.lightchat.client
     {
 
         protected PacketEventListener listener;
-        protected Client client;
+        protected LightClient lightClient;
 
-        public ClientHandler(Client client, PacketEventListener listener)
+        public ClientHandler(LightClient lightClient, PacketEventListener listener)
         {
             this.listener = listener;
-            this.client = client;
+            this.lightClient = lightClient;
         }
 
 
@@ -41,7 +41,7 @@ namespace com.github.fernthedev.lightchat.client
         {
             Tuple<Packet, int> packet;
 
-            StaticHandler.core.logger.Debug("Received the packet {} from {}", msg.GetType().Name, ctx.Channel.ToString());
+            StaticHandler.Core.Logger.Debug("Received the packet {0} from {1}", msg.GetType().Name, ctx.Channel.ToString());
 
             if (msg is Tuple<Packet, int>)
             {
@@ -58,9 +58,9 @@ namespace com.github.fernthedev.lightchat.client
 
         public override void ChannelUnregistered(IChannelHandlerContext ctx)
         {
-            StaticHandler.core.logger.Info("Lost connection to server.");
+            StaticHandler.Core.Logger.Info("Lost connection to server.");
 
-            client.disconnect(ServerDisconnectEvent.DisconnectStatus.CONNECTION_LOST).ConfigureAwait(true);
+            lightClient.disconnect(ServerDisconnectEvent.DisconnectStatus.CONNECTION_LOST).ConfigureAwait(false);
 
             base.ChannelUnregistered(ctx);
         }

@@ -14,18 +14,15 @@ namespace com.github.fernthedev.lightchat.core
 
         T fromJson<T>(string json);
 
-        T fromJson<T>(string json, GenericType<T> type)
-        {
-            return fromJson<T>(json);
-        }
+        T fromJson<T>(string json, Type type);
 
         public static IJsonHandler enumToHandler(JsonHandlerEnum enumJson)
         {
             switch(enumJson)
             {
-                case JsonHandlerEnum.Newtonsoft:
+                case JsonHandlerEnum.NEWTONSOFT:
                     return new NewtonsoftJsonHandler();
-                case JsonHandlerEnum.DotNetJson:
+                case JsonHandlerEnum.DOT_NET_JSON:
                     return new DotNetJsonHandler();
             }
 
@@ -35,11 +32,22 @@ namespace com.github.fernthedev.lightchat.core
 
     public class NewtonsoftJsonHandler : IJsonHandler
     {
+        private static readonly JsonSerializerSettings settings = new JsonSerializerSettings()
+        {
+            ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
+            TypeNameHandling = TypeNameHandling.Auto,
+
+        };
+
         public T fromJson<T>(string json)
         {
-            return JsonConvert.DeserializeObject<T>(json);
+            return JsonConvert.DeserializeObject<T>(json, settings: settings);
         }
 
+        public T fromJson<T>(string json, Type type)
+        {
+            return (T) JsonConvert.DeserializeObject(json, type, settings: settings);
+        }
 
 
         public string toJson(object o)
@@ -50,9 +58,21 @@ namespace com.github.fernthedev.lightchat.core
 
     public class DotNetJsonHandler : IJsonHandler
     {
+
+        private static readonly JsonSerializerOptions options = new JsonSerializerOptions()
+        {
+            AllowTrailingCommas = true
+
+        };
+
         public T fromJson<T>(string json)
         {
-            return JsonSerializer.Deserialize<T>(json);
+            return JsonSerializer.Deserialize<T>(json, options: options);
+        }
+
+        public T fromJson<T>(string json, Type type)
+        {
+            return (T) JsonSerializer.Deserialize(json, type, options: options);
         }
 
         public string toJson(object o)
@@ -63,8 +83,8 @@ namespace com.github.fernthedev.lightchat.core
 
     public enum JsonHandlerEnum
     {
-        Newtonsoft,
-        DotNetJson,
+        NEWTONSOFT,
+        DOT_NET_JSON,
     
     }
     

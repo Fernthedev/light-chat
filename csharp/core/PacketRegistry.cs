@@ -19,12 +19,10 @@ namespace com.github.fernthedev.lightchat.core
 
         private PacketRegistry() { }
 
-        private static readonly Dictionary<string, GenericType<Packet>> PACKET_REGISTRY = new Dictionary<string, GenericType<Packet>>();
+        private static readonly Dictionary<string, Type> PACKET_REGISTRY = new Dictionary<string, Type>();
 
-        public static GenericType<Packet> getPacketClassFromRegistry(string name)
+        public static Type getPacketClassFromRegistry(string name)
         {
-
-
             if (!PACKET_REGISTRY.ContainsKey(name)) throw new InvalidOperationException("The packet registry does not contain packet \"" + name + "\" in the registry. Make sure it is spelled correctly and is case-sensitive.");
 
             return PACKET_REGISTRY[name];
@@ -32,16 +30,16 @@ namespace com.github.fernthedev.lightchat.core
 
         public static GenericType<Packet> registerPacket(Packet packet)
         {
-            if (PACKET_REGISTRY.ContainsKey(packet.PacketName) && PACKET_REGISTRY[packet.PacketName].Typee != packet.GetType()) throw new InvalidOperationException("The packet " + packet.GetType().FullName + " tried to use packet name \"" + packet.PacketName + "\" which is already taken by the packet " + getPacketClassFromRegistry(packet.PacketName));
+            if (PACKET_REGISTRY.ContainsKey(packet._PacketName) && PACKET_REGISTRY[packet._PacketName] != packet.GetType()) throw new InvalidOperationException("The packet " + packet.GetType().FullName + " tried to use packet name \"" + packet._PacketName + "\" which is already taken by the packet " + getPacketClassFromRegistry(packet._PacketName));
 
-            PACKET_REGISTRY.Add(packet.PacketName, new GenericType<Packet>(packet));
+            PACKET_REGISTRY.Add(packet._PacketName, packet.GetType());
 
             return new GenericType<Packet>(packet);
         }
 
-        public static GenericType<Packet> registerPacket(GenericType<Packet> packet)
+        public static Type registerPacket(Type packet)
         {
-            string name = Packet.getPacketName(packet);
+            var name = Packet.getPacketName(packet);
 
             if (PACKET_REGISTRY.ContainsKey(name) && PACKET_REGISTRY[name] != packet) throw new ArgumentException("The packet name \"" + name + "\" is already taken by the packet " + getPacketClassFromRegistry(name));
 
@@ -52,22 +50,30 @@ namespace com.github.fernthedev.lightchat.core
 
         public static RegisteredReturnValues checkIfRegistered(Packet packet)
         {
-            if (!PACKET_REGISTRY.ContainsKey(packet.PacketName)) return RegisteredReturnValues.NOT_IN_REGISTRY;
+            if (packet == null || !PACKET_REGISTRY.ContainsKey(packet._PacketName)) return RegisteredReturnValues.NOT_IN_REGISTRY;
 
-            return PACKET_REGISTRY[packet.PacketName].Typee == new GenericType<Packet>(packet).Typee ? RegisteredReturnValues.IN_REGISTRY : RegisteredReturnValues.IN_REGISTRY_DIFFERENT_PACKET;
+            return PACKET_REGISTRY[packet._PacketName] == packet.GetType() ? RegisteredReturnValues.IN_REGISTRY : RegisteredReturnValues.IN_REGISTRY_DIFFERENT_PACKET;
+        }
+
+        public static RegisteredReturnValues checkIfRegistered(string packet)
+        {
+            if (packet == null || !PACKET_REGISTRY.ContainsKey(packet)) return RegisteredReturnValues.NOT_IN_REGISTRY;
+
+            return RegisteredReturnValues.IN_REGISTRY;
         }
 
 
-        private static Type[] GetTypesInNamespace(string nameSpace)
+
+        private static IEnumerable<Type> GetTypesInNamespace(string nameSpace)
         {
             return GetTypesInNamespace(Assembly.GetExecutingAssembly(), nameSpace);
         }
 
-            private static Type[] GetTypesInNamespace(Assembly assembly, string nameSpace)
+            private static IEnumerable<Type> GetTypesInNamespace(Assembly assembly, string nameSpace)
         {
             return
               assembly.GetTypes()
-                      .Where(t => t.Namespace.StartsWith(nameSpace, StringComparison.Ordinal) || t.Namespace.Equals(nameSpace, StringComparison.Ordinal))
+                      .Where(t => t.Namespace != null && (t.Namespace.StartsWith(nameSpace, StringComparison.Ordinal) || t.Namespace.Equals(nameSpace, StringComparison.Ordinal)))
                       .ToArray();
         }
 
@@ -77,12 +83,14 @@ namespace com.github.fernthedev.lightchat.core
             registerPacketPackage(GetTypesInNamespace(StaticHandler.PACKET_NAMESPACE));
         }
 
-        public static void registerPacketPackage(Type[] classes)
+        public static void registerPacketPackage(IEnumerable<Type> classes)
         {
-            GenericType<Packet>[] packetClasses = classes.Where(t => t.IsAssignableFrom(typeof(Packet))).Select(t => new GenericType<Packet>(t)).ToArray();
+            var packetClasses = classes.Where(t => typeof(Packet).IsAssignableFrom(t)).ToArray();
 
-            foreach (GenericType<Packet> packetClass in packetClasses) {
-                StaticHandler.core.logger.Debug("Registering the class {0}", packetClass.Typee.FullName);
+            foreach (var packetClass in packetClasses) {
+                StaticHandler.Core.Logger.Debug("Registering the class {0}", packetClass.FullName);
+                if (packetClass == typeof(Packet)) continue;
+
                 registerPacket(packetClass);
 
             }

@@ -28,10 +28,4 @@ public class VersionData {
         this.version = new DefaultArtifactVersion(version);
         this.minVersion = new DefaultArtifactVersion(minVersion);
     }
-
-
-
-
-
-
 }

@@ -2,43 +2,53 @@
 using com.github.fernthedev.lightchat.core.util;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace com.github.fernthedev.lightchat.core.packets
 {
     public abstract class Packet : IAcceptablePacketTypes
     {
-
-        [NonSerialized]
-        private readonly string packetName;
-
-
-        public string PacketName => packetName;
-
-        public static string getPacketName(GenericType<Packet> packet)
+        protected Packet()
         {
-            if (packet.Equals(typeof(Packet))) throw new ArgumentException("The class cannot be " + typeof(Packet).FullName);
+            if (!Attribute.IsDefined(GetType(), typeof(PacketInfoAttribute))) throw new ArgumentException("Packet " + GetType().FullName + " must have a packet info annotation");
 
-            if (!typeof(Packet).IsAssignableFrom(packet.Typee)) throw new ArgumentException("Packet " + packet.Typee.FullName + " must extend " + typeof(Packet).FullName);
+            _PacketName = ((PacketInfoAttribute) Attribute.GetCustomAttribute(GetType(), typeof(PacketInfoAttribute)))?.Name;
+        }
 
-            if (packet.Typee.IsAbstract || packet.Typee.IsInterface) throw new ArgumentException("The class cannot be abstract or interface.");
+        [field: NonSerialized]
+        [Newtonsoft.Json.JsonIgnore]
+        [JsonIgnore]
+        public string _PacketName { get; }
 
-            if (!System.Attribute.IsDefined(packet.Typee, typeof(PacketInfoAttribute))) throw new ArgumentException("Packet " + packet.Typee.FullName + " must have a packet info annotation");
+        public static string getPacketName(Type packet)
+        {
 
-            return ((PacketInfoAttribute) System.Attribute.GetCustomAttribute(packet.Typee, typeof(PacketInfoAttribute))).Name;
+            if (packet == typeof(Packet)) throw new ArgumentException("The class cannot be " + typeof(Packet).FullName);
+
+            if (!typeof(Packet).IsAssignableFrom(packet)) throw new ArgumentException("Packet " + packet.FullName + " must extend " + typeof(Packet).FullName);
+
+            if (packet.IsAbstract || packet.IsInterface) throw new ArgumentException("The class cannot be abstract or interface.");
+
+            if (!Attribute.IsDefined(packet, typeof(PacketInfoAttribute))) throw new ArgumentException("Packet " + packet.FullName + " must have a packet info annotation");
+
+            return ((PacketInfoAttribute) Attribute.GetCustomAttribute(packet, typeof(PacketInfoAttribute)))?.Name;
         }
     }
 
-    [System.AttributeUsage(System.AttributeTargets.Class)]
-    public sealed class PacketInfoAttribute : System.Attribute
+    [AttributeUsage(AttributeTargets.Class)]
+    public sealed class PacketInfoAttribute : Attribute
     {
-        private string name;
-
-        public string Name => name;
+        [NotNull]
+        public string Name { get; }
 
         public PacketInfoAttribute(string name)
         {
-            this.name = name;
+            Debug.Assert(name != null, nameof(name) + " != null");
+            Name = name;
         }
     }
 }

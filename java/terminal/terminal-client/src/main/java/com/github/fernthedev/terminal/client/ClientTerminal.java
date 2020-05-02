@@ -159,18 +159,18 @@ public class ClientTerminal {
                 DefaultArtifactVersion serverCurrent = new DefaultArtifactVersion(serverAddress.getVersion());
                 DefaultArtifactVersion serverMin = new DefaultArtifactVersion(serverAddress.getMinVersion());
 
-                StaticHandler.VERSION_RANGE range = StaticHandler.getVersionRangeStatus(new VersionData(serverCurrent, serverMin));
+                StaticHandler.VersionRange range = StaticHandler.getVersionRangeStatus(new VersionData(serverCurrent, serverMin));
 
-                if (range == StaticHandler.VERSION_RANGE.MATCH_REQUIREMENTS){
+                if (range == StaticHandler.VersionRange.MATCH_REQUIREMENTS){
                     System.out.println(">" + index + " | " + serverAddress.getAddress() + ":" + serverAddress.getPort());
                 } else {
                     // Current version is smaller than the server's required minimum
-                    if(range == StaticHandler.VERSION_RANGE.WE_ARE_LOWER) {
+                    if(range == StaticHandler.VersionRange.WE_ARE_LOWER) {
                         System.out.println(">" + index + " | " + serverAddress.getAddress() + ":" + serverAddress.getPort() + " (Server's required minimum version is " + serverAddress.getMinVersion() + " while your current version is smaller {" + StaticHandler.getVERSION_DATA().getVersion() + "} Incompatibility issues may arise)");
                     }
 
                     // Current version is larger than server's minimum version
-                    if (range == StaticHandler.VERSION_RANGE.WE_ARE_HIGHER) {
+                    if (range == StaticHandler.VersionRange.WE_ARE_HIGHER) {
                         System.out.println(">" + index + " | " + serverAddress.getAddress() + ":" + serverAddress.getPort() + " (Server's version is " + serverAddress.getVersion() + " while your minimum version is larger {" + StaticHandler.getVERSION_DATA().getMinVersion() + "} Incompatibility issues may arise)");
                     }
 

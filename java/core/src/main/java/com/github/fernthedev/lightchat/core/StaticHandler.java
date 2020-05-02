@@ -21,7 +21,7 @@ import java.util.*;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StaticHandler {
 
-    public static final int DEFAULT_PACKET_ID_MAX = 10;
+    public static int DEFAULT_PACKET_ID_MAX = 10;
 
     @Getter
     @Setter
@@ -107,11 +107,11 @@ public class StaticHandler {
     }
 
     @APIUsage
-    public static VERSION_RANGE getVersionRangeStatus(VersionData otherVersion) {
+    public static VersionRange getVersionRangeStatus(VersionData otherVersion) {
         return getVersionRangeStatus(VERSION_DATA, otherVersion);
     }
 
-    public static VERSION_RANGE getVersionRangeStatus(VersionData versionData, VersionData otherVersion) {
+    public static VersionRange getVersionRangeStatus(VersionData versionData, VersionData otherVersion) {
         DefaultArtifactVersion current = versionData.getVersion();
         DefaultArtifactVersion min = versionData.getMinVersion();
 
@@ -120,13 +120,13 @@ public class StaticHandler {
 
         // Current version is smaller than the server's required minimum
         if (current.compareTo(otherMin) < 0) {
-            return VERSION_RANGE.WE_ARE_LOWER;
+            return VersionRange.WE_ARE_LOWER;
         } else
 
             // Current version is larger than server's minimum version
             if (min.compareTo(otherCurrent) > 0) {
-                return VERSION_RANGE.WE_ARE_HIGHER;
-            } else return VERSION_RANGE.MATCH_REQUIREMENTS;
+                return VersionRange.WE_ARE_HIGHER;
+            } else return VersionRange.MATCH_REQUIREMENTS;
     }
 
     public static void displayVersion() {
@@ -263,14 +263,14 @@ public class StaticHandler {
 
     @AllArgsConstructor
     @Getter
-    public enum VERSION_RANGE {
+    public enum VersionRange {
         OTHER_IS_LOWER(-1),
         WE_ARE_HIGHER(-1),
         MATCH_REQUIREMENTS(0),
         WE_ARE_LOWER(1),
         OTHER_IS_HIGHER(1);
 
-        private int id;
+        private final int id;
     }
 
 }

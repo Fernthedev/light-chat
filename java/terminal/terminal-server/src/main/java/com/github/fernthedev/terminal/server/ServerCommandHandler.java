@@ -123,7 +123,7 @@ public class ServerCommandHandler {
                     ServerTerminal.sendMessage(sender, "Players: (" + (server.getPlayerHandler().getUuidMap().size()) + ")");
 
                     for (ClientConnection clientConnection : new HashMap<>(server.getPlayerHandler().getChannelMap()).values()) {
-                        ServerTerminal.sendMessage(sender, clientConnection.getName() + " :" + clientConnection.getUuid() + " { " + clientConnection.getAddress() + "} Ping:" + clientConnection.getPingDelay(TimeUnit.MILLISECONDS) + "ms");
+                        ServerTerminal.sendMessage(sender, clientConnection.getName() + " :" + clientConnection.getUuid() + " {" + clientConnection.getAddress() + "} [" + clientConnection.getOs() + "/" + clientConnection.getLangFramework() + "] Ping:" + clientConnection.getPingDelay(TimeUnit.MILLISECONDS) + "ms");
                     }
                 }
 
@@ -133,7 +133,7 @@ public class ServerCommandHandler {
                     for (ClientConnection clientConnection : new HashMap<>(server.getPlayerHandler().getChannelMap()).values()) {
                         if (clientConnection == null) continue;
 
-                        message = "\n" + clientConnection.getName() + " Ping:" + clientConnection.getPingDelay(TimeUnit.MILLISECONDS) + "ms";
+                        message = "\n" + clientConnection.getName() + "[" + clientConnection.getOs() + "/" + clientConnection.getLangFramework() + "] Ping:" + clientConnection.getPingDelay(TimeUnit.MILLISECONDS) + "ms";
 
                         // ServerTerminal.sendMessage(sender, clientConnection.getName() + " :" + clientConnection.getId() + " Ping:" + clientConnection.getDelayTime() + "ms");
                     }

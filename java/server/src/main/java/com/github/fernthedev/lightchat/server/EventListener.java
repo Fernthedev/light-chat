@@ -81,23 +81,23 @@ public class EventListener {
                 }
             }
 
-            clientConnection.finishConstruct(packet.getName(), packet.getOS());
+            clientConnection.finishConstruct(packet.getName(), packet.getOS(), packet.getLangFramework());
 
             VersionData versionData = packet.getVersionData();
 
-            StaticHandler.VERSION_RANGE versionRange = StaticHandler.getVersionRangeStatus(versionData);
+            StaticHandler.VersionRange versionRange = StaticHandler.getVersionRangeStatus(versionData);
 
-            if (versionRange == StaticHandler.VERSION_RANGE.MATCH_REQUIREMENTS)
+            if (versionRange == StaticHandler.VersionRange.MATCH_REQUIREMENTS)
                 server.logInfo("{}'s version range requirements match Server version.", clientConnection);
             else {
                 // The current version is larger than client's minimum version
-                if (versionRange == StaticHandler.VERSION_RANGE.WE_ARE_HIGHER) {
+                if (versionRange == StaticHandler.VersionRange.WE_ARE_HIGHER) {
                     server.logInfo("{}'s version ({}) does not meet server's minimum version ({}) requirements. Expect incompatibility issues", clientConnection, versionData.getVersion(), StaticHandler.getVERSION_DATA().getMinVersion());
                 }
 
 
                 // The current version is smaller than the client's required minimum
-                if (versionRange == StaticHandler.VERSION_RANGE.WE_ARE_LOWER) {
+                if (versionRange == StaticHandler.VersionRange.WE_ARE_LOWER) {
                     server.logInfo("The server version ({}) does not meet {}'s minimum version ({}) requirements. Expect incompatibility issues", StaticHandler.getVERSION_DATA().getVersion(), clientConnection, versionData.getMinVersion());
                 }
             }
@@ -107,7 +107,7 @@ public class EventListener {
 
             clientConnection.setRegistered(true);
 
-            server.logInfo("{} has connected to the server [{}]", clientConnection.getName(), clientConnection.getOs());
+            server.logInfo("{} has connected to the server [{} | {}] ", clientConnection.getName(), clientConnection.getOs(), clientConnection.getLangFramework());
             clientConnection.sendObject(new SelfMessagePacket(SelfMessagePacket.MessageType.REGISTER_PACKET));
             ThreadUtils.runAsync(() -> server.getPluginManager().callEvent(new PlayerJoinEvent(clientConnection, true)));
         } catch (Exception e) {

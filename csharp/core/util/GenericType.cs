@@ -19,7 +19,7 @@ namespace com.github.fernthedev.lightchat.core.util
 
         public GenericType(Type typee)
         {
-            this.Typee = typee?.GetType();
+            Typee = typee;
         }
 
 

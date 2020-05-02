@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.NonNull;
 
 /**
- * Final packet sent in the handshake
+ * The final packet sent in the handshake
  */
 @Getter
 @PacketInfo(name = "CONNECTED_PACKET")
@@ -23,6 +23,9 @@ public class ConnectedPacket extends Packet {
     @NonNull
     private VersionDataString versionData;
 
+    @NonNull
+    private String langFramework;
+
     public VersionData getVersionData() {
         return new VersionData(versionData.getVersion(), versionData.getMinVersion());
     }
@@ -32,10 +35,11 @@ public class ConnectedPacket extends Packet {
 //    @NonNull
 //    private UUID uuid;
 
-    public ConnectedPacket(@NonNull String name, @NonNull String os, VersionData versionData) { //, @NonNull UUID uuid) {
+    public ConnectedPacket(@NonNull String name, @NonNull String os, VersionData versionData, String langFramework) { //, @NonNull UUID uuid) {
         this.name = name;
         this.os = os;
         this.versionData = new VersionDataString(versionData.getVersion().toString(), versionData.getMinVersion().toString());
+        this.langFramework = langFramework;
 //        this.uuid = uuid;
     }
 

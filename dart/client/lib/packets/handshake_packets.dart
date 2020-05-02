@@ -58,17 +58,19 @@ class ConnectedPacket extends Packet {
   ConnectedPacket() : super.setName('CONNECTED_PACKET');
 
   factory ConnectedPacket.create(
-      String name, String os, VersionData versionData) {
+      String name, String os, VersionData versionData, String langFramework) {
     var connectedPacket = ConnectedPacket();
     connectedPacket.os = os;
     connectedPacket.name = name;
     connectedPacket.versionData = versionData.toDataString();
+    connectedPacket.langFramework = langFramework;
     return connectedPacket;
   }
 
   String name;
   String os;
   VersionDataString versionData;
+  String langFramework;
 
   /// A necessary factory constructor for creating a new User instance
   /// from a map. Pass the map to the generated `_$UserFromJson()` constructor.

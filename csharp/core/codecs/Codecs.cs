@@ -22,15 +22,6 @@ namespace com.github.fernthedev.lightchat.core.codecs
         //
         // Summary:
         //     Initializes a new instance of the DotNetty.Codecs.StringEncoder class with the
-        //     current system character set.
-        public LineEndStringEncoder() : base()
-        {
-
-        }
-
-        //
-        // Summary:
-        //     Initializes a new instance of the DotNetty.Codecs.StringEncoder class with the
         //     specified character set..
         //
         // Parameters:
@@ -43,16 +34,16 @@ namespace com.github.fernthedev.lightchat.core.codecs
 
         protected override void Encode(IChannelHandlerContext context, string message, List<object> output)
         {
-            base.Encode(context, message + StaticHandler.endLine, output);
+            base.Encode(context, message + StaticHandler.EndLine, output);
         }
 
         public void EncodePublic(IChannelHandlerContext context, string message, List<object> output)
         {
-            this.Encode(context, message, output);
+            Encode(context, message, output);
         }
     }
 
-    public class EncryptedJSONEncoder : MessageToMessageEncoder<IAcceptablePacketTypes>
+    public class EncryptedJsonEncoder : MessageToMessageEncoder<IAcceptablePacketTypes>
     {
 
         private readonly IJsonHandler jsonHandler;
@@ -65,7 +56,7 @@ namespace com.github.fernthedev.lightchat.core.codecs
         /**
          * Creates a new instance with the current system character set.
          */
-        public EncryptedJSONEncoder(IEncryptionKeyHolder encryptionKeyHolder, IJsonHandler jsonHandler) : this(StaticHandler.encoding, encryptionKeyHolder, jsonHandler)
+        public EncryptedJsonEncoder(IEncryptionKeyHolder encryptionKeyHolder, IJsonHandler jsonHandler) : this(StaticHandler.encoding, encryptionKeyHolder, jsonHandler)
         {
         }
 
@@ -74,18 +65,18 @@ namespace com.github.fernthedev.lightchat.core.codecs
          *
          * @param charset
          */
-        public EncryptedJSONEncoder(Encoding charset, IEncryptionKeyHolder encryptionKeyHolder, IJsonHandler jsonHandler)
+        public EncryptedJsonEncoder(Encoding charset, IEncryptionKeyHolder encryptionKeyHolder, IJsonHandler jsonHandler)
         {
             encoder = new LineEndStringEncoder(charset);
             this.charset = charset;
             this.encryptionKeyHolder = encryptionKeyHolder;
             this.jsonHandler = jsonHandler;
-            StaticHandler.core.logger.Debug("Using charset {} for encrypting", charset.EncodingName);
+            StaticHandler.Core.Logger.Debug("Using charset {0} for encrypting", charset.EncodingName);
         }
 
         protected override void Encode(IChannelHandlerContext ctx, IAcceptablePacketTypes msg, List<object> output)
         {
-
+            string jsonPacketWrapper = null;
             if (msg is UnencryptedPacketWrapper)
             {
                 var packetWrapper = msg as UnencryptedPacketWrapper;
@@ -94,20 +85,21 @@ namespace com.github.fernthedev.lightchat.core.codecs
             }
             else
             {
-                Packet packet = (Packet)msg;
+                var packet = (Packet)msg;
 
                 // Encrypting the data
-                string decryptedJSON = jsonHandler.toJson(msg);
-                EncryptedBytes encryptedBytes = encrypt(ctx, decryptedJSON);
+                var decryptedJson = jsonHandler.toJson(msg);
+                var encryptedBytes = encrypt(ctx, decryptedJson);
 
                 // Adds the encrypted json in the packet wrapper
-                var packetWrapper = new EncryptedPacketWrapper(encryptedBytes, packet, encryptionKeyHolder.getPacketId(new GenericType<Packet>(packet), ctx, ctx.Channel).Item1);
-                string jsonPacketWrapper = jsonHandler.toJson(packetWrapper);
+                var packetWrapper = new EncryptedPacketWrapper(encryptedBytes, packet, encryptionKeyHolder.getPacketId( packet.GetType(), ctx, ctx.Channel).Item1);
+                jsonPacketWrapper = jsonHandler.toJson(packetWrapper);
 
                 // Encodes the string for sending
                 encoder.EncodePublic(ctx, jsonPacketWrapper, output);
             }
 
+            StaticHandler.Core.Logger.Debug("Sending {0}", jsonPacketWrapper);
         }
 
         private EncryptedBytes encrypt(IChannelHandlerContext ctx, string decryptedJSON)
@@ -121,11 +113,11 @@ namespace com.github.fernthedev.lightchat.core.codecs
             }
 
 
-            RijndaelManaged secretKey = encryptionKeyHolder.getSecretKey(ctx, ctx.Channel);
-            EncryptedBytes encryptedJSON = EncryptionUtil.encrypt(secretKey.Key, secretKey.IV, decryptedJSON, charset);
+            var secretKey = encryptionKeyHolder.getSecretKey(ctx, ctx.Channel);
+            var encryptedJson = EncryptionUtil.encrypt(secretKey, decryptedJSON, charset);
 
 
-            return encryptedJSON;
+            return encryptedJson;
         }
     }
 
@@ -142,7 +134,7 @@ namespace com.github.fernthedev.lightchat.core.codecs
          */
         public EncryptedJSONDecoder(IEncryptionKeyHolder encryptionKeyHolder, IJsonHandler jsonHandler) : this(StaticHandler.encoding, encryptionKeyHolder, jsonHandler)
         {
-
+            StaticHandler.Core.Logger.Debug("Using charset {0} for decrypting", charset.EncodingName);
         }
 
         /**
@@ -167,28 +159,28 @@ namespace com.github.fernthedev.lightchat.core.codecs
          */
         protected override void Decode(IChannelHandlerContext ctx, IByteBuffer msg, List<object> output)
         {
-            List<object> tempDecodeList = new List<object>();
+            var tempDecodeList = new List<object>();
             base.Decode(ctx, msg, tempDecodeList);
 
-            string decodedStr = (string)tempDecodeList[0];
-            //        StaticHandler.getCore().getLogger().debug("Decoding the string {}", decodedStr);
-            PacketWrapper<object> packetWrapper = jsonHandler.fromJson<PacketWrapper<object>>(decodedStr);
+            var decodedStr = (string)tempDecodeList[0];
+            StaticHandler.Core.Logger.Debug("Decoding the string {0}", decodedStr);
+            var packetWrapper = jsonHandler.fromJson<GenericJsonPacketWrapper>(decodedStr, typeof(GenericJsonPacketWrapper));
 
-            string decryptedJSON;
+            string decryptedJson;
 
             try
             {
-                if (packetWrapper.isEncrypted)
+                if (packetWrapper.ENCRYPT)
                 {
                     var encryptedPacketWrapper = jsonHandler.fromJson<EncryptedPacketWrapper>(decodedStr);
 
-                    EncryptedBytes encryptedBytes = jsonHandler.fromJson<EncryptedBytes>(encryptedPacketWrapper.getJsonObject);
-                    decryptedJSON = decrypt(ctx, (encryptedBytes));
+                    var encryptedBytes = jsonHandler.fromJson<EncryptedBytes>(encryptedPacketWrapper.jsonObject);
+                    decryptedJson = decrypt(ctx, (encryptedBytes));
                 }
                 else
                 {
                     var unencryptedPacketWrapper = jsonHandler.fromJson<UnencryptedPacketWrapper>(decodedStr);
-                    decryptedJSON = packetWrapper.getJsonObject;
+                    decryptedJson = unencryptedPacketWrapper.jsonObject;
                 }
             }
             catch (Exception e)
@@ -196,7 +188,7 @@ namespace com.github.fernthedev.lightchat.core.codecs
                 throw new ArgumentException("Unable to parse string: " + decodedStr, e);
             }
 
-            output.Add(getParsedObject(packetWrapper.packetIdentifier, decryptedJSON, packetWrapper.getPacketId));
+            output.Add(getParsedObject(packetWrapper.packetIdentifier, decryptedJson, packetWrapper.packetId));
         }
 
         /**
@@ -207,15 +199,20 @@ namespace com.github.fernthedev.lightchat.core.codecs
          */
         public Tuple<Packet, int> getParsedObject(string packetIdentifier, string jsonObject, int packetId)
         {
-            GenericType<Packet> aClass = PacketRegistry.getPacketClassFromRegistry(packetIdentifier);
+            var aClass = PacketRegistry.getPacketClassFromRegistry(packetIdentifier);
 
             try
             {
-                return new Tuple<Packet, int>(jsonHandler.fromJson(jsonObject, aClass), packetId);
+                return new Tuple<Packet, int>(
+                    jsonHandler.fromJson<Packet>(
+                        jsonObject, aClass),
+                    packetId);
             }
             catch (Exception e)
             {
-                throw new ArgumentException("Attempting to parse packet " + packetIdentifier + " (" + aClass.Typee.Name + ") with string\n" + jsonObject, e);
+                throw new ArgumentException(
+                    "Attempting to parse packet " + packetIdentifier + " (" + aClass.Name + ") with string\n" +
+                    jsonObject, e);
             }
         }
 
@@ -224,7 +221,7 @@ namespace com.github.fernthedev.lightchat.core.codecs
 
             if (!encryptionKeyHolder.isEncryptionKeyRegistered(ctx, ctx.Channel)) throw new ArgumentException("No secret key available");
 
-            RijndaelManaged secretKey = encryptionKeyHolder.getSecretKey(ctx, ctx.Channel);
+            var secretKey = encryptionKeyHolder.getSecretKey(ctx, ctx.Channel);
 
             if (secretKey == null)
             {
@@ -232,15 +229,11 @@ namespace com.github.fernthedev.lightchat.core.codecs
             }
 
 
-            string decryptedJSON = null;
+            var decryptedJson = EncryptionUtil.decrypt(encryptedString, secretKey, charset);
 
 
 
-            decryptedJSON = EncryptionUtil.decrypt(encryptedString, secretKey.Key, secretKey.IV, charset);
-
-
-
-            return decryptedJSON;
+            return decryptedJson;
         }
     }
 

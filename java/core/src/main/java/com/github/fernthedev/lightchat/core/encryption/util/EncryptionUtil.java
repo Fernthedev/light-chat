@@ -98,6 +98,9 @@ public class EncryptionUtil {
             // get parameter object for password-based encryption
             AlgorithmParameters algParams = AlgorithmParameters.getInstance(encryptedBytes.getParamAlgorithm());
 
+
+            if (algParams == null) throw new IllegalArgumentException("EncryptedBytes.Parameters are not valid");
+
             // initialize with parameter encoding from above
             algParams.init(encryptedBytes.getParams());
 

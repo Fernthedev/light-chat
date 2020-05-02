@@ -8,6 +8,7 @@ import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 import java.util.Base64;
 
 public class RSAEncryptionUtil {
@@ -48,6 +49,8 @@ public class RSAEncryptionUtil {
 
 //            Cipher aesCipher = Cipher.getInstance("AES");
 //            aesCipher.init(Cipher.DECRYPT_MODE, secretKey);
+
+            if (secretKey == null || secretKey.length == 0) throw new IllegalArgumentException("Secret key is null or empty: " + Arrays.toString(secretKey));
 
             byte[] decryptedKey = rsaCipher.doFinal(secretKey);
 
