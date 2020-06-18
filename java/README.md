@@ -8,7 +8,7 @@ You can simply follow the instructions at https://jitpack.io/#Fernthedev/light-c
 
 To install from source, you can simply follow these steps:
 
-### Linus/macOs
+### Linux/macOS
 ```sh
 git clone https://github.com/Fernthedev/light-chat.git
 cd light-chat/java
