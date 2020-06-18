@@ -66,6 +66,7 @@ public class ServerTerminal {
 
     public static void main(String[] args) {
         init(args, ServerTerminalSettings.builder().build());
+        startBind();
     }
 
     public static void init(ServerTerminalSettings terminalSettings) {
@@ -180,7 +181,9 @@ public class ServerTerminal {
                     logger.info("Detected system is not linux. LightManager will not run (manual run with -lightmanager arg)");
                 }
             }, ThreadUtils.ThreadExecutors.CACHED_THREADS.getExecutorService());
+    }
 
+    public static void startBind() {
         new Thread(() -> {
             server.run();
             server.bind();
