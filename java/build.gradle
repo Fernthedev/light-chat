@@ -124,20 +124,22 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
 
     }
 
-    publishing {
-        publications {
-            maven(MavenPublication) {
-                from(components.java)
+    afterEvaluate {
+        publishing {
+            publications {
+                maven(MavenPublication) {
+                    from(components.java)
 
-                groupId = "${rootProject.group}.${rootProject.name}"
+                    groupId = "${rootProject.group}.${rootProject.name}"
 
-                artifactId = "$project.name"
+                    artifactId = "$project.name"
 
-                println "Publishing $groupId:$artifactId:$version"
+                    println "Publishing $groupId:$artifactId:${project.version}"
 
-                java {
-                    withSourcesJar()
-                    withJavadocJar()
+                    java {
+                        withSourcesJar()
+                        withJavadocJar()
+                    }
                 }
             }
         }
