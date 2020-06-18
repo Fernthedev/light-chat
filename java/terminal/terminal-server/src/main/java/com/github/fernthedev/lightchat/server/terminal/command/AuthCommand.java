@@ -1,5 +1,6 @@
 package com.github.fernthedev.lightchat.server.terminal.command;
 
+import com.github.fernthedev.config.common.exceptions.ConfigLoadException;
 import com.github.fernthedev.lightchat.server.SenderInterface;
 import com.github.fernthedev.lightchat.server.Server;
 import com.github.fernthedev.lightchat.server.terminal.ServerTerminal;
@@ -30,7 +31,11 @@ public class AuthCommand extends Command {
             if (authenticationManager.authenticate(sender)) {
                 ServerTerminal.sendMessage(sender, "Setting password now");
                 server.getSettingsManager().getConfigData().setPassword(args[0]);
-                server.getSettingsManager().save();
+                try {
+                    server.getSettingsManager().save();
+                } catch (ConfigLoadException e) {
+                    e.printStackTrace();
+                }
             }
         } else ServerTerminal.sendMessage(sender, "Password can only be alphanumeric");
     }

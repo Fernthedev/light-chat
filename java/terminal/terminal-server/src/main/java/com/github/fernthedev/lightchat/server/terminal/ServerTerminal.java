@@ -1,6 +1,7 @@
 package com.github.fernthedev.lightchat.server.terminal;
 
 import com.github.fernthedev.config.common.Config;
+import com.github.fernthedev.config.common.exceptions.ConfigLoadException;
 import com.github.fernthedev.config.gson.GsonConfig;
 import com.github.fernthedev.fernutils.thread.ThreadUtils;
 import com.github.fernthedev.light.LightManager;
@@ -111,10 +112,13 @@ public class ServerTerminal {
         CommonUtil.startSelfInCmd(args);
 
 
+        try {
+            settingsManager = new GsonConfig<>(terminalSettings.getServerSettings(), new File(getCurrentPath(), "settings.json"));
+            settingsManager.save();
+        } catch (ConfigLoadException e) {
+            e.printStackTrace();
+        }
 
-
-        settingsManager = new GsonConfig<>(terminalSettings.getServerSettings(), new File(getCurrentPath(), "settings.json"));
-        settingsManager.save();
 
         if (port == -1) port = settingsManager.getConfigData().getPort();
 
@@ -144,7 +148,7 @@ public class ServerTerminal {
         ThreadUtils.runAsync(() -> {
             authenticationManager = new AuthenticationManager(server);
             server.getPluginManager().registerEvents(authenticationManager);
-        });
+        }, ThreadUtils.ThreadExecutors.CACHED_THREADS.getExecutorService());
 
         if (terminalSettings.isAllowChangePassword())
             registerCommand(new AuthCommand("changepassword", server));
@@ -175,7 +179,7 @@ public class ServerTerminal {
                 } else {
                     logger.info("Detected system is not linux. LightManager will not run (manual run with -lightmanager arg)");
                 }
-            });
+            }, ThreadUtils.ThreadExecutors.CACHED_THREADS.getExecutorService());
 
         new Thread(() -> {
             server.run();

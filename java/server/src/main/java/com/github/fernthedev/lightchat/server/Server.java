@@ -1,6 +1,7 @@
 package com.github.fernthedev.lightchat.server;
 
 import com.github.fernthedev.config.common.Config;
+import com.github.fernthedev.fernutils.thread.ThreadUtils;
 import com.github.fernthedev.lightchat.core.ColorCode;
 import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.core.api.APIUsage;
@@ -12,15 +13,13 @@ import com.github.fernthedev.lightchat.core.encryption.codecs.general.gson.Encry
 import com.github.fernthedev.lightchat.core.encryption.codecs.general.gson.EncryptedJSONObjectEncoder;
 import com.github.fernthedev.lightchat.core.packets.Packet;
 import com.github.fernthedev.lightchat.core.packets.SelfMessagePacket;
-import com.github.fernthedev.fernutils.thread.ThreadUtils;
-import com.github.fernthedev.fernutils.thread.single.TaskInfo;
 import com.github.fernthedev.lightchat.server.api.IPacketHandler;
 import com.github.fernthedev.lightchat.server.event.ServerShutdownEvent;
 import com.github.fernthedev.lightchat.server.event.ServerStartupEvent;
 import com.github.fernthedev.lightchat.server.netty.MulticastServer;
+import com.github.fernthedev.lightchat.server.netty.ProcessingHandler;
 import com.github.fernthedev.lightchat.server.settings.NoFileConfig;
 import com.github.fernthedev.lightchat.server.settings.ServerSettings;
-import com.github.fernthedev.lightchat.server.netty.ProcessingHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollEventLoopGroup;
@@ -45,6 +44,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 
@@ -137,12 +137,12 @@ public class Server implements Runnable {
     }
 
     public synchronized void sendObjectToAllPlayers(@NonNull Packet packet) {
-        ThreadUtils.runAsync(interfaceTaskInfo -> {
+        ThreadUtils.runAsync((() -> {
             for (ClientConnection clientConnection : playerHandler.getChannelMap().values()) {
                 logger.debug("Sending to all {} to {}", packet.getPacketName(), clientConnection);
                 clientConnection.sendObject(packet);
             }
-        });
+        }), ThreadUtils.ThreadExecutors.CACHED_THREADS.getExecutorService());
     }
 
 
@@ -197,7 +197,7 @@ public class Server implements Runnable {
 
             running = true;
             StaticHandler.displayVersion();
-            List<TaskInfo> tasks = new ArrayList<>();
+            List<Future<Void>> tasks = new ArrayList<>();
 
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
@@ -214,7 +214,7 @@ public class Server implements Runnable {
                         clientConnection.close();
                     }
                 }
-            }))));
+            })), ThreadUtils.ThreadExecutors.CACHED_THREADS.getExecutorService()));
 
 
 
@@ -238,7 +238,7 @@ public class Server implements Runnable {
                         e.printStackTrace();
                     }
                 }
-            }));
+            }, ThreadUtils.ThreadExecutors.CACHED_THREADS.getExecutorService()));
 
 
 //        LoggerManager loggerManager = new LoggerManager();
@@ -248,9 +248,17 @@ public class Server implements Runnable {
 
 
 //        await();
-            tasks.add(ThreadUtils.runAsync(this::initServer));
+            tasks.add(ThreadUtils.runAsync((Runnable) this::initServer, ThreadUtils.ThreadExecutors.CACHED_THREADS.getExecutorService()));
 
-            for (TaskInfo taskInfo : tasks) taskInfo.awaitFinish(0);
+            for (Future<Void> taskInfo : tasks) {
+                while (!taskInfo.isDone()) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
 
 
             logger.info("Finished initializing. Took {}ms", stopWatch.getTime(TimeUnit.MILLISECONDS));

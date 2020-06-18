@@ -116,7 +116,7 @@ public class EventListener {
                 } catch (Exception e) {
                     throw ExceptionUtil.throwParsePacketException(e, p);
                 }
-            }).runThreads();
+            }).runThreads(ThreadUtils.ThreadExecutors.CACHED_THREADS.getExecutorService());
         } catch (ParsePacketException e) {
             throw e;
         } catch (Exception e) {

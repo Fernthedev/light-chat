@@ -1,9 +1,9 @@
 package com.github.fernthedev.lightchat.server.settings;
 
-import com.github.fernthedev.lightchat.core.CoreSettings;
-import com.github.fernthedev.lightchat.core.encryption.codecs.CodecEnum;
 import com.github.fernthedev.fernutils.thread.ThreadUtils;
 import com.github.fernthedev.fernutils.thread.multiple.TaskInfoFunctionList;
+import com.github.fernthedev.lightchat.core.CoreSettings;
+import com.github.fernthedev.lightchat.core.encryption.codecs.CodecEnum;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -208,15 +208,20 @@ public class ServerSettings extends CoreSettings {
         }));
 
         // 51 ms parallel
-        Map<Field, Pair<String, List<String>>> fieldReturnValues = ob.runThreads();
+        try {
+            ob.runThreads(ThreadUtils.ThreadExecutors.CACHED_THREADS.getExecutorService());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-        ob.awaitFinish(10);
+        Map<Field, Pair<String, List<String>>> values = ob.getValuesAndAwait(10);
 
 
         Map<String, List<String>> returnValues = new HashMap<>();
 
-        for (Field field : fieldReturnValues.keySet()) {
-            Pair<String, List<String>> pair = fieldReturnValues.get(field);
+        assert values != null;
+        for (Field field : values.keySet()) {
+            Pair<String, List<String>> pair = values.get(field);
             returnValues.put(pair.getKey(), pair.getRight());
         }
 

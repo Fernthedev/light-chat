@@ -1,5 +1,6 @@
 package com.github.fernthedev.lightchat.server.terminal.backend;
 
+import com.github.fernthedev.config.common.exceptions.ConfigLoadException;
 import com.github.fernthedev.lightchat.core.ColorCode;
 import com.github.fernthedev.lightchat.core.api.event.api.EventHandler;
 import com.github.fernthedev.lightchat.core.api.event.api.Listener;
@@ -93,7 +94,11 @@ public class AuthenticationManager implements Listener {
             if(event.getSender() instanceof Console) {
                 server.getLogger().info(ColorCode.GREEN + "Setting password now");
                 server.getSettingsManager().getConfigData().setPassword(event.getMessage());
-                server.getSettingsManager().save();
+                try {
+                    server.getSettingsManager().save();
+                } catch (ConfigLoadException e) {
+                    e.printStackTrace();
+                }
                 checking.remove(event.getSender());
             }
         }

@@ -1,6 +1,7 @@
 package com.github.fernthedev.lightchat.server.terminal.command;
 
 import com.github.fernthedev.config.common.Config;
+import com.github.fernthedev.config.common.exceptions.ConfigLoadException;
 import com.github.fernthedev.lightchat.core.ColorCode;
 import com.github.fernthedev.lightchat.server.SenderInterface;
 import com.github.fernthedev.lightchat.server.Server;
@@ -66,9 +67,14 @@ public class SettingsCommand extends Command {
                     case "reload":
                         ServerTerminal.sendMessage(sender, "Reloading.");
                         timeStart = System.nanoTime();
-                        settingsManager.save();
+                        try {
+                            settingsManager.save();
+//                            settingsManager.load();
+                        } catch (ConfigLoadException e) {
+                            e.printStackTrace();
+                        }
 
-                        settingsManager.load();
+
                         timeEnd = System.nanoTime();
                         timeElapsed = (timeEnd - timeStart) / 1000000;
                         ServerTerminal.sendMessage(sender, "Finished reloading. Took " + timeElapsed + "ms");
@@ -94,7 +100,11 @@ public class SettingsCommand extends Command {
                     case "save":
                         ServerTerminal.sendMessage(sender, "Saving.");
                         timeStart = System.nanoTime();
-                        settingsManager.save();
+                        try {
+                            settingsManager.save();
+                        } catch (ConfigLoadException e) {
+                            e.printStackTrace();
+                        }
                         timeEnd = System.nanoTime();
                         timeElapsed = (timeEnd - timeStart) / 1000000;
                         ServerTerminal.sendMessage(sender, "Finished saving. Took " + timeElapsed + "ms");
