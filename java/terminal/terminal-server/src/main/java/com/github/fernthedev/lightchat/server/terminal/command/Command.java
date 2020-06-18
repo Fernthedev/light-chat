@@ -1,4 +1,4 @@
-package com.github.fernthedev.terminal.server.command;
+package com.github.fernthedev.lightchat.server.terminal.command;
 
 import com.github.fernthedev.lightchat.server.SenderInterface;
 import lombok.Getter;

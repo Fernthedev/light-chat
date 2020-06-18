@@ -1,4 +1,4 @@
-package com.github.fernthedev.terminal.server;
+package com.github.fernthedev.lightchat.server.terminal;
 
 import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.core.data.LightCandidate;
@@ -11,7 +11,7 @@ import com.github.fernthedev.lightchat.server.api.IPacketHandler;
 import com.github.fernthedev.terminal.core.packets.AutoCompletePacket;
 import com.github.fernthedev.terminal.core.packets.CommandPacket;
 import com.github.fernthedev.terminal.core.packets.MessagePacket;
-import com.github.fernthedev.terminal.server.events.ChatEvent;
+import com.github.fernthedev.lightchat.server.terminal.events.ChatEvent;
 import lombok.AllArgsConstructor;
 
 import java.util.List;

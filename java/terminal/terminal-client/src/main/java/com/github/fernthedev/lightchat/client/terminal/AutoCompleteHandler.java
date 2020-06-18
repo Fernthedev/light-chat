@@ -1,4 +1,4 @@
-package com.github.fernthedev.terminal.client;
+package com.github.fernthedev.lightchat.client.terminal;
 
 import com.github.fernthedev.lightchat.client.Client;
 import com.github.fernthedev.terminal.core.packets.AutoCompletePacket;

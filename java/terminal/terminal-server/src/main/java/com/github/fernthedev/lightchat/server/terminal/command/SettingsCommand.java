@@ -1,11 +1,11 @@
-package com.github.fernthedev.terminal.server.command;
+package com.github.fernthedev.lightchat.server.terminal.command;
 
 import com.github.fernthedev.config.common.Config;
 import com.github.fernthedev.lightchat.core.ColorCode;
 import com.github.fernthedev.lightchat.server.SenderInterface;
 import com.github.fernthedev.lightchat.server.Server;
 import com.github.fernthedev.lightchat.server.settings.ServerSettings;
-import com.github.fernthedev.terminal.server.ServerTerminal;
+import com.github.fernthedev.lightchat.server.terminal.ServerTerminal;
 
 import java.util.List;
 import java.util.Map;

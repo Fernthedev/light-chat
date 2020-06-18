@@ -1,4 +1,4 @@
-package com.github.fernthedev.terminal.server;
+package com.github.fernthedev.lightchat.server.terminal;
 
 import com.github.fernthedev.lightchat.server.Server;
 import com.github.fernthedev.lightchat.server.ServerCore;

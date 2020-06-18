@@ -1,4 +1,4 @@
-package com.github.fernthedev.terminal.server;
+package com.github.fernthedev.lightchat.server.terminal;
 
 
 import com.github.fernthedev.lightchat.core.api.APIUsage;
@@ -6,11 +6,11 @@ import com.github.fernthedev.lightchat.server.ClientConnection;
 import com.github.fernthedev.lightchat.server.Console;
 import com.github.fernthedev.lightchat.server.SenderInterface;
 import com.github.fernthedev.lightchat.server.Server;
+import com.github.fernthedev.lightchat.server.terminal.command.KickCommand;
 import com.github.fernthedev.terminal.core.packets.MessagePacket;
-import com.github.fernthedev.terminal.server.backend.BannedData;
-import com.github.fernthedev.terminal.server.command.Command;
-import com.github.fernthedev.terminal.server.command.KickCommand;
-import com.github.fernthedev.terminal.server.events.ChatEvent;
+import com.github.fernthedev.lightchat.server.terminal.backend.BannedData;
+import com.github.fernthedev.lightchat.server.terminal.command.Command;
+import com.github.fernthedev.lightchat.server.terminal.events.ChatEvent;
 import lombok.NonNull;
 
 import java.util.Arrays;

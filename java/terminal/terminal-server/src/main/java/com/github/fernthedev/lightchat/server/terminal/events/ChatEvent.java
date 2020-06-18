@@ -1,4 +1,4 @@
-package com.github.fernthedev.terminal.server.events;
+package com.github.fernthedev.lightchat.server.terminal.events;
 
 import com.github.fernthedev.lightchat.core.api.event.api.Cancellable;
 import com.github.fernthedev.lightchat.core.api.event.api.Event;

@@ -13,5 +13,5 @@ dependencies {
 group "${project.parent.group}.server"
 
 application {
-    mainClassName = "com.github.fernthedev.terminal.server.ServerTerminal"
+    mainClassName = "com.github.fernthedev.lightchat.server.terminal.ServerTerminal"
 }

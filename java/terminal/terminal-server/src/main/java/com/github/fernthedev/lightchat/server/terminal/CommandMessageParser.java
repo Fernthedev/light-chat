@@ -1,12 +1,12 @@
-package com.github.fernthedev.terminal.server;
+package com.github.fernthedev.lightchat.server.terminal;
 
 import com.github.fernthedev.lightchat.core.ColorCode;
 import com.github.fernthedev.lightchat.core.api.event.api.Listener;
 import com.github.fernthedev.lightchat.server.Console;
 import com.github.fernthedev.lightchat.server.SenderInterface;
 import com.github.fernthedev.lightchat.server.Server;
-import com.github.fernthedev.terminal.server.command.Command;
-import com.github.fernthedev.terminal.server.events.ChatEvent;
+import com.github.fernthedev.lightchat.server.terminal.command.Command;
+import com.github.fernthedev.lightchat.server.terminal.events.ChatEvent;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 

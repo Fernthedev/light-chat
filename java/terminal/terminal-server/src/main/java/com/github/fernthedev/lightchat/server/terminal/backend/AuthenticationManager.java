@@ -1,4 +1,4 @@
-package com.github.fernthedev.terminal.server.backend;
+package com.github.fernthedev.lightchat.server.terminal.backend;
 
 import com.github.fernthedev.lightchat.core.ColorCode;
 import com.github.fernthedev.lightchat.core.api.event.api.EventHandler;
@@ -10,8 +10,8 @@ import com.github.fernthedev.lightchat.server.ClientConnection;
 import com.github.fernthedev.lightchat.server.Console;
 import com.github.fernthedev.lightchat.server.SenderInterface;
 import com.github.fernthedev.lightchat.server.Server;
-import com.github.fernthedev.terminal.server.ServerTerminal;
-import com.github.fernthedev.terminal.server.events.ChatEvent;
+import com.github.fernthedev.lightchat.server.terminal.ServerTerminal;
+import com.github.fernthedev.lightchat.server.terminal.events.ChatEvent;
 
 import java.util.HashMap;
 import java.util.Map;

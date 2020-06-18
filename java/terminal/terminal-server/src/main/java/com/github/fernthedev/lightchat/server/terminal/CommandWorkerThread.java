@@ -1,7 +1,7 @@
-package com.github.fernthedev.terminal.server;
+package com.github.fernthedev.lightchat.server.terminal;
 
 import com.github.fernthedev.lightchat.server.SenderInterface;
-import com.github.fernthedev.terminal.server.command.Command;
+import com.github.fernthedev.lightchat.server.terminal.command.Command;
 
 public class CommandWorkerThread implements Runnable {
 

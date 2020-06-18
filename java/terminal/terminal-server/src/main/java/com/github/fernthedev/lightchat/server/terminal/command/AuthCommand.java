@@ -1,9 +1,9 @@
-package com.github.fernthedev.terminal.server.command;
+package com.github.fernthedev.lightchat.server.terminal.command;
 
 import com.github.fernthedev.lightchat.server.SenderInterface;
 import com.github.fernthedev.lightchat.server.Server;
-import com.github.fernthedev.terminal.server.ServerTerminal;
-import com.github.fernthedev.terminal.server.backend.AuthenticationManager;
+import com.github.fernthedev.lightchat.server.terminal.ServerTerminal;
+import com.github.fernthedev.lightchat.server.terminal.backend.AuthenticationManager;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 

@@ -1,10 +1,10 @@
-package com.github.fernthedev.terminal.server.backend;
+package com.github.fernthedev.lightchat.server.terminal.backend;
 
 import com.github.fernthedev.lightchat.core.data.LightCandidate;
 import com.github.fernthedev.lightchat.server.Server;
-import com.github.fernthedev.terminal.server.ServerTerminal;
-import com.github.fernthedev.terminal.server.command.Command;
-import com.github.fernthedev.terminal.server.command.TabExecutor;
+import com.github.fernthedev.lightchat.server.terminal.ServerTerminal;
+import com.github.fernthedev.lightchat.server.terminal.command.Command;
+import com.github.fernthedev.lightchat.server.terminal.command.TabExecutor;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 

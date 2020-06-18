@@ -1,4 +1,4 @@
-package com.github.fernthedev.terminal.client;
+package com.github.fernthedev.lightchat.client.terminal;
 
 import com.github.fernthedev.lightchat.client.api.IPacketHandler;
 import com.github.fernthedev.lightchat.client.event.ServerDisconnectEvent;

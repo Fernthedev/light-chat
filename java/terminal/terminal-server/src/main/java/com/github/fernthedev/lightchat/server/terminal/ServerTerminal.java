@@ -1,4 +1,4 @@
-package com.github.fernthedev.terminal.server;
+package com.github.fernthedev.lightchat.server.terminal;
 
 import com.github.fernthedev.config.common.Config;
 import com.github.fernthedev.config.gson.GsonConfig;
@@ -14,14 +14,14 @@ import com.github.fernthedev.terminal.core.CommonUtil;
 import com.github.fernthedev.terminal.core.ConsoleHandler;
 import com.github.fernthedev.terminal.core.TermCore;
 import com.github.fernthedev.terminal.core.packets.MessagePacket;
-import com.github.fernthedev.terminal.server.backend.AuthenticationManager;
-import com.github.fernthedev.terminal.server.backend.AutoCompleteHandler;
-import com.github.fernthedev.terminal.server.backend.BanManager;
-import com.github.fernthedev.terminal.server.backend.ClientAutoCompleteHandler;
-import com.github.fernthedev.terminal.server.command.AuthCommand;
-import com.github.fernthedev.terminal.server.command.Command;
-import com.github.fernthedev.terminal.server.command.LightCommand;
-import com.github.fernthedev.terminal.server.command.SettingsCommand;
+import com.github.fernthedev.lightchat.server.terminal.backend.AuthenticationManager;
+import com.github.fernthedev.lightchat.server.terminal.backend.AutoCompleteHandler;
+import com.github.fernthedev.lightchat.server.terminal.backend.BanManager;
+import com.github.fernthedev.lightchat.server.terminal.backend.ClientAutoCompleteHandler;
+import com.github.fernthedev.lightchat.server.terminal.command.AuthCommand;
+import com.github.fernthedev.lightchat.server.terminal.command.Command;
+import com.github.fernthedev.lightchat.server.terminal.command.LightCommand;
+import com.github.fernthedev.lightchat.server.terminal.command.SettingsCommand;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
