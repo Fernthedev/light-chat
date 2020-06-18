@@ -33,18 +33,7 @@
       <change beforePath="$PROJECT_DIR$/../flutter/ios/Podfile.lock" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../flutter/ios/Runner.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/ios/Runner.xcodeproj/project.pbxproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../flutter/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/lightchat/client/EventListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/lightchat/client/EventListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/EventListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/EventListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/Server.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/settings/NoFileConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/settings/NoFileConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/settings/ServerSettings.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/settings/ServerSettings.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/lightchat/server/terminal/ServerTerminal.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/lightchat/server/terminal/ServerTerminal.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/lightchat/server/terminal/backend/AuthenticationManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/lightchat/server/terminal/backend/AuthenticationManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/lightchat/server/terminal/command/AuthCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/lightchat/server/terminal/command/AuthCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/lightchat/server/terminal/command/SettingsCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/lightchat/server/terminal/command/SettingsCommand.java" afterDir="false" />
     </list>
     <list id="3573a8f5-87af-4aa5-8e37-aaa9023d1393" name="CSharp" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -82,7 +71,12 @@
         </task>
         <projects_view>
           <tree_state>
-            <expand />
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="light-chat" type="f1a62948:ProjectNode" />
+              </path>
+            </expand>
             <select />
           </tree_state>
         </projects_view>
@@ -378,7 +372,7 @@
       <workItem from="1589232454398" duration="223000" />
       <workItem from="1591130394400" duration="703000" />
       <workItem from="1592442792838" duration="6853000" />
-      <workItem from="1592483714935" duration="630000" />
+      <workItem from="1592483714935" duration="3780000" />
     </task>
     <task id="LOCAL-00001" summary="Big changes, though small to the average user.&#10;&#10;- Refactored lots of code&#10;- Fixed lots of bugs with terminal usage&#10;- Added color support&#10;- Updated libraries such as JANSI and Jline&#10;- Still needs lots more refactoring of code&#10;- Settings now uses reflection and annotations to point to setting values, making less hard coded and static values and cleaner code&#10;- SettingsManager has been replaced by GsonConfig&lt;&gt;&#10;- Moved more threads async and attempted to fix more spaghetti code (Make less code dependant on each other and more modular)">
       <created>1569701369228</created>
@@ -702,7 +696,21 @@
       <option name="project" value="LOCAL" />
       <updated>1592447381621</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="Update dependencies and code">
+      <created>1592484485308</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1592484485308</updated>
+    </task>
+    <task id="LOCAL-00048" summary="Add start bind separately.">
+      <created>1592484757125</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1592484757125</updated>
+    </task>
+    <option name="localTasksCounter" value="49" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -746,8 +754,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="- Removed unnecessary Base64 encoding/decoding when encrypting&#10;- Bumped version and minimum version to show warning since Base64 encoding/decoding is used on older versions" />
-    <MESSAGE value="- Error handling in GSON Encoder" />
     <MESSAGE value="- Made useless field packetName transient to make Packet size smaller by ignoring in serialization" />
     <MESSAGE value="- Clients are now able to auto-fill password with HashedPasswordPacket. This requires the password to be hashed, whether the packet is encrypted or not. SelfMessagePacket with FillMessagePacket is sent, it should receive a MessagePacket in return or HashedPasswordPacket with the password hashed." />
     <MESSAGE value="- Clients are now able to auto-fill password with HashedPasswordPacket. This requires the password to be hashed, whether the packet is encrypted or not. SelfMessagePacket with FillMessagePacket is sent, it should receive a MessagePacket in return or HashedPasswordPacket with the password hashed. If password given is incorrect, SelfMessagePacket.MessageType.INCORRECT_PASSWORD_ATTEMPT is sent. If authentication finishes with incorrect password, SelfMessagePacket.MessageType.INCORRECT_PASSWORD_FAILURE is sent." />
@@ -771,7 +777,9 @@
     <MESSAGE value="Improve readability" />
     <MESSAGE value="Add support for controlling terminal settings using a builder" />
     <MESSAGE value="Fix Builder errors" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix Builder errors" />
+    <MESSAGE value="Update dependencies and code" />
+    <MESSAGE value="Add start bind separately." />
+    <option name="LAST_COMMIT_MESSAGE" value="Add start bind separately." />
   </component>
   <component name="WindowStateProjectService">
     <state x="385" y="53" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1592445370500">
@@ -814,25 +822,25 @@
     </state>
     <state x="740" y="275" key="FileChooserDialogImpl/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1588866614412" />
     <state x="740" y="275" key="FileChooserDialogImpl/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584367922818" />
-    <state width="1877" height="196" key="GridCell.Tab.0.bottom" timestamp="1592484218908">
+    <state width="1877" height="196" key="GridCell.Tab.0.bottom" timestamp="1592484793922">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="196" key="GridCell.Tab.0.bottom/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1592484218908" />
+    <state width="1877" height="196" key="GridCell.Tab.0.bottom/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1592484793922" />
     <state width="1877" height="261" key="GridCell.Tab.0.bottom/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584378074176" />
-    <state width="1877" height="196" key="GridCell.Tab.0.center" timestamp="1592484218908">
+    <state width="1877" height="196" key="GridCell.Tab.0.center" timestamp="1592484793922">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="196" key="GridCell.Tab.0.center/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1592484218907" />
+    <state width="1877" height="196" key="GridCell.Tab.0.center/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1592484793922" />
     <state width="1877" height="261" key="GridCell.Tab.0.center/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584378074176" />
-    <state width="1877" height="196" key="GridCell.Tab.0.left" timestamp="1592484218907">
+    <state width="1877" height="196" key="GridCell.Tab.0.left" timestamp="1592484793922">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="196" key="GridCell.Tab.0.left/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1592484218907" />
+    <state width="1877" height="196" key="GridCell.Tab.0.left/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1592484793922" />
     <state width="1877" height="261" key="GridCell.Tab.0.left/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584378074176" />
-    <state width="1877" height="196" key="GridCell.Tab.0.right" timestamp="1592484218908">
+    <state width="1877" height="196" key="GridCell.Tab.0.right" timestamp="1592484793922">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="196" key="GridCell.Tab.0.right/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1592484218908" />
+    <state width="1877" height="196" key="GridCell.Tab.0.right/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1592484793922" />
     <state width="1877" height="261" key="GridCell.Tab.0.right/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584378074176" />
     <state width="1877" height="340" key="GridCell.Tab.1.bottom" timestamp="1588531578396">
       <screen x="0" y="0" width="1920" height="1040" />
@@ -871,10 +879,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="512" y="432" key="VCS.EditChangelistDialog/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1587383640386" />
-    <state x="552" y="248" width="816" height="537" key="Vcs.Push.Dialog.v2" timestamp="1592484509725">
+    <state x="552" y="248" width="816" height="537" key="Vcs.Push.Dialog.v2" timestamp="1592484761985">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="248" width="816" height="537" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1592484509725" />
+    <state x="552" y="248" width="816" height="537" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1592484761985" />
     <state x="552" y="248" key="Vcs.Push.Dialog.v2/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584291889929" />
     <state x="767" y="431" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1584376266207">
       <screen x="0" y="0" width="1920" height="1040" />
