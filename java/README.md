@@ -11,13 +11,13 @@ To install from source, you can simply follow these steps:
 ### Linus/macOs
 ```sh
 git clone https://github.com/Fernthedev/light-chat.git
-cd java
+cd light-chat/java
 gradlew clean build publishToMavenLocal
 ```
 
 ### Windows 
 ```cmd
 git clone https://github.com/Fernthedev/light-chat.git
-cd java
+cd light-chat/java
 gradlew.bat clean build publishToMavenLocal
 ```
