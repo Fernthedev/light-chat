@@ -12,7 +12,8 @@ To install from source, you can simply follow these steps:
 ```sh
 git clone https://github.com/Fernthedev/light-chat.git
 cd light-chat/java
-gradlew clean build publishToMavenLocal
+chmod +x ./gradlew
+./gradlew clean build publishToMavenLocal
 ```
 
 ### Windows 
