@@ -2,18 +2,14 @@ package com.github.fernthedev.lightchat.server.terminal;
 
 import com.github.fernthedev.config.common.Config;
 import com.github.fernthedev.config.gson.GsonConfig;
-import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.fernutils.thread.ThreadUtils;
 import com.github.fernthedev.light.LightManager;
 import com.github.fernthedev.light.exceptions.NoPi4JLibsFoundException;
+import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.server.Console;
 import com.github.fernthedev.lightchat.server.SenderInterface;
 import com.github.fernthedev.lightchat.server.Server;
 import com.github.fernthedev.lightchat.server.settings.ServerSettings;
-import com.github.fernthedev.terminal.core.CommonUtil;
-import com.github.fernthedev.terminal.core.ConsoleHandler;
-import com.github.fernthedev.terminal.core.TermCore;
-import com.github.fernthedev.terminal.core.packets.MessagePacket;
 import com.github.fernthedev.lightchat.server.terminal.backend.AuthenticationManager;
 import com.github.fernthedev.lightchat.server.terminal.backend.AutoCompleteHandler;
 import com.github.fernthedev.lightchat.server.terminal.backend.BanManager;
@@ -22,6 +18,10 @@ import com.github.fernthedev.lightchat.server.terminal.command.AuthCommand;
 import com.github.fernthedev.lightchat.server.terminal.command.Command;
 import com.github.fernthedev.lightchat.server.terminal.command.LightCommand;
 import com.github.fernthedev.lightchat.server.terminal.command.SettingsCommand;
+import com.github.fernthedev.terminal.core.CommonUtil;
+import com.github.fernthedev.terminal.core.ConsoleHandler;
+import com.github.fernthedev.terminal.core.TermCore;
+import com.github.fernthedev.terminal.core.packets.MessagePacket;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,52 +61,59 @@ public class ServerTerminal {
 
     private static Logger logger = LoggerFactory.getLogger(ServerTerminal.class);
 
-    protected static boolean lightAllowed = true;
-    protected static boolean allowChangePassword = true;
-    protected static boolean allowTermPackets = true;
-    protected static boolean allowPortArgParse = true;
-    protected static boolean allowDebugArgParse = true;
-    protected static int port = -1;
+
 
     public static void main(String[] args) {
+        init(args, ServerTerminalSettings.builder().build());
+    }
+
+    public static void init(ServerTerminalSettings terminalSettings) {
+        init(new String[0], terminalSettings);
+    }
+
+    public static void init(String[] args, ServerTerminalSettings terminalSettings) {
         CommonUtil.initTerminal();
 
 
         //  Logger.getLogger("io.netty").setLevel(java.util.logging.Level.OFF);
 
 
-            for (int i = 0; i < args.length && (allowPortArgParse || allowDebugArgParse || lightAllowed); i++) {
-                String arg = args[i];
+        int port = terminalSettings.port;
 
-                if (arg.equalsIgnoreCase("-port") && allowPortArgParse) {
-                    try {
-                        port = Integer.parseInt(args[i + 1]);
-                        if (port < 0) {
-                            logger.error("-port cannot be less than 0");
-                            port = -1;
-                        } else logger.info("Using port {}", args[i + +1]);
-                    } catch (NumberFormatException | IndexOutOfBoundsException e) {
-                        logger.error("-port is not a number");
+        for (int i = 0; i < args.length && (terminalSettings.isAllowPortArgParse() || terminalSettings.isAllowDebugArgParse() || terminalSettings.isLightAllowed()); i++) {
+            String arg = args[i];
+
+            if (arg.equalsIgnoreCase("-port") && terminalSettings.isAllowPortArgParse()) {
+                try {
+                    port = Integer.parseInt(args[i + 1]);
+                    if (port < 0) {
+                        logger.error("-port cannot be less than 0");
                         port = -1;
-                    }
-                }
-
-                if (arg.equalsIgnoreCase("-lightmanager") && lightAllowed) {
-                    StaticHandler.setLight(true);
-                }
-
-                if (arg.equalsIgnoreCase("-debug") && allowDebugArgParse) {
-                    StaticHandler.setDebug(true);
-                    logger.debug("Debug enabled");
+                    } else logger.info("Using port {}", args[i + +1]);
+                } catch (NumberFormatException | IndexOutOfBoundsException e) {
+                    logger.error("-port is not a number");
+                    port = -1;
                 }
             }
+
+            if (arg.equalsIgnoreCase("-lightmanager") && terminalSettings.isLightAllowed()) {
+                StaticHandler.setLight(true);
+            }
+
+            if (arg.equalsIgnoreCase("-debug") && terminalSettings.isAllowDebugArgParse()) {
+                StaticHandler.setDebug(true);
+                logger.debug("Debug enabled");
+            }
+        }
 
 
 
         CommonUtil.startSelfInCmd(args);
 
 
-        settingsManager = new GsonConfig<>(new ServerSettings(), new File(getCurrentPath(), "settings.json"));
+
+
+        settingsManager = new GsonConfig<>(terminalSettings.getServerSettings(), new File(getCurrentPath(), "settings.json"));
         settingsManager.save();
 
         if (port == -1) port = settingsManager.getConfigData().getPort();
@@ -121,7 +128,7 @@ public class ServerTerminal {
 
         StaticHandler.setCore(new ServerTermCore(server));
 
-        if (allowTermPackets)
+        if (terminalSettings.isAllowTermPackets())
             CommonUtil.registerTerminalPackets();
 
         new Thread(() -> {
@@ -139,36 +146,36 @@ public class ServerTerminal {
             server.getPluginManager().registerEvents(authenticationManager);
         });
 
-        if (allowChangePassword)
+        if (terminalSettings.isAllowChangePassword())
             registerCommand(new AuthCommand("changepassword", server));
 
         autoCompleteHandler = new ClientAutoCompleteHandler(server);
 
-        if (lightAllowed)
-        ThreadUtils.runAsync(() -> {
-            if (StaticHandler.OS.equalsIgnoreCase("Linux") || StaticHandler.OS.contains("Linux") || StaticHandler.isLight()) {
-                logger.info("Running LightManager (Note this is for raspberry pies only)");
+        if (terminalSettings.isLightAllowed())
+            ThreadUtils.runAsync(() -> {
+                if (StaticHandler.OS.equalsIgnoreCase("Linux") || StaticHandler.OS.contains("Linux") || StaticHandler.isLight()) {
+                    logger.info("Running LightManager (Note this is for raspberry pies only)");
 
-                Thread lightThread = new Thread(() -> {
+                    Thread lightThread = new Thread(() -> {
 
-                    try {
-                        LightManager.init();
-                        registerCommand(new LightCommand(server));
-                    } catch (IllegalArgumentException | ExceptionInInitializerError | NoPi4JLibsFoundException e) {
-                        logger.error("Unable to load Pi4J Libraries. To load stacktrace, add -debug flag. Message: {}", e.getMessage());
-                        if (StaticHandler.isDebug()) {
-                            e.printStackTrace();
+                        try {
+                            LightManager.init();
                             registerCommand(new LightCommand(server));
+                        } catch (IllegalArgumentException | ExceptionInInitializerError | NoPi4JLibsFoundException e) {
+                            logger.error("Unable to load Pi4J Libraries. To load stacktrace, add -debug flag. Message: {}", e.getMessage());
+                            if (StaticHandler.isDebug()) {
+                                e.printStackTrace();
+                                registerCommand(new LightCommand(server));
+                            }
                         }
-                    }
 
-                }, "LightThread");
+                    }, "LightThread");
 //                registerCommand(new LightCommand(this));
-                lightThread.start();
-            } else {
-                logger.info("Detected system is not linux. LightManager will not run (manual run with -lightmanager arg)");
-            }
-        });
+                    lightThread.start();
+                } else {
+                    logger.info("Detected system is not linux. LightManager will not run (manual run with -lightmanager arg)");
+                }
+            });
 
         new Thread(() -> {
             server.run();
