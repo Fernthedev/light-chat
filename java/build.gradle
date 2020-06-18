@@ -129,7 +129,7 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
             maven(MavenPublication) {
                 from(components.java)
 
-                groupId = "$rootProject.group.$rootProject.name"
+                groupId = "${rootProject.group}.${rootProject.name}"
 
                 artifactId = "$project.name"
 
