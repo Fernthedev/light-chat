@@ -8,10 +8,16 @@
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.4/7103ab519b1cdbb0642ad4eaf1db209d905d0f96/lombok-1.18.4.jar" />
         </processorPath>
+        <module name="light-chat.core.main" />
+        <module name="light-chat.terminal.terminal-client.main" />
+        <module name="light-chat.terminal.terminal-core.main" />
         <module name="light-chat.terminal.terminal-server.main" />
+        <module name="light-chat.terminal.main" />
+        <module name="light-chat.client.main" />
+        <module name="light-chat.server.main" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="11">
+    <bytecodeTargetLevel target="1.8">
       <module name="client-api.main" target="1.8" />
       <module name="client-api.test" target="1.8" />
       <module name="light-chat.api.main" target="1.8" />

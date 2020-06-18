@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
+import java.util.Base64;
 
 public class EncryptionUtil {
 
@@ -75,6 +76,15 @@ public class EncryptionUtil {
             byte[] encodedData = cipher.doFinal(data.getBytes(StaticHandler.CHARSET_FOR_STRING));
             byte[] params = cipher.getParameters().getEncoded();
             String paramAlgorithm = cipher.getParameters().getAlgorithm();
+
+            // TODO: Remove this log
+            StaticHandler.getCore().getLogger().debug("Key, IV (no encode) and data (encoded): {} {} ({}) {} ({})",
+                    Base64.getEncoder().encodeToString(secret.getEncoded()),
+                    Base64.getEncoder().encodeToString(cipher.getParameters().getEncoded()),
+                    Base64.getEncoder().encodeToString(cipher.getIV()),
+                    data,
+                    Base64.getEncoder().encodeToString(encodedData)
+            );
 
             return new EncryptedBytes(encodedData, params, paramAlgorithm);
         } catch (InvalidKeyException e) {
