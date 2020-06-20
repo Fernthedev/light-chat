@@ -32,7 +32,6 @@ import io.netty.handler.codec.LineBasedFrameDecoder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import lombok.Synchronized;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
@@ -44,8 +43,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 
 public class Server implements Runnable {
@@ -54,6 +52,10 @@ public class Server implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
 
     private Thread serverThread;
+
+    @Getter
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    private final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
 
     @Getter
     private final int port;
@@ -142,7 +144,7 @@ public class Server implements Runnable {
                 logger.debug("Sending to all {} to {}", packet.getPacketName(), clientConnection);
                 clientConnection.sendObject(packet);
             }
-        }), ThreadUtils.ThreadExecutors.CACHED_THREADS.getExecutorService());
+        }), executorService);
     }
 
 
@@ -214,7 +216,7 @@ public class Server implements Runnable {
                         clientConnection.close();
                     }
                 }
-            })), ThreadUtils.ThreadExecutors.CACHED_THREADS.getExecutorService()));
+            })), executorService));
 
 
 
@@ -238,7 +240,7 @@ public class Server implements Runnable {
                         e.printStackTrace();
                     }
                 }
-            }, ThreadUtils.ThreadExecutors.CACHED_THREADS.getExecutorService()));
+            }, executorService));
 
 
 //        LoggerManager loggerManager = new LoggerManager();
@@ -248,7 +250,7 @@ public class Server implements Runnable {
 
 
 //        await();
-            tasks.add(ThreadUtils.runAsync((Runnable) this::initServer, ThreadUtils.ThreadExecutors.CACHED_THREADS.getExecutorService()));
+            tasks.add(ThreadUtils.runAsync((Runnable) this::initServer, executorService));
 
             for (Future<Void> taskInfo : tasks) {
                 while (!taskInfo.isDone()) {
@@ -266,6 +268,15 @@ public class Server implements Runnable {
             getPluginManager().callEvent(new ServerStartupEvent(true));
 
             startupLock.notifyAllThreads();
+        }
+
+        while (running) {
+            try {
+                queue.take().run();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                e.printStackTrace();
+            }
         }
     }
 
@@ -367,9 +378,17 @@ public class Server implements Runnable {
     }
 
     @APIUsage
-    @Synchronized
     public Thread getServerThread() {
         return serverThread;
+    }
+
+    @APIUsage
+    public void runOnServerThread(Runnable runnable) {
+        if (Thread.currentThread() == serverThread) {
+            runnable.run();
+        } else {
+            queue.add(runnable);
+        }
     }
 
     public String getName() {

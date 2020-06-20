@@ -35,7 +35,9 @@ public class ThreadLock {
      * @throws InterruptedException
      */
     public void waitOnLock() throws InterruptedException {
-        threadLockObject.wait();
+        synchronized (threadLockObject) {
+            threadLockObject.wait();
+        }
     }
 
     /**
@@ -46,8 +48,9 @@ public class ThreadLock {
      * @throws InterruptedException
      */
     public void waitOnLock(long timeoutMillis) throws InterruptedException {
-        threadLockObject.wait(timeoutMillis);
-
+        synchronized (threadLockObject) {
+            threadLockObject.wait(timeoutMillis);
+        }
     }
 
     /**
@@ -58,7 +61,9 @@ public class ThreadLock {
      * @throws InterruptedException
      */
     public void waitOnLock(long timeoutMillis, int nanos) throws InterruptedException {
-        threadLockObject.wait(timeoutMillis, nanos);
+        synchronized (threadLockObject) {
+            threadLockObject.wait(timeoutMillis, nanos);
+        }
     }
 
 

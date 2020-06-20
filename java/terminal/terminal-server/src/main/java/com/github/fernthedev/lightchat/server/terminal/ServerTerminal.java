@@ -149,7 +149,7 @@ public class ServerTerminal {
         ThreadUtils.runAsync(() -> {
             authenticationManager = new AuthenticationManager(server);
             server.getPluginManager().registerEvents(authenticationManager);
-        }, ThreadUtils.ThreadExecutors.CACHED_THREADS.getExecutorService());
+        }, server.getExecutorService());
 
         if (terminalSettings.isAllowChangePassword())
             registerCommand(new AuthCommand("changepassword", server));
@@ -180,7 +180,7 @@ public class ServerTerminal {
                 } else {
                     logger.info("Detected system is not linux. LightManager will not run (manual run with -lightmanager arg)");
                 }
-            }, ThreadUtils.ThreadExecutors.CACHED_THREADS.getExecutorService());
+            }, server.getExecutorService());
     }
 
     public static void startBind() {

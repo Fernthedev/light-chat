@@ -57,7 +57,7 @@ public class EventListener {
                 } catch (Exception e) {
                     throw ExceptionUtil.throwParsePacketException(e, p);
                 }
-            }).runThreads(ThreadUtils.ThreadExecutors.CACHED_THREADS.getExecutorService());
+            }).runThreads(server.getExecutorService());
 
         } catch (ParsePacketException e) {
             throw e;
@@ -109,7 +109,7 @@ public class EventListener {
 
             server.logInfo("{} has connected to the server [{} | {}] ", clientConnection.getName(), clientConnection.getOs(), clientConnection.getLangFramework());
             clientConnection.sendObject(new SelfMessagePacket(SelfMessagePacket.MessageType.REGISTER_PACKET));
-            ThreadUtils.runAsync(() -> server.getPluginManager().callEvent(new PlayerJoinEvent(clientConnection, true)), ThreadUtils.ThreadExecutors.CACHED_THREADS.getExecutorService());
+            ThreadUtils.runAsync(() -> server.getPluginManager().callEvent(new PlayerJoinEvent(clientConnection, true)), server.getExecutorService());
         } catch (Exception e) {
             throw ExceptionUtil.throwParsePacketException(e, packet);
         }
