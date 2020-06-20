@@ -372,7 +372,10 @@
       <workItem from="1589232454398" duration="223000" />
       <workItem from="1591130394400" duration="703000" />
       <workItem from="1592442792838" duration="6853000" />
-      <workItem from="1592483714935" duration="3780000" />
+      <workItem from="1592483714935" duration="5619000" />
+      <workItem from="1592590267124" duration="589000" />
+      <workItem from="1592600009578" duration="594000" />
+      <workItem from="1592606116502" duration="591000" />
     </task>
     <task id="LOCAL-00001" summary="Big changes, though small to the average user.&#10;&#10;- Refactored lots of code&#10;- Fixed lots of bugs with terminal usage&#10;- Added color support&#10;- Updated libraries such as JANSI and Jline&#10;- Still needs lots more refactoring of code&#10;- Settings now uses reflection and annotations to point to setting values, making less hard coded and static values and cleaner code&#10;- SettingsManager has been replaced by GsonConfig&lt;&gt;&#10;- Moved more threads async and attempted to fix more spaghetti code (Make less code dependant on each other and more modular)">
       <created>1569701369228</created>
@@ -710,7 +713,14 @@
       <option name="project" value="LOCAL" />
       <updated>1592484757125</updated>
     </task>
-    <option name="localTasksCounter" value="49" />
+    <task id="LOCAL-00049" summary="Add sudo chmod">
+      <created>1592496933965</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1592496933965</updated>
+    </task>
+    <option name="localTasksCounter" value="50" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -754,7 +764,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="- Made useless field packetName transient to make Packet size smaller by ignoring in serialization" />
     <MESSAGE value="- Clients are now able to auto-fill password with HashedPasswordPacket. This requires the password to be hashed, whether the packet is encrypted or not. SelfMessagePacket with FillMessagePacket is sent, it should receive a MessagePacket in return or HashedPasswordPacket with the password hashed." />
     <MESSAGE value="- Clients are now able to auto-fill password with HashedPasswordPacket. This requires the password to be hashed, whether the packet is encrypted or not. SelfMessagePacket with FillMessagePacket is sent, it should receive a MessagePacket in return or HashedPasswordPacket with the password hashed. If password given is incorrect, SelfMessagePacket.MessageType.INCORRECT_PASSWORD_ATTEMPT is sent. If authentication finishes with incorrect password, SelfMessagePacket.MessageType.INCORRECT_PASSWORD_FAILURE is sent." />
     <MESSAGE value="- Decoupling Client and Server to become it's own standalone API and terminal support is being moved to terminal module" />
@@ -779,7 +788,8 @@
     <MESSAGE value="Fix Builder errors" />
     <MESSAGE value="Update dependencies and code" />
     <MESSAGE value="Add start bind separately." />
-    <option name="LAST_COMMIT_MESSAGE" value="Add start bind separately." />
+    <MESSAGE value="Add sudo chmod" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add sudo chmod" />
   </component>
   <component name="WindowStateProjectService">
     <state x="385" y="53" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1592445370500">
@@ -879,10 +889,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="512" y="432" key="VCS.EditChangelistDialog/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1587383640386" />
-    <state x="552" y="248" width="816" height="537" key="Vcs.Push.Dialog.v2" timestamp="1592484761985">
+    <state x="552" y="248" width="816" height="537" key="Vcs.Push.Dialog.v2" timestamp="1592496997227">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="248" width="816" height="537" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1592484761985" />
+    <state x="552" y="248" width="816" height="537" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1592496997227" />
     <state x="552" y="248" key="Vcs.Push.Dialog.v2/3286.0.1920.1040/1920.317.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1584291889929" />
     <state x="767" y="431" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1584376266207">
       <screen x="0" y="0" width="1920" height="1040" />

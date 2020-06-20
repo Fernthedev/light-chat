@@ -28,6 +28,9 @@ public class ServerTerminalSettings {
     protected boolean allowDebugArgParse = true;
 
     @Builder.Default
+    protected boolean launchConsoleWhenNull = true;
+
+    @Builder.Default
     protected int port = -1;
 
 }

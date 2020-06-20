@@ -109,8 +109,8 @@ public class ServerTerminal {
         }
 
 
-
-        CommonUtil.startSelfInCmd(args);
+        if (terminalSettings.isLaunchConsoleWhenNull())
+            CommonUtil.startSelfInCmd(args);
 
 
         try {
