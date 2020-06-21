@@ -32,6 +32,7 @@ import io.netty.handler.codec.LineBasedFrameDecoder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import lombok.Synchronized;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
@@ -60,6 +61,7 @@ public class Server implements Runnable {
     @Getter
     private final int port;
     private boolean running;
+    private volatile boolean shutdown = false;
     private boolean isPortBind = false;
 
     @Getter
@@ -148,23 +150,27 @@ public class Server implements Runnable {
     }
 
 
-    public synchronized void shutdownServer() {
-        getLogger().info(ColorCode.RED + "Shutting down server.");
-        running = false;
-        if (multicastServer != null) multicastServer.stopMulticast();
+    @Synchronized
+    public void shutdownServer() {
+        if (!shutdown) {
+            shutdown = true;
+            getLogger().info(ColorCode.RED + "Shutting down server.");
+            running = false;
+            if (multicastServer != null) multicastServer.stopMulticast();
 
-        if (workerGroup != null) workerGroup.shutdownGracefully();
-        if (bossGroup != null) bossGroup.shutdownGracefully();
+            if (workerGroup != null) workerGroup.shutdownGracefully();
+            if (bossGroup != null) bossGroup.shutdownGracefully();
 
-        getPluginManager().callEvent(new ServerShutdownEvent());
+            getPluginManager().callEvent(new ServerShutdownEvent());
 
-        shutdownListeners.parallelStream().forEach(Runnable::run);
+            shutdownListeners.parallelStream().forEach(Runnable::run);
+        } else throw new IllegalStateException("Server is already shutting down!");
     }
 
 
 
     public boolean isRunning() {
-        return running;
+        return running && serverThread.isAlive();
     }
 
     /**
@@ -271,13 +277,24 @@ public class Server implements Runnable {
         }
 
         while (running) {
+            if (bossGroup.isShutdown() || workerGroup.isShutdown()) {
+                running = false;
+                continue;
+            }
+
             try {
                 queue.take().run();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
+
+        try {
+            shutdownServer();
+        } catch (IllegalStateException ignored) {}
     }
 
     private Server initServer() {
