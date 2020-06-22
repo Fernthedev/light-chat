@@ -1,10 +1,18 @@
 package com.github.fernthedev.lightchat.server.terminal.command;
 
+import com.github.fernthedev.lightchat.server.SenderInterface;
+
 import java.util.List;
 
 public interface TabExecutor {
 
-    List<String> getCompletions(String[] args);
+    /**
+     * Returns a list of completions based on the arguments given
+     * @param sender
+     * @param args
+     * @return
+     */
+    List<String> getCompletions(SenderInterface sender, String[] args);
 
 
 }

@@ -7,6 +7,7 @@ import com.github.fernthedev.lightchat.server.SenderInterface;
 import com.github.fernthedev.lightchat.server.Server;
 import com.github.fernthedev.lightchat.server.terminal.command.Command;
 import com.github.fernthedev.lightchat.server.terminal.events.ChatEvent;
+import com.github.fernthedev.lightchat.server.terminal.exception.InvalidCommandArgumentException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -22,24 +23,24 @@ public class CommandMessageParser implements Listener {
     public void onCommand(ChatEvent e) {
         SenderInterface sender = e.getSender();
 
-        if(e.isCancelled()) return;
+        if (e.isCancelled()) return;
 
         Runnable runnable;
 
         Runnable commandRunnable = () -> handleCommand(sender, e.getMessage()); // Just a static identifier
         Runnable messageRunnable = () -> handleMessage(sender, e.getMessage()); // Just a static identifier
 
-        if(e.getSender() instanceof Console) {
+        if (e.getSender() instanceof Console) {
             runnable = commandRunnable;
         } else {
-            if(e.isCommand()) {
+            if (e.isCommand()) {
                 runnable = commandRunnable;
-            }else{
+            } else {
                 runnable = messageRunnable;
             }
         }
 
-        if(e.isAsynchronous()) {
+        if (e.isAsynchronous()) {
             new Thread(runnable).start();
         } else {
             runnable.run();
@@ -96,8 +97,10 @@ public class CommandMessageParser implements Listener {
                         break;
                     }
                 }
+            } catch (InvalidCommandArgumentException e) {
+                ServerTerminal.sendMessage(sender, ColorCode.RED + "Error: " + e.getMessage());
             } catch (Exception e) {
-                Server.getLogger().error(e.getMessage(), e.getCause());
+                Server.getLogger().error(e.getMessage(), e);
                 ServerTerminal.sendMessage(sender, ColorCode.RED + "Command exception occurred. Error: " + e.getMessage());
             }
 

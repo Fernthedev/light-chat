@@ -204,12 +204,13 @@ public class Server implements Runnable {
             if (running) throw new IllegalStateException("Server is already running");
 
             running = true;
+            shutdown = false;
+
             StaticHandler.displayVersion();
             List<Future<Void>> tasks = new ArrayList<>();
 
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            check();
 
 
             new Thread(playerHandler = new PlayerHandler(this), "PlayerHandlerThread").start();
@@ -375,10 +376,6 @@ public class Server implements Runnable {
                         isPortBind = false;
                     }
                 });
-    }
-
-    private void check() {
-        if (System.console() == null && !StaticHandler.isDebug()) shutdownServer();
     }
 
     public PluginManager getPluginManager() {

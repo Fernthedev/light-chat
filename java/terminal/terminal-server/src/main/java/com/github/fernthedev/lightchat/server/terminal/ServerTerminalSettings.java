@@ -31,6 +31,9 @@ public class ServerTerminalSettings {
     protected boolean launchConsoleWhenNull = true;
 
     @Builder.Default
+    protected boolean consoleCommandHandler = true;
+
+    @Builder.Default
     protected int port = -1;
 
 }

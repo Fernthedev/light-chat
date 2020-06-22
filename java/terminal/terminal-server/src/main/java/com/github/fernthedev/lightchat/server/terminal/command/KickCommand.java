@@ -46,7 +46,7 @@ public class KickCommand extends Command implements TabExecutor {
     }
 
     @Override
-    public List<String> getCompletions(String[] args) {
+    public List<String> getCompletions(SenderInterface senderInterface, String[] args) {
 
         String curArg = args[args.length - 1];
         List<ClientConnection> completions = server.getPlayerHandler().getUuidMap().values().stream().filter(

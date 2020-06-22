@@ -6,11 +6,11 @@ import com.github.fernthedev.lightchat.server.ClientConnection;
 import com.github.fernthedev.lightchat.server.Console;
 import com.github.fernthedev.lightchat.server.SenderInterface;
 import com.github.fernthedev.lightchat.server.Server;
-import com.github.fernthedev.lightchat.server.terminal.command.KickCommand;
-import com.github.fernthedev.terminal.core.packets.MessagePacket;
 import com.github.fernthedev.lightchat.server.terminal.backend.BannedData;
 import com.github.fernthedev.lightchat.server.terminal.command.Command;
+import com.github.fernthedev.lightchat.server.terminal.command.KickCommand;
 import com.github.fernthedev.lightchat.server.terminal.events.ChatEvent;
+import com.github.fernthedev.terminal.core.packets.MessagePacket;
 import lombok.NonNull;
 
 import java.util.Arrays;
@@ -61,6 +61,20 @@ public class ServerCommandHandler {
 
     private void registerCommands() {
         ServerTerminal.registerCommand(new Command("exit") {
+            @Override
+            public void onCommand(SenderInterface sender, String[] args) {
+                if (sender instanceof Console) {
+                    ServerTerminal.sendMessage(sender, "Exiting");
+                    server.shutdownServer();
+                    System.exit(0);
+                } else if (sender instanceof ClientConnection) {
+                    ClientConnection clientConnection = (ClientConnection) sender;
+                    clientConnection.close();
+                }
+            }
+        }).setUsage("Safely closes the server.");
+
+        ServerTerminal.registerCommand(new Command("stop") {
             @Override
             public void onCommand(SenderInterface sender, String[] args) {
                 if (sender instanceof Console) {

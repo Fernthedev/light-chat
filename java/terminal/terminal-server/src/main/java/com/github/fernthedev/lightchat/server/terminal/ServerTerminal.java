@@ -14,7 +14,7 @@ import com.github.fernthedev.lightchat.server.settings.ServerSettings;
 import com.github.fernthedev.lightchat.server.terminal.backend.AuthenticationManager;
 import com.github.fernthedev.lightchat.server.terminal.backend.AutoCompleteHandler;
 import com.github.fernthedev.lightchat.server.terminal.backend.BanManager;
-import com.github.fernthedev.lightchat.server.terminal.backend.ClientAutoCompleteHandler;
+import com.github.fernthedev.lightchat.server.terminal.backend.TabCompleteFinder;
 import com.github.fernthedev.lightchat.server.terminal.command.AuthCommand;
 import com.github.fernthedev.lightchat.server.terminal.command.Command;
 import com.github.fernthedev.lightchat.server.terminal.command.LightCommand;
@@ -53,7 +53,7 @@ public class ServerTerminal {
     private static AuthenticationManager authenticationManager;
 
     @Getter
-    private static ClientAutoCompleteHandler autoCompleteHandler;
+    private static TabCompleteFinder autoCompleteHandler;
 
 
     @Getter
@@ -136,10 +136,12 @@ public class ServerTerminal {
         if (terminalSettings.isAllowTermPackets())
             CommonUtil.registerTerminalPackets();
 
-        new Thread(() -> {
-            logger.info("Type Command: (try help)");
-            new ConsoleHandler((TermCore) StaticHandler.getCore(), new AutoCompleteHandler(server)).start();
-        }, "ConsoleHandler").start();
+        if (terminalSettings.isConsoleCommandHandler()) {
+            new Thread(() -> {
+                logger.info("Type Command: (try help)");
+                new ConsoleHandler((TermCore) StaticHandler.getCore(), new AutoCompleteHandler(server)).start();
+            }, "ConsoleHandler").start();
+        }
 
         commandMessageParser = new CommandMessageParser(server);
         server.getPluginManager().registerEvents(commandMessageParser);
@@ -154,7 +156,7 @@ public class ServerTerminal {
         if (terminalSettings.isAllowChangePassword())
             registerCommand(new AuthCommand("changepassword", server));
 
-        autoCompleteHandler = new ClientAutoCompleteHandler(server);
+        autoCompleteHandler = new TabCompleteFinder(server);
 
         if (terminalSettings.isLightAllowed())
             ThreadUtils.runAsync(() -> {

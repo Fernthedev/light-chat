@@ -53,7 +53,7 @@ public class TerminalPacketHandler implements IPacketHandler {
             ServerTerminal.getCommandMessageParser().onCommand(chatEvent);
         }else if (p instanceof AutoCompletePacket) {
             AutoCompletePacket packet = (AutoCompletePacket) p;
-            List<LightCandidate> candidates = ServerTerminal.getAutoCompleteHandler().handleLine(packet.getWords());
+            List<LightCandidate> candidates = ServerTerminal.getAutoCompleteHandler().handleLine(clientConnection, packet.getWords());
 
             packet.setCandidateList(candidates);
             clientConnection.sendObject(packet);

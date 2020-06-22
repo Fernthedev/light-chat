@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class AutoCompleteHandler extends ClientAutoCompleteHandler implements Completer {
+public class AutoCompleteHandler extends TabCompleteFinder implements Completer {
 
     public AutoCompleteHandler(Server server) {
         super(server);
@@ -24,7 +24,7 @@ public class AutoCompleteHandler extends ClientAutoCompleteHandler implements Co
 //        Server.getLogger().info("Handled line");
 
 
-        List<LightCandidate> candidateList = handleLine(line.words());
+        List<LightCandidate> candidateList = handleLine(server.getConsole(), line.words());
 
         List<Candidate> convertedCandidate = new ArrayList<>();
 

@@ -86,7 +86,7 @@ public class LightCommand extends Command implements TabExecutor {
     }
 
     @Override
-    public List<String> getCompletions(String[] args) {
+    public List<String> getCompletions(SenderInterface senderInterface, String[] args) {
         if(args.length == 0) {
             return Arrays.asList("off",
                     "on",
