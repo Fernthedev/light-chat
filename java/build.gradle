@@ -57,7 +57,7 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
     apply plugin: 'com.github.johnrengelman.shadow'
 
     ext.netty_ver = "4.1.51.Final"
-    ext.jline_ver = "3.14.1"
+    ext.jline_ver = "3.15.0"
     ext.log4j_ver = "2.13.2"
 
     repositories {
