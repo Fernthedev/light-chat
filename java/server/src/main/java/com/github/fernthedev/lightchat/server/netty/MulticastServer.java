@@ -68,7 +68,7 @@ public class MulticastServer extends QuoteServerThread {
                 currentThread().interrupt();
             }
         }
-        Server.getLogger().info("Closing MultiCast Server");
+        server.getLogger().info("Closing MultiCast Server");
         socket.close();
     }
 

@@ -10,7 +10,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\client\client.csproj" />
+      <ProjectReference Include="..\client\client.csproj" />
     </ItemGroup>
 
 </Project>

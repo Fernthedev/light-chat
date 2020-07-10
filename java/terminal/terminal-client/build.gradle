@@ -9,3 +9,7 @@ group "${project.parent.group}.client"
 application {
     mainClassName = "com.github.fernthedev.lightchat.client.terminal.ClientTerminal"
 }
+
+run{
+    standardInput = System.in
+}

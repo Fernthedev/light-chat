@@ -5,7 +5,6 @@ import com.github.fernthedev.fernutils.thread.ThreadUtils;
 import com.github.fernthedev.lightchat.core.ColorCode;
 import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.core.api.APIUsage;
-import com.github.fernthedev.lightchat.core.api.ThreadLock;
 import com.github.fernthedev.lightchat.core.api.event.api.Listener;
 import com.github.fernthedev.lightchat.core.api.plugin.PluginManager;
 import com.github.fernthedev.lightchat.core.encryption.codecs.JSONHandler;
@@ -18,12 +17,16 @@ import com.github.fernthedev.lightchat.server.event.ServerShutdownEvent;
 import com.github.fernthedev.lightchat.server.event.ServerStartupEvent;
 import com.github.fernthedev.lightchat.server.netty.MulticastServer;
 import com.github.fernthedev.lightchat.server.netty.ProcessingHandler;
+import com.github.fernthedev.lightchat.server.security.AuthenticationManager;
+import com.github.fernthedev.lightchat.server.security.BanManager;
 import com.github.fernthedev.lightchat.server.settings.NoFileConfig;
 import com.github.fernthedev.lightchat.server.settings.ServerSettings;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
+import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
+import io.netty.channel.kqueue.KQueue;
 import io.netty.channel.kqueue.KQueueEventLoopGroup;
 import io.netty.channel.kqueue.KQueueServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -33,7 +36,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.Synchronized;
-import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,13 +52,22 @@ import java.util.concurrent.*;
 public class Server implements Runnable {
 
     @Getter
-    private static final Logger logger = LoggerFactory.getLogger(Server.class);
+    @Setter
+    private Logger logger = LoggerFactory.getLogger(Server.class);
 
     private Thread serverThread;
 
     @Getter
     private final ExecutorService executorService = Executors.newCachedThreadPool();
     private final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
+
+    @Setter
+    @Getter
+    private AuthenticationManager authenticationManager = new AuthenticationManager(this);
+
+    @Getter
+    @Setter
+    private BanManager banManager = new BanManager(this);
 
     @Getter
     private final int port;
@@ -92,7 +103,7 @@ public class Server implements Runnable {
     private List<Runnable> shutdownListeners = new ArrayList<>();
 
     @Getter
-    private final ThreadLock startupLock = new ThreadLock();
+    private final CompletableFuture<Void> startupLock = new CompletableFuture<>();
 
     @Getter
     private PlayerHandler playerHandler;
@@ -156,12 +167,19 @@ public class Server implements Runnable {
             shutdown = true;
             getLogger().info(ColorCode.RED + "Shutting down server.");
             running = false;
-            if (multicastServer != null) multicastServer.stopMulticast();
+
+            ThreadUtils.runAsync(() -> {
+                if (multicastServer != null) multicastServer.stopMulticast();
+            }, executorService);
+
+
 
             if (workerGroup != null) workerGroup.shutdownGracefully();
             if (bossGroup != null) bossGroup.shutdownGracefully();
 
             getPluginManager().callEvent(new ServerShutdownEvent());
+
+            executorService.shutdown();
 
             shutdownListeners.parallelStream().forEach(Runnable::run);
         } else throw new IllegalStateException("Server is already shutting down!");
@@ -197,7 +215,6 @@ public class Server implements Runnable {
     @APIUsage
     public void start() {
         synchronized (startupLock) {
-            startupLock.lock();
 
             if (serverThread == null) serverThread = Thread.currentThread();
 
@@ -218,7 +235,7 @@ public class Server implements Runnable {
             tasks.add(ThreadUtils.runAsync(() -> Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 for (ClientConnection clientConnection : playerHandler.getChannelMap().values()) {
                     if (clientConnection.getChannel().isOpen()) {
-                        Server.getLogger().info("Gracefully shutting down");
+                        getLogger().info("Gracefully shutting down");
                         sendObjectToAllPlayers(new SelfMessagePacket(SelfMessagePacket.MessageType.LOST_SERVER_CONNECTION));
                         clientConnection.close();
                     }
@@ -272,9 +289,10 @@ public class Server implements Runnable {
 
             logger.info("Finished initializing. Took {}ms", stopWatch.getTime(TimeUnit.MILLISECONDS));
 
-            getPluginManager().callEvent(new ServerStartupEvent(true));
+            ThreadUtils.runAsync(() -> getPluginManager().callEvent(new ServerStartupEvent(true)), executorService);
 
-            startupLock.notifyAllThreads();
+
+            startupLock.complete(null);
         }
 
         while (running) {
@@ -305,7 +323,9 @@ public class Server implements Runnable {
         Class<? extends ServerChannel> channelClass = NioServerSocketChannel.class;
 
         if (settingsManager.getConfigData().isUseNativeTransport()) {
-            if (SystemUtils.IS_OS_LINUX) {
+            getLogger().debug("Attempting to use native transport if available.");
+
+            if (Epoll.isAvailable() /*|| SystemUtils.IS_OS_LINUX*/) {
                 bossGroup = new EpollEventLoopGroup();
                 workerGroup = new EpollEventLoopGroup();
 
@@ -313,7 +333,8 @@ public class Server implements Runnable {
                 getLogger().info(ColorCode.GOLD + "OS IS LINUX! USING EPOLL TRANSPORT");
             }
 
-            if (SystemUtils.IS_OS_MAC_OSX || SystemUtils.IS_OS_FREE_BSD || SystemUtils.IS_OS_NET_BSD || SystemUtils.IS_OS_OPEN_BSD) {
+
+            if (KQueue.isAvailable() /*|| SystemUtils.IS_OS_MAC_OSX || SystemUtils.IS_OS_FREE_BSD || SystemUtils.IS_OS_NET_BSD || SystemUtils.IS_OS_OPEN_BSD*/) {
                 bossGroup = new KQueueEventLoopGroup();
                 workerGroup = new KQueueEventLoopGroup();
 

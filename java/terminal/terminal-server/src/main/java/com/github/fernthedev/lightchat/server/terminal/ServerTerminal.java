@@ -7,15 +7,14 @@ import com.github.fernthedev.fernutils.thread.ThreadUtils;
 import com.github.fernthedev.light.LightManager;
 import com.github.fernthedev.light.exceptions.NoPi4JLibsFoundException;
 import com.github.fernthedev.lightchat.core.StaticHandler;
+import com.github.fernthedev.lightchat.server.security.AuthenticationManager;
 import com.github.fernthedev.lightchat.server.Console;
 import com.github.fernthedev.lightchat.server.SenderInterface;
 import com.github.fernthedev.lightchat.server.Server;
 import com.github.fernthedev.lightchat.server.settings.ServerSettings;
-import com.github.fernthedev.lightchat.server.terminal.backend.AuthenticationManager;
 import com.github.fernthedev.lightchat.server.terminal.backend.AutoCompleteHandler;
-import com.github.fernthedev.lightchat.server.terminal.backend.BanManager;
 import com.github.fernthedev.lightchat.server.terminal.backend.TabCompleteFinder;
-import com.github.fernthedev.lightchat.server.terminal.command.AuthCommand;
+import com.github.fernthedev.lightchat.server.terminal.command.AuthTerminalHandler;
 import com.github.fernthedev.lightchat.server.terminal.command.Command;
 import com.github.fernthedev.lightchat.server.terminal.command.LightCommand;
 import com.github.fernthedev.lightchat.server.terminal.command.SettingsCommand;
@@ -31,6 +30,7 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ServerTerminal {
 
@@ -42,8 +42,7 @@ public class ServerTerminal {
 
     protected static Server server;
 
-    @Getter
-    private static BanManager banManager = new BanManager();
+
 
     @Getter
     private static CommandMessageParser commandMessageParser;
@@ -154,7 +153,7 @@ public class ServerTerminal {
         }, server.getExecutorService());
 
         if (terminalSettings.isAllowChangePassword())
-            registerCommand(new AuthCommand("changepassword", server));
+            registerCommand(new AuthTerminalHandler("changepassword", server));
 
         autoCompleteHandler = new TabCompleteFinder(server);
 
@@ -169,7 +168,7 @@ public class ServerTerminal {
                             LightManager.init();
                             registerCommand(new LightCommand(server));
                         } catch (IllegalArgumentException | ExceptionInInitializerError | NoPi4JLibsFoundException e) {
-                            logger.error("Unable to load Pi4J Libraries. To load stacktrace, add -debug flag. Message: {}", e.getMessage());
+                            logger.error("Unable to load Pi4J Libraries. To show stacktrace, add -debug flag. Message: {}", e.getMessage());
                             if (StaticHandler.isDebug()) {
                                 e.printStackTrace();
                                 registerCommand(new LightCommand(server));
@@ -187,8 +186,19 @@ public class ServerTerminal {
 
     public static void startBind() {
         new Thread(() -> {
+
+            // Run on startup
+            server.getStartupLock().thenRunAsync(() -> {
+                try {
+                    if (!server.bind().await(15, TimeUnit.SECONDS)) server.getLogger().error("Unable to bind port. Took longer than 15 seconds");
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    e.printStackTrace();
+                }
+            });
+
             server.run();
-            server.bind();
+
         }, "ServerMainStartupThread").start();
     }
 
@@ -206,7 +216,7 @@ public class ServerTerminal {
     }
 
     public static void broadcast(String message) {
-        Server.getLogger().info(message);
+        server.getLogger().info(message);
         server.sendObjectToAllPlayers(new MessagePacket(message));
     }
 

@@ -1,7 +1,9 @@
 package com.github.fernthedev.lightchat.server;
 
 import com.github.fernthedev.lightchat.core.packets.Packet;
+import io.netty.channel.ChannelFuture;
 import lombok.AllArgsConstructor;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 
@@ -11,8 +13,11 @@ public class Console implements SenderInterface, Serializable {
 
     private static final long serialVersionUID = -7832219582908962549L;
 
+    @Nullable
     @Override
-    public void sendPacket(Packet packet) { }
+    public ChannelFuture sendPacket(Packet packet) {
+        return null;
+    }
 
     @Override
     public String getName() {

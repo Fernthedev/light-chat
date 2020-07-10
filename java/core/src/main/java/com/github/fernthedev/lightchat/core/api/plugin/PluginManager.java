@@ -47,7 +47,7 @@ public class PluginManager {
             try {
                 registration.callEvent(event);
             } catch (Exception ex) {
-                StaticHandler.getCore().getLogger().error("Could not pass com.github.fernthedev.client.event " + event.getEventName() + " to ", ex);
+                StaticHandler.getCore().getLogger().error("Could not pass event " + event.getEventName() + " to ", ex);
             }
         }
     }

@@ -1,19 +1,29 @@
 package com.github.fernthedev.lightchat.server.terminal;
 
 
+import com.github.fernthedev.lightchat.core.ColorCode;
+import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.core.api.APIUsage;
+import com.github.fernthedev.lightchat.core.packets.IllegalConnectionPacket;
+import com.github.fernthedev.lightchat.core.packets.SelfMessagePacket;
+import com.github.fernthedev.lightchat.core.packets.handshake.ConnectedPacket;
+import com.github.fernthedev.lightchat.core.packets.handshake.InitialHandshakePacket;
+import com.github.fernthedev.lightchat.core.packets.handshake.KeyResponsePacket;
+import com.github.fernthedev.lightchat.core.packets.handshake.RequestConnectInfoPacket;
+import com.github.fernthedev.lightchat.core.packets.latency.PingPacket;
+import com.github.fernthedev.lightchat.core.packets.latency.PingReceive;
+import com.github.fernthedev.lightchat.core.packets.latency.PongPacket;
 import com.github.fernthedev.lightchat.server.ClientConnection;
 import com.github.fernthedev.lightchat.server.Console;
 import com.github.fernthedev.lightchat.server.SenderInterface;
 import com.github.fernthedev.lightchat.server.Server;
-import com.github.fernthedev.lightchat.server.terminal.backend.BannedData;
 import com.github.fernthedev.lightchat.server.terminal.command.Command;
 import com.github.fernthedev.lightchat.server.terminal.command.KickCommand;
 import com.github.fernthedev.lightchat.server.terminal.events.ChatEvent;
 import com.github.fernthedev.terminal.core.packets.MessagePacket;
 import lombok.NonNull;
+import lombok.SneakyThrows;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -26,7 +36,7 @@ public class ServerCommandHandler {
     public ServerCommandHandler(Server server) {
         this.server = server;
 
-        Server.getLogger().info("CommandHandler created");
+        server.getLogger().info("CommandHandler created");
         registerCommands();
     }
 
@@ -158,6 +168,38 @@ public class ServerCommandHandler {
 
         }).setUsage("Lists all players with ip, id and name");
 
+        if (StaticHandler.isDebug()) {
+            ServerTerminal.registerCommand(new Command("testpackets") {
+                @SneakyThrows
+                @Override
+                public void onCommand(SenderInterface sender, String[] args) {
+                    if (sender instanceof ClientConnection) {
+                        ClientConnection clientConnection = (ClientConnection) sender;
+                        sender.sendPacket(new MessagePacket("test"));
+
+                        sender.sendPacket(new PingPacket());
+                        sender.sendPacket(new PingReceive());
+                        sender.sendPacket(new PongPacket());
+
+
+                        if (clientConnection.getTempKeyPair() != null) {
+                            sender.sendPacket(new InitialHandshakePacket(clientConnection.getTempKeyPair().getPublic(), clientConnection.getVersionData()));
+                            sender.sendPacket(new KeyResponsePacket(clientConnection.getSecretKey(), clientConnection.getTempKeyPair().getPublic()));
+                        }
+
+                        sender.sendPacket(new RequestConnectInfoPacket());
+                        sender.sendPacket(new ConnectedPacket(clientConnection.getName(), clientConnection.getOs(), clientConnection.getVersionData(), clientConnection.getLangFramework()));
+
+
+                        for (SelfMessagePacket.MessageType messageType : SelfMessagePacket.MessageType.values()) {
+                            sender.sendPacket(new SelfMessagePacket(messageType));
+                        }
+                        sender.sendPacket(new IllegalConnectionPacket("test packet"));
+                    }
+                }
+            });
+        }
+
         ServerTerminal.registerCommand(new KickCommand("kick", server));
 
         ServerTerminal.registerCommand(new Command("ban") {
@@ -165,34 +207,51 @@ public class ServerCommandHandler {
             public void onCommand(SenderInterface sender, String[] args) {
                 if (sender instanceof Console) {
 
-                    if (args.length == 0) {
+                    if (args.length <= 1) {
                         ServerTerminal.sendMessage(sender, "No player to kick or type? (ban {type} {player}) \n types: name,ip");
                     } else {
-                        final String[] argName = {""};
-                        Arrays.stream(args).forEachOrdered(s -> argName[0] += s);
 
-                        for (ClientConnection clientConnection : new HashMap<>(server.getPlayerHandler().getChannelMap()).values()) {
-                            if (clientConnection.getName().equals(argName[0])) {
+                        StringBuilder message = new StringBuilder();
 
+                        int index = 0;
 
-                                StringBuilder message = new StringBuilder();
+                        for (String messageCheck : args) {
+                            index++;
+                            if (index >= 2) {
+                                message.append(messageCheck);
+                            }
+                        }
 
-                                int index = 0;
+                        switch (args[0].toLowerCase()) {
+                            case "name":
+                                for (ClientConnection clientConnection : new HashMap<>(server.getPlayerHandler().getChannelMap()).values()) {
+                                    if (clientConnection.getName().equals(args[1])) {
+                                        clientConnection.sendObject(new MessagePacket("Banned: " + message));
+                                        clientConnection.close();
 
-                                for (String messageCheck : args) {
-                                    index++;
-                                    if (index <= 1) {
-                                        message.append(messageCheck);
+                                        server.getBanManager().ban(clientConnection.getAddress());
+
+                                        break;
+                                    }
+                                }
+                                break;
+
+                            case "ip":
+                                for (ClientConnection clientConnection : new HashMap<>(server.getPlayerHandler().getChannelMap()).values()) {
+                                    if (clientConnection.getAddress().equals(args[1])) {
+                                        clientConnection.sendObject(new MessagePacket("Banned: " + message));
+                                        clientConnection.close();
                                     }
                                 }
 
-                                ServerTerminal.getBanManager().addBan(clientConnection, new BannedData(clientConnection.getAddress()));
-
-                                clientConnection.sendObject(new MessagePacket("Banned: " + message));
-                                clientConnection.close();
+                                server.getBanManager().ban(args[1]);
                                 break;
-                            }
+                            default:
+                                ServerTerminal.sendMessage(sender, "Unknown argument " + args[0]);
+                                return;
                         }
+
+                        ServerTerminal.sendMessage(sender, ColorCode.GREEN + "Banned " + args[1]);
                     }
 
                 } else ServerTerminal.sendMessage(sender, "You don't have permission for this");

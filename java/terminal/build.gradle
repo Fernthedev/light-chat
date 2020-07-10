@@ -19,6 +19,8 @@ subprojects {
         compile 'org.fusesource.jansi:jansi:1.18'
     }
 
+
+
     jar.classifier = 'old'
     shadowJar {
         project.configurations.implementation.canBeResolved = true

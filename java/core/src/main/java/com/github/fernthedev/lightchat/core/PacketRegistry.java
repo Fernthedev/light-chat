@@ -14,6 +14,10 @@ public class PacketRegistry {
 
     private static final Map<String, Class<? extends Packet>> PACKET_REGISTRY = Collections.synchronizedMap(new HashMap<>());
 
+    public static Map<String, Class<? extends Packet>> getPacketRegistryCopy() {
+        return new HashMap<>(PACKET_REGISTRY);
+    }
+
     public static Class<? extends Packet> getPacketClassFromRegistry(String name) {
         if (!PACKET_REGISTRY.containsKey(name)) throw new PacketNotInRegistryException("The packet registry does not contain packet \"" + name + "\" in the registry. Make sure it is spelled correctly and is case-sensitive.");
 
