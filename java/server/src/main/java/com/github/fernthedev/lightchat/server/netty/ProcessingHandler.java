@@ -134,6 +134,8 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 
         if (channel != null) {
 
+            server.getLogger().debug("Channel active {}", channel.remoteAddress().toString());
+
             UUID uuid = UUID.randomUUID();
 
             // Prevent duplicate UUIDs
@@ -147,6 +149,7 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 
             server.getPlayerHandler().getChannelMap().put(channel, clientConnection);
 
+            server.getLogger().debug("Awaiting RSA key generation for packet registration");
             clientConnection.onKeyGenerate(() -> {
                 clientConnection.sendObject(new InitialHandshakePacket(clientConnection.getTempKeyPair().getPublic(), StaticHandler.getVERSION_DATA()), false);
 
@@ -162,10 +165,11 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 
     protected boolean validateIsBanned(ChannelHandlerContext ctx) {
         if (ctx.channel().remoteAddress() instanceof InetSocketAddress) {
-
             InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
 
             if (server.getBanManager().isBanned(address.getAddress().getHostAddress())) {
+
+                server.getLogger().debug("Closing connection because it is banned for {}", address.toString());
                 close(ctx.channel());
 
                 return true;

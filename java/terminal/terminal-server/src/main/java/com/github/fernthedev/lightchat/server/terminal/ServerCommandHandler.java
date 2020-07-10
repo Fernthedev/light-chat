@@ -2,7 +2,17 @@ package com.github.fernthedev.lightchat.server.terminal;
 
 
 import com.github.fernthedev.lightchat.core.ColorCode;
+import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.core.api.APIUsage;
+import com.github.fernthedev.lightchat.core.packets.IllegalConnectionPacket;
+import com.github.fernthedev.lightchat.core.packets.SelfMessagePacket;
+import com.github.fernthedev.lightchat.core.packets.handshake.ConnectedPacket;
+import com.github.fernthedev.lightchat.core.packets.handshake.InitialHandshakePacket;
+import com.github.fernthedev.lightchat.core.packets.handshake.KeyResponsePacket;
+import com.github.fernthedev.lightchat.core.packets.handshake.RequestConnectInfoPacket;
+import com.github.fernthedev.lightchat.core.packets.latency.PingPacket;
+import com.github.fernthedev.lightchat.core.packets.latency.PingReceive;
+import com.github.fernthedev.lightchat.core.packets.latency.PongPacket;
 import com.github.fernthedev.lightchat.server.ClientConnection;
 import com.github.fernthedev.lightchat.server.Console;
 import com.github.fernthedev.lightchat.server.SenderInterface;
@@ -12,6 +22,7 @@ import com.github.fernthedev.lightchat.server.terminal.command.KickCommand;
 import com.github.fernthedev.lightchat.server.terminal.events.ChatEvent;
 import com.github.fernthedev.terminal.core.packets.MessagePacket;
 import lombok.NonNull;
+import lombok.SneakyThrows;
 
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
@@ -156,6 +167,38 @@ public class ServerCommandHandler {
             }
 
         }).setUsage("Lists all players with ip, id and name");
+
+        if (StaticHandler.isDebug()) {
+            ServerTerminal.registerCommand(new Command("testpackets") {
+                @SneakyThrows
+                @Override
+                public void onCommand(SenderInterface sender, String[] args) {
+                    if (sender instanceof ClientConnection) {
+                        ClientConnection clientConnection = (ClientConnection) sender;
+                        sender.sendPacket(new MessagePacket("test"));
+
+                        sender.sendPacket(new PingPacket());
+                        sender.sendPacket(new PingReceive());
+                        sender.sendPacket(new PongPacket());
+
+
+                        if (clientConnection.getTempKeyPair() != null) {
+                            sender.sendPacket(new InitialHandshakePacket(clientConnection.getTempKeyPair().getPublic(), clientConnection.getVersionData()));
+                            sender.sendPacket(new KeyResponsePacket(clientConnection.getSecretKey(), clientConnection.getTempKeyPair().getPublic()));
+                        }
+
+                        sender.sendPacket(new RequestConnectInfoPacket());
+                        sender.sendPacket(new ConnectedPacket(clientConnection.getName(), clientConnection.getOs(), clientConnection.getVersionData(), clientConnection.getLangFramework()));
+
+
+                        for (SelfMessagePacket.MessageType messageType : SelfMessagePacket.MessageType.values()) {
+                            sender.sendPacket(new SelfMessagePacket(messageType));
+                        }
+                        sender.sendPacket(new IllegalConnectionPacket("test packet"));
+                    }
+                }
+            });
+        }
 
         ServerTerminal.registerCommand(new KickCommand("kick", server));
 

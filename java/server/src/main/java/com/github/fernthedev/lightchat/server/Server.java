@@ -13,18 +13,20 @@ import com.github.fernthedev.lightchat.core.encryption.codecs.general.gson.Encry
 import com.github.fernthedev.lightchat.core.packets.Packet;
 import com.github.fernthedev.lightchat.core.packets.SelfMessagePacket;
 import com.github.fernthedev.lightchat.server.api.IPacketHandler;
-import com.github.fernthedev.lightchat.server.security.AuthenticationManager;
-import com.github.fernthedev.lightchat.server.security.BanManager;
 import com.github.fernthedev.lightchat.server.event.ServerShutdownEvent;
 import com.github.fernthedev.lightchat.server.event.ServerStartupEvent;
 import com.github.fernthedev.lightchat.server.netty.MulticastServer;
 import com.github.fernthedev.lightchat.server.netty.ProcessingHandler;
+import com.github.fernthedev.lightchat.server.security.AuthenticationManager;
+import com.github.fernthedev.lightchat.server.security.BanManager;
 import com.github.fernthedev.lightchat.server.settings.NoFileConfig;
 import com.github.fernthedev.lightchat.server.settings.ServerSettings;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
+import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
+import io.netty.channel.kqueue.KQueue;
 import io.netty.channel.kqueue.KQueueEventLoopGroup;
 import io.netty.channel.kqueue.KQueueServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -34,7 +36,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.Synchronized;
-import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -288,7 +289,8 @@ public class Server implements Runnable {
 
             logger.info("Finished initializing. Took {}ms", stopWatch.getTime(TimeUnit.MILLISECONDS));
 
-            getPluginManager().callEvent(new ServerStartupEvent(true));
+            ThreadUtils.runAsync(() -> getPluginManager().callEvent(new ServerStartupEvent(true)), executorService);
+
 
             startupLock.complete(null);
         }
@@ -321,7 +323,9 @@ public class Server implements Runnable {
         Class<? extends ServerChannel> channelClass = NioServerSocketChannel.class;
 
         if (settingsManager.getConfigData().isUseNativeTransport()) {
-            if (SystemUtils.IS_OS_LINUX) {
+            getLogger().debug("Attempting to use native transport if available.");
+
+            if (Epoll.isAvailable() /*|| SystemUtils.IS_OS_LINUX*/) {
                 bossGroup = new EpollEventLoopGroup();
                 workerGroup = new EpollEventLoopGroup();
 
@@ -329,7 +333,8 @@ public class Server implements Runnable {
                 getLogger().info(ColorCode.GOLD + "OS IS LINUX! USING EPOLL TRANSPORT");
             }
 
-            if (SystemUtils.IS_OS_MAC_OSX || SystemUtils.IS_OS_FREE_BSD || SystemUtils.IS_OS_NET_BSD || SystemUtils.IS_OS_OPEN_BSD) {
+
+            if (KQueue.isAvailable() /*|| SystemUtils.IS_OS_MAC_OSX || SystemUtils.IS_OS_FREE_BSD || SystemUtils.IS_OS_NET_BSD || SystemUtils.IS_OS_OPEN_BSD*/) {
                 bossGroup = new KQueueEventLoopGroup();
                 workerGroup = new KQueueEventLoopGroup();
 

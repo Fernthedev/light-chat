@@ -90,5 +90,6 @@ public class ConsoleHandler extends SimpleTerminalConsole {
     @Override
     protected void shutdown() {
         StaticHandler.getCore().shutdown();
+        System.exit(0);
     }
 }

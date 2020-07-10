@@ -23,11 +23,9 @@ import java.net.InetSocketAddress;
 import java.security.KeyPair;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * Handles client data
@@ -101,20 +99,35 @@ public class ClientConnection implements SenderInterface, AutoCloseable {
 
     public void onKeyGenerate(Runnable runnable) {
         new Thread(() -> {
-            long timeWhenEnding = System.nanoTime() + TimeUnit.SECONDS.toNanos(30);
-            while (!keyFuture.isDone() && timeWhenEnding - System.nanoTime() > 0) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
+//            long timeWhenEnding = System.nanoTime() + TimeUnit.SECONDS.toNanos(30);
+
+            try {
+                keyFuture.get(30, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (TimeoutException e) {
+                server.getLogger().error("Took too long to create RSA encryption keys. Is the CPU too slow?");
+
+                if (StaticHandler.isDebug())
                     e.printStackTrace();
-                    Thread.currentThread().interrupt();
-                }
             }
+
+//            while (!keyFuture.isDone() && timeWhenEnding - System.nanoTime() > 0) {
+//                try {
+//                    Thread.sleep(1000);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                    Thread.currentThread().interrupt();
+//                }
+//            }
 
             if (keyFuture.isDone()) {
                 runnable.run();
             }
-        }, "AwaitKeysThread-" + deviceName).start();
+        }, "AwaitKeysThread-" + deviceName + " " + new Random().nextInt(100)).start();
     }
 
     public ClientConnection(Server server, Channel channel, UUID uuid) {
@@ -130,9 +143,9 @@ public class ClientConnection implements SenderInterface, AutoCloseable {
 ////            }
 ////        });
 
-        ExecutorService executorService = Executors.newCachedThreadPool();
 
-        this.keyFuture = executorService.submit(() -> tempKeyPair = RSAEncryptionUtil.generateKeyPairs());
+
+        this.keyFuture = server.getExecutorService().submit(() -> tempKeyPair = RSAEncryptionUtil.generateKeyPairs());
 
         eventListener = new EventListener(server, this);
     }
@@ -248,9 +261,10 @@ public class ClientConnection implements SenderInterface, AutoCloseable {
         sendObject(new PingPacket(),false);
     }
 
+    @NonNull
     @Override
-    public void sendPacket(Packet packet) {
-        sendObject(packet);
+    public ChannelFuture sendPacket(Packet packet) {
+        return sendObject(packet);
     }
 
     @Override

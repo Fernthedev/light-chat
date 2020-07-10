@@ -30,6 +30,7 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ServerTerminal {
 
@@ -167,7 +168,7 @@ public class ServerTerminal {
                             LightManager.init();
                             registerCommand(new LightCommand(server));
                         } catch (IllegalArgumentException | ExceptionInInitializerError | NoPi4JLibsFoundException e) {
-                            logger.error("Unable to load Pi4J Libraries. To load stacktrace, add -debug flag. Message: {}", e.getMessage());
+                            logger.error("Unable to load Pi4J Libraries. To show stacktrace, add -debug flag. Message: {}", e.getMessage());
                             if (StaticHandler.isDebug()) {
                                 e.printStackTrace();
                                 registerCommand(new LightCommand(server));
@@ -185,8 +186,16 @@ public class ServerTerminal {
 
     public static void startBind() {
         new Thread(() -> {
+
             // Run on startup
-            server.getStartupLock().thenRunAsync(() -> server.bind());
+            server.getStartupLock().thenRunAsync(() -> {
+                try {
+                    if (!server.bind().await(15, TimeUnit.SECONDS)) server.getLogger().error("Unable to bind port. Took longer than 15 seconds");
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    e.printStackTrace();
+                }
+            });
 
             server.run();
 

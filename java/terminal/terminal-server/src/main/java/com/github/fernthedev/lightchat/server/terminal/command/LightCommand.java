@@ -81,15 +81,14 @@ public class LightCommand extends Command implements TabExecutor {
                 ServerTerminal.sendMessage(sender, "Unable to authorize command.");
             }
         }else{
-            ServerTerminal.sendMessage(sender, "Incorrect usage. Arguments: off, on, readfile, readfolder");
+            ServerTerminal.sendMessage(sender, "Incorrect usage. Arguments: readfile, readfolder");
         }
     }
 
     @Override
     public List<String> getCompletions(SenderInterface senderInterface, String[] args) {
         if(args.length == 0) {
-            return Arrays.asList("off",
-                    "on",
+            return Arrays.asList(
                     "readfile",
                     "readfolder");
         }
