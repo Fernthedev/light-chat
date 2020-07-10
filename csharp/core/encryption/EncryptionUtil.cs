@@ -204,7 +204,16 @@ namespace com.github.fernthedev.lightchat.core.encryption
             var octetString = (DerOctetString) Asn1Object.FromByteArray(keyParams);
 
             aesCryptoServiceProvider.IV = octetString.GetOctets();
-            aesCryptoServiceProvider.Padding = PaddingMode.PKCS7;
+
+
+            // TODO: Remove this log
+            StaticHandler.Core.Logger.Debug("Key, IV (no encode) and data: {0} {1} ({2}) {3} ({4})",
+                Convert.ToBase64String(aesCryptoServiceProvider.Key),
+                Convert.ToBase64String(keyParams),
+                Convert.ToBase64String(octetString.GetOctets()),
+                string.Join(',', cipherText),
+                Convert.ToBase64String(cipherText)
+            );
 
             plaintext = encoding.GetString(transform.TransformFinalBlock(cipherText, 0, cipherText.Length));
 

@@ -1,6 +1,7 @@
 ﻿using com.github.fernthedev.lightchat.core.packets;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -81,6 +82,11 @@ namespace com.github.fernthedev.lightchat.client
                     }
 
                     var secretKey = EncryptionUtil.generateAESProvider();
+
+                    // TODO: Remove this debug
+                    string debug = "Using key " + string.Join( ",", secretKey.Key) + " base64:" + Convert.ToBase64String(secretKey.Key);
+                    StaticHandler.Core.Logger.Debug(debug);
+
                     lightClient.setSecretKey(secretKey);
 
 

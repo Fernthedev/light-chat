@@ -92,8 +92,6 @@ class LoginFormState extends State<LoginForm> {
     }
   }
 
-
-
   String _ip = "192.168.0.17";
   int _port = 2000;
   String _password = "";
@@ -111,8 +109,11 @@ class LoginFormState extends State<LoginForm> {
 
     ServerData serverData = ServerData(_ip, _port, _password);
 
-    Main.client = Client(ConnectedPacket.create(await Main.getDeviceName(),
-        Platform.operatingSystem, Variables.versionData));
+    Main.client = Client(ConnectedPacket.create(
+        await Main.getDeviceName(),
+        Platform.operatingSystem,
+        Variables.versionData,
+        "Flutter ${Variables.defaultLangFramework}"));
     try {
       Main.client.onError((e) => {
             setState(() {
@@ -160,10 +161,7 @@ class LoginFormState extends State<LoginForm> {
     if (ModalRoute.of(context) != null) {
       // Extract the arguments from the current ModalRoute settings and cast
       // them as ScreenArguments.
-      final ServerData args = ModalRoute
-          .of(context)
-          .settings
-          .arguments;
+      final ServerData args = ModalRoute.of(context).settings.arguments;
 
       setState(() {
         _ip = args.ip;
@@ -206,7 +204,7 @@ class LoginFormState extends State<LoginForm> {
         return null;
       },
       keyboardType:
-      TextInputType.numberWithOptions(signed: false, decimal: true),
+          TextInputType.numberWithOptions(signed: false, decimal: true),
       autocorrect: false,
     );
 
@@ -293,11 +291,11 @@ class LoginFormState extends State<LoginForm> {
       },
       itemBuilder: (BuildContext context) =>
           buttonKeys.map<PopupMenuItem<String>>((String value) {
-            return PopupMenuItem<String>(
-              value: value,
-              child: Text(value),
-            );
-          }).toList(),
+        return PopupMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
       //icon: Icon(Icons.)
     );
 
@@ -306,9 +304,9 @@ class LoginFormState extends State<LoginForm> {
 
     return MaterialApp(
 
-      // Provide a function to handle named routes. Use this function to
-      // identify the named route being pushed and create the correct
-      // Screen.
+        // Provide a function to handle named routes. Use this function to
+        // identify the named route being pushed and create the correct
+        // Screen.
         onGenerateRoute: (settings) {
           // If you push the PassArguments route
           if (settings.name == ServerPage.routeName) {
@@ -337,34 +335,30 @@ class LoginFormState extends State<LoginForm> {
                 popupMenuButton,
               ],
             ),
-            body: Stack(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Form(
-                      key: formKey,
-                      child: ListView(
-                        children: [
-                          SizedBox(height: 10.0),
-                          ipField,
-                          SizedBox(height: 12.0),
-                          portField,
-                          SizedBox(height: 12.0),
-                          passwordField,
-                          SizedBox(height: 12.0),
-                          connectButton,
-                        ],
-                      ),
-                    ),
+            body: Stack(children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: formKey,
+                  child: ListView(
+                    children: [
+                      SizedBox(height: 10.0),
+                      ipField,
+                      SizedBox(height: 12.0),
+                      portField,
+                      SizedBox(height: 12.0),
+                      passwordField,
+                      SizedBox(height: 12.0),
+                      connectButton,
+                    ],
                   ),
-                  Align(
-                    child: _animationVisibility,
-                    alignment: FractionalOffset.center,
-                  )
-                ]
-            )
-        )
-    );
+                ),
+              ),
+              Align(
+                child: _animationVisibility,
+                alignment: FractionalOffset.center,
+              )
+            ])));
   }
 
   void setServerState(ServerData serverData) {
