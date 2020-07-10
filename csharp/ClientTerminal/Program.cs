@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using System.Threading;
-using System.Threading.Tasks;
 using com.github.fernthedev.lightchat.client;
 using com.github.fernthedev.lightchat.core;
 
