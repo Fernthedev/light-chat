@@ -18,7 +18,7 @@ import java.util.List;
 public class CommandMessageParser implements Listener {
 
     @NonNull
-    private Server server;
+    private final Server server;
 
     public void onCommand(ChatEvent e) {
         SenderInterface sender = e.getSender();
@@ -83,7 +83,7 @@ public class CommandMessageParser implements Listener {
             try {
 
                 if (!(sender instanceof Console))
-                    Server.getLogger().info("[{}] /{}", sender.getName(), command);
+                    server.getLogger().info("[{}] /{}", sender.getName(), command);
 
                 for (Command serverCommand : ServerTerminal.getCommands()) {
                     if (serverCommand.getName().equalsIgnoreCase(mainCommand)) {
@@ -100,7 +100,7 @@ public class CommandMessageParser implements Listener {
             } catch (InvalidCommandArgumentException e) {
                 ServerTerminal.sendMessage(sender, ColorCode.RED + "Error: " + e.getMessage());
             } catch (Exception e) {
-                Server.getLogger().error(e.getMessage(), e);
+                server.getLogger().error(e.getMessage(), e);
                 ServerTerminal.sendMessage(sender, ColorCode.RED + "Command exception occurred. Error: " + e.getMessage());
             }
 

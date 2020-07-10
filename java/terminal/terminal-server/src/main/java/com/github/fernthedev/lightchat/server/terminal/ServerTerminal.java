@@ -7,15 +7,14 @@ import com.github.fernthedev.fernutils.thread.ThreadUtils;
 import com.github.fernthedev.light.LightManager;
 import com.github.fernthedev.light.exceptions.NoPi4JLibsFoundException;
 import com.github.fernthedev.lightchat.core.StaticHandler;
+import com.github.fernthedev.lightchat.server.security.AuthenticationManager;
 import com.github.fernthedev.lightchat.server.Console;
 import com.github.fernthedev.lightchat.server.SenderInterface;
 import com.github.fernthedev.lightchat.server.Server;
 import com.github.fernthedev.lightchat.server.settings.ServerSettings;
-import com.github.fernthedev.lightchat.server.terminal.backend.AuthenticationManager;
 import com.github.fernthedev.lightchat.server.terminal.backend.AutoCompleteHandler;
-import com.github.fernthedev.lightchat.server.terminal.backend.BanManager;
 import com.github.fernthedev.lightchat.server.terminal.backend.TabCompleteFinder;
-import com.github.fernthedev.lightchat.server.terminal.command.AuthCommand;
+import com.github.fernthedev.lightchat.server.terminal.command.AuthTerminalHandler;
 import com.github.fernthedev.lightchat.server.terminal.command.Command;
 import com.github.fernthedev.lightchat.server.terminal.command.LightCommand;
 import com.github.fernthedev.lightchat.server.terminal.command.SettingsCommand;
@@ -42,8 +41,7 @@ public class ServerTerminal {
 
     protected static Server server;
 
-    @Getter
-    private static BanManager banManager = new BanManager();
+
 
     @Getter
     private static CommandMessageParser commandMessageParser;
@@ -154,7 +152,7 @@ public class ServerTerminal {
         }, server.getExecutorService());
 
         if (terminalSettings.isAllowChangePassword())
-            registerCommand(new AuthCommand("changepassword", server));
+            registerCommand(new AuthTerminalHandler("changepassword", server));
 
         autoCompleteHandler = new TabCompleteFinder(server);
 
@@ -187,8 +185,11 @@ public class ServerTerminal {
 
     public static void startBind() {
         new Thread(() -> {
+            // Run on startup
+            server.getStartupLock().thenRunAsync(() -> server.bind());
+
             server.run();
-            server.bind();
+
         }, "ServerMainStartupThread").start();
     }
 
@@ -206,7 +207,7 @@ public class ServerTerminal {
     }
 
     public static void broadcast(String message) {
-        Server.getLogger().info(message);
+        server.getLogger().info(message);
         server.sendObjectToAllPlayers(new MessagePacket(message));
     }
 

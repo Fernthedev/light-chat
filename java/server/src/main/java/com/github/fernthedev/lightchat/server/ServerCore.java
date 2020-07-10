@@ -17,7 +17,7 @@ public class ServerCore implements Core {
 
     @Override
     public Logger getLogger() {
-        return Server.getLogger();
+        return server.getLogger();
     }
 
     @Override

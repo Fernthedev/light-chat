@@ -15,6 +15,7 @@ import io.netty.util.ReferenceCountUtil;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.UUID;
 
 @ChannelHandler.Sharable
@@ -26,18 +27,24 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         this.server = server;
     }
 
+    /**
+     * Calls {@link ChannelHandlerContext#fireChannelRegistered()} to forward
+     * to the next {@link ChannelInboundHandler} in the {@link ChannelPipeline}.
+     * <p>
+     * Sub-classes may override this method to change behavior.
+     *
+     * @param ctx
+     */
+    @Override
+    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+        if (validateIsBanned(ctx)) return;
+
+        super.channelRegistered(ctx);
+    }
+
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        ClientConnection clientConnection = server.getPlayerHandler().getChannelMap().get(ctx.channel());
-
-        if (clientConnection == null) return;
-
-        if (server.getPlayerHandler().getUuidMap().containsValue(clientConnection) && ctx.isRemoved()) {
-
-
-            server.getPlayerHandler().getUuidMap().remove(clientConnection.getUuid());
-            clientConnection.close();
-        }
+        close(ctx.channel());
 
         super.channelInactive(ctx);
         //clientConnection.close();
@@ -54,9 +61,10 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        if (validateIsBanned(ctx)) return;
 
         if (cause instanceof IOException || cause.getCause() instanceof IOException) {
-            Server.getLogger().info("The channel {} has been closed from the client side.", ctx.channel());
+            server.getLogger().info("The channel {} has been closed from the client side.", ctx.channel());
 
             ClientConnection clientConnection = server.getPlayerHandler().getChannelMap().get(ctx.channel());
 
@@ -78,6 +86,7 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        if (validateIsBanned(ctx)) return;
 
         try {
 
@@ -108,6 +117,8 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        if (validateIsBanned(ctx)) return;
+
         ctx.flush();
         ctx.fireChannelReadComplete();
         super.channelReadComplete(ctx);
@@ -116,9 +127,13 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         // Server.getLogger().info("Channel Registering");
+
+        if (validateIsBanned(ctx)) return;
+
         Channel channel = ctx.channel();
 
         if (channel != null) {
+
             UUID uuid = UUID.randomUUID();
 
             // Prevent duplicate UUIDs
@@ -135,14 +150,52 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
             clientConnection.onKeyGenerate(() -> {
                 clientConnection.sendObject(new InitialHandshakePacket(clientConnection.getTempKeyPair().getPublic(), StaticHandler.getVERSION_DATA()), false);
 
-                Server.getLogger().info("[{}] established", clientConnection.getAddress());
+                server.getLogger().info("[{}] established", clientConnection.getAddress());
             });
         } else {
-            Server.getLogger().info("Channel is null");
+            server.getLogger().info("Channel is null");
             throw new NullPointerException();
         }
 
         super.channelActive(ctx);
+    }
+
+    protected boolean validateIsBanned(ChannelHandlerContext ctx) {
+        if (ctx.channel().remoteAddress() instanceof InetSocketAddress) {
+
+            InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
+
+            if (server.getBanManager().isBanned(address.getAddress().getHostAddress())) {
+                close(ctx.channel());
+
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    protected void close(Channel channel) {
+
+        ClientConnection clientConnection = server.getPlayerHandler().getChannelMap().get(channel);
+
+        if (clientConnection == null) {
+            channel.close();
+
+            return;
+        }
+
+        if (server.getPlayerHandler().getUuidMap().containsValue(clientConnection)) {
+            server.getPlayerHandler().getUuidMap().remove(clientConnection.getUuid());
+        }
+
+        if (server.getPlayerHandler().getChannelMap().containsValue(clientConnection)) {
+            server.getPlayerHandler().getChannelMap().remove(clientConnection.getChannel());
+        }
+
+        clientConnection.close();
     }
 
 }

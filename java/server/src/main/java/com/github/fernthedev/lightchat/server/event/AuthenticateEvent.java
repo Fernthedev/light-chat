@@ -3,7 +3,7 @@ package com.github.fernthedev.lightchat.server.event;
 import com.github.fernthedev.lightchat.core.api.event.api.Cancellable;
 import com.github.fernthedev.lightchat.core.api.event.api.Event;
 import com.github.fernthedev.lightchat.core.api.event.api.HandlerList;
-import com.github.fernthedev.lightchat.server.ClientConnection;
+import com.github.fernthedev.lightchat.server.security.AuthenticationManager;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -11,16 +11,16 @@ import lombok.RequiredArgsConstructor;
  * Called when client has successfully established a secure and valid connection
  */
 @RequiredArgsConstructor
-public class PlayerDisconnectEvent extends Event implements Cancellable {
+public class AuthenticateEvent extends Event implements Cancellable {
     private boolean cancel = false;
     private static final HandlerList handlers = new HandlerList();
 
     @Getter
-    private final ClientConnection disconnectedPlayer;
+    private final AuthenticationManager.PlayerInfo playerInfo;
 
-    public PlayerDisconnectEvent(ClientConnection disconnectedPlayer, boolean async) {
+    public AuthenticateEvent(AuthenticationManager.PlayerInfo playerInfo, boolean async) {
         super(async);
-        this.disconnectedPlayer = disconnectedPlayer;
+        this.playerInfo = playerInfo;
     }
 
 

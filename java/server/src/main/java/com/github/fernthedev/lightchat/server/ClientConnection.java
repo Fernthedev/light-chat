@@ -201,7 +201,7 @@ public class ClientConnection implements SenderInterface, AutoCloseable {
     public void close() {
 
         //DISCONNECT FROM SERVER
-        Server.getLogger().info("Closing player {}", this);
+        server.getLogger().info("Closing player {}", this);
 
         if (channel != null) {
 
