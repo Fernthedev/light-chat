@@ -41,7 +41,7 @@ public class CommandMessageParser implements Listener {
         }
 
         if (e.isAsynchronous()) {
-            new Thread(runnable).start();
+            server.getExecutorService().submit(runnable);
         } else {
             runnable.run();
         }
