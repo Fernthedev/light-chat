@@ -20,11 +20,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="74a9c842-9768-484a-b6c1-feb6a74ad587" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/NoFileConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/util/ClassTranslator.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/security/UserIsAuthenticatingException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/terminal/terminal-client/src/main/java/com/github/fernthedev/lightchat/client/terminal/ClientTerminalSettings.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/lightchat/server/terminal/ClientExtensions.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.github/workflows/dart.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../.github/workflows/dart.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../dart/client/.vscode/launch.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../dart/client/.vscode/settings.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../dart/client/bin/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/client/bin/main.dart" afterDir="false" />
@@ -52,37 +48,8 @@
       <change beforePath="$PROJECT_DIR$/../dart/client/lib/variables.dart" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../dart/client/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/client/pubspec.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/lightchat/client/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/lightchat/client/Client.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/lightchat/client/netty/ClientHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/lightchat/client/netty/ClientHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/lightchat/client/netty/MulticastClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/github/fernthedev/lightchat/client/netty/MulticastClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/core/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/StaticHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/StaticHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/encryption/util/RSAEncryptionUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/encryption/util/RSAEncryptionUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/server/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/ClientConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/ClientConnection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/Console.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/Console.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/Server.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/netty/ProcessingHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/netty/ProcessingHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/security/AuthenticationManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/security/AuthenticationManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/settings/ServerSettings.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/github/fernthedev/lightchat/server/settings/ServerSettings.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-client/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-client/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-client/src/main/java/com/github/fernthedev/lightchat/client/terminal/ClientTerminal.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-client/src/main/java/com/github/fernthedev/lightchat/client/terminal/ClientTerminal.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-client/src/main/java/com/github/fernthedev/lightchat/client/terminal/PacketHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-client/src/main/java/com/github/fernthedev/lightchat/client/terminal/PacketHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-core/src/main/java/com/github/fernthedev/terminal/core/ConsoleHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-core/src/main/java/com/github/fernthedev/terminal/core/ConsoleHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/lightchat/server/terminal/ServerCommandHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/lightchat/server/terminal/ServerCommandHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/lightchat/server/terminal/ServerTerminal.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/lightchat/server/terminal/ServerTerminal.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/lightchat/server/terminal/ServerTerminalSettings.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/lightchat/server/terminal/ServerTerminalSettings.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/lightchat/server/terminal/TerminalPacketHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/lightchat/server/terminal/TerminalPacketHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/lightchat/server/terminal/command/AuthTerminalHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/lightchat/server/terminal/command/AuthTerminalHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/lightchat/server/terminal/command/LightCommand.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/lightchat/server/terminal/command/SettingsCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/terminal/terminal-server/src/main/java/com/github/fernthedev/lightchat/server/terminal/command/SettingsCommand.java" afterDir="false" />
     </list>
-    <list id="3573a8f5-87af-4aa5-8e37-aaa9023d1393" name="CSharp" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -412,7 +379,7 @@
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="74a9c842-9768-484a-b6c1-feb6a74ad587" name="Default Changelist" comment="" />
-      <changelist id="3573a8f5-87af-4aa5-8e37-aaa9023d1393" name="CSharp" comment="" />
+      <changelist id="" name="CSharp" comment="" />
       <created>1569626764568</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -474,14 +441,7 @@
       <workItem from="1595339823225" duration="9440000" />
       <workItem from="1595371672422" duration="2558000" />
       <workItem from="1595426585061" duration="1190000" />
-      <workItem from="1595439455262" duration="4473000" />
-    </task>
-    <task id="LOCAL-00005" summary="Preparing for release">
-      <created>1572399105773</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1572399105773</updated>
+      <workItem from="1595439455262" duration="5736000" />
     </task>
     <task id="LOCAL-00006" summary="- Changed to a PacketRegistry system to allow for cross platform usage (packetname : packet.class)&#10;- Fixed a bug that caused the client to print an exception when sending a message before it was successfully registered&#10;- Added Alibaba FAST_JSON support (config setting) Gson is still default&#10;- Added MultiCast gracefully shut down.">
       <created>1574383998656</created>
@@ -819,7 +779,14 @@
       <option name="project" value="LOCAL" />
       <updated>1595443630809</updated>
     </task>
-    <option name="localTasksCounter" value="54" />
+    <task id="LOCAL-00054" summary="Performance, code cleanup and quality, bug fixes. &#10;Fixed console input for ServerTerminal&#10;ClientTerminal has been cleaned up and new ClientTerminalSettings&#10;ClientExtensions.kt for kotlin&#10;ClassTranslator for translating class types between languages. Must be used manually&#10;AuthenticationManager is now fully asynchronous&#10;ServerSettings now controls RSA key size">
+      <created>1595454542434</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1595454542434</updated>
+    </task>
+    <option name="localTasksCounter" value="55" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -863,7 +830,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Cleaned lots of old code. Most of the old redundant code has been refactored, optimized and removed for better efficiency and consistency.&#10;- Decoupling Client and Server to become it's own standalone API and terminal support and other features are being moved to terminal module" />
     <MESSAGE value="New events for both client and event Listener&#10;Packets now have a corresponding ID based on time taken to send and receive" />
     <MESSAGE value="Added JUnit 5 Testing dependencies&#10;Using RSA OAEP SHA 256 for encryption now" />
     <MESSAGE value="New Async.java annotation&#10;Client.connect is now async and returns a future if synchronized is required" />
@@ -888,7 +854,8 @@
     <MESSAGE value="Using server thread pool and fixed ThreadLock" />
     <MESSAGE value="Shutdown and exception handling" />
     <MESSAGE value="Use event loop for launching threads for commands" />
-    <option name="LAST_COMMIT_MESSAGE" value="Use event loop for launching threads for commands" />
+    <MESSAGE value="Performance, code cleanup and quality, bug fixes. &#10;Fixed console input for ServerTerminal&#10;ClientTerminal has been cleaned up and new ClientTerminalSettings&#10;ClientExtensions.kt for kotlin&#10;ClassTranslator for translating class types between languages. Must be used manually&#10;AuthenticationManager is now fully asynchronous&#10;ServerSettings now controls RSA key size" />
+    <option name="LAST_COMMIT_MESSAGE" value="Performance, code cleanup and quality, bug fixes. &#10;Fixed console input for ServerTerminal&#10;ClientTerminal has been cleaned up and new ClientTerminalSettings&#10;ClientExtensions.kt for kotlin&#10;ClassTranslator for translating class types between languages. Must be used manually&#10;AuthenticationManager is now fully asynchronous&#10;ServerSettings now controls RSA key size" />
   </component>
   <component name="WindowStateProjectService">
     <state x="752" y="253" key="#Dockerfile" timestamp="1594353266380">
@@ -1023,10 +990,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="512" y="432" key="VCS.EditChangelistDialog/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1587383640386" />
-    <state x="552" y="248" width="816" height="537" key="Vcs.Push.Dialog.v2" timestamp="1595443632410">
+    <state x="552" y="248" width="816" height="537" key="Vcs.Push.Dialog.v2" timestamp="1595454546445">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="248" width="816" height="537" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1595443632410" />
+    <state x="552" y="248" width="816" height="537" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1595454546445" />
     <state x="342" y="83" key="new project wizard" timestamp="1595081002773">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
