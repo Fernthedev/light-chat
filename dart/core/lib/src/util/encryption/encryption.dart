@@ -4,7 +4,7 @@ import 'dart:typed_data';
 
 import 'package:basic_utils/basic_utils.dart';
 import 'package:crypto/crypto.dart';
-import 'package:light_chat_client/transport/packetwrapper.dart';
+
 import 'package:encrypt/encrypt.dart';
 import 'package:pointycastle/api.dart';
 import 'package:pointycastle/asymmetric/api.dart';
@@ -13,6 +13,8 @@ import 'package:asn1lib/asn1lib.dart';
 import 'package:pointycastle/block/aes_fast.dart';
 import 'package:pointycastle/block/modes/cbc.dart';
 import 'package:pointycastle/export.dart';
+
+import '../../transport/packetwrapper.dart';
 
 class EncryptionUtil {
   static final Random _random = Random.secure();

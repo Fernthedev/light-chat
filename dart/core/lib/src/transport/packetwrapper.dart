@@ -3,11 +3,12 @@ import 'dart:core';
 import 'dart:typed_data';
 
 
-import 'package:light_chat_client/transport/packet_registry.dart';
+
 import 'package:json_annotation/json_annotation.dart';
 import 'package:lombok/lombok.dart';
 
 import 'codecs/AcceptablePacketTypes.dart';
+import 'packet_registry.dart';
 
 part 'packetwrapper.g.dart';
 

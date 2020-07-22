@@ -2,14 +2,11 @@
 //import 'package:lombok/lombok.dart';
 //import 'package:uuid/uuid.dart';
 
-import 'dart:convert';
 
-import 'package:crypto/crypto.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:light_chat_client/util/encryption/encryption.dart';
+import 'package:light_chat_core/core.dart';
+
 import 'package:lombok/lombok.dart';
-import 'package:path/path.dart';
-import 'package:pointycastle/digests/sha256.dart';
 import 'package:uuid/uuid.dart';
 
 part 'serverdata.g.dart';

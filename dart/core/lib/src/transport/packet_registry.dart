@@ -1,10 +1,12 @@
 import 'dart:collection';
 
-import 'package:light_chat_client/packets/handshake_packets.dart';
-import 'package:light_chat_client/packets/latency_packets.dart';
-import 'package:light_chat_client/packets/other_packets.dart';
-import 'package:light_chat_client/packets/packets.dart';
-import 'package:light_chat_client/variables.dart';
+import '../packets/handshake_packets.dart';
+import '../packets/latency_packets.dart';
+import '../packets/other_packets.dart';
+import '../packets/packets.dart';
+import '../variables.dart';
+
+
 
 class PacketRegistry {
   static final Map<String, Packet> packetRegistry = HashMap();

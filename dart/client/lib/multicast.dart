@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:light_chat_core/core.dart';
+import 'package:light_chat_core/packet_io.dart';
+import 'package:light_chat_core/packets_codecs.dart';
+import 'package:light_chat_core/packets.dart';
 
-import 'package:light_chat_client/variables.dart';
 import 'package:lombok/lombok.dart';
 
 part 'multicast.g.dart';

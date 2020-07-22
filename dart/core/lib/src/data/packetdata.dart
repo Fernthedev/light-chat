@@ -1,11 +1,10 @@
-import 'dart:convert';
 
-import 'package:crypto/crypto.dart';
-import 'package:light_chat_client/transport/packetwrapper.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:light_chat_client/util/encryption/encryption.dart';
 import 'package:lombok/lombok.dart';
 import 'package:version/version.dart';
+
+import '../transport/packetwrapper.dart';
+import '../util/encryption/encryption.dart';
 
 part 'packetdata.g.dart';
 

@@ -2,11 +2,11 @@ import 'dart:convert';
 
 import 'dart:typed_data';
 
-import 'package:light_chat_client/transport/packet_registry.dart';
-import 'package:light_chat_client/util/encryption/encryption.dart';
-import 'package:light_chat_client/variables.dart';
-import 'package:pointycastle/api.dart';
+import '../../data/handlers.dart';
 
+import '../../util/encryption/encryption.dart';
+import '../../variables.dart';
+import '../packet_registry.dart';
 import '../packetwrapper.dart';
 import 'AcceptablePacketTypes.dart';
 
@@ -185,12 +185,6 @@ class StringDecoder extends ObjectDecoder<Uint8List> {
   }
 }
 
-abstract class IKeyEncriptionHolder {
-  bool isEncryptionKeyRegistered();
-
-  KeyParameter getKey();
-}
-
 class EncryptedJSONObjectDecoder extends LineStringSeperatorDecoder {
   final IKeyEncriptionHolder keyEncryptionHolder;
   EncryptedJSONObjectDecoder(this.keyEncryptionHolder,
@@ -237,7 +231,9 @@ class EncryptedJSONObjectDecoder extends LineStringSeperatorDecoder {
       //   if (Variables.debug) print(
       //      'Decrypted json object: $decryptedJsonObject');
 
-      if (Variables.debug) print('Parsing: ${packetWrapper.packetIdentifier}  $decryptedJsonObject');
+      if (Variables.debug)
+        print(
+            'Parsing: ${packetWrapper.packetIdentifier}  $decryptedJsonObject');
 
       out.add(
           getParsedObject(packetWrapper.packetIdentifier, decryptedJsonObject));

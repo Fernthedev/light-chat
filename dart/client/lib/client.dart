@@ -2,15 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:light_chat_client/packets/handshake_packets.dart';
-import 'package:light_chat_client/packets/other_packets.dart';
-import 'package:light_chat_client/packets/packets.dart';
-import 'package:light_chat_client/transport/codecs/AcceptablePacketTypes.dart';
-import 'package:light_chat_client/transport/codecs/codecs.dart';
-import 'package:light_chat_client/transport/packet_registry.dart';
-import 'package:light_chat_client/transport/packetwrapper.dart';
-import 'package:light_chat_client/util/encryption/encryption.dart';
-import 'package:light_chat_client/variables.dart';
+import 'package:light_chat_core/core.dart';
+import 'package:light_chat_core/packet_io.dart';
+import 'package:light_chat_core/packets_codecs.dart';
+
 import 'package:pedantic/pedantic.dart';
 import 'package:pointycastle/api.dart';
 
@@ -194,7 +189,7 @@ class Client implements IKeyEncriptionHolder {
     Packet messagePacket = MessagePacket.create(line);
 
     if (line.startsWith('/')) {
-      line = line.substring(line.indexOf('/' ) + 1);
+      line = line.substring(line.indexOf('/') + 1);
       messagePacket = CommandPacket.create(line);
     }
 

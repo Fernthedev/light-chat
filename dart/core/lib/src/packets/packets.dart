@@ -1,9 +1,10 @@
 
-import 'package:light_chat_client/transport/codecs/AcceptablePacketTypes.dart';
-import 'package:light_chat_client/transport/packet_registry.dart';
-import 'package:light_chat_client/transport/packetwrapper.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:lombok/lombok.dart';
+
+import '../transport/codecs/AcceptablePacketTypes.dart';
+import '../transport/packet_registry.dart';
+import '../transport/packetwrapper.dart';
 
 
 part 'packets.g.dart';

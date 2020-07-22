@@ -1,12 +1,14 @@
 import 'dart:typed_data';
 
-import 'package:light_chat_client/data/packetdata.dart';
-import 'package:light_chat_client/packets/packets.dart';
-import 'package:light_chat_client/transport/packetwrapper.dart';
-import 'package:light_chat_client/util/encryption/encryption.dart';
+
 import 'package:json_annotation/json_annotation.dart';
 import 'package:lombok/lombok.dart';
 import 'package:pointycastle/export.dart';
+
+import '../data/packetdata.dart';
+import '../transport/packetwrapper.dart';
+import '../util/encryption/encryption.dart';
+import 'packets.dart';
 
 part 'handshake_packets.g.dart';
 

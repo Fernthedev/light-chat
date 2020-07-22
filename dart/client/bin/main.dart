@@ -1,13 +1,13 @@
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:light_chat_client/EventListener.dart';
 import 'package:light_chat_client/client.dart';
-import 'package:light_chat_client/data/packetdata.dart';
 import 'package:light_chat_client/data/serverdata.dart';
-import 'package:light_chat_client/packets/handshake_packets.dart';
-import 'package:light_chat_client/packets/other_packets.dart';
-import 'package:light_chat_client/packets/packets.dart';
-import 'package:light_chat_client/variables.dart';
+import 'package:light_chat_core/core.dart';
+import 'package:light_chat_core/packet_io.dart';
+import 'package:light_chat_core/packets_codecs.dart';
+import 'package:light_chat_core/packets.dart';
 
 void main(List<String> arguments) {
   String host;
@@ -40,13 +40,14 @@ void main(List<String> arguments) {
   port = int.parse(setValIfNull(port.toString(), 'Port:'));
   name = setValIfNull(name, 'Name:');
 
-  client = Client(ConnectedPacket.create(
-      name, Platform.operatingSystem, Variables.versionData, Variables.defaultLangFramework));
+  client = Client(ConnectedPacket.create(name, Platform.operatingSystem,
+      Variables.versionData, Variables.defaultLangFramework));
 
   client.addPacketListener(PacketListenerConsole());
 
-  client.initializeConnection(ServerData(host, port, null)).then((f) {
+  client.initializeConnection(ServerData(host, port, null)).then((f) async {
     print('Initialized connection sucessfully');
+    // setupAsyncInput(client);
   });
 
   client.onDisconnect((s) {
@@ -55,6 +56,27 @@ void main(List<String> arguments) {
 
   // client.onConnect(readCmdLine);
   // client.onConnect(f);
+}
+
+// TODO: FIX
+void setupAsyncInput(Client client) async {
+  var receivePort = ReceivePort();
+
+
+  await Isolate.spawn(createIsolate, receivePort.sendPort);
+
+  SendPort childSendPort = await receivePort.first;
+
+  childSendPort.send(client);
+}
+
+void createIsolate(SendPort mainSendorPort) async {
+    var childReceivePort = ReceivePort();
+    mainSendorPort.send(childReceivePort.sendPort);
+
+    Client client = await childReceivePort.first;
+
+    readCmdLine(client);
 }
 
 Client client;
@@ -89,6 +111,9 @@ class PacketListenerConsole extends PacketListener {
           case MessageType.INCORRECT_PASSWORD_FAILURE:
             print('Unable to authenticate with password');
             break;
+          case MessageType.CORRECT_PASSWORD:
+            // TODO: Handle this case.
+            break;
         }
         break;
     }
@@ -96,7 +121,7 @@ class PacketListenerConsole extends PacketListener {
 }
 
 // TODO: Make async to allow printing to console while reading input.
-void readCmdLine() async {
+void readCmdLine(Client client) async {
   print('Checking read');
   // return;
   while (client.connected) {

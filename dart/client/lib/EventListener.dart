@@ -1,12 +1,8 @@
-import 'package:light_chat_client/packets/handshake_packets.dart';
-import 'package:light_chat_client/packets/latency_packets.dart';
-import 'package:light_chat_client/packets/other_packets.dart';
-import 'package:light_chat_client/packets/packets.dart';
-
-import 'package:light_chat_client/client.dart';
-import 'package:light_chat_client/variables.dart';
-
-import 'data/packetdata.dart';
+import 'package:light_chat_core/core.dart';
+import 'package:light_chat_core/packet_io.dart';
+import 'package:light_chat_core/packets_codecs.dart';
+import 'package:light_chat_core/packets.dart';
+import 'client.dart';
 
 abstract class PacketListener {
   ///
@@ -50,7 +46,7 @@ class PacketEventHandler {
         print('Illegal connection error from server: ${packet.message}');
         result = packet.message;
 
-        client.close();
+        await client.close();
         break;
       case InitialHandshakePacket:
         InitialHandshakePacket packet = p;
@@ -96,7 +92,7 @@ class PacketEventHandler {
         SelfMessagePacket packet = p;
         switch (packet.type) {
           case MessageType.LOST_SERVER_CONNECTION:
-            client.close();
+            await client.close();
             print('Lost server connection');
             break;
           case MessageType.REGISTER_PACKET:
