@@ -1,8 +1,10 @@
 package com.github.fernthedev.lightchat.client;
 
+import com.github.fernthedev.config.common.Config;
 import com.github.fernthedev.lightchat.client.api.IPacketHandler;
 import com.github.fernthedev.lightchat.client.event.ServerDisconnectEvent;
 import com.github.fernthedev.lightchat.client.netty.ClientHandler;
+import com.github.fernthedev.lightchat.core.NoFileConfig;
 import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.core.api.APIUsage;
 import com.github.fernthedev.lightchat.core.api.Async;
@@ -49,11 +51,14 @@ import java.util.concurrent.TimeUnit;
 public class Client implements IEncryptionKeyHolder, AutoCloseable {
 
     @Getter
-    protected static Logger logger = LoggerFactory.getLogger(Client.class);
-    private static CLogger cLogger;
+    @Setter
+    protected Logger logger = LoggerFactory.getLogger(Client.class);
+
 
     @Getter
-    protected ClientSettings clientSettings;
+    @Setter
+    protected Config<? extends ClientSettings> clientSettingsManager = new NoFileConfig<>(new ClientSettings());
+
     protected EventListener listener;
 
     @Getter
@@ -71,14 +76,14 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
     private boolean registered;
 
     @Getter
-    private PluginManager pluginManager = new PluginManager();
+    private final PluginManager pluginManager = new PluginManager();
 
     @Setter
     @Getter
     private boolean running = false;
 
     @Getter
-    private List<IPacketHandler> packetHandlers = new ArrayList<>();
+    private final List<IPacketHandler> packetHandlers = new ArrayList<>();
 
     private int port;
     private String host;
@@ -91,7 +96,7 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
     private SecretKey secretKey;
 
 
-    private StopWatch stopWatch = new StopWatch();
+    private final StopWatch stopWatch = new StopWatch();
 
     /**
      * Packet:[ID,lastPacketSentTime]
@@ -114,7 +119,6 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
         this.host = host;
         this.port = port;
         StaticHandler.setCore(new ClientCore(this));
-        registerLogger();
 
         listener = new EventListener(this);
         clientHandler = new ClientHandler(this, listener);
@@ -139,7 +143,6 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
     }
 
     public void setup() {
-        registerLogger();
         running = true;
     }
 
@@ -154,9 +157,6 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
         getLogger().info("Initializing");
         StaticHandler.displayVersion();
 
-
-        registerOSCheck();
-        registerLogger();
 
 
 //        StaticHandler.setupTerminal(completeHandler);
@@ -181,21 +181,11 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
     }
 
 
-    protected void registerOSCheck() {
-        clientSettings = new ClientSettings();
-    }
 
-    protected void registerLogger() {
-        cLogger = new CLogger(logger);
-    }
+
 
     public String getOSName() {
         return System.getProperty("os.name");
-    }
-
-    public ILogManager getLoggerInterface() {
-        if (logger == null) registerLogger();
-        return cLogger;
     }
 
     @APIUsage
@@ -207,6 +197,8 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
         workerGroup = new NioEventLoopGroup();
 
         Class<? extends AbstractChannel> channelClass = NioSocketChannel.class;
+
+        ClientSettings clientSettings = clientSettingsManager.getConfigData();
 
         if (SystemUtils.IS_OS_LINUX && clientSettings.isRunNatives()) {
             workerGroup = new EpollEventLoopGroup();
@@ -384,7 +376,8 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
     }
 
     void endPingStopwatch() {
-        stopWatch.stop();
+        if (!stopWatch.isStopped())
+            stopWatch.stop();
     }
 
     public long getPingTime(TimeUnit timeUnit) {

@@ -30,7 +30,7 @@ public class MulticastClient {
         try(MulticastSocket socket = new MulticastSocket(4446)) {
 
             InetAddress group = InetAddress.getByName(StaticHandler.getMulticastAddress());
-
+            socket.setSoTimeout(2000);
             socket.joinGroup(group);
 
             DatagramPacket packet;
@@ -39,7 +39,7 @@ public class MulticastClient {
                 byte[] buf = new byte[256];
                 packet = new DatagramPacket(buf, buf.length);
 
-                socket.setSoTimeout(2000);
+
                 socket.receive(packet);
 
                 String received = new String(packet.getData());

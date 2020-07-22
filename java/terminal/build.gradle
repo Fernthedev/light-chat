@@ -27,4 +27,6 @@ subprojects {
         configurations = [project.configurations.implementation]
         classifier = ''
     }
+
+
 }

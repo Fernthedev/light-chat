@@ -28,7 +28,7 @@ public class StaticHandler {
     private static int lineLimit = 8000;
 
     public static final String END_STRING = "\n\r";
-    public static final int KEY_SIZE = 4096;
+
     public static final int AES_KEY_SIZE = 256;
     public static final String AES_KEY_MODE = "AES";
     public static final String AES_CIPHER_TRANSFORMATION = "AES/CBC/PKCS5Padding";
@@ -65,10 +65,6 @@ public class StaticHandler {
 
     @Getter
     private static boolean debug = false;
-
-    @Getter
-    @Setter
-    private static boolean isLight = false;
 
     @Getter
     private static Core core;

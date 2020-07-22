@@ -13,10 +13,7 @@ import com.github.fernthedev.lightchat.core.packets.handshake.RequestConnectInfo
 import com.github.fernthedev.lightchat.core.packets.latency.PingPacket;
 import com.github.fernthedev.lightchat.core.packets.latency.PingReceive;
 import com.github.fernthedev.lightchat.core.packets.latency.PongPacket;
-import com.github.fernthedev.lightchat.server.ClientConnection;
-import com.github.fernthedev.lightchat.server.Console;
-import com.github.fernthedev.lightchat.server.SenderInterface;
-import com.github.fernthedev.lightchat.server.Server;
+import com.github.fernthedev.lightchat.server.*;
 import com.github.fernthedev.lightchat.server.terminal.command.Command;
 import com.github.fernthedev.lightchat.server.terminal.command.KickCommand;
 import com.github.fernthedev.lightchat.server.terminal.events.ChatEvent;
@@ -24,7 +21,9 @@ import com.github.fernthedev.terminal.core.packets.MessagePacket;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
@@ -173,28 +172,38 @@ public class ServerCommandHandler {
                 @SneakyThrows
                 @Override
                 public void onCommand(SenderInterface sender, String[] args) {
+                    List<ClientConnection> connections = new ArrayList<>();
+                    if (sender instanceof Console) {
+                        connections.addAll(server.getPlayerHandler().getChannelMap().values());
+                    }
+
                     if (sender instanceof ClientConnection) {
-                        ClientConnection clientConnection = (ClientConnection) sender;
-                        sender.sendPacket(new MessagePacket("test"));
+                        connections.add((ClientConnection) sender);
+                    }
 
-                        sender.sendPacket(new PingPacket());
-                        sender.sendPacket(new PingReceive());
-                        sender.sendPacket(new PongPacket());
+                    for (ClientConnection connection : connections) {
+                        ServerTerminal.sendMessage(sender, ColorCode.YELLOW + "Running packets on " + connection.getName());
+                        connection.sendPacket(new MessagePacket("test"));
+
+                        connection.sendPacket(new PingPacket());
+                        connection.sendPacket(new PingReceive());
+                        connection.sendPacket(new PongPacket());
 
 
-                        if (clientConnection.getTempKeyPair() != null) {
-                            sender.sendPacket(new InitialHandshakePacket(clientConnection.getTempKeyPair().getPublic(), clientConnection.getVersionData()));
-                            sender.sendPacket(new KeyResponsePacket(clientConnection.getSecretKey(), clientConnection.getTempKeyPair().getPublic()));
+                        if (connection.getTempKeyPair() != null) {
+                            connection.sendPacket(new InitialHandshakePacket(connection.getTempKeyPair().getPublic(), connection.getVersionData()));
+                            connection.sendPacket(new KeyResponsePacket(connection.getSecretKey(), connection.getTempKeyPair().getPublic()));
                         }
 
-                        sender.sendPacket(new RequestConnectInfoPacket());
-                        sender.sendPacket(new ConnectedPacket(clientConnection.getName(), clientConnection.getOs(), clientConnection.getVersionData(), clientConnection.getLangFramework()));
+                        connection.sendPacket(new RequestConnectInfoPacket());
+                        connection.sendPacket(new ConnectedPacket(connection.getName(), connection.getOs(), connection.getVersionData(), connection.getLangFramework()));
 
 
                         for (SelfMessagePacket.MessageType messageType : SelfMessagePacket.MessageType.values()) {
-                            sender.sendPacket(new SelfMessagePacket(messageType));
+                            connection.sendPacket(new SelfMessagePacket(messageType));
                         }
-                        sender.sendPacket(new IllegalConnectionPacket("test packet"));
+                        connection.sendPacket(new IllegalConnectionPacket("test packet"));
+
                     }
                 }
             });

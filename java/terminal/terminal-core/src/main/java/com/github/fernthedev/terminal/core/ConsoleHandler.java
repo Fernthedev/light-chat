@@ -1,6 +1,7 @@
 package com.github.fernthedev.terminal.core;
 
 import com.github.fernthedev.lightchat.core.StaticHandler;
+import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -9,7 +10,7 @@ import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ConsoleHandler extends SimpleTerminalConsole {
 
     @Setter
@@ -20,13 +21,14 @@ public class ConsoleHandler extends SimpleTerminalConsole {
         new Thread(() -> {
             StaticHandler.getCore().getLogger().info("Starting console handler");
             new ConsoleHandler(termCore, completeHandler).start();
+            StaticHandler.getCore().getLogger().info("Started console handler");
         },"ConsoleHandler").start();
 
-        StaticHandler.getCore().getLogger().info("Started console handler");
+
     }
 
     @NonNull
-    private Completer completer;
+    private final Completer completer;
 
     /**
      * Determines if the application is still running and accepting input.

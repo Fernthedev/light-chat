@@ -8,10 +8,10 @@ import com.github.fernthedev.lightchat.core.packets.handshake.ConnectedPacket;
 import com.github.fernthedev.lightchat.server.ClientConnection;
 import com.github.fernthedev.lightchat.server.Server;
 import com.github.fernthedev.lightchat.server.api.IPacketHandler;
+import com.github.fernthedev.lightchat.server.terminal.events.ChatEvent;
 import com.github.fernthedev.terminal.core.packets.AutoCompletePacket;
 import com.github.fernthedev.terminal.core.packets.CommandPacket;
 import com.github.fernthedev.terminal.core.packets.MessagePacket;
-import com.github.fernthedev.lightchat.server.terminal.events.ChatEvent;
 import lombok.AllArgsConstructor;
 
 import java.util.List;
@@ -25,12 +25,14 @@ public class TerminalPacketHandler implements IPacketHandler {
 
         if (p instanceof ConnectedPacket) {
             if(server.getSettingsManager().getConfigData().isPasswordRequiredForLogin()) {
-                boolean authenticated = ServerTerminal.getAuthenticationManager().authenticate(clientConnection);
-                if(!authenticated) {
-                    clientConnection.sendObject(new MessagePacket("Unable to authenticate"));
-                    clientConnection.close();
-                    return;
-                }
+                server.getAuthenticationManager().authenticate(clientConnection).thenAccept(authenticated -> {
+                    if(!authenticated) {
+                        clientConnection.sendObject(new MessagePacket("Unable to authenticate"));
+                        clientConnection.close();
+                        return;
+                    }
+                });
+
             }
         } if (p instanceof MessagePacket) {
             MessagePacket messagePacket = (MessagePacket) p;
@@ -58,7 +60,7 @@ public class TerminalPacketHandler implements IPacketHandler {
             packet.setCandidateList(candidates);
             clientConnection.sendObject(packet);
         } else if (p instanceof HashedPasswordPacket) {
-            ServerTerminal.getAuthenticationManager().attemptAuthenticationHash(
+            server.getAuthenticationManager().attemptAuthenticationHash(
                     ((HashedPasswordPacket) p).getHashedPassword(),
                     clientConnection
             );

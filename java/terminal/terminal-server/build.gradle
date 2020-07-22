@@ -16,6 +16,9 @@ application {
     mainClassName = "com.github.fernthedev.lightchat.server.terminal.ServerTerminal"
 }
 
-run{
+run {
     standardInput = System.in
+
+    workingDir = rootProject.projectDir
+
 }

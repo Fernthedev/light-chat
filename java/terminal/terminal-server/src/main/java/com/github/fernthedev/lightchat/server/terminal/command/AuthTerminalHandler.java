@@ -5,10 +5,10 @@ import com.github.fernthedev.lightchat.core.ColorCode;
 import com.github.fernthedev.lightchat.core.api.event.api.EventHandler;
 import com.github.fernthedev.lightchat.core.api.event.api.Listener;
 import com.github.fernthedev.lightchat.core.data.HashedPassword;
-import com.github.fernthedev.lightchat.server.security.AuthenticationManager;
 import com.github.fernthedev.lightchat.server.SenderInterface;
 import com.github.fernthedev.lightchat.server.Server;
 import com.github.fernthedev.lightchat.server.event.AuthenticationAttemptedEvent;
+import com.github.fernthedev.lightchat.server.security.AuthenticationManager;
 import com.github.fernthedev.lightchat.server.terminal.ServerTerminal;
 import com.github.fernthedev.lightchat.server.terminal.events.ChatEvent;
 import lombok.NonNull;
@@ -34,15 +34,17 @@ public class AuthTerminalHandler extends Command implements Listener {
         }
 
         if (StringUtils.isAlphanumeric(args[0])) {
-            if (server.getAuthenticationManager().authenticate(sender)) {
-                ServerTerminal.sendMessage(sender, "Setting password now");
-                server.getSettingsManager().getConfigData().setPassword(args[0]);
-                try {
-                    server.getSettingsManager().save();
-                } catch (ConfigLoadException e) {
-                    e.printStackTrace();
+            server.getAuthenticationManager().authenticate(sender).thenAccept(aBoolean -> {
+                if (aBoolean) {
+                    ServerTerminal.sendMessage(sender, "Setting password now");
+                    server.getSettingsManager().getConfigData().setPassword(args[0]);
+                    try {
+                        server.getSettingsManager().save();
+                    } catch (ConfigLoadException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
+            });
         } else ServerTerminal.sendMessage(sender, "Password can only be alphanumeric");
     }
 

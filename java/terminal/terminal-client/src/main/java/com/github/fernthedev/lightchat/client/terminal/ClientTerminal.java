@@ -1,5 +1,6 @@
 package com.github.fernthedev.lightchat.client.terminal;
 
+import com.github.fernthedev.fernutils.console.ArgumentArrayUtils;
 import com.github.fernthedev.lightchat.client.Client;
 import com.github.fernthedev.lightchat.client.netty.MulticastClient;
 import com.github.fernthedev.lightchat.core.MulticastData;
@@ -14,8 +15,6 @@ import com.google.common.base.Stopwatch;
 import lombok.Getter;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.core.config.Configurator;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,103 +22,143 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ClientTerminal {
 
     @Getter
-    private static Logger logger = LoggerFactory.getLogger(ClientTerminal.class);
+    protected static Logger logger = LoggerFactory.getLogger(ClientTerminal.class);
 
     @Getter
     private static AutoCompleteHandler autoCompleteHandler;
-    private static Client client;
+    protected static Client client;
 
     @Getter
-    private static Stopwatch messageDelay = Stopwatch.createUnstarted();
+    private static final Stopwatch messageDelay = Stopwatch.createUnstarted();
 
     public static void main(String[] args) {
+        AtomicInteger port = new AtomicInteger(-1);
+        AtomicReference<String> host = new AtomicReference<>(null);
+
+        ArgumentArrayUtils.parseArguments(args)
+                .handle("-port", queue -> {
+                    try {
+                        port.set(Integer.parseInt(queue.remove()));
+                        if (port.get() <= 0) {
+                            logger.error("-port cannot be less than 0");
+                            port.set(-1);
+                        } else logger.info("Using port {}", port);
+                    } catch (NumberFormatException e) {
+                        logger.error("-port is not a number");
+                        port.set(-1);
+                    }
+                })
+                .handle("-host", queue -> {
+                    try {
+                        host.set(queue.remove());
+                        logger.info("Using host {}", host.get());
+                    } catch (IndexOutOfBoundsException e) {
+                        logger.error("Cannot find argument for -host");
+                        host.set(null);
+                    }
+                })
+                .handle("-debug", queue -> StaticHandler.setDebug(true))
+                .apply();
+
+        init(args, ClientTerminalSettings.builder()
+                .host(host.get())
+                .port(port.get())
+                .build());
+
+        connect();
+    }
+
+
+    public static void init(ClientTerminalSettings settings) {
+        init(new String[0], settings);
+    }
+
+    public static void init(String[] args, ClientTerminalSettings settings) {
         CommonUtil.initTerminal();
 
-        String host = null;
-        int port = -1;
+        final AtomicReference<String> host = new AtomicReference<>(settings.getHost());
+        final AtomicInteger port = new AtomicInteger(settings.getPort());
 
-        for (int i = 0; i < args.length; i++) {
-            String arg = args[i];
 
-            if (arg.equalsIgnoreCase("-port")) {
+        if (settings.isLaunchConsoleInCMDWhenNone())
+            CommonUtil.startSelfInCmd(args);
+
+        if (settings.isCheckForServersInMulticast()) {
+            MulticastClient multicastClient;
+            Scanner scanner = new Scanner(System.in);
+            if (host.get() == null || host.equals("") || port.get() == -1) {
+                multicastClient = new MulticastClient();
+
                 try {
-                    port = Integer.parseInt(args[i + 1]);
-                    if (port < 0) {
-                        logger.error("-port cannot be less than 0");
-                        port = -1;
-                    } else logger.info("Using port {}", args[i+ + 1]);
-                } catch (NumberFormatException | IndexOutOfBoundsException e) {
-                    logger.error("-port is not a number");
-                    port = -1;
+                    Pair<String, Integer> hostPortPair = check(multicastClient, scanner, 4);
+
+                    if (hostPortPair != null) {
+                        host.set(hostPortPair.getLeft());
+                        port.set(hostPortPair.getRight());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
+        }
 
-            if (arg.equalsIgnoreCase("-ip") || arg.equalsIgnoreCase("-host")) {
-                try {
-                    host = args[i + 1];
-                    logger.info("Using host {}", args[i+ + 1]);
-                } catch (IndexOutOfBoundsException e) {
-                    logger.error("Cannot find argument for -host");
-                    host = null;
+        if (settings.isAskUserForHostPort()) {
+            Scanner scanner = new Scanner(System.in);
+            while (host.get() == null || host.get().equalsIgnoreCase("") || port.get() == -1) {
+                if (host.get() == null || host.get().equals("")) {
+                    host.set(readLine(scanner, "Host:"));
+                }
+
+                if (port.get() == -1) {
+                    port.set(readInt(scanner, "Port:"));
                 }
             }
+        }
 
-            if (arg.equalsIgnoreCase("-debug")) {
-                StaticHandler.setDebug(true);
-                Configurator.setLevel(getLogger().getName(), Level.DEBUG);
-                logger.debug("Debug enabled");
-            }
+        if (host.get() == null || host.get().equals("")) {
+            throw new IllegalStateException("Host is null or not provided. Provide in settings or allow user to provide");
+        }
+
+        if (port.get() == -1) {
+            throw new IllegalStateException("Port is null or not provided. Provide in settings or allow user to provide");
         }
 
 
-        CommonUtil.startSelfInCmd(args);
+        client = new Client(host.get(), port.get());
 
-        MulticastClient multicastClient;
-        Scanner scanner = new Scanner(System.in);
-        if (host == null || host.equals("") || port == -1) {
-            multicastClient = new MulticastClient();
-            Pair<String, Integer> hostPortPair = check(multicastClient, scanner,4);
-
-            if (hostPortPair != null) {
-                host = hostPortPair.getLeft();
-                port = hostPortPair.getRight();
-            }
-        }
-
-        while (host == null || host.equalsIgnoreCase("") || port == -1) {
-            if (host == null || host.equals(""))
-                host = readLine(scanner, "Host:");
-
-            if (port == -1)
-                port = readInt(scanner, "Port:");
-        }
-
-
-
-
-        client = new Client(host, port);
+        client.setClientSettingsManager(settings.getServerSettings());
 
         StaticHandler.setCore(new ClientTermCore(client));
-        CommonUtil.registerTerminalPackets();
 
-        autoCompleteHandler = new AutoCompleteHandler(client);
+        if (settings.isAllowTermPackets())
+            CommonUtil.registerTerminalPackets();
 
-        ConsoleHandler.startConsoleHandlerAsync((TermCore) StaticHandler.getCore(), autoCompleteHandler);
+        if (settings.isConsoleCommandHandler()) {
+            autoCompleteHandler = new AutoCompleteHandler(client);
+
+            ConsoleHandler.startConsoleHandlerAsync((TermCore) StaticHandler.getCore(), autoCompleteHandler);
+        }
 
         PacketHandler packetHandler = new PacketHandler();
         client.addPacketHandler(packetHandler);
         client.getPluginManager().registerEvents(packetHandler);
 
+
+
+    }
+
+    public static void connect() {
         try {
             client.connect();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-
     }
 
     private static String readLine(Scanner scanner, String message) {
@@ -140,8 +179,7 @@ public class ClientTerminal {
         } else return -1;
     }
 
-
-    private static Pair<String, Integer> check(MulticastClient multicastClient, Scanner scanner, int amount) {
+    protected static Pair<String, Integer> check(MulticastClient multicastClient, Scanner scanner, int amount) {
         logger.info("Looking for MultiCast servers");
         multicastClient.checkServers(amount);
 
@@ -161,11 +199,11 @@ public class ClientTerminal {
 
                 StaticHandler.VersionRange range = StaticHandler.getVersionRangeStatus(new VersionData(serverCurrent, serverMin));
 
-                if (range == StaticHandler.VersionRange.MATCH_REQUIREMENTS){
+                if (range == StaticHandler.VersionRange.MATCH_REQUIREMENTS) {
                     System.out.println(">" + index + " | " + serverAddress.getAddress() + ":" + serverAddress.getPort());
                 } else {
                     // Current version is smaller than the server's required minimum
-                    if(range == StaticHandler.VersionRange.WE_ARE_LOWER) {
+                    if (range == StaticHandler.VersionRange.WE_ARE_LOWER) {
                         System.out.println(">" + index + " | " + serverAddress.getAddress() + ":" + serverAddress.getPort() + " (Server's required minimum version is " + serverAddress.getMinVersion() + " while your current version is smaller {" + StaticHandler.getVERSION_DATA().getVersion() + "} Incompatibility issues may arise)");
                     }
 

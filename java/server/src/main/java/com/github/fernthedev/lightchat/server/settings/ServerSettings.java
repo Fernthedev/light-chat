@@ -31,6 +31,9 @@ public class ServerSettings extends CoreSettings {
     @SettingValue
     private String password = "password";
 
+    @SettingValue
+    private int rsaKeySize = 4096;
+
     @SettingValue(name = "multicast")
     private boolean useMulticast = false;
 

@@ -59,17 +59,19 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-        client.getLoggerInterface().info("Lost connection to server.");
+        if (!ctx.channel().isActive()) {
+            client.getLogger().info("Lost connection to server.");
 
-        client.disconnect(ServerDisconnectEvent.DisconnectStatus.CONNECTION_LOST);
+            client.disconnect(ServerDisconnectEvent.DisconnectStatus.CONNECTION_LOST);
 
-        super.channelUnregistered(ctx);
+            super.channelUnregistered(ctx);
+        }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         if (cause instanceof ReadTimeoutException) {
-            client.getLoggerInterface().info("Timed out connection");
+            client.getLogger().info("Timed out connection");
 
             if (StaticHandler.isDebug()) StaticHandler.getCore().getLogger().error(cause.getMessage(), cause);
 

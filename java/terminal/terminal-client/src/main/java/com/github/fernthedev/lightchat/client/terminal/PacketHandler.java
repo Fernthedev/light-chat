@@ -26,7 +26,9 @@ public class PacketHandler implements IPacketHandler, Listener {
             MessagePacket messagePacket = (MessagePacket) p;
             ClientTerminal.getLogger().info(messagePacket.getMessage());
 
-            ClientTerminal.getMessageDelay().stop();
+            if (ClientTerminal.getMessageDelay().isRunning())
+                ClientTerminal.getMessageDelay().stop();
+
             ClientTerminal.getLogger().debug("Time taken for message: {}", ClientTerminal.getMessageDelay().elapsed(TimeUnit.MILLISECONDS));
 
         } else if (p instanceof SelfMessagePacket) {

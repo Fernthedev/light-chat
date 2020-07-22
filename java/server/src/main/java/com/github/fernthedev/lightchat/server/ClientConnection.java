@@ -145,7 +145,7 @@ public class ClientConnection implements SenderInterface, AutoCloseable {
 
 
 
-        this.keyFuture = server.getExecutorService().submit(() -> tempKeyPair = RSAEncryptionUtil.generateKeyPairs());
+        this.keyFuture = server.getExecutorService().submit(() -> tempKeyPair = RSAEncryptionUtil.generateKeyPairs(server.getSettingsManager().getConfigData().getRsaKeySize()));
 
         eventListener = new EventListener(server, this);
     }

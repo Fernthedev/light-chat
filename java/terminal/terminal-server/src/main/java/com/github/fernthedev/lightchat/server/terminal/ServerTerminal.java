@@ -2,12 +2,8 @@ package com.github.fernthedev.lightchat.server.terminal;
 
 import com.github.fernthedev.config.common.Config;
 import com.github.fernthedev.config.common.exceptions.ConfigLoadException;
-import com.github.fernthedev.config.gson.GsonConfig;
-import com.github.fernthedev.fernutils.thread.ThreadUtils;
-import com.github.fernthedev.light.LightManager;
-import com.github.fernthedev.light.exceptions.NoPi4JLibsFoundException;
+import com.github.fernthedev.fernutils.console.ArgumentArrayUtils;
 import com.github.fernthedev.lightchat.core.StaticHandler;
-import com.github.fernthedev.lightchat.server.security.AuthenticationManager;
 import com.github.fernthedev.lightchat.server.Console;
 import com.github.fernthedev.lightchat.server.SenderInterface;
 import com.github.fernthedev.lightchat.server.Server;
@@ -16,7 +12,6 @@ import com.github.fernthedev.lightchat.server.terminal.backend.AutoCompleteHandl
 import com.github.fernthedev.lightchat.server.terminal.backend.TabCompleteFinder;
 import com.github.fernthedev.lightchat.server.terminal.command.AuthTerminalHandler;
 import com.github.fernthedev.lightchat.server.terminal.command.Command;
-import com.github.fernthedev.lightchat.server.terminal.command.LightCommand;
 import com.github.fernthedev.lightchat.server.terminal.command.SettingsCommand;
 import com.github.fernthedev.terminal.core.CommonUtil;
 import com.github.fernthedev.terminal.core.ConsoleHandler;
@@ -26,45 +21,61 @@ import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ServerTerminal {
 
     @Getter
-    private static Config<ServerSettings> settingsManager;
+    private static Config<? extends ServerSettings> settingsManager;
 
     @Getter
     private static ServerCommandHandler commandHandler;
 
     protected static Server server;
 
-
-
     @Getter
     private static CommandMessageParser commandMessageParser;
-
-
-    @Getter
-    private static AuthenticationManager authenticationManager;
 
     @Getter
     private static TabCompleteFinder autoCompleteHandler;
 
-
     @Getter
     private static List<Command> commandList = new ArrayList<>();
 
-
-    private static Logger logger = LoggerFactory.getLogger(ServerTerminal.class);
-
-
+    protected static Logger logger = LoggerFactory.getLogger(ServerTerminal.class);
 
     public static void main(String[] args) {
-        init(args, ServerTerminalSettings.builder().build());
+
+        AtomicInteger port = new AtomicInteger(-1);
+
+        ArgumentArrayUtils.parseArguments(args)
+                .handle("-port", queue -> {
+
+                    try {
+                        port.set(Integer.parseInt(queue.remove()));
+                        if (port.get() <= 0) {
+                            logger.error("-port cannot be less than 0");
+                            port.set(-1);
+                        } else logger.info("Using port {}", port);
+                    } catch (NumberFormatException e) {
+                        logger.error("-port is not a number");
+                        port.set(-1);
+                    }
+
+
+
+                })
+                .handle("-debug", queue -> StaticHandler.setDebug(true))
+                .apply();
+
+        init(args,
+                ServerTerminalSettings.builder()
+                .port(port.get())
+                .build());
         startBind();
     }
 
@@ -81,39 +92,13 @@ public class ServerTerminal {
 
         int port = terminalSettings.port;
 
-        for (int i = 0; i < args.length && (terminalSettings.isAllowPortArgParse() || terminalSettings.isAllowDebugArgParse() || terminalSettings.isLightAllowed()); i++) {
-            String arg = args[i];
 
-            if (arg.equalsIgnoreCase("-port") && terminalSettings.isAllowPortArgParse()) {
-                try {
-                    port = Integer.parseInt(args[i + 1]);
-                    if (port < 0) {
-                        logger.error("-port cannot be less than 0");
-                        port = -1;
-                    } else logger.info("Using port {}", args[i + +1]);
-                } catch (NumberFormatException | IndexOutOfBoundsException e) {
-                    logger.error("-port is not a number");
-                    port = -1;
-                }
-            }
-
-            if (arg.equalsIgnoreCase("-lightmanager") && terminalSettings.isLightAllowed()) {
-                StaticHandler.setLight(true);
-            }
-
-            if (arg.equalsIgnoreCase("-debug") && terminalSettings.isAllowDebugArgParse()) {
-                StaticHandler.setDebug(true);
-                logger.debug("Debug enabled");
-            }
-        }
-
-
-        if (terminalSettings.isLaunchConsoleWhenNull())
+        if (terminalSettings.isLaunchConsoleInCMDWhenNone())
             CommonUtil.startSelfInCmd(args);
 
 
         try {
-            settingsManager = new GsonConfig<>(terminalSettings.getServerSettings(), new File(getCurrentPath(), "settings.json"));
+            settingsManager = terminalSettings.getServerSettings();
             settingsManager.save();
         } catch (ConfigLoadException e) {
             e.printStackTrace();
@@ -136,10 +121,10 @@ public class ServerTerminal {
             CommonUtil.registerTerminalPackets();
 
         if (terminalSettings.isConsoleCommandHandler()) {
-            new Thread(() -> {
-                logger.info("Type Command: (try help)");
-                new ConsoleHandler((TermCore) StaticHandler.getCore(), new AutoCompleteHandler(server)).start();
-            }, "ConsoleHandler").start();
+            server.getStartupLock().thenRun(() -> {
+                ConsoleHandler.startConsoleHandlerAsync((TermCore) StaticHandler.getCore(), new AutoCompleteHandler(server));
+                logger.info("Command handler ready! Type Command: (try help)");
+            });
         }
 
         commandMessageParser = new CommandMessageParser(server);
@@ -147,41 +132,10 @@ public class ServerTerminal {
 
         registerCommand(new SettingsCommand(server));
 
-        ThreadUtils.runAsync(() -> {
-            authenticationManager = new AuthenticationManager(server);
-            server.getPluginManager().registerEvents(authenticationManager);
-        }, server.getExecutorService());
-
         if (terminalSettings.isAllowChangePassword())
             registerCommand(new AuthTerminalHandler("changepassword", server));
 
         autoCompleteHandler = new TabCompleteFinder(server);
-
-        if (terminalSettings.isLightAllowed())
-            ThreadUtils.runAsync(() -> {
-                if (StaticHandler.OS.equalsIgnoreCase("Linux") || StaticHandler.OS.contains("Linux") || StaticHandler.isLight()) {
-                    logger.info("Running LightManager (Note this is for raspberry pies only)");
-
-                    Thread lightThread = new Thread(() -> {
-
-                        try {
-                            LightManager.init();
-                            registerCommand(new LightCommand(server));
-                        } catch (IllegalArgumentException | ExceptionInInitializerError | NoPi4JLibsFoundException e) {
-                            logger.error("Unable to load Pi4J Libraries. To show stacktrace, add -debug flag. Message: {}", e.getMessage());
-                            if (StaticHandler.isDebug()) {
-                                e.printStackTrace();
-                                registerCommand(new LightCommand(server));
-                            }
-                        }
-
-                    }, "LightThread");
-//                registerCommand(new LightCommand(this));
-                    lightThread.start();
-                } else {
-                    logger.info("Detected system is not linux. LightManager will not run (manual run with -lightmanager arg)");
-                }
-            }, server.getExecutorService());
     }
 
     public static void startBind() {

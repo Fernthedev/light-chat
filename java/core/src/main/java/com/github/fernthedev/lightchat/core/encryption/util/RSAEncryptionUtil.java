@@ -65,7 +65,7 @@ public class RSAEncryptionUtil {
      * Create a key pair
      * @return The pair
      */
-    public static KeyPair generateKeyPairs() {
+    public static KeyPair generateKeyPairs(int keySize) {
         KeyPairGenerator keyGen;
         try {
             keyGen = KeyPairGenerator.getInstance("RSA");
@@ -73,7 +73,7 @@ public class RSAEncryptionUtil {
             e.printStackTrace();
             return null;
         }
-        keyGen.initialize(StaticHandler.KEY_SIZE);
+        keyGen.initialize(keySize);
         return keyGen.generateKeyPair();
     }
 

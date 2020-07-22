@@ -11,9 +11,11 @@ import com.github.fernthedev.lightchat.server.Server;
 import com.github.fernthedev.lightchat.server.event.AuthenticateRequestEvent;
 import com.github.fernthedev.lightchat.server.event.AuthenticationAttemptedEvent;
 import lombok.Getter;
+import org.jetbrains.annotations.Contract;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Can be used to authenticate command senders.
@@ -31,44 +33,68 @@ public class AuthenticationManager implements Listener {
     protected int amountOfTries = 2;
 
 
-    public boolean authenticate(SenderInterface sender) {
+    /**
+     * Runs asynchronously to check if the
+     * sender is authenticated
+     *
+     * Child classes may override this to their liking
+     *
+     * @param sender authenticator
+     * @return future
+     *
+     * @throws UserIsAuthenticatingException thrown if the user is already attempting authentication
+     */
+    public CompletableFuture<Boolean> authenticate(SenderInterface sender) {
+        if (checking.containsKey(sender)) throw new UserIsAuthenticatingException("The sender " + sender + " is already attempting authentication.");
+
         if (sender instanceof Console) {
-            return true;
+            return CompletableFuture.completedFuture(true);
         }
 
-        PlayerInfo playerInfo = new PlayerInfo(sender);
+        CompletableFuture<Boolean> completableFuture = new CompletableFuture<>();
 
-        if (!checking.containsKey(sender)) {
-            checking.put(sender, playerInfo);
-        }
+        PlayerInfo playerInfo = new PlayerInfo(sender, completableFuture);
 
 
 
         if (sender instanceof ClientConnection) {
-            playerInfo.mode = Mode.AUTHENTICATE;
-            AuthenticateRequestEvent event = new AuthenticateRequestEvent(playerInfo, true);
+            server.getExecutorService().submit(() -> {
 
-            server.getPluginManager().callEvent(event);
+                playerInfo.mode = Mode.AUTHENTICATE;
+                AuthenticateRequestEvent event = new AuthenticateRequestEvent(playerInfo, true);
 
-            if (event.isCancelled()) return playerInfo.authenticated;
+                server.getPluginManager().callEvent(event);
 
-            ClientConnection clientConnection = (ClientConnection) sender;
-            clientConnection.sendObject(new SelfMessagePacket(SelfMessagePacket.MessageType.FILL_PASSWORD),false);
+                if (event.isCancelled()) {
+                    completableFuture.complete(playerInfo.authenticated);
+                    return;
+                }
 
+                if (!checking.containsKey(sender)) {
+                    checking.put(sender, playerInfo);
+                }
+
+                ClientConnection clientConnection = (ClientConnection) sender;
+                clientConnection.sendObject(new SelfMessagePacket(SelfMessagePacket.MessageType.FILL_PASSWORD), false);
+
+
+            });
         }
 
-        while (checking.containsKey(sender)) {
-            try {
-                Thread.sleep(30);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return playerInfo.authenticated;
+        return completableFuture;
     }
 
 
+    /**
+     * Gets the future of the authentication
+     * process for the sender if they are being authenticated
+     *
+     * @return null if not being authenticated
+     */
+    @Contract("null -> null")
+    public CompletableFuture<Boolean> getUserAuthenticationFuture(SenderInterface sender) {
+        return checking.get(sender).future;
+    }
 
     /**
      * This requires the password to be hashed, whether the packet is encrypted
@@ -77,6 +103,7 @@ public class AuthenticationManager implements Listener {
      * If password given is incorrect, SelfMessagePacket.MessageType.INCORRECT_PASSWORD_ATTEMPT
      * is sent. If authentication finishes with incorrect password,
      * SelfMessagePacket.MessageType.INCORRECT_PASSWORD_FAILURE is sent.
+     *
      * @param hashedPassword
      * @param sender
      */
@@ -87,59 +114,60 @@ public class AuthenticationManager implements Listener {
             AuthenticationAttemptedEvent event = new AuthenticationAttemptedEvent(playerInfo, true, null);
 
 
-            if (sender instanceof ClientConnection) {
-                ClientConnection clientConnection = (ClientConnection) sender;
-                if (playerInfo.mode == Mode.AUTHENTICATE) {
+            if (playerInfo.mode == Mode.AUTHENTICATE) {
 
-                    String rightPass = EncryptionUtil.makeSHA256Hash(server.getSettingsManager().getConfigData().getPassword());
+                String rightPass = EncryptionUtil.makeSHA256Hash(server.getSettingsManager().getConfigData().getPassword());
 
-                    AuthenticationAttemptedEvent.EventStatus eventStatus;
+                AuthenticationAttemptedEvent.EventStatus eventStatus;
 
-                    if (rightPass.equals(hashedPassword.getPassword()))
-                        eventStatus = AuthenticationAttemptedEvent.EventStatus.SUCCESS;
-                    else
-                        eventStatus = playerInfo.tries <= amountOfTries ?
-                                AuthenticationAttemptedEvent.EventStatus.ATTEMPT_FAILED :
-                                AuthenticationAttemptedEvent.EventStatus.NO_MORE_TRIES;
+                if (rightPass.equals(hashedPassword.getPassword()))
+                    eventStatus = AuthenticationAttemptedEvent.EventStatus.SUCCESS;
+                else
+                    eventStatus = playerInfo.tries <= amountOfTries ?
+                            AuthenticationAttemptedEvent.EventStatus.ATTEMPT_FAILED :
+                            AuthenticationAttemptedEvent.EventStatus.NO_MORE_TRIES;
 
-                    //Handle event
-                    event.setEventStatus(eventStatus);
+                //Handle event
+                event.setEventStatus(eventStatus);
 
-                    server.getPluginManager().callEvent(event);
-
-                    if (event.isCancelled()) return;
-
-
-                    playerInfo.authenticated = event.getEventStatus() == AuthenticationAttemptedEvent.EventStatus.SUCCESS;
-
-                    switch (event.getEventStatus()) {
-
-                        case SUCCESS:
-                            checking.remove(sender);
-
-                            sender.sendPacket(new SelfMessagePacket(SelfMessagePacket.MessageType.CORRECT_PASSWORD));
-                            break;
-                        case ATTEMPT_FAILED:
-                            sender.sendPacket(new SelfMessagePacket(SelfMessagePacket.MessageType.INCORRECT_PASSWORD_ATTEMPT));
-                            playerInfo.tries++;
-                            break;
-                        case NO_MORE_TRIES:
-                            server.getLogger().warn("{}:{} tried to authenticate but failed 2 times", sender.getName(), clientConnection.getAddress());
-                            sender.sendPacket(new SelfMessagePacket(SelfMessagePacket.MessageType.INCORRECT_PASSWORD_FAILURE));
-                            checking.remove(sender);
-                            break;
-                    }
-                }
-            }
-
-            if (sender instanceof Console) {
                 server.getPluginManager().callEvent(event);
 
                 if (event.isCancelled()) return;
 
-                checking.remove(sender);
+
+                playerInfo.authenticated = event.getEventStatus() == AuthenticationAttemptedEvent.EventStatus.SUCCESS;
+
+                switch (event.getEventStatus()) {
+
+                    case SUCCESS:
+                        completeAuthentication(playerInfo, true);
+
+                        sender.sendPacket(new SelfMessagePacket(SelfMessagePacket.MessageType.CORRECT_PASSWORD));
+                        break;
+                    case ATTEMPT_FAILED:
+                        sender.sendPacket(new SelfMessagePacket(SelfMessagePacket.MessageType.INCORRECT_PASSWORD_ATTEMPT));
+                        playerInfo.tries++;
+
+                        break;
+                    case NO_MORE_TRIES:
+
+                        String info;
+
+                        if (sender instanceof ClientConnection) info = ((ClientConnection) sender).getAddress();
+                        else info = "";
+
+                        server.getLogger().warn("{}:{} tried to authenticate but failed 2 times", sender.getName(), info);
+                        sender.sendPacket(new SelfMessagePacket(SelfMessagePacket.MessageType.INCORRECT_PASSWORD_FAILURE));
+                        completeAuthentication(playerInfo, false);
+                        break;
+                }
             }
         }
+    }
+
+    protected void completeAuthentication(PlayerInfo playerInfo, boolean authenticated) {
+        playerInfo.future.complete(authenticated);
+        checking.remove(playerInfo.sender);
     }
 
     /**
@@ -156,6 +184,8 @@ public class AuthenticationManager implements Listener {
 
     public static class PlayerInfo {
 
+        protected CompletableFuture<Boolean> future;
+
         public final SenderInterface sender;
 
         public boolean authenticated = false;
@@ -165,8 +195,9 @@ public class AuthenticationManager implements Listener {
 
 
 
-        public PlayerInfo(SenderInterface sender) {
+        public PlayerInfo(SenderInterface sender, CompletableFuture<Boolean> completableFuture) {
             this.sender = sender;
+            this.future = completableFuture;
         }
 
 

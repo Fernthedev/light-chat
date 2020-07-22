@@ -89,13 +89,17 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         if (validateIsBanned(ctx)) return;
 
         try {
-
-            EventListener eventListener = server.getPlayerHandler().getChannelMap().get(ctx.channel()).getEventListener();
+            ClientConnection connection = server.getPlayerHandler().getChannelMap().get(ctx.channel());
+            EventListener eventListener = connection.getEventListener();
 
             if (msg instanceof Pair) {
                 Pair<? extends Packet, Integer> pair = (Pair<? extends Packet, Integer>) msg;
                 if (pair.getKey() instanceof ConnectedPacket) {
-                    eventListener.handleConnect((ConnectedPacket) pair.getKey());
+                    if (!connection.isRegistered()) {
+                        eventListener.handleConnect((ConnectedPacket) pair.getKey());
+                    } else {
+                        server.getLogger().warn("Connection {} just attempted to send a connection packet while registered. Glitch or security bug? ", connection.toString());
+                    }
                 } else {
                     if (!server.getPlayerHandler().getChannelMap().containsKey(ctx.channel())) {
                         // Discard the received data silently.

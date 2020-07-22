@@ -2,7 +2,9 @@ package com.github.fernthedev.lightchat.server;
 
 import com.github.fernthedev.config.common.Config;
 import com.github.fernthedev.fernutils.thread.ThreadUtils;
+import com.github.fernthedev.fernutils.thread.single.TaskInfo;
 import com.github.fernthedev.lightchat.core.ColorCode;
+import com.github.fernthedev.lightchat.core.NoFileConfig;
 import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.core.api.APIUsage;
 import com.github.fernthedev.lightchat.core.api.event.api.Listener;
@@ -19,7 +21,6 @@ import com.github.fernthedev.lightchat.server.netty.MulticastServer;
 import com.github.fernthedev.lightchat.server.netty.ProcessingHandler;
 import com.github.fernthedev.lightchat.server.security.AuthenticationManager;
 import com.github.fernthedev.lightchat.server.security.BanManager;
-import com.github.fernthedev.lightchat.server.settings.NoFileConfig;
 import com.github.fernthedev.lightchat.server.settings.ServerSettings;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -81,7 +82,7 @@ public class Server implements Runnable {
 
     @Getter
     @Setter
-    private Config<ServerSettings> settingsManager = new NoFileConfig<>(new ServerSettings());
+    private Config<? extends ServerSettings> settingsManager = new NoFileConfig<>(new ServerSettings());
 
     private MulticastServer multicastServer;
 
@@ -224,7 +225,7 @@ public class Server implements Runnable {
             shutdown = false;
 
             StaticHandler.displayVersion();
-            List<Future<Void>> tasks = new ArrayList<>();
+            List<TaskInfo<Void>> tasks = new ArrayList<>();
 
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
@@ -254,8 +255,8 @@ public class Server implements Runnable {
             e.printStackTrace();
         }*/
 
-            tasks.add(ThreadUtils.runAsync(() -> {
-                if (settingsManager.getConfigData().isUseMulticast()) {
+            if (settingsManager.getConfigData().isUseMulticast()) {
+                tasks.add(ThreadUtils.runAsync(() -> {
                     getLogger().info("Initializing MultiCast Server");
                     try {
                         multicastServer = new MulticastServer("MultiCast Thread", this, StaticHandler.getMulticastAddress());
@@ -263,8 +264,14 @@ public class Server implements Runnable {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                }
-            }, executorService));
+
+                }, executorService));
+            }
+
+            tasks.add(ThreadUtils.runAsync(() -> {
+                authenticationManager = new AuthenticationManager(this);
+                getPluginManager().registerEvents(authenticationManager);
+            }, getExecutorService()));
 
 
 //        LoggerManager loggerManager = new LoggerManager();
@@ -276,14 +283,8 @@ public class Server implements Runnable {
 //        await();
             tasks.add(ThreadUtils.runAsync((Runnable) this::initServer, executorService));
 
-            for (Future<Void> taskInfo : tasks) {
-                while (!taskInfo.isDone()) {
-                    try {
-                        Thread.sleep(1);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+            for (TaskInfo<Void> taskInfo : tasks) {
+                taskInfo.awaitFinish(1);
             }
 
 
@@ -365,7 +366,8 @@ public class Server implements Runnable {
 
                         ch.pipeline().addLast(channelHandlers.toArray(new ChannelHandler[0]));
                     }
-                }).option(ChannelOption.SO_BACKLOG, 128)
+                })
+                .option(ChannelOption.SO_BACKLOG, 128)
                 .option(ChannelOption.RCVBUF_ALLOCATOR, new AdaptiveRecvByteBufAllocator(512, 512, 64 * 1024))
                 //       .option(EpollChannelOption.MAX_DATAGRAM_PAYLOAD_SIZE, 512)
                 .childOption(ChannelOption.SO_KEEPALIVE, true)

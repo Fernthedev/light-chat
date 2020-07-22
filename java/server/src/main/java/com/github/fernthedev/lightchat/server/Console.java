@@ -15,6 +15,7 @@ public class Console implements SenderInterface, Serializable {
 
     @Nullable
     @Override
+    @Deprecated
     public ChannelFuture sendPacket(Packet packet) {
         return null;
     }

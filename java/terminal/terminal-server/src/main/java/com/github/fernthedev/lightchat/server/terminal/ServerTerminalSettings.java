@@ -1,7 +1,14 @@
 package com.github.fernthedev.lightchat.server.terminal;
 
+import com.github.fernthedev.config.common.Config;
+import com.github.fernthedev.config.gson.GsonConfig;
 import com.github.fernthedev.lightchat.server.settings.ServerSettings;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.SneakyThrows;
+
+import java.io.File;
 
 @Getter
 @Builder
@@ -10,10 +17,8 @@ public class ServerTerminalSettings {
 
     @Builder.Default
     @NonNull
-    private ServerSettings serverSettings = new ServerSettings();
+    private Config<? extends ServerSettings> serverSettings = createConfigWithoutException();
 
-    @Builder.Default
-    protected boolean lightAllowed = true;
 
     @Builder.Default
     protected boolean allowChangePassword = true;
@@ -22,13 +27,7 @@ public class ServerTerminalSettings {
     protected boolean allowTermPackets = true;
 
     @Builder.Default
-    protected boolean allowPortArgParse = true;
-
-    @Builder.Default
-    protected boolean allowDebugArgParse = true;
-
-    @Builder.Default
-    protected boolean launchConsoleWhenNull = true;
+    protected boolean launchConsoleInCMDWhenNone = true;
 
     @Builder.Default
     protected boolean consoleCommandHandler = true;
@@ -36,4 +35,9 @@ public class ServerTerminalSettings {
     @Builder.Default
     protected int port = -1;
 
+
+    @SneakyThrows
+    protected static Config<? extends ServerSettings> createConfigWithoutException() {
+        return new GsonConfig<>(new ServerSettings(), new File("settings.json"));
+    }
 }
