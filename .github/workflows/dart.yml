@@ -57,7 +57,7 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/pubspec.lock') }}
           restore-keys: ${{ runner.os }}-dart
       - name: Install dependencies
-      - run: cd dart/core ${{ matrix.and }} pub get
+        run: cd dart/core ${{ matrix.and }} pub get
       - run: cd dart/client ${{ matrix.and }} pub get
       - run: cd dart/client ${{ matrix.and }} mkdir build
       - name: Compile to native
