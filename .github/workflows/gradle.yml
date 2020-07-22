@@ -3,16 +3,15 @@ name: Java CI
 on:
   push:
     paths:
-      - 'java/**'
-      - 'java/*'
-      - 'java/' 
+      - "java/**"
+      - "java/*"
+      - "java/"
   release:
-      types: # This configuration does not affect the page_build event above
-        - created
+    types: # This configuration does not affect the page_build event above
+      - created
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -23,6 +22,12 @@ jobs:
           java-version: 1.8
       - name: Change wrapper permissions
         run: cd java && chmod +x ./gradlew
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle
       - name: Build with Gradle
         run: cd java && ./gradlew clean build
       - name: Upload server artifact
@@ -31,8 +36,8 @@ jobs:
           # Artifact name
           name: Server Jar Files
           # Directory containing files to upload
-          path: ./java/terminal/terminal-server/build/libs 
-      - name: Upload client artifact 
+          path: ./java/terminal/terminal-server/build/libs
+      - name: Upload client artifact
         uses: actions/upload-artifact@v1.0.0
         with:
           # Artifact name

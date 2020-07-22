@@ -3,15 +3,14 @@ name: DotNET CSharp CI
 on:
   push:
     paths:
-      - 'csharp/**'
-      - 'csharp/*'
-      - 'csharp/' 
+      - "csharp/**"
+      - "csharp/*"
+      - "csharp/"
   release:
-      types: # This configuration does not affect the page_build event above
-        - created
+    types: # This configuration does not affect the page_build event above
+      - created
 jobs:
   build:
-
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -20,21 +19,28 @@ jobs:
         include:
           - os: ubuntu-latest
             output-name: client-linux
-            and: '&&'
+            and: "&&"
           - os: macOS-latest
             output-name: client-mac
-            and: '&&'
+            and: "&&"
           - os: windows-latest
             output-name: client-windows.exe
-            and: ';'
-    
+            and: ";"
+
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v1.4.0
-      with:
-        dotnet-version: 3.1.102
-    - name: Build and restore core
-      run: cd csharp/core ${{ matrix.and }} dotnet build
-    - name: Build
-      run: cd csharp/client ${{ matrix.and }} dotnet build --configuration Release
+      - uses: actions/checkout@v2
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1.4.0
+        with:
+          dotnet-version: 3.1.102
+      - name: Cache NuGet packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+      - name: Build and restore core
+        run: cd csharp/core ${{ matrix.and }} dotnet build
+      - name: Build
+        run: cd csharp/client ${{ matrix.and }} dotnet build --configuration Release
