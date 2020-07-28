@@ -28,8 +28,9 @@ class InitialHandshakePacket extends Packet {
   factory InitialHandshakePacket.create(
       RSAPublicKey publicKey, VersionData versionData) {
     var packet = InitialHandshakePacket();
-    if (publicKey != null)
+    if (publicKey != null) {
       packet.publicKey = EncryptionUtil.rsaAsymmetricKeyToString(publicKey);
+    }
     packet.versionData = versionData.toDataString();
     return packet;
   }

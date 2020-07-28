@@ -231,9 +231,10 @@ class EncryptedJSONObjectDecoder extends LineStringSeperatorDecoder {
       //   if (Variables.debug) print(
       //      'Decrypted json object: $decryptedJsonObject');
 
-      if (Variables.debug)
+      if (Variables.debug) {
         print(
             'Parsing: ${packetWrapper.packetIdentifier}  $decryptedJsonObject');
+      }
 
       out.add(
           getParsedObject(packetWrapper.packetIdentifier, decryptedJsonObject));

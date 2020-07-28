@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="BranchesTreeState">
     <expand>
       <path>
@@ -20,35 +23,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="74a9c842-9768-484a-b6c1-feb6a74ad587" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../.github/workflows/dart.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../.github/workflows/dart.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/.vscode/launch.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/.vscode/settings.json" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/deprecated/fastjson/EncryptedFastJSONObjectDecoder.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/deprecated/fastjson/EncryptedFastJSONObjectEncoder.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/deprecated/gson/EncryptedGSONObjectDecoder.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/deprecated/gson/EncryptedGSONObjectEncoder.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/old/client/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/old/core/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/old/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/old/server/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/terminal/terminal-server/banned.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../dart/client/bin/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/client/bin/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/bin/main.reflectable.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/lib/EventListener.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/client/lib/EventListener.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/lib/client.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/client/lib/client.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/lib/data/packetdata.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/lib/data/packetdata.g.dart" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../dart/client/lib/data/serverdata.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/client/lib/data/serverdata.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../dart/client/lib/multicast.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/client/lib/multicast.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/lib/packets/handshake_packets.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/lib/packets/handshake_packets.g.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/lib/packets/latency_packets.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/lib/packets/latency_packets.g.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/lib/packets/other_packets.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/lib/packets/other_packets.g.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/lib/packets/packets.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/lib/packets/packets.g.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/lib/transport/codecs/AcceptablePacketTypes.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/lib/transport/codecs/codecs.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/lib/transport/packet_registry.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/lib/transport/packetwrapper.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/lib/transport/packetwrapper.g.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/lib/util/encryption/encryption.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/lib/variables.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/client/pubspec.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dart/core/lib/src/packets/handshake_packets.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/core/lib/src/packets/handshake_packets.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dart/core/lib/src/transport/codecs/codecs.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/core/lib/src/transport/codecs/codecs.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/StaticHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/StaticHandler.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -146,7 +137,7 @@
     <property name="android.sdk.path" value="$USER_HOME$/AppData/Local/Android/Sdk" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="go.import.settings.migrated" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../ObamaBot/build.gradle" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="project.structure.last.edited" value="Problems" />
     <property name="project.structure.proportion" value="0.1528965" />
@@ -362,6 +353,7 @@
       </list>
     </recent_temporary>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="project-level" UseSingleDictionary="true" transferred="true" />
   <component name="StructuralSearchPlugin">
     <searchConfiguration name="user defined" created="1583622866889" text="System.exit(0);" recursive="true" caseInsensitive="true" type="JAVA" pattern_context="default" scope_type="PROJECT" scope_descriptor="" history="1">
       <constraint name="__context__" within="" contains="" />
@@ -379,7 +371,6 @@
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="74a9c842-9768-484a-b6c1-feb6a74ad587" name="Default Changelist" comment="" />
-      <changelist id="" name="CSharp" comment="" />
       <created>1569626764568</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -441,7 +432,14 @@
       <workItem from="1595339823225" duration="9440000" />
       <workItem from="1595371672422" duration="2558000" />
       <workItem from="1595426585061" duration="1190000" />
-      <workItem from="1595439455262" duration="5736000" />
+      <workItem from="1595439455262" duration="7180000" />
+      <workItem from="1595522086420" duration="595000" />
+      <workItem from="1595604140049" duration="1177000" />
+      <workItem from="1595627121832" duration="1177000" />
+      <workItem from="1595776542902" duration="573000" />
+      <workItem from="1595864421102" duration="2587000" />
+      <workItem from="1595946965248" duration="585000" />
+      <workItem from="1595961210940" duration="602000" />
     </task>
     <task id="LOCAL-00006" summary="- Changed to a PacketRegistry system to allow for cross platform usage (packetname : packet.class)&#10;- Fixed a bug that caused the client to print an exception when sending a message before it was successfully registered&#10;- Added Alibaba FAST_JSON support (config setting) Gson is still default&#10;- Added MultiCast gracefully shut down.">
       <created>1574383998656</created>
@@ -790,7 +788,7 @@
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="2" />
+    <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.History.Properties">
     <option name="COLUMN_ORDER">
@@ -917,10 +915,10 @@
     </state>
     <state x="184" y="91" width="1536" height="861" key="DiffContextDialog/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1595080540353" />
     <state x="245" y="139" width="2048" height="1098" key="DiffContextDialog/0.23.2560.1326@0.23.2560.1326" timestamp="1594326914860" />
-    <state x="740" y="275" key="FileChooserDialogImpl" timestamp="1595080980027">
+    <state x="740" y="275" key="FileChooserDialogImpl" timestamp="1595871169415">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="740" y="275" key="FileChooserDialogImpl/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1595080980027" />
+    <state x="740" y="275" key="FileChooserDialogImpl/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1595871169415" />
     <state width="1877" height="340" key="GridCell.Tab.0.bottom" timestamp="1595454169221">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>

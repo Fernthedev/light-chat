@@ -30,7 +30,7 @@ class Multicast {
           if (dg == null) {
             print('Discarding null dg.');
           } else {
-            var codec = new Utf8Codec();
+            var codec = Utf8Codec();
             final mess = codec.decode(dg.data);
             print('Received $mess!');
           }
@@ -50,11 +50,16 @@ class Multicast {
 class MulticastData with _$MulticastDataLombok {
   MulticastData(this.address, this.version, this.port, this.clientNumbers);
 
+  @override
   final String address;
 
+  @override
   final String version;
+  @override
   final int port;
 
+  @override
   int clientNumbers = 0;
+  @override
   List<String> clients;
 }
