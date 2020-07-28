@@ -113,7 +113,8 @@ class EncryptionUtil {
     var pem =
         '-----BEGIN RSA PUBLIC KEY-----\n$key\n-----END RSA PUBLIC KEY-----';
 
-    var public = X509Utils.publicKeyFromPem(pem);
+
+    var public = CryptoUtils.rsaPublicKeyFromPem(pem);
 
     return public;
   }
