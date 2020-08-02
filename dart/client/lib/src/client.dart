@@ -117,6 +117,15 @@ class Client implements IKeyEncriptionHolder {
     list.add(callback);
   }
 
+  void unregisterCallback<T>(
+      EventType<T> eventType, EventCallback<T> callback) {
+    if (!eventListeners.containsKey(eventType)) return;
+
+    eventListeners[eventType].remove(callback);
+
+    if (eventListeners[eventType].isEmpty) eventListeners.remove(eventType);
+  }
+
   Future<void> runCallbacks<T>(EventType<T> eventType, T data) async {
     var list = eventListeners[eventType];
 
