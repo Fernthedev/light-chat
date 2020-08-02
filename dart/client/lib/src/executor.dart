@@ -49,7 +49,8 @@ void startClient(List<String> arguments) {
     // setupAsyncInput(client);
   });
 
-  client.onDisconnect((s) {
+  client.runCallbacks(EventType.DISCONNECT_EVENT, (s) {
+    print('Error: ${s}');
     exit(0);
   });
 }

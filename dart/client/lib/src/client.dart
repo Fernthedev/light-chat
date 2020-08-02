@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:core';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -6,11 +7,19 @@ import 'package:light_chat_core/core.dart';
 import 'package:light_chat_core/packet_io.dart';
 import 'package:light_chat_core/packets_codecs.dart';
 
-import 'package:pedantic/pedantic.dart';
 import 'package:pointycastle/api.dart';
 
 import 'EventListener.dart';
 import 'data/serverdata.dart';
+
+typedef EventCallback<T> = void Function(T data);
+
+class EventType<T> {
+  static final REGISTER_EVENT = EventType<ServerData>();
+  static final CONNECT_EVENT = EventType<ServerData>();
+  static final DISCONNECT_EVENT = EventType<ServerData>();
+  static final ERROR_EVENT = EventType<Error>();
+}
 
 class Client implements IKeyEncriptionHolder {
   Socket socket;
@@ -26,19 +35,14 @@ class Client implements IKeyEncriptionHolder {
   int milliPingDelay;
   ServerData _serverData;
 
-  bool _disconnecting = false;
+  bool disconnecting = false;
 
   ServerData get serverData => _serverData;
 
-  final List<PacketListener> futureList = <PacketListener>[];
-  final List<Function> _registerCallBackList = <Function(ServerData)>[];
-  final List<Function(ServerData)> _connectCallBackList =
-      <Function(ServerData)>[];
+  final List<PacketListener> packetListeners = <PacketListener>[];
 
-  final List<Function(ServerData)> _disconnectCallBackList =
-      <Function(ServerData)>[];
-
-  final List<Function> _errorCallBackList = <Function>[];
+  final Map<EventType<dynamic>, List<EventCallback<dynamic>>> eventListeners =
+      {};
 
   /// True when the server sucessfully establishes the connection and the server registered the info.
   bool _registered = false;
@@ -47,13 +51,13 @@ class Client implements IKeyEncriptionHolder {
   bool get connected => _connected;
   set connected(bool val) {
     _connected = val;
-    _runConnectCallbacks();
+    runCallbacks(EventType.CONNECT_EVENT, serverData);
   }
 
   bool get registered => _registered;
   set registered(bool val) {
     _registered = val;
-    _runRegisterCallbacks();
+    runCallbacks(EventType.REGISTER_EVENT, serverData);
   }
 
   PacketEventHandler eventHandler;
@@ -66,20 +70,22 @@ class Client implements IKeyEncriptionHolder {
   }
 
   Future<void> initializeConnection(ServerData serverData) async {
-    _registered = false;
-    _connected = false;
+    try {
+      _registered = false;
+      _connected = false;
 
-    _serverData = serverData;
+      _serverData = serverData;
 
-    var ip = serverData.ip;
-    var port = serverData.port;
+      var ip = serverData.ip;
+      var port = serverData.port;
 
-    _encoder = EncryptedJSONObjectEncoder(this, lineEndStringEncoder);
-    _decoder = EncryptedJSONObjectDecoder(this);
+      _encoder = EncryptedJSONObjectEncoder(this, lineEndStringEncoder);
+      _decoder = EncryptedJSONObjectDecoder(this);
 
-    print('Attempt connection $ip:$port');
+      print('Attempt connection $ip:$port');
 
-    var s = Socket.connect(ip, port).then((Socket sock) {
+      var sock = await Socket.connect(ip, port);
+
       print('Connected');
       connected = true;
       socket = sock;
@@ -90,81 +96,31 @@ class Client implements IKeyEncriptionHolder {
 
       socket.listen(onReceive, onError: (e) {
         print('Server error: $e');
-        _runErrorCallbacks();
+        runCallbacks(EventType.ERROR_EVENT, e);
         throw e;
       }, onDone: onDoneEvent, cancelOnError: Variables.debug);
-    });
-
-    unawaited(s.catchError((e) => _runErrorCallbacks()));
-
-    return Future.value(s);
-  }
-
-  void onRegister(Function(ServerData) callback) {
-    _registerCallBackList.add(callback);
-  }
-
-  void removeOnRegister(Function(ServerData) callback) {
-    _registerCallBackList.remove(callback);
-  }
-
-  void onConnect(Function(ServerData) callback) {
-    _connectCallBackList.add(callback);
-  }
-
-  void removeOnConnect(Function(ServerData) callback) {
-    _connectCallBackList.remove(callback);
-  }
-
-  void onDisconnect(Function(ServerData) callback) {
-    _disconnectCallBackList.add(callback);
-  }
-
-  void removeOnDisconnect(Function(ServerData) callback) {
-    _disconnectCallBackList.remove(callback);
-  }
-
-  void onError(Function callback) {
-    _errorCallBackList.add(callback);
-  }
-
-  void removeOnError(Function callback) {
-    _errorCallBackList.remove(callback);
-  }
-
-  void _runErrorCallbacks() async {
-    for (var callback in _errorCallBackList) {
-      if (Variables.debug) print('Running the callback');
-      unawaited(runCallback(callback));
+    } catch (e) {
+      runCallbacks(EventType.ERROR_EVENT, e);
+      rethrow;
     }
   }
 
-  void _runConnectCallbacks() async {
-    for (var callback in _connectCallBackList) {
-      if (Variables.debug) print('Running the callback');
-      unawaited(runCallback(callback, arguments: serverData));
-    }
+  void registerCallback<T>(EventType<T> eventType, EventCallback<T> callback) {
+    eventListeners.putIfAbsent(eventType, () => <EventCallback<dynamic>>[]);
+
+    var list = eventListeners[eventType];
+
+    list.add(callback);
   }
 
-  void _runDisconnectCallbacks() async {
-    if (!_disconnecting) {
-      for (var callback in _disconnectCallBackList) {
-        if (Variables.debug) print('Running the callback');
-        unawaited(runCallback(callback, arguments: serverData));
+  void runCallbacks<T>(EventType<T> eventType, T data) async {
+    var list = eventListeners[eventType];
+
+    if (list != null) {
+      for (var callback in list) {
+        callback(data);
       }
     }
-  }
-
-  void _runRegisterCallbacks() async {
-    for (Function() callback in _registerCallBackList) {
-      if (Variables.debug) print('Running the callback');
-      unawaited(runCallback(callback, arguments: serverData));
-    }
-  }
-
-  Future<void> runCallback(Function function, {Object arguments}) async {
-    function(arguments);
-    return Future.value();
   }
 
   Future<void> onReceive(dynamic data) async {
@@ -267,28 +223,28 @@ class Client implements IKeyEncriptionHolder {
   }
 
   void addPacketListener(PacketListener listener) {
-    futureList.add(listener);
+    packetListeners.add(listener);
   }
 
   void removePacketListener(PacketListener listener) {
-    futureList.remove(listener);
+    packetListeners.remove(listener);
   }
 
   void handlePacket(Packet p, [Object result]) async {
-    for (var packetListener in futureList) {
+    for (var packetListener in packetListeners) {
       packetListener.handle(p, result);
     }
   }
 
   Future<void> close() async {
-    _disconnecting = true;
+    disconnecting = true;
 
     print('Closing socket');
     await socket.close();
     print('Closed');
 
-    _disconnecting = false;
-    _runDisconnectCallbacks();
+    disconnecting = false;
+    runCallbacks(EventType.DISCONNECT_EVENT, serverData);
 
     return Future.value();
   }
