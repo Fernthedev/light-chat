@@ -6,6 +6,7 @@ import 'package:basic_utils/basic_utils.dart';
 import 'package:crypto/crypto.dart';
 
 import 'package:encrypt/encrypt.dart';
+import 'package:light_chat_core/core.dart';
 import 'package:pointycastle/api.dart';
 import 'package:pointycastle/asymmetric/api.dart';
 
@@ -21,7 +22,7 @@ class EncryptionUtil {
 
   static Uint8List createRandomBytes([int length = 32]) {
     return Uint8List.fromList(
-        List<int>.generate(length, (i) => _random.nextInt(256)));
+        List<int>.generate(length, (i) => _random.nextInt(Variables.keySize)));
   }
 
   static String createCryptoRandomString([int length = 32]) {
@@ -50,7 +51,7 @@ class EncryptionUtil {
       ..[0] = 4
       ..[1] = 16;
     for (var i = 2; i < 18; i++) {
-      params[i] = random.nextInt(256);
+      params[i] = random.nextInt(Variables.keySize); // 256
     }
     var iv = params.sublist(2);
 

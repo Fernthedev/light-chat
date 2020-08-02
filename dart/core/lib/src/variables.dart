@@ -9,6 +9,8 @@ class Variables {
 
   static bool _debug = false;
 
+  static int keySize = 256;
+
   static bool get debug => _debug;
 
   static set debug(bool debug) {

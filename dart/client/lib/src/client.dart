@@ -15,10 +15,12 @@ import 'data/serverdata.dart';
 typedef EventCallback<T> = void Function(T data);
 
 class EventType<T> {
-  static final REGISTER_EVENT = EventType<ServerData>();
-  static final CONNECT_EVENT = EventType<ServerData>();
-  static final DISCONNECT_EVENT = EventType<ServerData>();
-  static final ERROR_EVENT = EventType<Error>();
+  static const REGISTER_EVENT = EventType<ServerData>();
+  static const CONNECT_EVENT = EventType<ServerData>();
+  static const DISCONNECT_EVENT = EventType<ServerData>();
+  static const ERROR_EVENT = EventType<Error>();
+
+  const EventType();
 }
 
 class Client implements IKeyEncriptionHolder {
@@ -84,13 +86,14 @@ class Client implements IKeyEncriptionHolder {
 
       print('Attempt connection $ip:$port');
 
-      var sock = await Socket.connect(ip, port);
+      socket = await Socket.connect(ip, port);
 
       print('Connected');
       connected = true;
-      socket = sock;
+      print('Making key');
       _key = EncryptionUtil.generateSecretKeyParam();
       _registered = false;
+      print('Key generated');
 
       socket.setOption(SocketOption.tcpNoDelay, true);
 
@@ -99,6 +102,7 @@ class Client implements IKeyEncriptionHolder {
         await runCallbacks(EventType.ERROR_EVENT, e);
       }, onDone: onDoneEvent);
     } catch (e) {
+      print('Server error: $e');
       await runCallbacks(EventType.ERROR_EVENT, e);
     }
   }
