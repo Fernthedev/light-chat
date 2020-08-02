@@ -94,14 +94,12 @@ class Client implements IKeyEncriptionHolder {
 
       socket.setOption(SocketOption.tcpNoDelay, true);
 
-      socket.listen(onReceive, onError: (e) {
+      socket.listen(onReceive, onError: (e) async {
         print('Server error: $e');
-        runCallbacks(EventType.ERROR_EVENT, e);
-        throw e;
-      }, onDone: onDoneEvent, cancelOnError: Variables.debug);
+        await runCallbacks(EventType.ERROR_EVENT, e);
+      }, onDone: onDoneEvent);
     } catch (e) {
-      runCallbacks(EventType.ERROR_EVENT, e);
-      rethrow;
+      await runCallbacks(EventType.ERROR_EVENT, e);
     }
   }
 
