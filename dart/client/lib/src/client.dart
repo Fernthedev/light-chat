@@ -113,7 +113,7 @@ class Client implements IKeyEncriptionHolder {
     list.add(callback);
   }
 
-  void runCallbacks<T>(EventType<T> eventType, T data) async {
+  Future<void> runCallbacks<T>(EventType<T> eventType, T data) async {
     var list = eventListeners[eventType];
 
     if (list != null) {
@@ -121,6 +121,8 @@ class Client implements IKeyEncriptionHolder {
         callback(data);
       }
     }
+
+    return Future.value();
   }
 
   Future<void> onReceive(dynamic data) async {
@@ -239,12 +241,14 @@ class Client implements IKeyEncriptionHolder {
   Future<void> close() async {
     disconnecting = true;
 
-    print('Closing socket');
-    await socket.close();
+    if (socket != null) {
+      print('Closing socket');
+      await socket.close();
+    }
     print('Closed');
 
     disconnecting = false;
-    runCallbacks(EventType.DISCONNECT_EVENT, serverData);
+    await runCallbacks(EventType.DISCONNECT_EVENT, serverData);
 
     return Future.value();
   }
