@@ -15,12 +15,14 @@ import 'data/serverdata.dart';
 typedef EventCallback<T> = void Function(T data);
 
 class EventType<T> {
-  static const REGISTER_EVENT = EventType<ServerData>();
-  static const CONNECT_EVENT = EventType<ServerData>();
-  static const DISCONNECT_EVENT = EventType<ServerData>();
-  static const ERROR_EVENT = EventType<Error>();
+  static const REGISTER_EVENT = EventType<ServerData>('REGISTER_EVENT');
+  static const CONNECT_EVENT = EventType<ServerData>('CONNECT_EVENT');
+  static const DISCONNECT_EVENT = EventType<ServerData>('DISCONNECT_EVENT');
+  static const ERROR_EVENT = EventType<Error>('ERROR_EVENT');
 
-  const EventType();
+  const EventType(this.eventName);
+
+  final String eventName;
 }
 
 class Client implements IKeyEncriptionHolder {
