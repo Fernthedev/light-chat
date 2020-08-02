@@ -97,7 +97,7 @@ class Client implements IKeyEncriptionHolder {
 
     unawaited(s.catchError((e) => _runErrorCallbacks()));
 
-    return s;
+    return Future.value(s);
   }
 
   void onRegister(Function(ServerData) callback) {
