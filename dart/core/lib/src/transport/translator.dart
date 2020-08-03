@@ -44,7 +44,6 @@ class ClassTranslator {
     registerReverseTranslation(Int8, 'byte');
     registerReverseTranslation(Int16, 'short');
     registerReverseTranslation(Int32, 'int');
-    registerReverseTranslation(Int64, 'long');
     registerReverseTranslation(int, 'long');
     registerReverseTranslation(Float, 'float');
   }
