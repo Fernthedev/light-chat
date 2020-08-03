@@ -49,7 +49,7 @@ class Client implements IKeyEncriptionHolder {
       {};
 
   // Watch event registers
-  final Map<dynamic,EventCallback<dynamic>> eventListenerRegistry = {};
+  final Map<dynamic, EventCallback<dynamic>> eventListenerRegistry = {};
 
   /// True when the server sucessfully establishes the connection and the server registered the info.
   bool _registered = false;
@@ -284,6 +284,9 @@ class Client implements IKeyEncriptionHolder {
 
     disconnecting = false;
     await runCallbacks(EventType.DISCONNECT_EVENT, serverData);
+
+    eventListeners.clear();
+    eventListenerRegistry.clear();
 
     return Future.value();
   }
