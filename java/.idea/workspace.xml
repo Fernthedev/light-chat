@@ -23,23 +23,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="74a9c842-9768-484a-b6c1-feb6a74ad587" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/core/deprecated/fastjson/EncryptedFastJSONObjectDecoder.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/deprecated/fastjson/EncryptedFastJSONObjectEncoder.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/deprecated/gson/EncryptedGSONObjectDecoder.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/deprecated/gson/EncryptedGSONObjectEncoder.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/client/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/core/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/server/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/terminal/terminal-server/banned.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/bin/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/client/bin/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/lib/data/serverdata.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/client/lib/data/serverdata.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/client/lib/multicast.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/client/lib/multicast.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/core/lib/src/packets/handshake_packets.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/core/lib/src/packets/handshake_packets.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../dart/core/lib/src/transport/codecs/codecs.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/core/lib/src/transport/codecs/codecs.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/StaticHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/StaticHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/util/ClassTranslator.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/util/ClassTranslator.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,6 +39,9 @@
   </component>
   <component name="CodeInsightWorkspaceSettings">
     <option name="optimizeImportsOnTheFly" value="true" />
+  </component>
+  <component name="ComposerSettings">
+    <execution />
   </component>
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
@@ -137,7 +126,7 @@
     <property name="android.sdk.path" value="$USER_HOME$/AppData/Local/Android/Sdk" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="go.import.settings.migrated" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../ObamaBot/build.gradle" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../web_ip_auth/frontend" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="project.structure.last.edited" value="Problems" />
     <property name="project.structure.proportion" value="0.1528965" />
@@ -191,7 +180,7 @@
       <command value="gradle termina:terminal-server:dependencies" />
     </option>
   </component>
-  <component name="RunManager" selected="Gradle.ServerTerminal">
+  <component name="RunManager" selected="Gradle.ClientTerminal">
     <configuration default="true" type="Application" factoryName="Application">
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <method v="2">
@@ -337,21 +326,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <list>
-      <item itemvalue="Gradle.ServerTerminal" />
-      <item itemvalue="Gradle.ClientTerminal" />
-      <item itemvalue="Gradle.Gradle Build and Install" />
-      <item itemvalue="Gradle.java [processResources]" />
-      <item itemvalue="Gradle.java [dependencies:tree]" />
-      <item itemvalue="Gradle.java [termina:terminal-server:dependencies]" />
-      <item itemvalue="Maven.Maven Build (old)" />
-    </list>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Gradle.java [termina:terminal-server:dependencies]" />
-        <item itemvalue="Gradle.java [dependencies:tree]" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="project-level" UseSingleDictionary="true" transferred="true" />
   <component name="StructuralSearchPlugin">
@@ -440,6 +414,9 @@
       <workItem from="1595864421102" duration="2587000" />
       <workItem from="1595946965248" duration="585000" />
       <workItem from="1595961210940" duration="602000" />
+      <workItem from="1596212014089" duration="160000" />
+      <workItem from="1596287409201" duration="1188000" />
+      <workItem from="1596474525927" duration="711000" />
     </task>
     <task id="LOCAL-00006" summary="- Changed to a PacketRegistry system to allow for cross platform usage (packetname : packet.class)&#10;- Fixed a bug that caused the client to print an exception when sending a message before it was successfully registered&#10;- Added Alibaba FAST_JSON support (config setting) Gson is still default&#10;- Added MultiCast gracefully shut down.">
       <created>1574383998656</created>
@@ -915,10 +892,10 @@
     </state>
     <state x="184" y="91" width="1536" height="861" key="DiffContextDialog/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1595080540353" />
     <state x="245" y="139" width="2048" height="1098" key="DiffContextDialog/0.23.2560.1326@0.23.2560.1326" timestamp="1594326914860" />
-    <state x="740" y="275" key="FileChooserDialogImpl" timestamp="1595871169415">
+    <state x="740" y="275" key="FileChooserDialogImpl" timestamp="1596212181862">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="740" y="275" key="FileChooserDialogImpl/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1595871169415" />
+    <state x="740" y="275" key="FileChooserDialogImpl/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1596212181862" />
     <state width="1877" height="340" key="GridCell.Tab.0.bottom" timestamp="1595454169221">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -971,23 +948,16 @@
     </state>
     <state width="1877" height="340" key="GridCell.Tab.1.right/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1595454169220" />
     <state width="2101" height="458" key="GridCell.Tab.1.right/0.23.2560.1326@0.23.2560.1326" timestamp="1594329898786" />
-    <state x="540" y="254" key="IDE.errors.dialog" timestamp="1587384873261">
+    <state x="872" y="431" width="635" height="237" key="MultipleFileMergeDialog" timestamp="1596212039018">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="540" y="254" key="IDE.errors.dialog/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1587384873261" />
-    <state x="1162" y="573" key="MultipleFileMergeDialog" timestamp="1589170573500">
-      <screen x="0" y="23" width="2560" height="1326" />
-    </state>
+    <state x="872" y="431" width="635" height="237" key="MultipleFileMergeDialog/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1596212039018" />
     <state x="1162" y="573" key="MultipleFileMergeDialog/0.23.2560.1326@0.23.2560.1326" timestamp="1589170573500" />
     <state x="455" y="168" width="1243" height="852" key="SettingsEditor" timestamp="1595080150452">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="455" y="168" width="1243" height="852" key="SettingsEditor/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1595080150452" />
     <state x="607" y="237" key="SettingsEditor/0.23.2560.1324@0.23.2560.1324" timestamp="1589120952758" />
-    <state x="512" y="432" key="VCS.EditChangelistDialog" timestamp="1587383640386">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="512" y="432" key="VCS.EditChangelistDialog/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1587383640386" />
     <state x="552" y="248" width="816" height="537" key="Vcs.Push.Dialog.v2" timestamp="1595454546445">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>

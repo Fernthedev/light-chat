@@ -36,6 +36,8 @@ public class ClassTranslator {
         registerTranslation(double.class, "double");
         registerTranslation(Long.class, "long");
         registerTranslation(long.class, "long");
+        registerTranslation(Byte.class, "byte");
+        registerTranslation(byte.class, "byte");
         registerTranslation(Integer.class, "int");
         registerTranslation(int.class, "int");
         registerTranslation(Float.class, "float");
@@ -51,6 +53,7 @@ public class ClassTranslator {
         registerReverseTranslation(double.class, "double");
         registerReverseTranslation(long.class, "long");
         registerReverseTranslation(int.class, "int");
+        registerReverseTranslation(byte.class, "byte");
         registerReverseTranslation(float.class, "float");
         registerReverseTranslation(short.class, "short");
     }
