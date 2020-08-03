@@ -74,6 +74,7 @@ class Client implements IKeyEncriptionHolder {
   }
 
   Future<void> initializeConnection(ServerData serverData) async {
+    
     try {
       _registered = false;
       _connected = false;
