@@ -29,6 +29,7 @@ class ClassTranslator {
     registerTranslation(BigInt, 'big_integer');
     registerTranslation(double, 'double');
     registerTranslation(Float, 'float');
+    registerTranslation(Int8, 'byte');
     registerTranslation(Uint8, 'byte');
     registerTranslation(Int16, 'short');
     registerTranslation(Int32, 'int');
@@ -40,7 +41,7 @@ class ClassTranslator {
     registerReverseTranslation(String, 'string');
     registerReverseTranslation(BigInt, 'big_integer');
     registerReverseTranslation(double, 'double');
-    registerReverseTranslation(Uint8, 'byte');
+    registerReverseTranslation(Int8, 'byte');
     registerReverseTranslation(Int16, 'short');
     registerReverseTranslation(Int32, 'int');
     registerReverseTranslation(Int64, 'long');
