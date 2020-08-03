@@ -49,7 +49,7 @@ class Client implements IKeyEncriptionHolder {
       {};
 
   // Watch event registers
-  final Map<EventCallback<dynamic>,EventCallback<dynamic>> eventListenerRegistry = {};
+  final Map<dynamic,EventCallback<dynamic>> eventListenerRegistry = {};
 
   /// True when the server sucessfully establishes the connection and the server registered the info.
   bool _registered = false;
