@@ -48,6 +48,9 @@ class Client implements IKeyEncriptionHolder {
   final Map<EventType<dynamic>, List<EventCallback<dynamic>>> eventListeners =
       {};
 
+  // Watch event registers
+  final Map<EventCallback<dynamic>,EventCallback<dynamic>> eventListenerRegistry = {};
+
   /// True when the server sucessfully establishes the connection and the server registered the info.
   bool _registered = false;
   bool _connected = false;
@@ -115,14 +118,19 @@ class Client implements IKeyEncriptionHolder {
 
     var list = eventListeners[eventType];
 
-    list.add(callback);
+    // Wrap around dynamic event call back to avoid type errors.
+    var wrapper = (d) => callback(d as T);
+
+    list.add(wrapper);
+    eventListenerRegistry[callback] = wrapper;
   }
 
   void unregisterCallback<T>(
       EventType<T> eventType, EventCallback<T> callback) {
     if (!eventListeners.containsKey(eventType)) return;
 
-    eventListeners[eventType].remove(callback);
+    eventListeners[eventType].remove(eventListenerRegistry[callback]);
+    eventListenerRegistry.remove(callback);
 
     if (eventListeners[eventType].isEmpty) eventListeners.remove(eventType);
   }
@@ -134,6 +142,9 @@ class Client implements IKeyEncriptionHolder {
   }
 
   void unregisterEvents<T>(EventType<T> eventType) {
+    eventListeners[eventType].forEach((element) {
+      unregisterCallback(eventType, element);
+    });
     eventListeners.remove(eventType);
   }
 
