@@ -202,8 +202,12 @@ class Client implements IKeyEncriptionHolder {
   //   return Future.value();
   // }
 
-  Future<void> write(AcceptablePacketTypes packet,
+  Future<void> send(AcceptablePacketTypes packet,
       [bool encrypt = true]) async {
+    if (packet == null) throw ArgumentError.notNull('packet');
+
+    Variables.printDebug('Sending $packet');
+
     AcceptablePacketTypes json;
 
     if (encrypt) {
@@ -226,25 +230,6 @@ class Client implements IKeyEncriptionHolder {
     }
 
     // await socket.flush();
-
-    return Future.value();
-  }
-
-  Future<void> send(AcceptablePacketTypes packet, [bool encrypt = true]) async {
-    // if (socketFuture != null) {
-    //   socketFuture.whenComplete(() {
-    //     write(packet, encrypt);
-    //     flush();
-    //   });
-    // } else {
-
-    if (packet == null) throw ArgumentError.notNull('packet');
-
-    Variables.printDebug('Sending $packet');
-
-    await write(packet, encrypt);
-    // await flush();
-    // }
 
     return Future.value();
   }
