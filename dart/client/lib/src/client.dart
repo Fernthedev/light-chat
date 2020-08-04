@@ -269,7 +269,7 @@ class Client implements IKeyEncriptionHolder {
 
   void handlePacket(Packet p, [Object result]) async {
     for (var packetListener in packetListeners) {
-      packetListener.handle(p, result);
+      packetListener(p, result);
     }
   }
 

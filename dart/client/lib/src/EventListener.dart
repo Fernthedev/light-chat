@@ -4,12 +4,10 @@ import 'package:light_chat_core/packets_codecs.dart';
 import 'package:light_chat_core/packets.dart';
 import 'client.dart';
 
-abstract class PacketListener {
-  ///
-  /// [result] is the result from [PacketEventHandler]
-  ///
-  void handle(Packet p, [Object result]);
-}
+///
+/// [result] is the result from [PacketEventHandler]
+///
+typedef PacketListener = void Function(Packet p, [Object result]);
 
 class PacketEventHandler {
   Client client;

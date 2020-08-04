@@ -42,7 +42,7 @@ void startClient(List<String> arguments) {
   client = Client(ConnectedPacket.create(name, Platform.operatingSystem,
       Variables.versionData, Variables.defaultLangFramework));
 
-  client.addPacketListener(PacketListenerConsole());
+  client.addPacketListener(PacketListenerConsole);
 
   client.initializeConnection(ServerData(host, port, null)).then((f) async {
     print('Initialized connection sucessfully');
@@ -77,44 +77,41 @@ void createIsolate(SendPort mainSendorPort) async {
 
 Client client;
 
-class PacketListenerConsole extends PacketListener {
-  @override
-  void handle(Packet p, [Object result]) {
-    // print('Handling packet ${p.runtimeType}');
-    switch (p.runtimeType) {
-      case SelfMessagePacket:
-        SelfMessagePacket packet = p;
-        // print('Message Type: ${p.toString()}');
-        switch (packet.type) {
-          case MessageType.INCORRECT_PASSWORD_ATTEMPT:
-          case MessageType.FILL_PASSWORD:
-            print('Reading console input');
-            var line = stdin.readLineSync();
+final PacketListener PacketListenerConsole = (Packet p, [Object result]) {
+  // print('Handling packet ${p.runtimeType}');
+  switch (p.runtimeType) {
+    case SelfMessagePacket:
+      SelfMessagePacket packet = p;
+      // print('Message Type: ${p.toString()}');
+      switch (packet.type) {
+        case MessageType.INCORRECT_PASSWORD_ATTEMPT:
+        case MessageType.FILL_PASSWORD:
+          print('Reading console input');
+          var line = stdin.readLineSync();
 
-            print('Sent the password $line');
+          print('Sent the password $line');
 
-            var hashedPasswordPacket =
-                HashedPasswordPacket.create(HashedPassword(line));
+          var hashedPasswordPacket =
+              HashedPasswordPacket.create(HashedPassword(line));
 
-            client.send(hashedPasswordPacket);
-            break;
-          case MessageType.LOST_SERVER_CONNECTION:
-            break;
-          case MessageType.REGISTER_PACKET:
-            break;
-          case MessageType.TIMED_OUT_REGISTRATION:
-            break;
-          case MessageType.INCORRECT_PASSWORD_FAILURE:
-            print('Unable to authenticate with password');
-            break;
-          case MessageType.CORRECT_PASSWORD:
-            // TODO: Handle this case.
-            break;
-        }
-        break;
-    }
+          client.send(hashedPasswordPacket);
+          break;
+        case MessageType.LOST_SERVER_CONNECTION:
+          break;
+        case MessageType.REGISTER_PACKET:
+          break;
+        case MessageType.TIMED_OUT_REGISTRATION:
+          break;
+        case MessageType.INCORRECT_PASSWORD_FAILURE:
+          print('Unable to authenticate with password');
+          break;
+        case MessageType.CORRECT_PASSWORD:
+          // TODO: Handle this case.
+          break;
+      }
+      break;
   }
-}
+};
 
 // TODO: Make async to allow printing to console while reading input.
 void readCmdLine(Client client) async {
