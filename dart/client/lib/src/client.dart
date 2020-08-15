@@ -18,7 +18,7 @@ class EventType<T> {
   static const REGISTER_EVENT = EventType<ServerData>('REGISTER_EVENT');
   static const CONNECT_EVENT = EventType<ServerData>('CONNECT_EVENT');
   static const DISCONNECT_EVENT = EventType<ServerData>('DISCONNECT_EVENT');
-  static const ERROR_EVENT = EventType<Error>('ERROR_EVENT');
+  static const ERROR_EVENT = EventType<dynamic>('ERROR_EVENT');
 
   const EventType(this.eventName);
 
