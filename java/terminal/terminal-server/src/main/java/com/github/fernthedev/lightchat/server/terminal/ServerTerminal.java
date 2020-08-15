@@ -99,6 +99,7 @@ public class ServerTerminal {
 
         try {
             settingsManager = terminalSettings.getServerSettings();
+            settingsManager.load();
             settingsManager.save();
         } catch (ConfigLoadException e) {
             e.printStackTrace();

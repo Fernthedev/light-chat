@@ -22,7 +22,7 @@ public class ClientTerminalSettings {
 
     @Builder.Default
     @NonNull
-    protected Config<? extends ClientSettings> serverSettings = createConfigWithoutException();
+    protected Config<? extends ClientSettings> clientSettings = createConfigWithoutException();
 
 
     @Builder.Default

@@ -13,6 +13,7 @@ import com.github.fernthedev.terminal.core.packets.CommandPacket;
 import com.github.fernthedev.terminal.core.packets.MessagePacket;
 import com.google.common.base.Stopwatch;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -79,6 +80,7 @@ public class ClientTerminal {
         init(new String[0], settings);
     }
 
+    @SneakyThrows
     public static void init(String[] args, ClientTerminalSettings settings) {
         CommonUtil.initTerminal();
 
@@ -132,7 +134,10 @@ public class ClientTerminal {
 
         client = new Client(host.get(), port.get());
 
-        client.setClientSettingsManager(settings.getServerSettings());
+        client.setClientSettingsManager(settings.getClientSettings());
+
+        client.getClientSettingsManager().load();
+        client.getClientSettingsManager().save();
 
         StaticHandler.setCore(new ClientTermCore(client));
 
