@@ -23,9 +23,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="74a9c842-9768-484a-b6c1-feb6a74ad587" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.vscode/launch.json" beforeDir="false" afterPath="$PROJECT_DIR$/../.vscode/launch.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.vscode/tasks.json" beforeDir="false" afterPath="$PROJECT_DIR$/../.vscode/tasks.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../csharp/core/StaticHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../csharp/core/StaticHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dart/client/lib/src/client.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../dart/client/lib/src/client.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../flutter/android/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/android/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../flutter/ios/Flutter/Debug.xcconfig" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/ios/Flutter/Debug.xcconfig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../flutter/ios/Flutter/Release.xcconfig" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/ios/Flutter/Release.xcconfig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../flutter/ios/Runner.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/ios/Runner.xcodeproj/project.pbxproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../flutter/ios/Runner.xcworkspace/contents.xcworkspacedata" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/ios/Runner.xcworkspace/contents.xcworkspacedata" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../flutter/ios/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/ios/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../flutter/lib/assets/themed_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/lib/assets/themed_widget.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/Gradle_Build_and_Install.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/runConfigurations/Gradle_Build_and_Install.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/util/ClassTranslator.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/github/fernthedev/lightchat/core/util/ClassTranslator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradlew" beforeDir="false" afterPath="$PROJECT_DIR$/gradlew" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/settings.gradle" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -326,6 +339,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Gradle.java [termina:terminal-server:dependencies]" />
+        <item itemvalue="Gradle.java [processResources]" />
+        <item itemvalue="Gradle.java [dependencies:tree]" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="project-level" UseSingleDictionary="true" transferred="true" />
   <component name="StructuralSearchPlugin">
@@ -416,14 +436,15 @@
       <workItem from="1595961210940" duration="602000" />
       <workItem from="1596212014089" duration="160000" />
       <workItem from="1596287409201" duration="1188000" />
-      <workItem from="1596474525927" duration="711000" />
-    </task>
-    <task id="LOCAL-00006" summary="- Changed to a PacketRegistry system to allow for cross platform usage (packetname : packet.class)&#10;- Fixed a bug that caused the client to print an exception when sending a message before it was successfully registered&#10;- Added Alibaba FAST_JSON support (config setting) Gson is still default&#10;- Added MultiCast gracefully shut down.">
-      <created>1574383998656</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1574383998656</updated>
+      <workItem from="1596474525927" duration="1327000" />
+      <workItem from="1596554674922" duration="712000" />
+      <workItem from="1596636796178" duration="626000" />
+      <workItem from="1596982878569" duration="590000" />
+      <workItem from="1596988079904" duration="1174000" />
+      <workItem from="1597067044171" duration="3757000" />
+      <workItem from="1597177888727" duration="1061000" />
+      <workItem from="1597504218807" duration="1246000" />
+      <workItem from="1597521780521" duration="581000" />
     </task>
     <task id="LOCAL-00007" summary="- Fixed AutoComplete support&#10;- Fixed Debug mode&#10;- Fixed File Logger and is now on Client support">
       <created>1574978861448</created>
@@ -761,7 +782,14 @@
       <option name="project" value="LOCAL" />
       <updated>1595454542434</updated>
     </task>
-    <option name="localTasksCounter" value="55" />
+    <task id="LOCAL-00055" summary="Add byte to translation">
+      <created>1596475705204</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1596475705205</updated>
+    </task>
+    <option name="localTasksCounter" value="56" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -805,7 +833,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="New events for both client and event Listener&#10;Packets now have a corresponding ID based on time taken to send and receive" />
     <MESSAGE value="Added JUnit 5 Testing dependencies&#10;Using RSA OAEP SHA 256 for encryption now" />
     <MESSAGE value="New Async.java annotation&#10;Client.connect is now async and returns a future if synchronized is required" />
     <MESSAGE value="Fix server port not binding and packets not registering." />
@@ -830,7 +857,8 @@
     <MESSAGE value="Shutdown and exception handling" />
     <MESSAGE value="Use event loop for launching threads for commands" />
     <MESSAGE value="Performance, code cleanup and quality, bug fixes. &#10;Fixed console input for ServerTerminal&#10;ClientTerminal has been cleaned up and new ClientTerminalSettings&#10;ClientExtensions.kt for kotlin&#10;ClassTranslator for translating class types between languages. Must be used manually&#10;AuthenticationManager is now fully asynchronous&#10;ServerSettings now controls RSA key size" />
-    <option name="LAST_COMMIT_MESSAGE" value="Performance, code cleanup and quality, bug fixes. &#10;Fixed console input for ServerTerminal&#10;ClientTerminal has been cleaned up and new ClientTerminalSettings&#10;ClientExtensions.kt for kotlin&#10;ClassTranslator for translating class types between languages. Must be used manually&#10;AuthenticationManager is now fully asynchronous&#10;ServerSettings now controls RSA key size" />
+    <MESSAGE value="Add byte to translation" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add byte to translation" />
   </component>
   <component name="WindowStateProjectService">
     <state x="752" y="253" key="#Dockerfile" timestamp="1594353266380">
@@ -958,14 +986,14 @@
     </state>
     <state x="455" y="168" width="1243" height="852" key="SettingsEditor/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1595080150452" />
     <state x="607" y="237" key="SettingsEditor/0.23.2560.1324@0.23.2560.1324" timestamp="1589120952758" />
-    <state x="552" y="248" width="816" height="537" key="Vcs.Push.Dialog.v2" timestamp="1595454546445">
+    <state x="552" y="248" width="816" height="537" key="Vcs.Push.Dialog.v2" timestamp="1596475707228">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="248" width="816" height="537" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1595454546445" />
-    <state x="342" y="83" key="new project wizard" timestamp="1595081002773">
+    <state x="552" y="248" width="816" height="537" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1596475707228" />
+    <state x="342" y="83" key="new project wizard" timestamp="1597178416553">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="342" y="83" key="new project wizard/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1595081002773" />
+    <state x="342" y="83" key="new project wizard/0.0.1920.1040/1920.316.1366.728@0.0.1920.1040" timestamp="1597178416553" />
     <state x="616" y="240" width="672" height="677" key="run.anything.popup" timestamp="1595443453524">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
