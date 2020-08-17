@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer
 
 //buildscript {
-//    ext.kotlin_version = '1.3.72'
+//    ext.kotlin_version = '1.4.0'
 //    repositories {
 //        mavenCentral()
 //    }
@@ -11,7 +11,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCach
 //}
 
 buildscript {
-    ext.kotlin_version = '1.3.72'
+    ext.kotlin_version = '1.4.0'
 }
 
 plugins {
