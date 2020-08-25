@@ -11,13 +11,14 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCach
 //}
 
 buildscript {
-    ext.kotlin_version = '1.3.72'
+    ext.kotlin_version = '1.4.0'
 }
 
 plugins {
     id 'com.github.johnrengelman.shadow' version '6.0.0'
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version "$kotlin_version"
+    id "io.freefair.lombok" version "5.1.1"
 }
 apply plugin: 'base'
 apply plugin: 'kotlin'
@@ -55,6 +56,7 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
     apply plugin: 'java'
     apply plugin: 'maven-publish'
     apply plugin: 'com.github.johnrengelman.shadow'
+    apply plugin: "io.freefair.lombok"
 
     ext.netty_ver = "4.1.51.Final"
     ext.jline_ver = "3.16.0"
@@ -87,19 +89,22 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
         testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.2'
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'
 
-        compile "io.netty:netty-all:$netty_ver"
-        compile "io.netty:netty-transport-native-epoll:$netty_ver"
-        compile "io.netty:netty-transport-native-kqueue:$netty_ver"
-        compile 'com.lmax:disruptor:3.4.2'
-        compile 'org.apache.commons:commons-lang3:3.11'
-        compile 'com.github.Fernthedev:fern-configmanager:1.3.0'
-        compile 'com.google.guava:guava:29.0-jre'
-        compile 'com.googlecode.json-simple:json-simple:1.1.1'
-        compile 'com.google.code.gson:gson:2.8.6'
-        compile 'com.github.Fernthedev:FernUtils:1.4.0'
-        compileOnly 'org.projectlombok:lombok:1.18.12'
-        compile group: 'org.apache.maven', name: 'maven-artifact', version: '3.6.3'
-        annotationProcessor 'org.projectlombok:lombok:1.18.12'
+        implementation "org.apache.logging.log4j:log4j-api:$log4j_ver"
+        implementation "org.apache.logging.log4j:log4j-core:$log4j_ver"
+        implementation "org.apache.logging.log4j:log4j-slf4j-impl:$log4j_ver"
+        implementation 'org.slf4j:slf4j-api:1.7.30'
+
+        implementation "io.netty:netty-all:$netty_ver"
+        implementation "io.netty:netty-transport-native-epoll:$netty_ver"
+        implementation "io.netty:netty-transport-native-kqueue:$netty_ver"
+        implementation 'com.lmax:disruptor:3.4.2'
+        implementation 'org.apache.commons:commons-lang3:3.11'
+        implementation 'com.github.Fernthedev:fern-configmanager:1.3.0'
+        implementation 'com.google.guava:guava:29.0-jre'
+        implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+        implementation 'com.google.code.gson:gson:2.8.6'
+        implementation 'com.github.Fernthedev:FernUtils:1.4.0'
+        implementation group: 'org.apache.maven', name: 'maven-artifact', version: '3.6.3'
     }
 
     sourceCompatibility = '8'
@@ -107,6 +112,11 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
     java {
         withSourcesJar()
         withJavadocJar()
+    }
+//    tasks.withType(Javadoc).all { enabled = false }
+
+    javadoc {
+        failOnError = false;
     }
 
     processResources {
