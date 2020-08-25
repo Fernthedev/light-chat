@@ -23,15 +23,16 @@ plugins {
 apply plugin: 'base'
 apply plugin: 'kotlin'
 
+project.ext.protocol_ver = "1.6.0" // Build version
+project.ext.protocol_ver_min = "1.6.0" // Minimum build
+
+version = project.ext.protocol_ver
 
 
 allprojects {
     group = 'com.github.Fernthedev'
 
-    project.ext.protocol_ver = "1.6.0" // Build version
-    project.ext.protocol_ver_min = "1.6.0" // Minimum build
-
-    version = project.ext.protocol_ver
+    version = rootProject.version
 
     repositories {
         jcenter()
