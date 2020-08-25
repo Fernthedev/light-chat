@@ -852,3 +852,5 @@ java/banned.json
 java/terminal/terminal-server/banned.json
 
 java/terminal/terminal-server/settings.json
+
+*lombok.config
