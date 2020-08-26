@@ -10,7 +10,7 @@
 subprojects {
 //    apply com.github.fernthedev.client.plugin: 'application'
     group = "${project.parent.group}.terminal"
-    version = "1.0.0-$protocol_ver"
+    version = "$protocol_ver"
 
     dependencies {
         compile "org.jline:jline:$jline_ver"
