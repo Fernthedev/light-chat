@@ -59,7 +59,7 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
     apply plugin: 'com.github.johnrengelman.shadow'
     apply plugin: "io.freefair.lombok"
 
-    ext.netty_ver = "4.1.51.Final"
+    ext.netty_ver = "4.1.52.Final"
     ext.jline_ver = "3.16.0"
     ext.log4j_ver = "2.13.3"
 
