@@ -12,6 +12,8 @@ This project was originally a fork of my java chatroom program. It was actually 
 
 I have sucessfully created a Dart client for the Java server and a Flutter app will soon be functioning as well by using the client as the backend. My hope is that I will be able to create a multi-language/cross-platform communication system for developers as either an API\* or as a base for other applications.
 
+This has now become a protocol project itself rather than a project to manage Raspberry Pies. This will continue to be developed as a framework/protocol with certain features rather than a server/client itself. The point of this is to be a protocol with a basic starting point for cross-language communication. 
+
 # About
 
 This is a network platform in which I hope to soon become a multi-language/cross-platform communication system where developers can use as either an API\* or as a base for other applications.
@@ -25,11 +27,9 @@ The specifications can be found [here](docs/specs.md)
 
 - Uses JSON for packet wrapping and allows cross-platform usage
 - Encryption using RSA 4096 key exchange (server generates temporary key pair -> server sends public key -> client generates AES 256 key -> encrypts key with server's public key -> server and client use AES key from client for the rest of communications)
-- Uses [LightReader](https://github.com/Fernthedev/LightReader) API
-- Support for using RaspberryPi for manipulating pins using a custom file format and a GUI for it.
-- ANSI Support using Jansi
+- ANSI Support using Jansi (Java)
 - Multicast support for locating other servers in the same network
-- Is built on using async code with Netty and the server/client core itself.
+- Is built on using async code with Netty and the server/client core itself. (Java)
 - Authentication system for restrictive access.
 - Ban System with IPs and names
 
