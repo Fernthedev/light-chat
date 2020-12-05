@@ -92,6 +92,11 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
             ClientConnection connection = server.getPlayerHandler().getChannelMap().get(ctx.channel());
             EventListener eventListener = connection.getEventListener();
 
+            if (msg instanceof ByteBuf && !server.getPlayerHandler().getChannelMap().containsKey(ctx.channel())) {
+                // Discard the received data silently.
+                ((ByteBuf) msg).release();
+            }
+
             if (msg instanceof Pair) {
                 Pair<? extends Packet, Integer> pair = (Pair<? extends Packet, Integer>) msg;
                 if (pair.getKey() instanceof ConnectedPacket) {
@@ -101,15 +106,13 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
                         server.getLogger().warn("Connection {} just attempted to send a connection packet while registered. Glitch or security bug? ", connection.toString());
                     }
                 } else {
-                    if (!server.getPlayerHandler().getChannelMap().containsKey(ctx.channel())) {
-                        // Discard the received data silently.
-                        ((ByteBuf) msg).release();
+                    if (server.getPlayerHandler().getChannelMap().containsKey(ctx.channel())) {
+                        if (pair.getKey() != null) {
+                            if (!(pair.getLeft() instanceof LatencyPacket))
+                                StaticHandler.getCore().getLogger().debug("Received the packet {} from {}", pair.getLeft().getPacketName(), ctx.channel());
 
-                    } else if (pair.getKey() != null) {
-                        if (!(pair.getLeft() instanceof LatencyPacket))
-                            StaticHandler.getCore().getLogger().debug("Received the packet {} from {}", pair.getLeft().getPacketName(), ctx.channel());
-
-                        eventListener.received(pair.getKey(), pair.getRight());
+                            eventListener.received(pair.getKey(), pair.getRight());
+                        }
                     }
                 }
             }
