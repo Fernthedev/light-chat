@@ -2,6 +2,9 @@ package com.github.fernthedev.lightchat.server.security;
 
 import java.security.PrivilegedActionException;
 
+/**
+ * Thrown if the user is already attempting authentication
+ */
 public class UserIsAuthenticatingException extends IllegalStateException {
     /**
      * Constructs an IllegalStateException with no detail message.
