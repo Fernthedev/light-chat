@@ -58,6 +58,7 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
     apply plugin: 'maven-publish'
     apply plugin: 'com.github.johnrengelman.shadow'
     apply plugin: "io.freefair.lombok"
+    apply plugin: 'kotlin'
 
     ext.netty_ver = "4.1.51.Final"
     ext.jline_ver = "3.16.0"
@@ -180,6 +181,10 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
         }
     }
 
+    sourceSets {
+        main.kotlin.srcDirs += 'src/main/java'
+        main.java.srcDirs += 'src/main/kotlin'
+    }
 
 }
 repositories {
