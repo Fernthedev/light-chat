@@ -4,7 +4,6 @@ import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.core.VersionData;
 import com.github.fernthedev.lightchat.core.api.APIUsage;
 import com.github.fernthedev.lightchat.core.encryption.UnencryptedPacketWrapper;
-import com.github.fernthedev.lightchat.core.encryption.util.RSAEncryptionUtil;
 import com.github.fernthedev.lightchat.core.packets.Packet;
 import com.github.fernthedev.lightchat.core.packets.latency.LatencyPacket;
 import com.github.fernthedev.lightchat.core.packets.latency.PingPacket;
@@ -23,9 +22,9 @@ import java.net.InetSocketAddress;
 import java.security.KeyPair;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * Handles client data
@@ -70,6 +69,8 @@ public class ClientConnection implements SenderInterface, AutoCloseable {
     /**
      * The keypair encryption
      * Used in initial connection establishment
+     *
+     * Used before secret key is initialized
      */
     @Getter
     private KeyPair tempKeyPair;
@@ -91,46 +92,12 @@ public class ClientConnection implements SenderInterface, AutoCloseable {
         this.tempKeyPair = null;
     }
 
-    private final Future<KeyPair> keyFuture;
-
-//    public void awaitKeys() {
+    //    public void awaitKeys() {
 //        if(keyFuture != null) keyFuture.awaitFinish(0);
 //    }
 
-    public void onKeyGenerate(Runnable runnable) {
-        new Thread(() -> {
-//            long timeWhenEnding = System.nanoTime() + TimeUnit.SECONDS.toNanos(30);
 
-            try {
-                keyFuture.get(30, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (TimeoutException e) {
-                server.getLogger().error("Took too long to create RSA encryption keys. Is the CPU too slow?");
-
-                if (StaticHandler.isDebug())
-                    e.printStackTrace();
-            }
-
-//            while (!keyFuture.isDone() && timeWhenEnding - System.nanoTime() > 0) {
-//                try {
-//                    Thread.sleep(1000);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                    Thread.currentThread().interrupt();
-//                }
-//            }
-
-            if (keyFuture.isDone()) {
-                runnable.run();
-            }
-        }, "AwaitKeysThread-" + deviceName + " " + new Random().nextInt(100)).start();
-    }
-
-    public ClientConnection(Server server, Channel channel, UUID uuid) {
+    public ClientConnection(Server server, Channel channel, UUID uuid, Consumer<ClientConnection> callback) {
         this.server = server;
         this.channel = channel;
         this.uuid = uuid;
@@ -144,8 +111,10 @@ public class ClientConnection implements SenderInterface, AutoCloseable {
 ////        });
 
 
-
-        this.keyFuture = server.getExecutorService().submit(() -> tempKeyPair = RSAEncryptionUtil.generateKeyPairs(server.getSettingsManager().getConfigData().getRsaKeySize()));
+        server.getRsaKeyThread().getRandomKey().thenAccept(keyPair -> {
+            tempKeyPair = keyPair;
+            callback.accept(this);
+        });
 
         eventListener = new EventListener(server, this);
     }

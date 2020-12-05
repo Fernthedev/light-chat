@@ -12,11 +12,13 @@ import com.github.fernthedev.lightchat.core.api.plugin.PluginManager;
 import com.github.fernthedev.lightchat.core.encryption.codecs.JSONHandler;
 import com.github.fernthedev.lightchat.core.encryption.codecs.general.gson.EncryptedJSONObjectDecoder;
 import com.github.fernthedev.lightchat.core.encryption.codecs.general.gson.EncryptedJSONObjectEncoder;
+import com.github.fernthedev.lightchat.core.encryption.util.RSAEncryptionUtil;
 import com.github.fernthedev.lightchat.core.packets.Packet;
 import com.github.fernthedev.lightchat.core.packets.SelfMessagePacket;
 import com.github.fernthedev.lightchat.server.api.IPacketHandler;
 import com.github.fernthedev.lightchat.server.event.ServerShutdownEvent;
 import com.github.fernthedev.lightchat.server.event.ServerStartupEvent;
+import com.github.fernthedev.lightchat.server.netty.KeyThread;
 import com.github.fernthedev.lightchat.server.netty.MulticastServer;
 import com.github.fernthedev.lightchat.server.netty.ProcessingHandler;
 import com.github.fernthedev.lightchat.server.security.AuthenticationManager;
@@ -44,10 +46,12 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.function.Supplier;
 
 
 public class Server implements Runnable {
@@ -87,6 +91,11 @@ public class Server implements Runnable {
     private MulticastServer multicastServer;
 
     private EventLoopGroup bossGroup, workerGroup;
+
+
+    @Getter
+    private final KeyThread<KeyPair> rsaKeyThread;
+
     private ProcessingHandler processingHandler;
 
     private final List<ChannelHandler> channelHandlers = new ArrayList<>();
@@ -140,6 +149,12 @@ public class Server implements Runnable {
 
         console = new Console(this);
         StaticHandler.setCore(new ServerCore(this));
+
+        int rsaKeyPoolSize = 15;
+
+        Supplier<Boolean> serverCondition = () -> running;
+
+        rsaKeyThread = new KeyThread<>(() -> RSAEncryptionUtil.generateKeyPairs(settingsManager.getConfigData().getRsaKeySize()), rsaKeyPoolSize, serverCondition);
     }
 
     @APIUsage
@@ -351,6 +366,10 @@ public class Server implements Runnable {
 
         JSONHandler jsonHandler = settingsManager.getConfigData().getCodec();
 
+        // Start key thread before initializing netty
+        rsaKeyThread.setDaemon(true);
+        rsaKeyThread.start();
+        getLogger().info("Started RSA Key thread pool. Currently {} keys", rsaKeyThread.getKeysInPool());
 
         bootstrap.group(bossGroup, workerGroup)
                 .channel(channelClass)

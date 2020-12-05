@@ -6,7 +6,6 @@ import com.github.fernthedev.lightchat.client.event.ServerConnectHandshakeEvent;
 import com.github.fernthedev.lightchat.client.event.ServerDisconnectEvent;
 import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.core.VersionData;
-import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil;
 import com.github.fernthedev.lightchat.core.exceptions.ParsePacketException;
 import com.github.fernthedev.lightchat.core.packets.IllegalConnectionPacket;
 import com.github.fernthedev.lightchat.core.packets.Packet;
@@ -20,7 +19,6 @@ import com.github.fernthedev.lightchat.core.packets.latency.PingReceive;
 import com.github.fernthedev.lightchat.core.packets.latency.PongPacket;
 import com.github.fernthedev.lightchat.core.util.ExceptionUtil;
 
-import javax.crypto.SecretKey;
 import java.security.InvalidKeyException;
 import java.util.concurrent.TimeUnit;
 
@@ -71,17 +69,15 @@ public class EventListener {
 
                 }
 
-                SecretKey secretKey = EncryptionUtil.generateSecretKey();
-                client.setSecretKey(secretKey);
+                client.getSecretKey().thenAccept(secretKey -> {
+                    try {
+                        KeyResponsePacket responsePacket = new KeyResponsePacket(secretKey, packet.getPublicKey());
 
-
-                try {
-                    KeyResponsePacket responsePacket = new KeyResponsePacket(secretKey, packet.getPublicKey());
-
-                    client.sendObject(responsePacket, false);
-                } catch (InvalidKeyException e) {
-                    e.printStackTrace();
-                }
+                        client.sendObject(responsePacket, false);
+                    } catch (InvalidKeyException e) {
+                        e.printStackTrace();
+                    }
+                });
 
                 client.getPluginManager().callEvent(new ServerConnectHandshakeEvent(client.getChannel()));
             } else if (p instanceof RequestConnectInfoPacket) {

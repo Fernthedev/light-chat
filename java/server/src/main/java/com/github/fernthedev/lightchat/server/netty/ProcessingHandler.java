@@ -116,6 +116,8 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
                     }
                 }
             }
+
+
         } finally {
             ReferenceCountUtil.release(msg);
         }
@@ -150,18 +152,17 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
                 uuid = UUID.randomUUID();
             }
 
-            ClientConnection clientConnection = new ClientConnection(server, channel, uuid);
+            ClientConnection clientConnection = new ClientConnection(server, channel, uuid, (clientConnection1) -> {
+                clientConnection1.sendObject(new InitialHandshakePacket(clientConnection1.getTempKeyPair().getPublic(), StaticHandler.getVERSION_DATA()), false);
+
+                server.getLogger().info("[{}] established", clientConnection1.getAddress());
+            });
 
             //Server.getLogger().info("Registering " + clientConnection.getNameAddress());
 
             server.getPlayerHandler().getChannelMap().put(channel, clientConnection);
 
             server.getLogger().debug("Awaiting RSA key generation for packet registration");
-            clientConnection.onKeyGenerate(() -> {
-                clientConnection.sendObject(new InitialHandshakePacket(clientConnection.getTempKeyPair().getPublic(), StaticHandler.getVERSION_DATA()), false);
-
-                server.getLogger().info("[{}] established", clientConnection.getAddress());
-            });
         } else {
             server.getLogger().info("Channel is null");
             throw new NullPointerException();

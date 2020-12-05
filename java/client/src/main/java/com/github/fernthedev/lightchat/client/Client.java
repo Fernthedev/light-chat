@@ -13,6 +13,7 @@ import com.github.fernthedev.lightchat.core.encryption.RSA.IEncryptionKeyHolder;
 import com.github.fernthedev.lightchat.core.encryption.UnencryptedPacketWrapper;
 import com.github.fernthedev.lightchat.core.encryption.codecs.general.gson.EncryptedJSONObjectDecoder;
 import com.github.fernthedev.lightchat.core.encryption.codecs.general.gson.EncryptedJSONObjectEncoder;
+import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil;
 import com.github.fernthedev.lightchat.core.exceptions.DebugException;
 import com.github.fernthedev.lightchat.core.packets.Packet;
 import com.github.fernthedev.lightchat.core.packets.handshake.ConnectedPacket;
@@ -45,6 +46,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 
@@ -92,8 +94,12 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
     @Setter
     private String name = null;
 
+    /**
+     * Is null until a connection is established
+     *
+     */
     @Getter
-    private SecretKey secretKey;
+    private CompletableFuture<SecretKey> secretKey;
 
 
     private final StopWatch stopWatch = new StopWatch();
@@ -213,61 +219,57 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
         }
 
 
-        try {
-            b.group(workerGroup);
-            b.channel(channelClass);
-            b.option(ChannelOption.SO_KEEPALIVE, true);
-            b.option(ChannelOption.TCP_NODELAY, true);
+        b.group(workerGroup);
+        b.channel(channelClass);
+        b.option(ChannelOption.SO_KEEPALIVE, true);
+        b.option(ChannelOption.TCP_NODELAY, true);
 
-            b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, (int) clientSettings.getTimeoutTime());
+        b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, (int) clientSettings.getTimeoutTime());
 
-            b.handler(new ChannelInitializer<Channel>() {
-                @Override
-                public void initChannel(Channel ch) {
-                    ch.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler((int) clientSettings.getTimeoutTime()));
+        b.handler(new ChannelInitializer<Channel>() {
+            @Override
+            public void initChannel(Channel ch) {
+                ch.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler((int) clientSettings.getTimeoutTime()));
 
-                    ch.pipeline().addLast("frameDecoder", new LineBasedFrameDecoder(StaticHandler.getLineLimit()));
-                    ch.pipeline().addLast("stringDecoder", new EncryptedJSONObjectDecoder(clientSettings.getCharset(), Client.this, clientSettings.getCodec()));
+                ch.pipeline().addLast("frameDecoder", new LineBasedFrameDecoder(StaticHandler.getLineLimit()));
+                ch.pipeline().addLast("stringDecoder", new EncryptedJSONObjectDecoder(clientSettings.getCharset(), Client.this, clientSettings.getCodec()));
 
-                    ch.pipeline().addLast("stringEncoder", new EncryptedJSONObjectEncoder(clientSettings.getCharset(), Client.this, clientSettings.getCodec()));
+                ch.pipeline().addLast("stringEncoder", new EncryptedJSONObjectEncoder(clientSettings.getCharset(), Client.this, clientSettings.getCodec()));
 
-                    ch.pipeline().addLast(clientHandler);
+                ch.pipeline().addLast(clientHandler);
 //                    ch.pipeline().addLast(new ObjectEncoder(),
 //                            new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
 //                            clientHandler);
-                }
-            });
+            }
+        });
 
-            getLogger().info("Establishing connection");
+        getLogger().info("Establishing connection");
 
-            Stopwatch connectTime = Stopwatch.createStarted();
+        Stopwatch connectTime = Stopwatch.createStarted();
 
-            future = b.connect(host, port).await();
+        secretKey = CompletableFuture.supplyAsync(EncryptionUtil::generateSecretKey);
 
-            return future.addListener(newFuture -> {
+        future = b.connect(host, port);
 
-                channel = future.channel();
+        return future.addListener(newFuture -> {
 
-                if (future.isSuccess() && future.channel().isActive()) {
+            channel = future.channel();
+
+            if (future.isSuccess() && future.channel().isActive()) {
 
 
-                    connectTime.stop();
-                    StaticHandler.getCore().getLogger().debug("Time taken to connect: {}", connectTime.elapsed(TimeUnit.MILLISECONDS));
-                    running = true;
-                    // getLogger().info("NEW WAIT FOR COMMAND THREAD");
+                connectTime.stop();
+                StaticHandler.getCore().getLogger().debug("Time taken to connect: {}ms", connectTime.elapsed(TimeUnit.MILLISECONDS));
+                running = true;
+                // getLogger().info("NEW WAIT FOR COMMAND THREAD");
 //                waitThread = new Thread(waitForCommand, "CommandThread");
 //                waitThread.start();
 
 
-                }
-            });
+            }
+        });
 
 
-
-        } catch (InterruptedException e) {
-            getLogger().error(e.getMessage(), e);
-            throw e;
-        }
     }
 
 
@@ -340,7 +342,7 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
 
     @Override
     public SecretKey getSecretKey(ChannelHandlerContext ctx, Channel channel) {
-        return secretKey;
+        return secretKey.getNow(null);
     }
 
     @Override
@@ -366,9 +368,7 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
         return packetIdMap.get(clazz);
     }
 
-    public void setSecretKey(SecretKey secretKey) {
-        this.secretKey = secretKey;
-    }
+
 
     void startPingStopwatch() {
         stopWatch.reset();
