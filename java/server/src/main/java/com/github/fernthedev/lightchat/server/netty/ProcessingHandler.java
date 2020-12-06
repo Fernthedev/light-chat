@@ -70,17 +70,12 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 
             if (clientConnection == null) return;
 
-            if (clientConnection.getName() != null && clientConnection.isRegistered()) {
-                server.getPluginManager().callEvent(new PlayerDisconnectEvent(clientConnection));
-                server.logInfo("[{}] has disconnected from the server", clientConnection.getName());
-            }
 
             if (server.getPlayerHandler().getUuidMap().containsValue(clientConnection)) {
-
-
                 server.getPlayerHandler().getUuidMap().remove(clientConnection.getUuid());
-                clientConnection.close();
             }
+
+            close(ctx.channel());
         } else super.exceptionCaught(ctx, cause);
     }
 
@@ -190,7 +185,6 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
     }
 
     protected void close(Channel channel) {
-
         ClientConnection clientConnection = server.getPlayerHandler().getChannelMap().get(channel);
 
         if (clientConnection == null) {
@@ -205,6 +199,11 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 
         if (server.getPlayerHandler().getChannelMap().containsValue(clientConnection)) {
             server.getPlayerHandler().getChannelMap().remove(clientConnection.getChannel());
+        }
+
+        if (clientConnection.getName() != null && clientConnection.isRegistered()) {
+            server.getPluginManager().callEvent(new PlayerDisconnectEvent(clientConnection));
+            server.logInfo("[{}] has disconnected from the server", clientConnection.getName());
         }
 
         clientConnection.close();
