@@ -11,7 +11,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCach
 //}
 
 buildscript {
-    ext.kotlin_version = '1.4.0'
+    ext.kotlin_version = '1.4.20'
 }
 
 plugins {
@@ -62,7 +62,7 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
 
     ext.netty_ver = "4.1.51.Final"
     ext.jline_ver = "3.16.0"
-    ext.log4j_ver = "2.13.3"
+    ext.log4j_ver = "2.14.0"
 
     repositories {
         jcenter()
