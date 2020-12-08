@@ -4,4 +4,7 @@ dependencies {
     implementation 'com.alibaba:fastjson:1.2.73'
     implementation 'org.reflections:reflections:0.9.12'
 
+
+    api group: 'org.lz4', name: 'lz4-java', version: '1.7.1'
+
 }

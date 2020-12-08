@@ -3,17 +3,13 @@ package com.github.fernthedev.lightchat.server.settings;
 import com.github.fernthedev.fernutils.thread.ThreadUtils;
 import com.github.fernthedev.fernutils.thread.multiple.TaskInfoFunctionList;
 import com.github.fernthedev.lightchat.core.CoreSettings;
-import com.github.fernthedev.lightchat.core.encryption.codecs.CodecEnum;
+import com.github.fernthedev.lightchat.core.codecs.CodecEnum;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,6 +20,7 @@ import java.util.stream.Collectors;
 @Data
 @ToString
 public class ServerSettings extends CoreSettings {
+
 
     @SettingValue
     private int port = 2000;
@@ -359,13 +356,4 @@ public class ServerSettings extends CoreSettings {
     private static final Object[] emptyObject = new Object[0];
 
 
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target({ElementType.FIELD})
-    public @interface SettingValue {
-        @NonNull String name() default "";
-
-        boolean editable() default true;
-
-        @NonNull String[] values() default {};
-    }
 }

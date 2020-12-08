@@ -1,4 +1,4 @@
-package com.github.fernthedev.lightchat.core.encryption.codecs;
+package com.github.fernthedev.lightchat.core.codecs;
 
 import java.io.Serializable;
 

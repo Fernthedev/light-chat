@@ -1,8 +1,8 @@
-package com.github.fernthedev.lightchat.core.encryption.codecs.json;
+package com.github.fernthedev.lightchat.core.codecs.json;
 
 import com.alibaba.fastjson.JSON;
 import com.github.fernthedev.lightchat.core.api.APIUsage;
-import com.github.fernthedev.lightchat.core.encryption.codecs.JSONHandler;
+import com.github.fernthedev.lightchat.core.codecs.JSONHandler;
 
 @APIUsage
 public class FastJSONHandler implements JSONHandler {

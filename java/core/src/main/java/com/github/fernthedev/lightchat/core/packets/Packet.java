@@ -1,6 +1,6 @@
 package com.github.fernthedev.lightchat.core.packets;
 
-import com.github.fernthedev.lightchat.core.encryption.codecs.AcceptablePacketTypes;
+import com.github.fernthedev.lightchat.core.codecs.AcceptablePacketTypes;
 import lombok.NonNull;
 import lombok.ToString;
 

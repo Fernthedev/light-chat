@@ -9,10 +9,10 @@ import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.core.api.APIUsage;
 import com.github.fernthedev.lightchat.core.api.Async;
 import com.github.fernthedev.lightchat.core.api.plugin.PluginManager;
+import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectDecoder;
+import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectEncoder;
 import com.github.fernthedev.lightchat.core.encryption.RSA.IEncryptionKeyHolder;
 import com.github.fernthedev.lightchat.core.encryption.UnencryptedPacketWrapper;
-import com.github.fernthedev.lightchat.core.encryption.codecs.general.gson.EncryptedJSONObjectDecoder;
-import com.github.fernthedev.lightchat.core.encryption.codecs.general.gson.EncryptedJSONObjectEncoder;
 import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil;
 import com.github.fernthedev.lightchat.core.exceptions.DebugException;
 import com.github.fernthedev.lightchat.core.packets.Packet;
@@ -27,6 +27,8 @@ import io.netty.channel.kqueue.KQueueSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.codec.compression.Lz4FrameDecoder;
+import io.netty.handler.codec.compression.Lz4FrameEncoder;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -36,6 +38,7 @@ import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -228,8 +231,12 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
 
         b.handler(new ChannelInitializer<Channel>() {
             @Override
-            public void initChannel(Channel ch) {
+            public void initChannel(@NotNull Channel ch) {
+
+//                ch.pipeline().addFirst()
+
                 ch.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler((int) clientSettings.getTimeoutTime()));
+
 
                 ch.pipeline().addLast("frameDecoder", new LineBasedFrameDecoder(StaticHandler.getLineLimit()));
                 ch.pipeline().addLast("stringDecoder", new EncryptedJSONObjectDecoder(clientSettings.getCharset(), Client.this, clientSettings.getCodec()));
@@ -240,6 +247,17 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
 //                    ch.pipeline().addLast(new ObjectEncoder(),
 //                            new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
 //                            clientHandler);
+
+
+                // TODO: Find some native Lz4 compressor
+                ch.pipeline().addFirst(new Lz4FrameDecoder());
+
+                int compression = getClientSettingsManager().getConfigData().getCompression();
+                if (compression > 0) {
+                    boolean level = compression == 2;
+                    ch.pipeline().addBefore("stringEncoder","compressEncoder", new Lz4FrameEncoder(level));
+                    getLogger().info("Using Lz4 {} compression", compression);
+                }
             }
         });
 

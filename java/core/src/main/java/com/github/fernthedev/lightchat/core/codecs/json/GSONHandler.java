@@ -1,7 +1,7 @@
-package com.github.fernthedev.lightchat.core.encryption.codecs.json;
+package com.github.fernthedev.lightchat.core.codecs.json;
 
 import com.github.fernthedev.lightchat.core.api.APIUsage;
-import com.github.fernthedev.lightchat.core.encryption.codecs.JSONHandler;
+import com.github.fernthedev.lightchat.core.codecs.JSONHandler;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 

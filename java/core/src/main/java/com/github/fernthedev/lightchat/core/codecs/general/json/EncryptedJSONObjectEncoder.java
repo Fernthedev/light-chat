@@ -1,4 +1,4 @@
-package com.github.fernthedev.lightchat.core.encryption.codecs.general.gson;
+package com.github.fernthedev.lightchat.core.codecs.general.json;
 
 import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.core.encryption.EncryptedBytes;
@@ -6,9 +6,9 @@ import com.github.fernthedev.lightchat.core.encryption.EncryptedPacketWrapper;
 import com.github.fernthedev.lightchat.core.encryption.PacketWrapper;
 import com.github.fernthedev.lightchat.core.encryption.RSA.IEncryptionKeyHolder;
 import com.github.fernthedev.lightchat.core.encryption.UnencryptedPacketWrapper;
-import com.github.fernthedev.lightchat.core.encryption.codecs.AcceptablePacketTypes;
-import com.github.fernthedev.lightchat.core.encryption.codecs.JSONHandler;
-import com.github.fernthedev.lightchat.core.encryption.codecs.LineEndStringEncoder;
+import com.github.fernthedev.lightchat.core.codecs.AcceptablePacketTypes;
+import com.github.fernthedev.lightchat.core.codecs.JSONHandler;
+import com.github.fernthedev.lightchat.core.codecs.LineEndStringEncoder;
 import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil;
 import com.github.fernthedev.lightchat.core.packets.Packet;
 import com.github.fernthedev.lightchat.core.util.ExceptionUtil;
@@ -96,6 +96,7 @@ public class EncryptedJSONObjectEncoder extends MessageToMessageEncoder<Acceptab
         }
 
 //        if (!(packetWrapper.getJsonObjectInstance() instanceof LatencyPacket))
+        if (StaticHandler.isDebug())
             StaticHandler.getCore().getLogger().debug("Sending {}", jsonHandler.toJson(packetWrapper));
     }
 

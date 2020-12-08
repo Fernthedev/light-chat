@@ -1,7 +1,7 @@
 package com.github.fernthedev.lightchat.core.encryption;
 
 import com.github.fernthedev.lightchat.core.PacketRegistry;
-import com.github.fernthedev.lightchat.core.encryption.codecs.AcceptablePacketTypes;
+import com.github.fernthedev.lightchat.core.codecs.AcceptablePacketTypes;
 import com.github.fernthedev.lightchat.core.packets.Packet;
 
 /**

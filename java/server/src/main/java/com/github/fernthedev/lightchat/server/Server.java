@@ -9,9 +9,9 @@ import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.core.api.APIUsage;
 import com.github.fernthedev.lightchat.core.api.event.api.Listener;
 import com.github.fernthedev.lightchat.core.api.plugin.PluginManager;
-import com.github.fernthedev.lightchat.core.encryption.codecs.JSONHandler;
-import com.github.fernthedev.lightchat.core.encryption.codecs.general.gson.EncryptedJSONObjectDecoder;
-import com.github.fernthedev.lightchat.core.encryption.codecs.general.gson.EncryptedJSONObjectEncoder;
+import com.github.fernthedev.lightchat.core.codecs.JSONHandler;
+import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectDecoder;
+import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectEncoder;
 import com.github.fernthedev.lightchat.core.encryption.util.RSAEncryptionUtil;
 import com.github.fernthedev.lightchat.core.packets.Packet;
 import com.github.fernthedev.lightchat.core.packets.SelfMessagePacket;
@@ -35,11 +35,14 @@ import io.netty.channel.kqueue.KQueueServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.codec.compression.Lz4FrameDecoder;
+import io.netty.handler.codec.compression.Lz4FrameEncoder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.Synchronized;
 import org.apache.commons.lang3.time.StopWatch;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +79,7 @@ public class Server implements Runnable {
 
     @Getter
     private final int port;
-    private boolean running;
+    private volatile boolean running;
     private volatile boolean shutdown = false;
     private boolean isPortBind = false;
 
@@ -375,11 +378,23 @@ public class Server implements Runnable {
                 .channel(channelClass)
                 .childHandler(new ChannelInitializer<Channel>() {
                     @Override
-                    public void initChannel(Channel ch) {
+                    public void initChannel(@NotNull Channel ch) {
                         ch.pipeline().addLast("frameDecoder", new LineBasedFrameDecoder(StaticHandler.getLineLimit()));
                         ch.pipeline().addLast("stringDecoder", new EncryptedJSONObjectDecoder(settingsManager.getConfigData().getCharset(), keyFinder, jsonHandler));
 
+
                         ch.pipeline().addLast("stringEncoder", new EncryptedJSONObjectEncoder(settingsManager.getConfigData().getCharset(), keyFinder, jsonHandler));
+
+                        // TODO: Find some native ZLib compressor
+                        ch.pipeline().addFirst(new Lz4FrameDecoder());
+
+                        int compression = settingsManager.getConfigData().getCompression();
+                        if (compression > 0) {
+                            boolean level = compression == 2;
+                            ch.pipeline().addBefore("stringEncoder","compressEncoder", new Lz4FrameEncoder(level));
+                            getLogger().info("Using Lz4 {} compression", compression);
+                        }
+
 
                         ch.pipeline().addLast(processingHandler);
 

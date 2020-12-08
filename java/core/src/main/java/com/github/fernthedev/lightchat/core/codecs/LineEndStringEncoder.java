@@ -1,4 +1,4 @@
-package com.github.fernthedev.lightchat.core.encryption.codecs;
+package com.github.fernthedev.lightchat.core.codecs;
 
 import com.github.fernthedev.lightchat.core.StaticHandler;
 import io.netty.channel.ChannelHandlerContext;

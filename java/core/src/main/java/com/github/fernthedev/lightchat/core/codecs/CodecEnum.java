@@ -1,7 +1,7 @@
-package com.github.fernthedev.lightchat.core.encryption.codecs;
+package com.github.fernthedev.lightchat.core.codecs;
 
-import com.github.fernthedev.lightchat.core.encryption.codecs.json.FastJSONHandler;
-import com.github.fernthedev.lightchat.core.encryption.codecs.json.GSONHandler;
+import com.github.fernthedev.lightchat.core.codecs.json.FastJSONHandler;
+import com.github.fernthedev.lightchat.core.codecs.json.GSONHandler;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
