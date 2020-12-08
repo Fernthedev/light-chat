@@ -1,14 +1,14 @@
 package com.github.fernthedev.lightchat.core;
 
 import com.github.fernthedev.lightchat.core.api.APIUsage;
+import com.github.fernthedev.lightchat.core.exceptions.DebugException;
+import com.github.fernthedev.lightchat.core.util.Log4jDebug;
 import com.google.gson.Gson;
 import io.netty.util.CharsetUtil;
 import lombok.*;
 import org.apache.commons.lang3.SystemUtils;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.core.config.Configurator;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.reflections.Reflections;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -69,21 +69,37 @@ public class StaticHandler {
     @Getter
     private static Core core;
 
+    private static boolean log4j = false;
+
     static {
         VERSION_DATA = new VersionData(gson.fromJson(getFile("variables.json"), VariablesJSON.class));
+        try {
+            Class.forName("org.apache.logging.log4j.core.config.Configurator");
+            log4j = true;
+        } catch (ClassNotFoundException e) {
+            log4j = false;
+            if (debug) {
+                new DebugException("Could not find Log4J though it is not required. Just a warning",e).printStackTrace();
+            }
+        }
     }
 
 
 
     public static void setDebug(boolean debug) {
-
         if (StaticHandler.debug != debug && getCore() != null) {
             StaticHandler.getCore().getLogger().info("Set debug mode to: {}", debug);
         }
 
         StaticHandler.debug = debug;
-        if (getCore() != null) Configurator.setLevel(getCore().getLogger().getName(), debug ? Level.DEBUG : Level.INFO);
-        Configurator.setLevel(Reflections.class.getName(), debug ? Level.DEBUG : Level.WARN);
+
+        Logger logger = null;
+
+        if (getCore() != null && getCore().getLogger() != null)
+            logger = getCore().getLogger();
+
+        if (log4j)
+            Log4jDebug.setDebug(logger, debug);
     }
 
     @Synchronized

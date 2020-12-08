@@ -91,9 +91,6 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
         testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.2'
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'
 
-        implementation "org.apache.logging.log4j:log4j-api:$log4j_ver"
-        implementation "org.apache.logging.log4j:log4j-core:$log4j_ver"
-        implementation "org.apache.logging.log4j:log4j-slf4j-impl:$log4j_ver"
         api 'org.slf4j:slf4j-api:1.7.30'
 
         api "io.netty:netty-all:$netty_ver"
