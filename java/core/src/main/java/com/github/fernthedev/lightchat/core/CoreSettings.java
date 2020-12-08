@@ -2,6 +2,7 @@ package com.github.fernthedev.lightchat.core;
 
 import com.github.fernthedev.lightchat.core.codecs.CodecEnum;
 import com.github.fernthedev.lightchat.core.codecs.JSONHandler;
+import com.github.fernthedev.lightchat.core.codecs.general.compression.CompressionAlgorithm;
 import io.netty.util.CharsetUtil;
 import lombok.*;
 
@@ -19,7 +20,10 @@ import java.nio.charset.Charset;
 public class CoreSettings implements Serializable {
 
     @SettingValue
-    private int compression = 2;
+    private int compressionLevel = 2;
+
+    @SettingValue
+    private CompressionAlgorithm compressionAlgorithm = CompressionAlgorithm.LZ4;
 
     protected transient Charset charset = CharsetUtil.UTF_8;
     protected long timeoutTime = (long) 30 * 1000;

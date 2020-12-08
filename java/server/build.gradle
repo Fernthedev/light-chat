@@ -1,7 +1,7 @@
 //apply com.github.fernthedev.client.plugin: 'application'
 
 dependencies {
-    compile project(':core')
+    api project(':core')
     implementation 'com.squareup.okio:okio:2.7.0'
 //    compile 'com.github.Fernthedev:LightReader:1.2.1'
 }

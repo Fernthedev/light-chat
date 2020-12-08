@@ -9,6 +9,8 @@ import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.core.api.APIUsage;
 import com.github.fernthedev.lightchat.core.api.Async;
 import com.github.fernthedev.lightchat.core.api.plugin.PluginManager;
+import com.github.fernthedev.lightchat.core.codecs.general.compression.CompressionAlgorithm;
+import com.github.fernthedev.lightchat.core.codecs.general.compression.Compressors;
 import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectDecoder;
 import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectEncoder;
 import com.github.fernthedev.lightchat.core.encryption.RSA.IEncryptionKeyHolder;
@@ -19,6 +21,7 @@ import com.github.fernthedev.lightchat.core.packets.Packet;
 import com.github.fernthedev.lightchat.core.packets.handshake.ConnectedPacket;
 import com.google.common.base.Stopwatch;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollSocketChannel;
@@ -27,8 +30,7 @@ import io.netty.channel.kqueue.KQueueSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LineBasedFrameDecoder;
-import io.netty.handler.codec.compression.Lz4FrameDecoder;
-import io.netty.handler.codec.compression.Lz4FrameEncoder;
+import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -249,14 +251,19 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
 //                            clientHandler);
 
 
-                // TODO: Find some native Lz4 compressor
-                ch.pipeline().addFirst(new Lz4FrameDecoder());
 
-                int compression = getClientSettingsManager().getConfigData().getCompression();
-                if (compression > 0) {
-                    boolean level = compression == 2;
-                    ch.pipeline().addBefore("stringEncoder","compressEncoder", new Lz4FrameEncoder(level));
-                    getLogger().info("Using Lz4 {} compression", compression);
+                int compression = getClientSettingsManager().getConfigData().getCompressionLevel();
+                CompressionAlgorithm compressionAlgorithm = getClientSettingsManager().getConfigData().getCompressionAlgorithm();
+
+                if (compressionAlgorithm != CompressionAlgorithm.NONE) {
+                    ch.pipeline().addFirst(Compressors.getCompressDecoder(compressionAlgorithm, compression));
+
+                    if (compression > 0) {
+
+                        MessageToByteEncoder<ByteBuf> compressEncoder = Compressors.getCompressEncoder(compressionAlgorithm, compression);
+                        ch.pipeline().addBefore("stringEncoder", "compressEncoder", compressEncoder);
+                        getLogger().info("Using {} {} compression", compressionAlgorithm.name(), compression);
+                    }
                 }
             }
         });

@@ -13,10 +13,10 @@ subprojects {
     version = "$protocol_ver"
 
     dependencies {
-        compile "org.jline:jline:$jline_ver"
-        compile "org.jline:jline-terminal-jansi:$jline_ver"
-        compile 'net.minecrell:terminalconsoleappender:1.2.0'
-        compile 'org.fusesource.jansi:jansi:1.18'
+        implementation "org.jline:jline:$jline_ver"
+        implementation "org.jline:jline-terminal-jansi:$jline_ver"
+        implementation 'net.minecrell:terminalconsoleappender:1.2.0'
+        implementation 'org.fusesource.jansi:jansi:1.18'
     }
 
 

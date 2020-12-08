@@ -6,8 +6,8 @@ repositories {
 }
 
 dependencies {
-    compile(project(':server'))
-    compile(project(':terminal:terminal-core'))
+    api(project(':server'))
+    api(project(':terminal:terminal-core'))
 }
 
 group "${project.parent.group}.server"

@@ -10,6 +10,8 @@ import com.github.fernthedev.lightchat.core.api.APIUsage;
 import com.github.fernthedev.lightchat.core.api.event.api.Listener;
 import com.github.fernthedev.lightchat.core.api.plugin.PluginManager;
 import com.github.fernthedev.lightchat.core.codecs.JSONHandler;
+import com.github.fernthedev.lightchat.core.codecs.general.compression.CompressionAlgorithm;
+import com.github.fernthedev.lightchat.core.codecs.general.compression.Compressors;
 import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectDecoder;
 import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectEncoder;
 import com.github.fernthedev.lightchat.core.encryption.util.RSAEncryptionUtil;
@@ -25,6 +27,7 @@ import com.github.fernthedev.lightchat.server.security.AuthenticationManager;
 import com.github.fernthedev.lightchat.server.security.BanManager;
 import com.github.fernthedev.lightchat.server.settings.ServerSettings;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
@@ -35,8 +38,7 @@ import io.netty.channel.kqueue.KQueueServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LineBasedFrameDecoder;
-import io.netty.handler.codec.compression.Lz4FrameDecoder;
-import io.netty.handler.codec.compression.Lz4FrameEncoder;
+import io.netty.handler.codec.MessageToByteEncoder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -385,14 +387,18 @@ public class Server implements Runnable {
 
                         ch.pipeline().addLast("stringEncoder", new EncryptedJSONObjectEncoder(settingsManager.getConfigData().getCharset(), keyFinder, jsonHandler));
 
-                        // TODO: Find some native ZLib compressor
-                        ch.pipeline().addFirst(new Lz4FrameDecoder());
+                        int compression = getSettingsManager().getConfigData().getCompressionLevel();
+                        CompressionAlgorithm compressionAlgorithm = getSettingsManager().getConfigData().getCompressionAlgorithm();
 
-                        int compression = settingsManager.getConfigData().getCompression();
-                        if (compression > 0) {
-                            boolean level = compression == 2;
-                            ch.pipeline().addBefore("stringEncoder","compressEncoder", new Lz4FrameEncoder(level));
-                            getLogger().info("Using Lz4 {} compression", compression);
+                        if (compressionAlgorithm != CompressionAlgorithm.NONE) {
+                            ch.pipeline().addFirst(Compressors.getCompressDecoder(compressionAlgorithm, compression));
+
+                            if (compression > 0) {
+
+                                MessageToByteEncoder<ByteBuf> compressEncoder = Compressors.getCompressEncoder(compressionAlgorithm, compression);
+                                ch.pipeline().addBefore("stringEncoder", "compressEncoder", compressEncoder);
+                                getLogger().info("Using {} {} compression", compressionAlgorithm.name(), compression);
+                            }
                         }
 
 

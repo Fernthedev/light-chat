@@ -1,7 +1,7 @@
 apply plugin: 'application'
 dependencies {
-    compile(project(':client'))
-    compile(project(':terminal:terminal-core'))
+    api(project(':client'))
+    api(project(':terminal:terminal-core'))
 }
 
 group "${project.parent.group}.client"
