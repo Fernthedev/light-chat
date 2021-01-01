@@ -6,7 +6,6 @@
 //    id 'application'
 //}
 //apply com.github.fernthedev.client.plugin: 'com.github.johnrengelman.shadow'
-import com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer
 
 plugins {
     id 'com.github.johnrengelman.shadow' version '6.1.0'
@@ -27,34 +26,31 @@ subprojects {
 
 
 
-    jar.classifier = 'old'
+
+
+
+
+
+    jar.dependsOn(shadowJar)
     shadowJar {
-        project.configurations.implementation.canBeResolved = true
-        configurations = [project.configurations.implementation]
-        classifier = ''
-    }
-
-
-}
-
-jar.dependsOn(shadowJar)
-shadowJar {
 //        project.configurations.implementation.canBeResolved = true
 //        configurations = [project.configurations.implementation]
-    classifier = '-shaded'
-    transform(Log4j2PluginsCacheFileTransformer)
+        transform(com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer)
 //        transform(Log4j2PluginsCacheFileTransformer)
-    minimize() {
-        exclude (dependency('io.netty:netty-transport.*:.*') )
-        exclude (dependency('log4j:log4j:.*') )
-        exclude (dependency('org.apache.logging.log4j:.*:.*') )
-        exclude (dependency('org.slf4j:slf4j-api:.*') )
-        exclude (dependency('commons-logging:.*:.*') )
-        exclude (dependency('com.pi4j:.*:.*') )
-        exclude (dependency('org.fusesource.jansi:.*:.*') )
-        exclude (dependency('org.jline:.*:.*') )
-        exclude (dependency('net.minecrell:.*:.*') )
-        exclude (dependency('com.lmax:disruptor:.*'))
-        exclude ('.**/Log4j2Plugins.dat' )
+        minimize() {
+            exclude (dependency('io.netty:netty-transport.*:.*') )
+            exclude (dependency('log4j:log4j:.*') )
+            exclude (dependency('org.apache.logging.log4j:.*:.*') )
+            exclude (dependency('org.slf4j:slf4j-api:.*') )
+            exclude (dependency('commons-logging:.*:.*') )
+            exclude (dependency('com.pi4j:.*:.*') )
+            exclude (dependency('org.fusesource.jansi:.*:.*') )
+            exclude (dependency('org.jline:.*:.*') )
+            exclude (dependency('net.minecrell:.*:.*') )
+            exclude (dependency('com.lmax:disruptor:.*'))
+            exclude ('.**/Log4j2Plugins.dat' )
+        }
     }
 }
+
+
