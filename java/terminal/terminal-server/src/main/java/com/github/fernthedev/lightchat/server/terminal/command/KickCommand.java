@@ -8,10 +8,7 @@ import com.github.fernthedev.lightchat.server.terminal.ServerTerminal;
 import com.github.fernthedev.terminal.core.packets.MessagePacket;
 import lombok.NonNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class KickCommand extends Command implements TabExecutor {
@@ -46,9 +43,9 @@ public class KickCommand extends Command implements TabExecutor {
     }
 
     @Override
-    public List<String> getCompletions(SenderInterface senderInterface, String[] args) {
+    public List<String> getCompletions(SenderInterface senderInterface, LinkedList<String> args) {
 
-        String curArg = args[args.length - 1];
+        String curArg = args.getLast();
         List<ClientConnection> completions = server.getPlayerHandler().getUuidMap().values().stream().filter(
                 item -> item.getName().startsWith(curArg)).collect(Collectors.toList());
 

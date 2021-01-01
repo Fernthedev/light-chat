@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -20,7 +21,7 @@ public class TabCompleteFinder {
     public List<LightCandidate> handleLine(SenderInterface senderInterface, List<String> words) {
         List<LightCandidate> candidates = new ArrayList<>();
 
-
+        if (words.isEmpty()) return candidates;
 
         if(words.size() == 1) {
             for (Command command : ServerTerminal.getCommands()) {
@@ -28,6 +29,10 @@ public class TabCompleteFinder {
                 candidates.add(new LightCandidate(string, string, null, null, null, null, true));
             }
         }else{
+            List<String> args = new ArrayList<>(words);
+
+            args.remove(0); // Remove the command as first argument
+
             String c = words.get(0);
             Command curCommand = null;
 
@@ -41,13 +46,7 @@ public class TabCompleteFinder {
             if(curCommand instanceof TabExecutor) {
                 TabExecutor tabExecutor = (TabExecutor) curCommand;
 
-                List<String> args = new ArrayList<>(words);
-
-                if(args.isEmpty()) return candidates;
-
-                args.remove(0); // Remove the command as first argument
-
-                @NonNull List<String> completions = tabExecutor.getCompletions(senderInterface, args.toArray(new String[0]));
+                @NonNull List<String> completions = tabExecutor.getCompletions(senderInterface, new LinkedList<>(args));
 
                 for (String string : completions) {
                     candidates.add(new LightCandidate(string, string, null, null, null, null, true));

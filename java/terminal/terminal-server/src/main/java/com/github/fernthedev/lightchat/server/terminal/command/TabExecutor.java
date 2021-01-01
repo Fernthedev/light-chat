@@ -2,6 +2,7 @@ package com.github.fernthedev.lightchat.server.terminal.command;
 
 import com.github.fernthedev.lightchat.server.SenderInterface;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public interface TabExecutor {
@@ -12,7 +13,7 @@ public interface TabExecutor {
      * @param args
      * @return
      */
-    List<String> getCompletions(SenderInterface sender, String[] args);
+    List<String> getCompletions(SenderInterface sender, LinkedList<String> args);
 
 
 }

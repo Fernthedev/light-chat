@@ -8,6 +8,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class FileNameTabExecutor extends Completers.FileNameCompleter implements TabExecutor {
@@ -33,10 +34,10 @@ public class FileNameTabExecutor extends Completers.FileNameCompleter implements
      * @since 2.3
      */
     @Override
-    public List<String> getCompletions(SenderInterface sender, String[] args) {
+    public List<String> getCompletions(SenderInterface sender, LinkedList<String> args) {
 
         List<String> candidates = new ArrayList<>();
-        String commandLine = args[args.length - 1];
+        String commandLine = args.getLast();
 
         assert commandLine != null;
 
