@@ -4,7 +4,7 @@ dependencies {
     runtimeOnly "org.apache.logging.log4j:log4j-api:$log4j_ver"
     runtimeOnly "org.apache.logging.log4j:log4j-core:$log4j_ver"
     runtimeOnly "org.apache.logging.log4j:log4j-slf4j-impl:$log4j_ver"
-    runtimeOnly group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '2.11.2'
+    runtimeOnly group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '2.14.0'
 }
 
 group "${project.parent.group}.core"
