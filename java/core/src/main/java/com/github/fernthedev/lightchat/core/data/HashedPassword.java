@@ -12,7 +12,24 @@ public class HashedPassword implements Serializable {
 
     protected HashedPassword() {}
 
+    /**
+     * Encrypts the string using 256 hash
+     * @param password
+     */
     public HashedPassword(String password) {
         this.password = EncryptionUtil.makeSHA256Hash(password);
+    }
+
+    /**
+     * Does not encrypt hash
+     * @param hash
+     * @return
+     */
+    public static HashedPassword fromHash(String hash) {
+        HashedPassword hashedPassword = new HashedPassword();
+
+        hashedPassword.password = hash;
+
+        return hashedPassword;
     }
 }
