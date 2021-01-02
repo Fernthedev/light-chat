@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiFunction;
 
 public class ClientTerminal {
 
@@ -34,6 +35,8 @@ public class ClientTerminal {
     @Getter
     private static AutoCompleteHandler autoCompleteHandler;
     protected static Client client;
+
+    protected static BiFunction<String, Integer, ? extends Client> clientSupplier = Client::new;
 
     @Getter
     private static final Stopwatch messageDelay = Stopwatch.createUnstarted();
@@ -132,7 +135,7 @@ public class ClientTerminal {
         }
 
 
-        client = new Client(host.get(), port.get());
+        client = clientSupplier.apply(host.get(), port.get());
 
         client.setClientSettingsManager(settings.getClientSettings());
 
