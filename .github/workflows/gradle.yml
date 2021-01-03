@@ -43,4 +43,4 @@ jobs:
           # Artifact name
           name: Client Jar Files
           # Directory containing files to upload
-          path: ./java/terminal/terminal-client/build/libs/*.-all\.jar
+          path: ./java/terminal/terminal-client/build/libs/*.-all.jar
