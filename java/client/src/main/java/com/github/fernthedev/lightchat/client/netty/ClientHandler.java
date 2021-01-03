@@ -56,16 +56,23 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         super.channelRead(ctx, msg);
     }
 
-
+    /**
+     * Calls {@link ChannelHandlerContext#fireChannelUnregistered()} to forward
+     * to the next {@link ChannelInboundHandler} in the {@link ChannelPipeline}.
+     * <p>
+     * Sub-classes may override this method to change behavior.
+     *
+     * @param ctx
+     */
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
         if (!ctx.channel().isActive()) {
             client.getLogger().info("Lost connection to server.");
 
             client.disconnect(ServerDisconnectEvent.DisconnectStatus.CONNECTION_LOST);
         }
 
-        super.channelInactive(ctx);
+        super.channelUnregistered(ctx);
     }
 
     @Override
