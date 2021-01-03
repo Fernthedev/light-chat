@@ -202,6 +202,11 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
     @APIUsage
     @Async
     public ChannelFuture connect() throws InterruptedException {
+        registered = false;
+        channel = null;
+        future = null;
+        workerGroup = null;
+
         getLogger().info("Connecting to server.");
 
         Bootstrap b = new Bootstrap();
@@ -362,6 +367,9 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
 
         workerGroup.shutdownGracefully();
 
+        channel = null;
+        future = null;
+        workerGroup = null;
 
     }
 

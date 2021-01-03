@@ -33,9 +33,9 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
      * @param ctx
      */
     @Override
-    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
         client.getPluginManager().callEvent(new ServerConnectFinishEvent(ctx.channel()));
-        super.channelRegistered(ctx);
+        super.channelActive(ctx);
     }
 
     @Override
@@ -58,14 +58,14 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
 
     @Override
-    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         if (!ctx.channel().isActive()) {
             client.getLogger().info("Lost connection to server.");
 
             client.disconnect(ServerDisconnectEvent.DisconnectStatus.CONNECTION_LOST);
-
-            super.channelUnregistered(ctx);
         }
+
+        super.channelInactive(ctx);
     }
 
     @Override
