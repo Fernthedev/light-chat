@@ -155,7 +155,9 @@ public class ClientTerminal {
 
         PacketHandler packetHandler = new PacketHandler();
         client.addPacketHandler(packetHandler);
-        client.getPluginManager().registerEvents(packetHandler);
+
+        if (settings.isShutdownOnDisconnect())
+            client.getPluginManager().registerEvents(packetHandler);
 
 
 

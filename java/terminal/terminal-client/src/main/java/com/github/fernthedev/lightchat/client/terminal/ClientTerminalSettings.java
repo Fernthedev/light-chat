@@ -40,6 +40,9 @@ public class ClientTerminalSettings {
     @Builder.Default
     protected boolean askUserForHostPort = true;
 
+    @Builder.Default
+    protected boolean shutdownOnDisconnect = true;
+
     @SneakyThrows
     protected static Config<? extends ClientSettings> createConfigWithoutException() {
         return new GsonConfig<>(new ClientSettings(), new File("client_settings.json"));
