@@ -69,7 +69,7 @@ public class StaticHandler {
     @Getter
     private static Core core;
 
-    private static boolean log4j = false;
+    private static boolean log4j;
 
     static {
         VERSION_DATA = new VersionData(gson.fromJson(getFile("variables.json"), VariablesJSON.class));
@@ -103,14 +103,19 @@ public class StaticHandler {
     }
 
     @Synchronized
-    public static void setCore(Core core) {
+    public static void setCore(Core core, boolean override) {
+        if (StaticHandler.core != null && !override) return;
+
+        boolean ifNull = StaticHandler.core == null;
+
         StaticHandler.core = core;
 
         // Updates debug config
         setDebug(debug);
 //        Configurator.setLevel(getCore().getLogger().getName(), debug ? Level.DEBUG : Level.INFO);
 
-        PacketRegistry.registerDefaultPackets();
+        if (ifNull)
+            PacketRegistry.registerDefaultPackets();
     }
 
     @APIUsage

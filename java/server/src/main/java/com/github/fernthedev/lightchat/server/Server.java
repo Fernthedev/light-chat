@@ -153,7 +153,7 @@ public class Server implements Runnable {
 
 
         console = new Console(this);
-        StaticHandler.setCore(new ServerCore(this));
+        StaticHandler.setCore(new ServerCore(this), false);
 
         int rsaKeyPoolSize = 15;
 

@@ -129,7 +129,7 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
     public Client(String host, int port) {
         this.host = host;
         this.port = port;
-        StaticHandler.setCore(new ClientCore(this));
+        StaticHandler.setCore(new ClientCore(this), false);
 
         listener = new EventListener(this);
         clientHandler = new ClientHandler(this, listener);

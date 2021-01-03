@@ -116,7 +116,7 @@ public class ServerTerminal {
 
 
 
-        StaticHandler.setCore(new ServerTermCore(server));
+        StaticHandler.setCore(new ServerTermCore(server), true);
 
         if (terminalSettings.isAllowTermPackets())
             CommonUtil.registerTerminalPackets();

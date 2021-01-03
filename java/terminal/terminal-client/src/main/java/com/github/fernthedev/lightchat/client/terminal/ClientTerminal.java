@@ -142,7 +142,7 @@ public class ClientTerminal {
         client.getClientSettingsManager().load();
         client.getClientSettingsManager().save();
 
-        StaticHandler.setCore(new ClientTermCore(client));
+        StaticHandler.setCore(new ClientTermCore(client), true);
 
         if (settings.isAllowTermPackets())
             CommonUtil.registerTerminalPackets();
