@@ -426,10 +426,14 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
 
     void endPingStopwatch() {
         if (!stopWatch.isStopped())
-            stopWatch.stop();
+            stopWatch.suspend();
     }
 
     public long getPingTime(TimeUnit timeUnit) {
+        // Return -1 if ping has not been measured yet
+        if (!stopWatch.isStarted() && !stopWatch.isSuspended())
+            return -1;
+
         return stopWatch.getTime(timeUnit);
     }
 
