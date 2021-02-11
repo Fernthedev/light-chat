@@ -17,6 +17,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import lombok.NonNull;
 
+import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -102,12 +103,13 @@ public class EncryptedJSONObjectEncoder extends MessageToMessageEncoder<Acceptab
 
     public EncryptedBytes encrypt(ChannelHandlerContext ctx, String decryptedString) {
         @NonNull SecretKey secretKey = encryptionKeyHolder.getSecretKey(ctx, ctx.channel());
-        EncryptedBytes encryptedJSON = null;
+        @NonNull Cipher cipher = encryptionKeyHolder.getEncryptCipher(ctx, ctx.channel());
+        EncryptedBytes encryptedJSON;
 
         if (decryptedString == null || decryptedString.isEmpty()) decryptedString = "";
 
         try {
-            encryptedJSON = EncryptionUtil.encrypt(decryptedString, secretKey);
+            encryptedJSON = EncryptionUtil.encrypt(decryptedString, secretKey, cipher);
 
         } catch (Exception e) {
              throw ExceptionUtil.throwParsePacketException(e, decryptedString);

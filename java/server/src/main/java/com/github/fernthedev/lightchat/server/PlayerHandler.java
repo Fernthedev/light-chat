@@ -18,7 +18,7 @@ public class PlayerHandler implements Runnable {
     private final Map<Channel, ClientConnection> channelMap = new ConcurrentHashMap<>();
 
     @NonNull
-    private Server server;
+    private final Server server;
 
     @Getter
     private final Map<UUID, ClientConnection> uuidMap = new ConcurrentHashMap<>();

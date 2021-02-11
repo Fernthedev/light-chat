@@ -44,9 +44,12 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -137,11 +140,11 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
         initialize(host, port);
     }
 
-//    @Getter
-//    private Cipher decryptCipher;
-//
-//    @Getter
-//    private Cipher encryptCipher;
+    @Getter
+    private Cipher decryptCipher;
+
+    @Getter
+    private Cipher encryptCipher;
 
     @APIUsage
     public void addPacketHandler(IPacketHandler iPacketHandler) {
@@ -168,11 +171,6 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
         getLogger().info("Initializing");
         StaticHandler.displayVersion();
 
-
-
-//        StaticHandler.setupTerminal(completeHandler);
-
-
         try {
             if (name == null) name = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
@@ -180,14 +178,12 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
             disconnect();
         }
 
-
-
-
-//        waitForCommand = new WaitForCommand(this);
-
-
-
-
+        try {
+            encryptCipher = EncryptionUtil.getEncryptCipher();
+            decryptCipher = EncryptionUtil.getDecryptCipher();
+        } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
 
     }
 
@@ -287,15 +283,9 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
 
             if (future.isSuccess() && future.channel().isActive()) {
 
-
                 connectTime.stop();
                 StaticHandler.getCore().getLogger().debug("Time taken to connect: {}ms", connectTime.elapsed(TimeUnit.MILLISECONDS));
                 running = true;
-                // getLogger().info("NEW WAIT FOR COMMAND THREAD");
-//                waitThread = new Thread(waitForCommand, "CommandThread");
-//                waitThread.start();
-
-
             }
         });
 
@@ -376,6 +366,16 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
     @Override
     public SecretKey getSecretKey(ChannelHandlerContext ctx, Channel channel) {
         return secretKey.getNow(null);
+    }
+
+    @Override
+    public Cipher getEncryptCipher(ChannelHandlerContext ctx, Channel channel) {
+        return encryptCipher;
+    }
+
+    @Override
+    public Cipher getDecryptCipher(ChannelHandlerContext ctx, Channel channel) {
+        return decryptCipher;
     }
 
     @Override

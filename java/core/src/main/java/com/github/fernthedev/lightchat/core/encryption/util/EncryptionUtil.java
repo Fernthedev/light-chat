@@ -15,7 +15,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
-import java.util.Base64;
 
 public class EncryptionUtil {
 
@@ -58,70 +57,60 @@ public class EncryptionUtil {
     }
 
     /**
+     * Initializes and creates an encryption cipher
+     * @return the cipher
+     *
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     */
+    public static Cipher getEncryptCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
+        return Cipher.getInstance(StaticHandler.AES_CIPHER_TRANSFORMATION);
+    }
+
+    /**
      * Encrypt object with password
      *
      * @param data   Object to be encrypted
-     * @param secret Password to use for encryption
      * @return Encrypted version of object
      */
-    public static EncryptedBytes encrypt(String data, SecretKey secret) throws InvalidKeyException {
+    public static EncryptedBytes encrypt(String data, SecretKey secret, @NonNull Cipher cipher) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, IOException {
+        cipher.init(Cipher.ENCRYPT_MODE, secret);
 
-        try {
-            Cipher cipher = Cipher.getInstance(StaticHandler.AES_CIPHER_TRANSFORMATION);
-            cipher.init(Cipher.ENCRYPT_MODE, secret);
+        byte[] encodedData = cipher.doFinal(data.getBytes(StaticHandler.CHARSET_FOR_STRING));
+        byte[] params = cipher.getParameters().getEncoded();
+        String paramAlgorithm = cipher.getParameters().getAlgorithm();
 
-            // properly encode the complete ciphertext
-            //logEncrypt(password, object);
+        return new EncryptedBytes(encodedData, params, paramAlgorithm);
+    }
 
-            byte[] encodedData = cipher.doFinal(data.getBytes(StaticHandler.CHARSET_FOR_STRING));
-            byte[] params = cipher.getParameters().getEncoded();
-            String paramAlgorithm = cipher.getParameters().getAlgorithm();
-
-            // TODO: Remove this log
-            StaticHandler.getCore().getLogger().debug("Key, IV (no encode) and data (encoded): {} {} ({}) {} ({})",
-                    Base64.getEncoder().encodeToString(secret.getEncoded()),
-                    Base64.getEncoder().encodeToString(cipher.getParameters().getEncoded()),
-                    Base64.getEncoder().encodeToString(cipher.getIV()),
-                    data,
-                    Base64.getEncoder().encodeToString(encodedData)
-            );
-
-            return new EncryptedBytes(encodedData, params, paramAlgorithm);
-        } catch (InvalidKeyException e) {
-            throw e;
-        } catch (NoSuchAlgorithmException | IllegalBlockSizeException | NoSuchPaddingException | BadPaddingException | IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+    /**
+     * Initializes and creates a decryption cipher
+     * @return the cipher
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     */
+    @NonNull
+    public static Cipher getDecryptCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
+        return Cipher.getInstance(StaticHandler.AES_CIPHER_TRANSFORMATION);
     }
 
     /**
      * Decrypt data with secret
      *
      * @param encryptedBytes Object to be decrypted
-     * @param secret         Password to use for decryption
      * @return Decrypted version of object
      */
-    public static String decrypt(EncryptedBytes encryptedBytes, @NonNull SecretKey secret) throws InvalidKeyException {
-        try {
-
-            // get parameter object for password-based encryption
-            AlgorithmParameters algParams = AlgorithmParameters.getInstance(encryptedBytes.getParamAlgorithm());
+    public static String decrypt(@NonNull EncryptedBytes encryptedBytes, SecretKey secret, @NonNull Cipher cipher) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, IOException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+        // get parameter object for password-based encryption
+        AlgorithmParameters algParams = AlgorithmParameters.getInstance(encryptedBytes.getParamAlgorithm());
 
 
-            if (algParams == null) throw new IllegalArgumentException("EncryptedBytes.Parameters are not valid");
+        // initialize with parameter encoding from above
+        algParams.init(encryptedBytes.getParams());
 
-            // initialize with parameter encoding from above
-            algParams.init(encryptedBytes.getParams());
+        cipher.init(Cipher.DECRYPT_MODE, secret, algParams);
 
-            Cipher cipher = Cipher.getInstance(StaticHandler.AES_CIPHER_TRANSFORMATION);
-            cipher.init(Cipher.DECRYPT_MODE, secret, algParams);
-
-            return new String(cipher.doFinal(encryptedBytes.getData()), StaticHandler.CHARSET_FOR_STRING);
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException | IOException | InvalidAlgorithmParameterException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return new String(cipher.doFinal(encryptedBytes.getData()), StaticHandler.CHARSET_FOR_STRING);
     }
 
     /**

@@ -4,6 +4,7 @@ import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.core.VersionData;
 import com.github.fernthedev.lightchat.core.api.APIUsage;
 import com.github.fernthedev.lightchat.core.encryption.UnencryptedPacketWrapper;
+import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil;
 import com.github.fernthedev.lightchat.core.packets.Packet;
 import com.github.fernthedev.lightchat.core.packets.latency.LatencyPacket;
 import com.github.fernthedev.lightchat.core.packets.latency.PingPacket;
@@ -17,9 +18,12 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import java.net.InetSocketAddress;
 import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -79,6 +83,12 @@ public class ClientConnection implements SenderInterface, AutoCloseable {
     @Getter
     private SecretKey secretKey;
 
+    @Getter
+    private final Cipher encryptCipher;
+
+    @Getter
+    private final Cipher decryptCipher;
+
     /**
      * Packet:[ID,lastPacketSentTime]
      */
@@ -92,24 +102,11 @@ public class ClientConnection implements SenderInterface, AutoCloseable {
         this.tempKeyPair = null;
     }
 
-    //    public void awaitKeys() {
-//        if(keyFuture != null) keyFuture.awaitFinish(0);
-//    }
-
 
     public ClientConnection(Server server, Channel channel, UUID uuid, Consumer<ClientConnection> callback) {
         this.server = server;
         this.channel = channel;
         this.uuid = uuid;
-
-//        this.keyFuture = ThreadUtils.runAsync(new Task() {
-////            @Override
-////            public void run(InterfaceTaskInfo<?, Task> taskInfo) {
-////                tempKeyPair = RSAEncryptionUtil.generateKeyPairs();
-////                taskInfo.finish(this);
-////            }
-////        });
-
 
         server.getRsaKeyThread().getRandomKey().thenAccept(keyPair -> {
             tempKeyPair = keyPair;
@@ -117,6 +114,13 @@ public class ClientConnection implements SenderInterface, AutoCloseable {
         });
 
         eventListener = new EventListener(server, this);
+
+        try {
+            encryptCipher = EncryptionUtil.getEncryptCipher();
+            decryptCipher = EncryptionUtil.getDecryptCipher();
+        } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
 

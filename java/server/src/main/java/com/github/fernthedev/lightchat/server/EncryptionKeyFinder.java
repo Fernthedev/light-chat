@@ -8,6 +8,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 
 @RequiredArgsConstructor
@@ -31,6 +32,16 @@ public class EncryptionKeyFinder implements IEncryptionKeyHolder {
     @Override
     public @NonNull SecretKey getSecretKey(ChannelHandlerContext ctx, Channel channel) {
         return server.getPlayerHandler().getChannelMap().get(channel).getSecretKey();
+    }
+
+    @Override
+    public Cipher getEncryptCipher(ChannelHandlerContext ctx, Channel channel) {
+        return server.getPlayerHandler().getChannelMap().get(channel).getEncryptCipher();
+    }
+
+    @Override
+    public Cipher getDecryptCipher(ChannelHandlerContext ctx, Channel channel) {
+        return server.getPlayerHandler().getChannelMap().get(channel).getDecryptCipher();
     }
 
     @Override

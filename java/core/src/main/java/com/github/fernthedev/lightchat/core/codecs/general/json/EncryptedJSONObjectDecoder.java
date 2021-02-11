@@ -11,17 +11,26 @@ import com.github.fernthedev.lightchat.core.encryption.UnencryptedPacketWrapper;
 import com.github.fernthedev.lightchat.core.codecs.JSONHandler;
 import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil;
 import com.github.fernthedev.lightchat.core.packets.Packet;
+import com.github.fernthedev.lightchat.core.util.ExceptionUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.string.StringDecoder;
+import lombok.NonNull;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
+import java.io.IOException;
 import java.nio.charset.Charset;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -112,18 +121,20 @@ public class EncryptedJSONObjectDecoder extends StringDecoder {
 
         SecretKey secretKey = encryptionKeyHolder.getSecretKey(ctx, ctx.channel());
 
+        @NonNull Cipher decryptCipher = encryptionKeyHolder.getDecryptCipher(ctx, ctx.channel());
+
         if (secretKey == null) {
             throw new NoSecretKeyException();
         }
 
 
-        String decryptedJSON = null;
+        String decryptedJSON;
 
 
         try {
-            decryptedJSON = EncryptionUtil.decrypt(encryptedString, secretKey);
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
+            decryptedJSON = EncryptionUtil.decrypt(encryptedString, secretKey, decryptCipher);
+        } catch (InvalidKeyException | BadPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException | IOException | InvalidAlgorithmParameterException e) {
+            throw ExceptionUtil.throwParsePacketException(e, Arrays.toString(encryptedString.getData()));
         }
 
 
