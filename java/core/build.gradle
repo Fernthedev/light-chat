@@ -1,5 +1,5 @@
 dependencies {
-    implementation 'commons-io:commons-io:2.7'
+    implementation 'commons-io:commons-io:2.8.0'
     implementation 'commons-codec:commons-codec:1.15'
     compileOnly 'com.alibaba:fastjson:1.2.75'
     implementation 'org.reflections:reflections:0.9.12'
