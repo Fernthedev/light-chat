@@ -9,6 +9,7 @@ on:
   release:
     types: # This configuration does not affect the page_build event above
       - created
+  workflow_dispatch:
 
 jobs:
   build:
@@ -36,11 +37,11 @@ jobs:
           # Artifact name
           name: Server Jar Files
           # Directory containing files to upload
-          path: ./java/terminal/terminal-server/build/libs/*.-all\.jar
+          path: ./java/terminal/terminal-server/build/libs/*-all.jar
       - name: Upload client artifact
         uses: actions/upload-artifact@v1.0.0
         with:
           # Artifact name
           name: Client Jar Files
           # Directory containing files to upload
-          path: ./java/terminal/terminal-client/build/libs/*.-all.jar
+          path: ./java/terminal/terminal-client/build/libs/*-all.jar
