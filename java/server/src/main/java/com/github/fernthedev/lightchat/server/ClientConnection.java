@@ -214,10 +214,6 @@ public class ClientConnection implements SenderInterface, AutoCloseable {
         //serverSocket.close();
     }
 
-    public SecureRandom getSecureRandom() {
-        return secureRandom;
-    }
-
 
     @Override
     public String toString() {
