@@ -108,6 +108,10 @@ hs_err_pid*
 *.iml
 *.ipr
 
+.idea/discord.xml
+.idea/checkstyle-idea.xml
+.idea/misc.xml
+
 # CMake
 cmake-build-*/
 
