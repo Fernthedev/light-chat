@@ -3,7 +3,6 @@ package com.github.fernthedev.lightchat.server.settings;
 import com.github.fernthedev.fernutils.thread.ThreadUtils;
 import com.github.fernthedev.fernutils.thread.multiple.TaskInfoFunctionList;
 import com.github.fernthedev.lightchat.core.CoreSettings;
-import com.github.fernthedev.lightchat.core.codecs.CodecEnum;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -41,7 +40,7 @@ public class ServerSettings extends CoreSettings {
     private boolean useNativeTransport = true;
 
     @SettingValue(name = "codec")
-    protected CodecEnum jsonCodec = DEFAULT_CODEC;
+    protected String jsonCodec = DEFAULT_CODEC;
 
     @Deprecated
     public void setNewValue(@NonNull String oldValue, @NonNull String newValue) {

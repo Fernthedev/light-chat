@@ -1,6 +1,6 @@
 package com.github.fernthedev.lightchat.core;
 
-import com.github.fernthedev.lightchat.core.codecs.CodecEnum;
+import com.github.fernthedev.lightchat.core.codecs.Codecs;
 import com.github.fernthedev.lightchat.core.codecs.JSONHandler;
 import com.github.fernthedev.lightchat.core.codecs.general.compression.CompressionAlgorithm;
 import io.netty.util.CharsetUtil;
@@ -28,9 +28,9 @@ public class CoreSettings implements Serializable {
     protected transient Charset charset = CharsetUtil.UTF_8;
     protected long timeoutTime = (long) 30 * 1000;
 
-    protected transient JSONHandler codec = DEFAULT_CODEC.getJsonHandler();
+    protected transient String codec = DEFAULT_CODEC;
 
-    protected static final transient CodecEnum DEFAULT_CODEC = CodecEnum.GSON;
+    protected static final transient String DEFAULT_CODEC = Codecs.GSON_STR;
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})

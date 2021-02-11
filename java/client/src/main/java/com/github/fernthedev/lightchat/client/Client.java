@@ -9,6 +9,8 @@ import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.core.api.APIUsage;
 import com.github.fernthedev.lightchat.core.api.Async;
 import com.github.fernthedev.lightchat.core.api.plugin.PluginManager;
+import com.github.fernthedev.lightchat.core.codecs.Codecs;
+import com.github.fernthedev.lightchat.core.codecs.JSONHandler;
 import com.github.fernthedev.lightchat.core.codecs.general.compression.CompressionAlgorithm;
 import com.github.fernthedev.lightchat.core.codecs.general.compression.Compressors;
 import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectDecoder;
@@ -224,6 +226,10 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
             channelClass = KQueueSocketChannel.class;
         }
 
+        JSONHandler jsonHandler = Codecs.getJsonHandler(clientSettings.getCodec());
+
+        if (jsonHandler == null)
+            throw new IllegalStateException("The codec " + clientSettings.getCodec() + " was not recognized");
 
         b.group(workerGroup);
         b.channel(channelClass);
@@ -242,9 +248,9 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
 
 
                 ch.pipeline().addLast("frameDecoder", new LineBasedFrameDecoder(StaticHandler.getLineLimit()));
-                ch.pipeline().addLast("stringDecoder", new EncryptedJSONObjectDecoder(clientSettings.getCharset(), Client.this, clientSettings.getCodec()));
+                ch.pipeline().addLast("stringDecoder", new EncryptedJSONObjectDecoder(clientSettings.getCharset(), Client.this, jsonHandler));
 
-                ch.pipeline().addLast("stringEncoder", new EncryptedJSONObjectEncoder(clientSettings.getCharset(), Client.this, clientSettings.getCodec()));
+                ch.pipeline().addLast("stringEncoder", new EncryptedJSONObjectEncoder(clientSettings.getCharset(), Client.this, jsonHandler));
 
                 ch.pipeline().addLast(clientHandler);
 //                    ch.pipeline().addLast(new ObjectEncoder(),

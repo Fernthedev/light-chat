@@ -9,6 +9,7 @@ import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.core.api.APIUsage;
 import com.github.fernthedev.lightchat.core.api.event.api.Listener;
 import com.github.fernthedev.lightchat.core.api.plugin.PluginManager;
+import com.github.fernthedev.lightchat.core.codecs.Codecs;
 import com.github.fernthedev.lightchat.core.codecs.JSONHandler;
 import com.github.fernthedev.lightchat.core.codecs.general.compression.CompressionAlgorithm;
 import com.github.fernthedev.lightchat.core.codecs.general.compression.Compressors;
@@ -369,7 +370,10 @@ public class Server implements Runnable {
 
         EncryptionKeyFinder keyFinder = new EncryptionKeyFinder(this);
 
-        JSONHandler jsonHandler = settingsManager.getConfigData().getCodec();
+        JSONHandler jsonHandler = Codecs.getJsonHandler(settingsManager.getConfigData().getCodec());
+
+        if (jsonHandler == null)
+            throw new IllegalStateException("The codec " + settingsManager.getConfigData().getCodec() + " was not recognized");
 
         // Start key thread before initializing netty
         rsaKeyThread.setDaemon(true);
