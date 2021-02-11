@@ -2,9 +2,11 @@ package com.github.fernthedev.lightchat.core.encryption.util;
 
 import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.core.encryption.EncryptedBytes;
+import kotlin.Pair;
 import lombok.NonNull;
 
 import javax.crypto.*;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -13,10 +15,14 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
+import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
 
 public class EncryptionUtil {
+
+    private static final int GCM_NONCE_LENGTH = 12;
+    private static final int GCM_TAG_LENGTH = 16;
 
     public static SecretKey generateSecretKey() {
 
@@ -56,6 +62,22 @@ public class EncryptionUtil {
         return null;
     }
 
+    public static SecureRandom getSecureRandom(SecretKey secretKey) throws NoSuchAlgorithmException {
+        SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+        random.setSeed(secretKey.getEncoded());
+
+        return random;
+    }
+
+    @NonNull
+    public static AlgorithmParameterSpec getAlgorithmSpec(SecureRandom random) {
+        // Create our IV from random bytes with the correct block size
+        byte[] nonce = new byte[GCM_NONCE_LENGTH];
+        random.nextBytes(nonce);
+
+        return new GCMParameterSpec(GCM_TAG_LENGTH * 8, nonce);
+    }
+
     /**
      * Initializes and creates an encryption cipher
      * @return the cipher
@@ -73,8 +95,10 @@ public class EncryptionUtil {
      * @param data   Object to be encrypted
      * @return Encrypted version of object
      */
-    public static EncryptedBytes encrypt(String data, SecretKey secret, @NonNull Cipher cipher) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, IOException {
-        cipher.init(Cipher.ENCRYPT_MODE, secret);
+    public static EncryptedBytes encrypt(String data, SecretKey secret, @NonNull Cipher cipher, SecureRandom secureRandom) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, IOException, InvalidAlgorithmParameterException {
+        AlgorithmParameterSpec spec = getAlgorithmSpec(secureRandom);
+
+        cipher.init(Cipher.ENCRYPT_MODE, secret, spec);
 
         byte[] encodedData = cipher.doFinal(data.getBytes(StaticHandler.CHARSET_FOR_STRING));
         byte[] params = cipher.getParameters().getEncoded();
@@ -100,15 +124,10 @@ public class EncryptionUtil {
      * @param encryptedBytes Object to be decrypted
      * @return Decrypted version of object
      */
-    public static String decrypt(@NonNull EncryptedBytes encryptedBytes, SecretKey secret, @NonNull Cipher cipher) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, IOException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-        // get parameter object for password-based encryption
-        AlgorithmParameters algParams = AlgorithmParameters.getInstance(encryptedBytes.getParamAlgorithm());
+    public static String decrypt(@NonNull EncryptedBytes encryptedBytes, SecretKey secret, @NonNull Cipher cipher, SecureRandom secureRandom) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, IOException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+        AlgorithmParameterSpec spec = getAlgorithmSpec(secureRandom);
 
-
-        // initialize with parameter encoding from above
-        algParams.init(encryptedBytes.getParams());
-
-        cipher.init(Cipher.DECRYPT_MODE, secret, algParams);
+        cipher.init(Cipher.DECRYPT_MODE, secret, spec);
 
         return new String(cipher.doFinal(encryptedBytes.getData()), StaticHandler.CHARSET_FOR_STRING);
     }

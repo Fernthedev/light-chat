@@ -31,7 +31,7 @@ public class StaticHandler {
 
     public static final int AES_KEY_SIZE = 256;
     public static final String AES_KEY_MODE = "AES";
-    public static final String AES_CIPHER_TRANSFORMATION = "AES/CBC/PKCS5Padding";
+    public static final String AES_CIPHER_TRANSFORMATION = "AES/GCM/NoPadding";
 
 
     public static final String PACKET_PACKAGE = "com.github.fernthedev.lightchat.core.packets";

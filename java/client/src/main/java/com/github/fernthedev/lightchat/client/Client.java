@@ -34,10 +34,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.timeout.ReadTimeoutHandler;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -52,6 +49,7 @@ import javax.crypto.SecretKey;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -148,6 +146,9 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
     @Getter
     private Cipher encryptCipher;
 
+    @Getter
+    private SecureRandom secureRandom;
+
     @APIUsage
     public void addPacketHandler(IPacketHandler iPacketHandler) {
         packetHandlers.add(iPacketHandler);
@@ -179,14 +180,6 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
             getLogger().error(e.getMessage(), e.getCause());
             disconnect();
         }
-
-        try {
-            encryptCipher = EncryptionUtil.getEncryptCipher();
-            decryptCipher = EncryptionUtil.getDecryptCipher();
-        } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
-        }
-
     }
 
 
@@ -280,6 +273,17 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
         Stopwatch connectTime = Stopwatch.createStarted();
 
         secretKey = CompletableFuture.supplyAsync(EncryptionUtil::generateSecretKey);
+
+        secretKey.thenAccept(secretKey -> {
+            try {
+                encryptCipher = EncryptionUtil.getEncryptCipher();
+                decryptCipher = EncryptionUtil.getDecryptCipher();
+
+                secureRandom = EncryptionUtil.getSecureRandom(secretKey);
+            } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
+                e.printStackTrace();
+            }
+        });
 
         future = b.connect(host, port);
 
@@ -382,6 +386,12 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
     @Override
     public Cipher getDecryptCipher(ChannelHandlerContext ctx, Channel channel) {
         return decryptCipher;
+    }
+
+    @SneakyThrows
+    @Override
+    public SecureRandom getSecureRandom(ChannelHandlerContext ctx, Channel channel) {
+        return secureRandom;
     }
 
     @Override

@@ -10,6 +10,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
+import java.security.SecureRandom;
 
 @RequiredArgsConstructor
 public class EncryptionKeyFinder implements IEncryptionKeyHolder {
@@ -42,6 +43,11 @@ public class EncryptionKeyFinder implements IEncryptionKeyHolder {
     @Override
     public Cipher getDecryptCipher(ChannelHandlerContext ctx, Channel channel) {
         return server.getPlayerHandler().getChannelMap().get(channel).getDecryptCipher();
+    }
+
+    @Override
+    public SecureRandom getSecureRandom(ChannelHandlerContext ctx, Channel channel) {
+        return server.getPlayerHandler().getChannelMap().get(channel).getSecureRandom();
     }
 
     @Override

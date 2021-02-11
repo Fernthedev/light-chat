@@ -2,13 +2,13 @@ package com.github.fernthedev.lightchat.core.codecs.general.json;
 
 import com.github.fernthedev.lightchat.core.PacketRegistry;
 import com.github.fernthedev.lightchat.core.StaticHandler;
+import com.github.fernthedev.lightchat.core.codecs.JSONHandler;
 import com.github.fernthedev.lightchat.core.encryption.EncryptedBytes;
 import com.github.fernthedev.lightchat.core.encryption.EncryptedPacketWrapper;
 import com.github.fernthedev.lightchat.core.encryption.PacketWrapper;
 import com.github.fernthedev.lightchat.core.encryption.RSA.IEncryptionKeyHolder;
 import com.github.fernthedev.lightchat.core.encryption.RSA.NoSecretKeyException;
 import com.github.fernthedev.lightchat.core.encryption.UnencryptedPacketWrapper;
-import com.github.fernthedev.lightchat.core.codecs.JSONHandler;
 import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil;
 import com.github.fernthedev.lightchat.core.packets.Packet;
 import com.github.fernthedev.lightchat.core.util.ExceptionUtil;
@@ -29,6 +29,7 @@ import java.nio.charset.Charset;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -123,6 +124,8 @@ public class EncryptedJSONObjectDecoder extends StringDecoder {
 
         @NonNull Cipher decryptCipher = encryptionKeyHolder.getDecryptCipher(ctx, ctx.channel());
 
+        SecureRandom random = encryptionKeyHolder.getSecureRandom(ctx, ctx.channel());
+
         if (secretKey == null) {
             throw new NoSecretKeyException();
         }
@@ -132,8 +135,8 @@ public class EncryptedJSONObjectDecoder extends StringDecoder {
 
 
         try {
-            decryptedJSON = EncryptionUtil.decrypt(encryptedString, secretKey, decryptCipher);
-        } catch (InvalidKeyException | BadPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException | IOException | InvalidAlgorithmParameterException e) {
+            decryptedJSON = EncryptionUtil.decrypt(encryptedString, secretKey, decryptCipher, random);
+        } catch (BadPaddingException | IOException | NoSuchAlgorithmException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException e) {
             throw ExceptionUtil.throwParsePacketException(e, Arrays.toString(encryptedString.getData()));
         }
 

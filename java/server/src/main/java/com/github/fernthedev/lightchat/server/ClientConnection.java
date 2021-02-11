@@ -24,6 +24,7 @@ import javax.crypto.SecretKey;
 import java.net.InetSocketAddress;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -84,10 +85,13 @@ public class ClientConnection implements SenderInterface, AutoCloseable {
     private SecretKey secretKey;
 
     @Getter
-    private final Cipher encryptCipher;
+    private Cipher encryptCipher;
 
     @Getter
-    private final Cipher decryptCipher;
+    private Cipher decryptCipher;
+
+    @Getter
+    private SecureRandom secureRandom;
 
     /**
      * Packet:[ID,lastPacketSentTime]
@@ -100,6 +104,12 @@ public class ClientConnection implements SenderInterface, AutoCloseable {
     public void setSecretKey(SecretKey secretKey) {
         this.secretKey = secretKey;
         this.tempKeyPair = null;
+
+        try {
+            this.secureRandom = EncryptionUtil.getSecureRandom(secretKey);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -113,14 +123,14 @@ public class ClientConnection implements SenderInterface, AutoCloseable {
             callback.accept(this);
         });
 
-        eventListener = new EventListener(server, this);
-
         try {
             encryptCipher = EncryptionUtil.getEncryptCipher();
             decryptCipher = EncryptionUtil.getDecryptCipher();
         } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
+            e.printStackTrace();
         }
+
+        eventListener = new EventListener(server, this);
     }
 
 
@@ -202,6 +212,10 @@ public class ClientConnection implements SenderInterface, AutoCloseable {
 
 
         //serverSocket.close();
+    }
+
+    public SecureRandom getSecureRandom() {
+        return secureRandom;
     }
 
 

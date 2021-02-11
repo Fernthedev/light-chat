@@ -1,14 +1,14 @@
 package com.github.fernthedev.lightchat.core.codecs.general.json;
 
 import com.github.fernthedev.lightchat.core.StaticHandler;
+import com.github.fernthedev.lightchat.core.codecs.AcceptablePacketTypes;
+import com.github.fernthedev.lightchat.core.codecs.JSONHandler;
+import com.github.fernthedev.lightchat.core.codecs.LineEndStringEncoder;
 import com.github.fernthedev.lightchat.core.encryption.EncryptedBytes;
 import com.github.fernthedev.lightchat.core.encryption.EncryptedPacketWrapper;
 import com.github.fernthedev.lightchat.core.encryption.PacketWrapper;
 import com.github.fernthedev.lightchat.core.encryption.RSA.IEncryptionKeyHolder;
 import com.github.fernthedev.lightchat.core.encryption.UnencryptedPacketWrapper;
-import com.github.fernthedev.lightchat.core.codecs.AcceptablePacketTypes;
-import com.github.fernthedev.lightchat.core.codecs.JSONHandler;
-import com.github.fernthedev.lightchat.core.codecs.LineEndStringEncoder;
 import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil;
 import com.github.fernthedev.lightchat.core.packets.Packet;
 import com.github.fernthedev.lightchat.core.util.ExceptionUtil;
@@ -20,6 +20,7 @@ import lombok.NonNull;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import java.nio.charset.Charset;
+import java.security.SecureRandom;
 import java.util.List;
 
 /**
@@ -104,14 +105,18 @@ public class EncryptedJSONObjectEncoder extends MessageToMessageEncoder<Acceptab
     public EncryptedBytes encrypt(ChannelHandlerContext ctx, String decryptedString) {
         @NonNull SecretKey secretKey = encryptionKeyHolder.getSecretKey(ctx, ctx.channel());
         @NonNull Cipher cipher = encryptionKeyHolder.getEncryptCipher(ctx, ctx.channel());
+        @NonNull SecureRandom secureRandom = encryptionKeyHolder.getSecureRandom(ctx, ctx.channel());
         EncryptedBytes encryptedJSON;
 
         if (decryptedString == null || decryptedString.isEmpty()) decryptedString = "";
 
         try {
-            encryptedJSON = EncryptionUtil.encrypt(decryptedString, secretKey, cipher);
+            encryptedJSON = EncryptionUtil.encrypt(decryptedString, secretKey, cipher, secureRandom);
 
         } catch (Exception e) {
+            if (StaticHandler.isDebug())
+                e.printStackTrace();
+
              throw ExceptionUtil.throwParsePacketException(e, decryptedString);
         }
 
