@@ -19,12 +19,16 @@ public class Codecs {
 
     private static final Map<String, JSONHandler> jsonHandlerMap = new HashMap<>();
 
-
     public static String GSON_STR = "GSON";
     public static final JSONHandler GSON = new GSONHandler();
 
     public static String FASTSON_STR = "ALIBABA_FASTJSON";
     public static final JSONHandler ALIBABA_FASTJSON = new FastJSONHandler();
+
+    static {
+        registerJsonHandler(GSON_STR, GSON);
+        registerJsonHandler(FASTSON_STR, ALIBABA_FASTJSON);
+    }
 
     /**
      * Gets the json handler
