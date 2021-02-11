@@ -37,11 +37,11 @@ jobs:
           # Artifact name
           name: Server Jar Files
           # Directory containing files to upload
-          path: ./java/terminal/terminal-server/build/libs/*-all*
+          path: ./java/terminal/terminal-server/build/libs/**-all**
       - name: Upload client artifact
         uses: actions/upload-artifact@v1.0.0
         with:
           # Artifact name
           name: Client Jar Files
           # Directory containing files to upload
-          path: ./java/terminal/terminal-client/build/libs/*all*
+          path: ./java/terminal/terminal-client/build/libs/**all**
