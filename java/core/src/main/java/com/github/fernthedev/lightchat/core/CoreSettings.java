@@ -1,8 +1,7 @@
 package com.github.fernthedev.lightchat.core;
 
 import com.github.fernthedev.lightchat.core.codecs.Codecs;
-import com.github.fernthedev.lightchat.core.codecs.JSONHandler;
-import com.github.fernthedev.lightchat.core.codecs.general.compression.CompressionAlgorithm;
+import com.github.fernthedev.lightchat.core.codecs.general.compression.CompressionAlgorithms;
 import io.netty.util.CharsetUtil;
 import lombok.*;
 
@@ -20,10 +19,10 @@ import java.nio.charset.Charset;
 public class CoreSettings implements Serializable {
 
     @SettingValue
-    private int compressionLevel = 2;
+    private int compressionLevel = 7;
 
     @SettingValue
-    private CompressionAlgorithm compressionAlgorithm = CompressionAlgorithm.LZ4;
+    private String compressionAlgorithm = CompressionAlgorithms.JDK_ZLIB_STR;
 
     protected transient Charset charset = CharsetUtil.UTF_8;
     protected long timeoutTime = (long) 30 * 1000;
@@ -40,5 +39,14 @@ public class CoreSettings implements Serializable {
         boolean editable() default true;
 
         @NonNull String[] values() default {};
+    }
+
+    //Avoid Kotlin compile errors with Lombok
+    public int getCompressionLevel() {
+        return compressionLevel;
+    }
+
+    public String getCompressionAlgorithm() {
+        return compressionAlgorithm;
     }
 }

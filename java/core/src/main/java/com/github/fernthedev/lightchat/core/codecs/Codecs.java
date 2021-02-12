@@ -3,9 +3,7 @@ package com.github.fernthedev.lightchat.core.codecs;
 import com.github.fernthedev.lightchat.core.codecs.json.FastJSONHandler;
 import com.github.fernthedev.lightchat.core.codecs.json.GSONHandler;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +12,6 @@ import java.util.Map;
  * Shortcut for json handlers
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
 public class Codecs {
 
     private static final Map<String, JSONHandler> jsonHandlerMap = new HashMap<>();

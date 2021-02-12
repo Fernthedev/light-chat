@@ -4,6 +4,7 @@ import com.github.fernthedev.config.common.Config;
 import com.github.fernthedev.fernutils.thread.ThreadUtils;
 import com.github.fernthedev.fernutils.thread.single.TaskInfo;
 import com.github.fernthedev.lightchat.core.ColorCode;
+import com.github.fernthedev.lightchat.core.CoreSettings;
 import com.github.fernthedev.lightchat.core.NoFileConfig;
 import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.core.api.APIUsage;
@@ -11,8 +12,7 @@ import com.github.fernthedev.lightchat.core.api.event.api.Listener;
 import com.github.fernthedev.lightchat.core.api.plugin.PluginManager;
 import com.github.fernthedev.lightchat.core.codecs.Codecs;
 import com.github.fernthedev.lightchat.core.codecs.JSONHandler;
-import com.github.fernthedev.lightchat.core.codecs.general.compression.CompressionAlgorithm;
-import com.github.fernthedev.lightchat.core.codecs.general.compression.Compressors;
+import com.github.fernthedev.lightchat.core.codecs.general.compression.CompressionAlgorithms;
 import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectDecoder;
 import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectEncoder;
 import com.github.fernthedev.lightchat.core.encryption.util.RSAEncryptionUtil;
@@ -28,7 +28,6 @@ import com.github.fernthedev.lightchat.server.security.AuthenticationManager;
 import com.github.fernthedev.lightchat.server.security.BanManager;
 import com.github.fernthedev.lightchat.server.settings.ServerSettings;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
@@ -38,6 +37,7 @@ import io.netty.channel.kqueue.KQueueEventLoopGroup;
 import io.netty.channel.kqueue.KQueueServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import lombok.Getter;
@@ -57,6 +57,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 
@@ -392,16 +393,23 @@ public class Server implements Runnable {
                         ch.pipeline().addLast("stringEncoder", new EncryptedJSONObjectEncoder(settingsManager.getConfigData().getCharset(), keyFinder, jsonHandler));
 
                         int compression = getSettingsManager().getConfigData().getCompressionLevel();
-                        CompressionAlgorithm compressionAlgorithm = getSettingsManager().getConfigData().getCompressionAlgorithm();
+                        String compressionAlgorithm = getSettingsManager().getConfigData().getCompressionAlgorithm();
 
-                        if (compressionAlgorithm != CompressionAlgorithm.NONE) {
-                            ch.pipeline().addFirst(Compressors.getCompressDecoder(compressionAlgorithm, compression));
+                        kotlin.Pair<Function<CoreSettings, ? extends MessageToByteEncoder<?>>, Function<CoreSettings, ? extends ByteToMessageDecoder>> compressions = CompressionAlgorithms.getCompressions(compressionAlgorithm);
 
-                            if (compression > 0) {
+                        MessageToByteEncoder<?> encoder = null;
+                        ByteToMessageDecoder decoder = compressions.component2().apply(getSettingsManager().getConfigData());
 
-                                MessageToByteEncoder<ByteBuf> compressEncoder = Compressors.getCompressEncoder(compressionAlgorithm, compression);
-                                ch.pipeline().addBefore("stringEncoder", "compressEncoder", compressEncoder);
-                                getLogger().info("Using {} {} compression", compressionAlgorithm.name(), compression);
+                        if (compression >= 0) encoder = compressions.component1().apply(getSettingsManager().getConfigData());
+
+                        if (!compressionAlgorithm.equals("NONE")) {
+
+                            if (decoder != null)
+                                ch.pipeline().addFirst(decoder);
+
+                            if (compression >= 0 && encoder != null) {
+                                ch.pipeline().addBefore("stringEncoder", "compressEncoder", encoder);
+                                getLogger().info("Using {} {} compression", compressionAlgorithm, compression);
                             }
                         }
 

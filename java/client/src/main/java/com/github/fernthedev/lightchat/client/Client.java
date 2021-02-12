@@ -4,6 +4,7 @@ import com.github.fernthedev.config.common.Config;
 import com.github.fernthedev.lightchat.client.api.IPacketHandler;
 import com.github.fernthedev.lightchat.client.event.ServerDisconnectEvent;
 import com.github.fernthedev.lightchat.client.netty.ClientHandler;
+import com.github.fernthedev.lightchat.core.CoreSettings;
 import com.github.fernthedev.lightchat.core.NoFileConfig;
 import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.core.api.APIUsage;
@@ -11,8 +12,7 @@ import com.github.fernthedev.lightchat.core.api.Async;
 import com.github.fernthedev.lightchat.core.api.plugin.PluginManager;
 import com.github.fernthedev.lightchat.core.codecs.Codecs;
 import com.github.fernthedev.lightchat.core.codecs.JSONHandler;
-import com.github.fernthedev.lightchat.core.codecs.general.compression.CompressionAlgorithm;
-import com.github.fernthedev.lightchat.core.codecs.general.compression.Compressors;
+import com.github.fernthedev.lightchat.core.codecs.general.compression.CompressionAlgorithms;
 import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectDecoder;
 import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectEncoder;
 import com.github.fernthedev.lightchat.core.encryption.RSA.IEncryptionKeyHolder;
@@ -23,7 +23,6 @@ import com.github.fernthedev.lightchat.core.packets.Packet;
 import com.github.fernthedev.lightchat.core.packets.handshake.ConnectedPacket;
 import com.google.common.base.Stopwatch;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollSocketChannel;
@@ -31,6 +30,7 @@ import io.netty.channel.kqueue.KQueueEventLoopGroup;
 import io.netty.channel.kqueue.KQueueSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.timeout.ReadTimeoutHandler;
@@ -56,6 +56,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 
 public class Client implements IEncryptionKeyHolder, AutoCloseable {
@@ -235,36 +236,36 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
             @Override
             public void initChannel(@NotNull Channel ch) {
 
-//                ch.pipeline().addFirst()
+
 
                 ch.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler((int) clientSettings.getTimeoutTime()));
-
-
                 ch.pipeline().addLast("frameDecoder", new LineBasedFrameDecoder(StaticHandler.getLineLimit()));
                 ch.pipeline().addLast("stringDecoder", new EncryptedJSONObjectDecoder(clientSettings.getCharset(), Client.this, jsonHandler));
-
                 ch.pipeline().addLast("stringEncoder", new EncryptedJSONObjectEncoder(clientSettings.getCharset(), Client.this, jsonHandler));
-
-                ch.pipeline().addLast(clientHandler);
-//                    ch.pipeline().addLast(new ObjectEncoder(),
-//                            new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
-//                            clientHandler);
-
 
 
                 int compression = getClientSettingsManager().getConfigData().getCompressionLevel();
-                CompressionAlgorithm compressionAlgorithm = getClientSettingsManager().getConfigData().getCompressionAlgorithm();
+                String compressionAlgorithm = getClientSettingsManager().getConfigData().getCompressionAlgorithm();
+                kotlin.Pair<Function<CoreSettings, ? extends MessageToByteEncoder<?>>, Function<CoreSettings, ? extends ByteToMessageDecoder>> compressions = CompressionAlgorithms.getCompressions(compressionAlgorithm);
 
-                if (compressionAlgorithm != CompressionAlgorithm.NONE) {
-                    ch.pipeline().addFirst(Compressors.getCompressDecoder(compressionAlgorithm, compression));
+                MessageToByteEncoder<?> encoder = null;
+                ByteToMessageDecoder decoder = compressions.component2().apply(getClientSettingsManager().getConfigData());
 
-                    if (compression > 0) {
+                if (compression >= 0) encoder = compressions.component1().apply(getClientSettingsManager().getConfigData());
 
-                        MessageToByteEncoder<ByteBuf> compressEncoder = Compressors.getCompressEncoder(compressionAlgorithm, compression);
-                        ch.pipeline().addBefore("stringEncoder", "compressEncoder", compressEncoder);
-                        getLogger().info("Using {} {} compression", compressionAlgorithm.name(), compression);
+                if (!compressionAlgorithm.equals("NONE")) {
+
+                    if (decoder != null)
+                        ch.pipeline().addFirst("compressDecoder", decoder);
+
+                    if (compression >= 0 && encoder != null) {
+                        ch.pipeline().addBefore("stringEncoder", "compressEncoder", encoder);
+                        getLogger().info("Using {} {} compression", compressionAlgorithm, compression);
                     }
                 }
+
+
+                ch.pipeline().addLast(clientHandler);
             }
         });
 
