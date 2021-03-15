@@ -62,7 +62,7 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
 
     ext.netty_ver = "4.1.59.Final"
     ext.jline_ver = "3.18.0"
-    ext.log4j_ver = "2.14.0"
+    ext.log4j_ver = "2.14.1"
 
     repositories {
         jcenter()
