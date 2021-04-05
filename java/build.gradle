@@ -106,7 +106,7 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
         implementation 'com.googlecode.json-simple:json-simple:1.1.1'
         implementation 'com.google.code.gson:gson:2.8.6'
         implementation 'com.github.Fernthedev:FernUtils:1.4.0'
-        api group: 'org.apache.maven', name: 'maven-artifact', version: '3.6.3'
+        api group: 'org.apache.maven', name: 'maven-artifact', version: '3.8.1'
     }
 
     sourceCompatibility = '8'
