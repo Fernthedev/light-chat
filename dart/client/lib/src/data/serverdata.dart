@@ -54,7 +54,7 @@ class ServerData {
   /// from a map. Pass the map to the generated `_$UserFromJson()` constructor.
   /// The constructor is named after the source class, in this case User.
   factory ServerData.fromJson(Map<String, dynamic> json) {
-    ServerData serverData = _$ServerDataFromJson(json);
+    var serverData = _$ServerDataFromJson(json);
 
     serverData._hashedPassword = json['hashedPassword'];
 

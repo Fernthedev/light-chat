@@ -54,7 +54,7 @@ class VersionData {
   static final int AES_KEY_SIZE = 256;
 }
 
-@JsonSerializable(nullable: false)
+@JsonSerializable()
 class VersionDataString implements JsonSerializableClass {
   final String version;
   final String minVersion;
@@ -88,7 +88,7 @@ enum VersionRange {
   WE_ARE_LOWER,
 }
 
-@JsonSerializable(explicitToJson: true, nullable: false)
+@JsonSerializable(explicitToJson: true)
 class HashedPassword extends JsonSerializableClass {
   late String password;
 

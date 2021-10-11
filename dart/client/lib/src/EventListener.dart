@@ -7,14 +7,14 @@ import 'client.dart';
 ///
 /// [result] is the result from [PacketEventHandler]
 ///
-typedef PacketListener = void Function(Packet p, [Object? result]);
+typedef PacketListener = Future<void> Function(Packet p, [Object? result]);
 
 class PacketEventHandler {
   Client client;
 
   PacketEventHandler(this.client);
 
-  void received(Packet p) async {
+  Future<void> received(Packet p) async {
     Object? result;
     switch (p.runtimeType) {
       case PingReceive:

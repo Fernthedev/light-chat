@@ -5,7 +5,6 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:pointycastle/export.dart';
 
 import '../data/packetdata.dart';
-import '../transport/packetwrapper.dart';
 import '../util/encryption/encryption.dart';
 import 'packets.dart';
 

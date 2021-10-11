@@ -2,7 +2,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import '../data/packetdata.dart';
-import '../transport/packetwrapper.dart';
 import 'packets.dart';
 
 part 'other_packets.g.dart';

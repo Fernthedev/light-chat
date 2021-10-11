@@ -12,7 +12,7 @@ import 'package:pointycastle/api.dart';
 import 'EventListener.dart';
 import 'data/serverdata.dart';
 
-typedef EventCallback<T> = void Function(T data);
+typedef EventCallback<T> = Future<void> Function(T data);
 
 class EventType<T> {
   static const REGISTER_EVENT = EventType<ServerData>('REGISTER_EVENT');
@@ -155,29 +155,17 @@ class Client implements IKeyEncriptionHolder {
     var list = eventListeners[eventType];
 
     if (list != null) {
-      for (var callback in list) {
-        callback(data);
-      }
+      return Future.forEach(
+          list, (EventCallback<T> callback) async => await callback(data));
     }
-
-    return Future.value();
   }
 
-  Future<void> onReceive(dynamic data) async {
-    if (data is Uint8List) {
-      var list = data;
+  Future<void> onReceive(Uint8List data) async {
+    var decodedObjects = <Object>[];
+    await _decoder!.decode(data, decodedObjects);
 
-      var decodedObjects = <Object>[];
-      await _decoder!.decode(list, decodedObjects);
-
-      for (var packet in decodedObjects.whereType<Packet>()) {
-        eventHandler.received(packet);
-      }
-
-      //Object msgObject = bd.getUint8(0);
-
-//    socket.writeln(new String.fromCharCodes(stream).trim() + '\n');
-
+    for (var packet in decodedObjects.whereType<Packet>()) {
+      await eventHandler.received(packet);
     }
   }
 
@@ -191,9 +179,7 @@ class Client implements IKeyEncriptionHolder {
 
     if (line == '' || line.isEmpty) return;
 
-    await send(messagePacket);
-
-    return Future.value();
+    return await send(messagePacket);
   }
 
   void onDoneEvent() {}
@@ -208,24 +194,12 @@ class Client implements IKeyEncriptionHolder {
   Future<void> send(AcceptablePacketTypes packet, [bool encrypt = true]) async {
     Variables.printDebug('Sending $packet');
 
-    AcceptablePacketTypes json;
-
-    if (encrypt) {
-      json = packet;
-    } else {
-      json = UnencryptedPacketWrapper(packet);
-    }
+    var json = encrypt ? packet : UnencryptedPacketWrapper(packet);
 
     var encodedMessages = <Object>[];
     await _encoder!.encode(json, encodedMessages);
 
-    var dataList = <List<int>>[];
-
-    for (var o in encodedMessages.whereType()) {
-      dataList.add(o);
-    }
-
-    for (var data in dataList) {
+    for (var data in encodedMessages.whereType<List<int>>()) {
       socket!.add(data);
     }
 
@@ -254,7 +228,7 @@ class Client implements IKeyEncriptionHolder {
 
   void handlePacket(Packet p, [Object? result]) async {
     for (var packetListener in packetListeners) {
-      packetListener(p, result);
+      await packetListener(p, result);
     }
   }
 
@@ -275,7 +249,5 @@ class Client implements IKeyEncriptionHolder {
 
     eventListeners.clear();
     eventListenerRegistry.clear();
-
-    return Future.value();
   }
 }

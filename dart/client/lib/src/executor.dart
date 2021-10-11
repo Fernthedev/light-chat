@@ -50,7 +50,7 @@ void startClient(List<String> arguments) {
   });
 
   client!.runCallbacks(EventType.DISCONNECT_EVENT, (s) {
-    print('Error: ${s}');
+    print('Error: $s');
     exit(0);
   });
 }
@@ -111,6 +111,8 @@ final PacketListener PacketListenerConsole = (Packet p, [Object? result]) {
       }
       break;
   }
+
+  return Future.value();
 };
 
 // TODO: Make async to allow printing to console while reading input.

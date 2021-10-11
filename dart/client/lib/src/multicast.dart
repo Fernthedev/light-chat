@@ -15,7 +15,7 @@ class Multicast {
     _count = value;
   }
 
-  Future<MulticastData> startChecking() async {
+  Future<MulticastData?> startChecking() async {
     return await RawDatagramSocket.bind(InternetAddress.anyIPv4, 4446)
         .then((RawDatagramSocket s) {
       s.joinMulticast(InternetAddress(Variables.multicastIP));

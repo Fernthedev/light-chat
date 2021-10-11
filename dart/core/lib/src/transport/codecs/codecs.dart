@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'dart:typed_data';
 
+import 'package:light_chat_core/packets.dart';
+
 import '../../data/handlers.dart';
 
 import '../../util/encryption/encryption.dart';
@@ -12,12 +14,12 @@ import 'AcceptablePacketTypes.dart';
 
 abstract class ObjectEncoder<T> {
   /// Encodes [msg] and adds to [out]
-  void encode(T msg, List<Object> out);
+  Future<void> encode(T msg, List<Object> out);
 }
 
 abstract class ObjectDecoder<T> {
   /// Decodes [msg] and adds to [out]
-  void decode(T msg, List<Object> out);
+  Future<void> decode(T msg, List<Object> out);
 }
 
 class StringEncoder extends ObjectEncoder<String> {
@@ -41,8 +43,7 @@ class LineEndStringEncoder extends StringEncoder {
 //
   @override
   Future<void> encode(String msg, List<Object> out) async {
-    await super.encode(msg + endString, out);
-    return Future.value();
+    return await super.encode(msg + endString, out);
   }
 }
 
@@ -62,27 +63,9 @@ class EncryptedJSONObjectEncoder extends ObjectEncoder<AcceptablePacketTypes> {
 
       decryptedJson[PacketWrapper.getJsonIdentifier()] = msg.jsonObject;
 
-//      Map<String, dynamic> decryptedJSONOld = msg.toJson();
-//
-//      Map<String, dynamic> decryptedJson = Map();
-//
-//      decryptedJSONOld.forEach((f, v) {
-//        decryptedJson[f.replaceAll("\"", "\\\"")] = v;
-//      });
-
-//      decryptedJson[PacketWrapper.getJsonIdentifier()] = jsonEncode(decryptedJson[PacketWrapper.getJsonIdentifier()]).replaceAll("\"", "\\\"");
-
       sendJson = jsonEncode(decryptedJson);
     } else {
       var decryptedJSON = msg.toJson();
-
-//      Map<String, dynamic> decryptedJSONOld = msg.toJson();
-//
-//      Map<String, dynamic> decryptedJSON = Map();
-//
-//      decryptedJSONOld.forEach((f, v) {
-//        decryptedJSON[f.replaceAll("\"", "\\\"").replaceAll("\\\\\"", "\\\"")] = v;
-//      });
 
       var jsonString = jsonEncode(decryptedJSON);
 
@@ -92,15 +75,11 @@ class EncryptedJSONObjectEncoder extends ObjectEncoder<AcceptablePacketTypes> {
       var packetWrapper =
           EncryptedPacketWrapper(encryptedBytes, msg.getPacketName());
       var jsonPacketWrapper = packetWrapper.toJson();
-//      jsonPacketWrapper[PacketWrapper.getJsonIdentifier()] = encryptedBytes;
-
-//      jsonPacketWrapper[PacketWrapper.getJsonIdentifier()] = jsonEncode(jsonPacketWrapper[PacketWrapper.getJsonIdentifier()]).replaceAll("\"", "\\\"").replaceAll("\\\\\"", "\\\"");
 
       sendJson = jsonEncode(jsonPacketWrapper);
     }
 
-    await lineEndStringEncoder.encode(sendJson, out);
-    return Future.value();
+    return await lineEndStringEncoder.encode(sendJson, out);
   }
 }
 
@@ -114,7 +93,7 @@ class LineBasedFrameDecoder extends ObjectDecoder<Uint8List> {
   Uint8List get seperatorByte => Uint8List.fromList(encoding.encode(seperator));
 
   @override
-  void decode(Uint8List msg, List<Object> out) {
+  Future<void> decode(Uint8List msg, List<Object> out) async {
     var checkedIndex = 0;
 
     while (checkedIndex < msg.length) {
@@ -145,6 +124,8 @@ class LineBasedFrameDecoder extends ObjectDecoder<Uint8List> {
       out.add(msg.sublist(checkedIndex, msg.indexOf(indexOfSeperate) - 1));
       checkedIndex = indexOfSeperate + seperatorByte.length;
     }
+
+    return Future.value();
   }
 }
 
@@ -163,7 +144,7 @@ class LineStringSeperatorDecoder extends StringDecoder {
     for (var s in msgSplit) {
       var noSkipS = s.replaceAll(seperator, '');
 
-      if (noSkipS == '') continue;
+      if (noSkipS.isEmpty) continue;
 
       out.add(noSkipS);
     }
@@ -194,21 +175,17 @@ class EncryptedJSONObjectDecoder extends LineStringSeperatorDecoder {
   @override
   Future<void> decode(Uint8List msg, List<Object> out) async {
     var seperatedDecodeList = <Object>[];
-    // await lineBasedFrameDecoder.decode(msg, tempDecodeList);
-//
-    // for (Uint8List bytes in tempDecodeList) {
-    // await super.decode(bytes, seperatedDecodeList);
-    // }
 
     await super.decode(msg, seperatedDecodeList);
 
-    for (var decodedString in seperatedDecodeList) {
+    return Future.forEach(seperatedDecodeList, (decodedString) {
       if (decodedString is String) {
         Map<String, dynamic> jsonMapPacketWrapper;
 
         // await Future.sync(() {
         jsonMapPacketWrapper = json.decode(decodedString);
-        PacketWrapper packetWrapper = ImplPacketWrapper.fromJson(jsonMapPacketWrapper);
+        PacketWrapper packetWrapper =
+            ImplPacketWrapper.fromJson(jsonMapPacketWrapper);
 
         Map<String, dynamic> decryptedJsonObject;
         if (packetWrapper.encrypt) {
@@ -239,16 +216,10 @@ class EncryptedJSONObjectDecoder extends LineStringSeperatorDecoder {
         out.add(getParsedObject(
             packetWrapper.packetIdentifier!, decryptedJsonObject));
       }
-    }
-    // }).catchError((e) {
-    //   Variables.printDebug("Parsed $decodedString");
-    //   throw e;
-    // });
-
-    return Future.value();
+    });
   }
 
-  static dynamic getParsedObject(
+  static Packet getParsedObject(
       String packetIdentifier, Map<String, dynamic> jsonObject) {
     return PacketRegistry.getPacketInstanceFromRegistry(
         packetIdentifier, jsonObject);
