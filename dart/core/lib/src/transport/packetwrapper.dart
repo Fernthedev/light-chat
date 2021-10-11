@@ -81,7 +81,7 @@ class ImplPacketWrapper extends PacketWrapper<dynamic>
       : super.empty(null, packetIdentifier) {
     if (PacketRegistry.checkIfRegisteredIdentifier(packetIdentifier) ==
         RegisteredReturnValues.NOT_IN_REGISTRY) {
-      throw ('The packet trying to be wrapped is not registered. \"$packetIdentifier\"');
+      throw ('The packet trying to be wrapped is not registered. "$packetIdentifier"');
     }
 
     this.encrypt = encrypt;
@@ -129,7 +129,7 @@ class UnencryptedPacketWrapper extends PacketWrapper<Map<String, dynamic>>
       : super(JsonSerializableMap(json), packetIdentifier) {
     if (PacketRegistry.checkIfRegisteredIdentifier(packetIdentifier) ==
         RegisteredReturnValues.NOT_IN_REGISTRY) {
-      throw ('The packet trying to be wrapped is not registered. \"$packetIdentifier\"');
+      throw ('The packet trying to be wrapped is not registered. "$packetIdentifier"');
     }
 
     encrypt = false;
@@ -173,7 +173,7 @@ class EncryptedPacketWrapper extends PacketWrapper<EncryptedBytes>
       : super(encryptedBytes, packetIdentifier) {
     if (PacketRegistry.checkIfRegisteredIdentifier(packetIdentifier) ==
         RegisteredReturnValues.NOT_IN_REGISTRY) {
-      throw ('The packet trying to be wrapped is not registered. \"$packetIdentifier\"');
+      throw ('The packet trying to be wrapped is not registered. "$packetIdentifier"');
     }
 
     encrypt = true;

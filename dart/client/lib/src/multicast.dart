@@ -7,13 +7,7 @@ import 'package:light_chat_core/packets.dart';
 
 // TODO: INCOMPLETE. FINISH IMPLEMENTATION FOLLOWING THE JAVA SERVER IMPLEMENTATION
 class Multicast {
-  int _count = 4;
-
-  int get count => _count;
-
-  set count(int value) {
-    _count = value;
-  }
+  int count = 4;
 
   Future<MulticastData?> startChecking() async {
     return await RawDatagramSocket.bind(InternetAddress.anyIPv4, 4446)

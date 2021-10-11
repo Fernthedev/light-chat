@@ -193,9 +193,7 @@ class EncryptedJSONObjectDecoder extends LineStringSeperatorDecoder {
 
           packetWrapper = EncryptedPacketWrapper.fromJson(jsonMapPacketWrapper);
 
-          var encryptedBytes;
-
-          encryptedBytes =
+          EncryptedBytes encryptedBytes =
               EncryptedBytes.fromJson(jsonDecode(packetWrapper.jsonObject!));
 
           decryptedJsonObject = _decrypt(encryptedBytes);

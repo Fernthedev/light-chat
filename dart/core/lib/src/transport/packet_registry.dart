@@ -16,9 +16,7 @@ class PacketRegistry {
   static Packet getPacketInstanceFromRegistry(
       String name, Map<String, dynamic> json) {
     if (!packetRegistry.containsKey(name)) {
-      throw Exception('The packet registry does not contain packet \"' +
-          name +
-          '\" in the registry. Make sure it is spelled correctly and is case-sensitive.');
+      throw Exception('The packet registry does not contain packet $name in the registry. Make sure it is spelled correctly and is case-sensitive.');
     }
 
     return packetRegistry[name]!.fromJson(json);
@@ -27,7 +25,7 @@ class PacketRegistry {
   static Type registerPacket(Packet packet) {
     if (packetRegistry.containsKey(packet.packetName) &&
         packetRegistry[packet.packetName] != packet) {
-      throw ('The packet ${packet.runtimeType} tried to use packet name \"${packet.packetName}\" which is already taken by the packet ${packetRegistry[packet.packetName].runtimeType}');
+      throw ('The packet ${packet.runtimeType} tried to use packet name "${packet.packetName}" which is already taken by the packet ${packetRegistry[packet.packetName].runtimeType}');
     }
 
     packetRegistry[packet.packetName!] = packet;

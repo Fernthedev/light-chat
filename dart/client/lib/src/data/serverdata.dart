@@ -17,14 +17,13 @@ part 'serverdata.g.dart';
 class ServerData {
   late String ip;
   late int port;
-  String? _hashedPassword;
+  String? hashedPassword;
   String? _uuid;
 
-  String? get hashedPassword => _hashedPassword;
   set hashedPasswordDoHash(String hashedPassword) =>
-      _hashedPassword = EncryptionUtil.toSha256(hashedPassword);
+      hashedPassword = EncryptionUtil.toSha256(hashedPassword);
 
-  set hashedPassword(String? password) => _hashedPassword = password;
+
 
   String get uuid {
     _uuid ??= Uuid().v4();
@@ -37,16 +36,16 @@ class ServerData {
 
   ServerData(this.ip, this.port, String? hashedPassword) {
     if (hashedPassword != null) {
-      _hashedPassword = EncryptionUtil.toSha256(hashedPassword);
+      hashedPassword = EncryptionUtil.toSha256(hashedPassword);
     } else {
-      _hashedPassword = null;
+      hashedPassword = null;
     }
   }
 
   ServerData.fromServer(ServerData serverData) {
     ip = serverData.ip;
     port = serverData.port;
-    _hashedPassword = serverData.hashedPassword;
+    hashedPassword = serverData.hashedPassword;
     _uuid = serverData._uuid;
   }
 
@@ -56,7 +55,7 @@ class ServerData {
   factory ServerData.fromJson(Map<String, dynamic> json) {
     var serverData = _$ServerDataFromJson(json);
 
-    serverData._hashedPassword = json['hashedPassword'];
+    serverData.hashedPassword = json['hashedPassword'];
 
     return serverData;
   }

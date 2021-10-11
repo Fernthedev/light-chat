@@ -36,7 +36,7 @@ class PacketEventHandler {
 
       case MessagePacket:
         var packet = p as MessagePacket;
-        print('${packet.message}');
+        print(packet.message);
         result = packet.message;
         break;
       case IllegalConnection:

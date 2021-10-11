@@ -1,4 +1,6 @@
 
+// ignore_for_file: prefer_initializing_formals
+
 import 'package:json_annotation/json_annotation.dart';
 
 import '../data/packetdata.dart';

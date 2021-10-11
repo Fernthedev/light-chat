@@ -4,7 +4,6 @@ import 'dart:isolate';
 import 'package:light_chat_core/core.dart';
 import 'package:light_chat_core/packet_io.dart';
 
-import 'EventListener.dart';
 import 'client.dart';
 import 'data/serverdata.dart';
 
@@ -77,7 +76,7 @@ void createIsolate(SendPort mainSendorPort) async {
 
 Client? client;
 
-final PacketListener PacketListenerConsole = (Packet p, [Object? result]) {
+Future<void> PacketListenerConsole(Packet p, [Object? result]) async {
   // print('Handling packet ${p.runtimeType}');
   switch (p.runtimeType) {
     case SelfMessagePacket:
@@ -113,7 +112,7 @@ final PacketListener PacketListenerConsole = (Packet p, [Object? result]) {
   }
 
   return Future.value();
-};
+}
 
 // TODO: Make async to allow printing to console while reading input.
 void readCmdLine(Client client) async {

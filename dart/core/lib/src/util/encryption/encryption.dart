@@ -68,7 +68,7 @@ class EncryptionUtil {
       );
     var plainBytes = Uint8List.fromList(utf8.encode(plainText));
 
-    var cipherTextBytes;
+    Uint8List cipherTextBytes;
 
     if (plainText == '') {
       cipherTextBytes = plainBytes;

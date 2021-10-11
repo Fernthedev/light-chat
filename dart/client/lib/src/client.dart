@@ -72,11 +72,12 @@ class Client implements IKeyEncriptionHolder {
   ConnectedPacket connectedPacketInfo;
 
   Client(this.connectedPacketInfo) {
-    PacketRegistry.registerDefaultPackets();
+
     eventHandler = PacketEventHandler(this);
   }
 
   Future<void> initializeConnection(ServerData serverData) async {
+    PacketRegistry.registerDefaultPackets();
     ClassTranslator.init();
     try {
       _registered = false;
@@ -145,9 +146,9 @@ class Client implements IKeyEncriptionHolder {
   }
 
   void unregisterEvents<T>(EventType<T> eventType) {
-    eventListeners[eventType]!.forEach((element) {
+    for (var element in eventListeners[eventType]!) {
       unregisterCallback(eventType, element);
-    });
+    }
     eventListeners.remove(eventType);
   }
 
