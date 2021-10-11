@@ -57,10 +57,10 @@ class ClassTranslator {
   }
 
   static String translate(Type clazz) {
-    return _classTranslateMap[clazz];
+    return _classTranslateMap[clazz]!;
   }
 
   static Type findTranslation(String lookup) {
-    return _reverseTranslationMap[lookup];
+    return _reverseTranslationMap[lookup]!;
   }
 }

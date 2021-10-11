@@ -1,6 +1,5 @@
 
 import 'package:json_annotation/json_annotation.dart';
-import 'package:lombok/lombok.dart';
 
 import '../data/packetdata.dart';
 import '../transport/packetwrapper.dart';
@@ -9,13 +8,12 @@ import 'packets.dart';
 part 'other_packets.g.dart';
 
 @JsonSerializable()
-@ToString()
 class CommandPacket extends Packet {
   static final CommandPacket constant = CommandPacket();
 
   CommandPacket() : super.setName('COMMAND_PACKET');
 
-  String message;
+  late String message;
 
   factory CommandPacket.create(String message) {
     var packet = CommandPacket();
@@ -32,7 +30,7 @@ class CommandPacket extends Packet {
       _$CommandPacketFromJson(json);
 
   @override
-  JsonSerializableClass fromJson(Map<String, dynamic> json) {
+  CommandPacket fromJson(Map<String, dynamic> json) {
     return CommandPacket.fromJson(json);
   }
 
@@ -44,13 +42,12 @@ class CommandPacket extends Packet {
 }
 
 @JsonSerializable()
-@ToString()
 class IllegalConnection extends Packet {
   static final IllegalConnection constant = IllegalConnection();
 
   IllegalConnection() : super.setName('ILLEGAL_CONNECTION_PACKET');
 
-  String message;
+  late String message;
 
   factory IllegalConnection.create(String message) {
     var packet = IllegalConnection();
@@ -67,7 +64,7 @@ class IllegalConnection extends Packet {
       _$IllegalConnectionFromJson(json);
 
   @override
-  JsonSerializableClass fromJson(Map<String, dynamic> json) {
+  IllegalConnection fromJson(Map<String, dynamic> json) {
     return IllegalConnection.fromJson(json);
   }
 
@@ -79,13 +76,12 @@ class IllegalConnection extends Packet {
 }
 
 @JsonSerializable()
-@ToString()
 class MessagePacket extends Packet {
   static final MessagePacket constant = MessagePacket();
 
   MessagePacket() : super.setName('MESSAGE_PACKET');
 
-  String message;
+  late String message;
 
   factory MessagePacket.create(String message) {
     var packet = MessagePacket();
@@ -102,7 +98,7 @@ class MessagePacket extends Packet {
       _$MessagePacketFromJson(json);
 
   @override
-  JsonSerializableClass fromJson(Map<String, dynamic> json) {
+  MessagePacket fromJson(Map<String, dynamic> json) {
     return MessagePacket.fromJson(json);
   }
 
@@ -114,13 +110,12 @@ class MessagePacket extends Packet {
 }
 
 @JsonSerializable()
-@ToString()
 class SelfMessagePacket extends Packet {
   static final SelfMessagePacket constant = SelfMessagePacket();
 
   SelfMessagePacket() : super.setName('SELF_MESSAGE_PACKET');
 
-  MessageType type;
+  late MessageType type;
 
   factory SelfMessagePacket.create(MessageType messageType) {
     var packet = SelfMessagePacket();
@@ -137,7 +132,7 @@ class SelfMessagePacket extends Packet {
       _$SelfMessagePacketFromJson(json);
 
   @override
-  JsonSerializableClass fromJson(Map<String, dynamic> json) {
+  SelfMessagePacket fromJson(Map<String, dynamic> json) {
     return SelfMessagePacket.fromJson(json);
   }
 
@@ -159,13 +154,12 @@ enum MessageType {
 }
 
 @JsonSerializable()
-@ToString()
 class HashedPasswordPacket extends Packet {
   static final HashedPasswordPacket constant = HashedPasswordPacket();
 
   HashedPasswordPacket() : super.setName('HASHED_PASSWORD_PACKET');
 
-  HashedPassword hashedPassword;
+  late HashedPassword hashedPassword;
 
   factory HashedPasswordPacket.create(HashedPassword hashedPassword) {
     var packet = HashedPasswordPacket();
@@ -182,7 +176,7 @@ class HashedPasswordPacket extends Packet {
       _$HashedPasswordPacketFromJson(json);
 
   @override
-  JsonSerializableClass fromJson(Map<String, dynamic> json) {
+  HashedPasswordPacket fromJson(Map<String, dynamic> json) {
     return HashedPasswordPacket.fromJson(json);
   }
 

@@ -42,29 +42,3 @@ Map<String, dynamic> _$EncryptedBytesToJson(EncryptedBytes instance) =>
       'params': instance.params,
       'paramAlgorithm': instance.paramAlgorithm,
     };
-
-// **************************************************************************
-// GetterGenerator
-// **************************************************************************
-
-abstract class _$EncryptedBytesLombok {
-  /// Field
-  Uint8List data;
-  Uint8List params;
-  String paramAlgorithm;
-
-  /// Setter
-
-  /// Getter
-  Uint8List getData() {
-    return data;
-  }
-
-  Uint8List getParams() {
-    return params;
-  }
-
-  String getParamAlgorithm() {
-    return paramAlgorithm;
-  }
-}

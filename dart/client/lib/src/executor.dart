@@ -9,9 +9,9 @@ import 'client.dart';
 import 'data/serverdata.dart';
 
 void startClient(List<String> arguments) {
-  String host;
+  String? host;
   var port = -1;
-  String name;
+  String? name;
 
   for (var arg in arguments) {
     if (Variables.debug) {
@@ -35,21 +35,21 @@ void startClient(List<String> arguments) {
     }
   }
 
-  host = setValIfNull(host, 'Host:');
-  port = int.parse(setValIfNull(port.toString(), 'Port:'));
-  name = setValIfNull(name, 'Name:');
+  host = setValIfNull(host, 'Host:')!;
+  port = int.parse(setValIfNull(port.toString(), 'Port:')!);
+  name = setValIfNull(name, 'Name:')!;
 
   client = Client(ConnectedPacket.create(name, Platform.operatingSystem,
       Variables.versionData, Variables.defaultLangFramework));
 
-  client.addPacketListener(PacketListenerConsole);
+  client!.addPacketListener(PacketListenerConsole);
 
-  client.initializeConnection(ServerData(host, port, null)).then((f) async {
+  client!.initializeConnection(ServerData(host, port, null)).then((f) async {
     print('Initialized connection sucessfully');
     // setupAsyncInput(client);
   });
 
-  client.runCallbacks(EventType.DISCONNECT_EVENT, (s) {
+  client!.runCallbacks(EventType.DISCONNECT_EVENT, (s) {
     print('Error: ${s}');
     exit(0);
   });
@@ -75,13 +75,13 @@ void createIsolate(SendPort mainSendorPort) async {
   readCmdLine(client);
 }
 
-Client client;
+Client? client;
 
-final PacketListener PacketListenerConsole = (Packet p, [Object result]) {
+final PacketListener PacketListenerConsole = (Packet p, [Object? result]) {
   // print('Handling packet ${p.runtimeType}');
   switch (p.runtimeType) {
     case SelfMessagePacket:
-      SelfMessagePacket packet = p;
+      var packet = p as SelfMessagePacket;
       // print('Message Type: ${p.toString()}');
       switch (packet.type) {
         case MessageType.INCORRECT_PASSWORD_ATTEMPT:
@@ -92,9 +92,9 @@ final PacketListener PacketListenerConsole = (Packet p, [Object result]) {
           print('Sent the password $line');
 
           var hashedPasswordPacket =
-              HashedPasswordPacket.create(HashedPassword(line));
+              HashedPasswordPacket.create(HashedPassword(line!));
 
-          client.send(hashedPasswordPacket);
+          client!.send(hashedPasswordPacket);
           break;
         case MessageType.LOST_SERVER_CONNECTION:
           break;
@@ -119,10 +119,10 @@ void readCmdLine(Client client) async {
   // return;
   while (client.connected) {
     print('Reading');
-    var line = stdin.readLineSync().trim().replaceAll('  ', ' ');
+    var line = stdin.readLineSync()?.trim().replaceAll('  ', ' ');
     print('Read $line');
 
-    Packet messagePacket = MessagePacket.create(line);
+    Packet messagePacket = MessagePacket.create(line!);
 
     if (line.startsWith('/')) {
       line = line.substring(line.indexOf('/'));
@@ -135,7 +135,7 @@ void readCmdLine(Client client) async {
   }
 }
 
-String setValIfNull(String arg, String message) {
+String? setValIfNull(String? arg, String message) {
   if (arg == null || arg == '-1') {
     print(message);
     return stdin.readLineSync();

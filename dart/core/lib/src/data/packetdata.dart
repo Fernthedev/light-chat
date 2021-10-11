@@ -1,6 +1,5 @@
 
 import 'package:json_annotation/json_annotation.dart';
-import 'package:lombok/lombok.dart';
 import 'package:version/version.dart';
 
 import '../transport/packetwrapper.dart';
@@ -8,10 +7,9 @@ import '../util/encryption/encryption.dart';
 
 part 'packetdata.g.dart';
 
-@data
 class VersionData {
-  Version version;
-  Version minVersion;
+  late Version version;
+  late Version minVersion;
 
   VersionData(this.version, this.minVersion);
 
@@ -92,7 +90,7 @@ enum VersionRange {
 
 @JsonSerializable(explicitToJson: true, nullable: false)
 class HashedPassword extends JsonSerializableClass {
-  String password;
+  late String password;
 
   HashedPassword.fromHash(this.password);
 

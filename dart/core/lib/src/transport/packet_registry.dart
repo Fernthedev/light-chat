@@ -21,7 +21,7 @@ class PacketRegistry {
           '\" in the registry. Make sure it is spelled correctly and is case-sensitive.');
     }
 
-    return packetRegistry[name].fromJson(json);
+    return packetRegistry[name]!.fromJson(json);
   }
 
   static Type registerPacket(Packet packet) {
@@ -30,7 +30,7 @@ class PacketRegistry {
       throw ('The packet ${packet.runtimeType} tried to use packet name \"${packet.packetName}\" which is already taken by the packet ${packetRegistry[packet.packetName].runtimeType}');
     }
 
-    packetRegistry[packet.packetName] = packet;
+    packetRegistry[packet.packetName!] = packet;
 
     return packet.runtimeType;
   }

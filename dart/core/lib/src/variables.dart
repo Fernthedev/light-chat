@@ -22,5 +22,5 @@ class Variables {
     if (Variables.debug) print(o);
   }
 
-  static String multicastIP;
+  static String multicastIP = '';
 }

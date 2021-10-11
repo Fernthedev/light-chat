@@ -6,9 +6,8 @@ part of 'packets.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_TemplatePacket _$_TemplatePacketFromJson(Map<String, dynamic> json) {
-  return _TemplatePacket();
-}
+_TemplatePacket _$TemplatePacketFromJson(Map<String, dynamic> json) =>
+    _TemplatePacket();
 
-Map<String, dynamic> _$_TemplatePacketToJson(_TemplatePacket instance) =>
+Map<String, dynamic> _$TemplatePacketToJson(_TemplatePacket instance) =>
     <String, dynamic>{};

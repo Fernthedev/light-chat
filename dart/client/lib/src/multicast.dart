@@ -5,10 +5,6 @@ import 'package:light_chat_core/packet_io.dart';
 import 'package:light_chat_core/packets_codecs.dart';
 import 'package:light_chat_core/packets.dart';
 
-import 'package:lombok/lombok.dart';
-
-part 'multicast.g.dart';
-
 // TODO: INCOMPLETE. FINISH IMPLEMENTATION FOLLOWING THE JAVA SERVER IMPLEMENTATION
 class Multicast {
   int _count = 4;
@@ -20,7 +16,7 @@ class Multicast {
   }
 
   Future<MulticastData> startChecking() async {
-    await RawDatagramSocket.bind(InternetAddress.anyIPv4, 4446)
+    return await RawDatagramSocket.bind(InternetAddress.anyIPv4, 4446)
         .then((RawDatagramSocket s) {
       s.joinMulticast(InternetAddress(Variables.multicastIP));
 
@@ -38,6 +34,7 @@ class Multicast {
       }
 
       s.close();
+      return Future.value();
     });
   }
 
@@ -46,20 +43,12 @@ class Multicast {
   }
 }
 
-@data
-class MulticastData with _$MulticastDataLombok {
+class MulticastData {
   MulticastData(this.address, this.version, this.port, this.clientNumbers);
 
-  @override
   final String address;
-
-  @override
   final String version;
-  @override
   final int port;
-
-  @override
   int clientNumbers = 0;
-  @override
-  List<String> clients;
+  late List<String> clients;
 }

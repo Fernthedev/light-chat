@@ -1,6 +1,5 @@
 
 import 'package:json_annotation/json_annotation.dart';
-import 'package:lombok/lombok.dart';
 
 import '../transport/codecs/AcceptablePacketTypes.dart';
 import '../transport/packet_registry.dart';
@@ -14,7 +13,7 @@ abstract class Packet implements AcceptablePacketTypes, JsonSerializableClass  {
   Packet();
 
   @JsonKey(ignore: true)
-  String packetName;
+  String? packetName;
 
   Packet.setName(this.packetName);
 
@@ -26,18 +25,20 @@ abstract class Packet implements AcceptablePacketTypes, JsonSerializableClass  {
     return PacketRegistry.getPacketInstanceFromRegistry(json[PacketWrapper.getPacketIdentifier()], json[PacketWrapper.getJsonIdentifier()]);
   }
 
-//  /// `toJson` is the convention for a class to declare support for serialization
-//  /// to JSON. The implementation simply calls the private, generated
-//  /// helper method `_$UserToJson`.
-//  Map<String, dynamic> toJson() => _$PacketToJson(this);
+  //  /// `toJson` is the convention for a class to declare support for serialization
+  //  /// to JSON. The implementation simply calls the private, generated
+  //  /// helper method `_$UserToJson`.
+  //  Map<String, dynamic> toJson() => _$PacketToJson(this);
   @override
   String getPacketName() {
-    return packetName;
+    return packetName!;
   }
+
+  @override
+  Packet fromJson(Map<String, dynamic> json);
 }
 
 @JsonSerializable()
-@ToString()
 class _TemplatePacket extends Packet {
 
   static final _TemplatePacket constant = _TemplatePacket();
@@ -53,10 +54,10 @@ class _TemplatePacket extends Packet {
   /// A necessary factory constructor for creating a new User instance
   /// from a map. Pass the map to the generated `_$UserFromJson()` constructor.
   /// The constructor is named after the source class, in this case, User.
-  factory _TemplatePacket.fromJson(Map<String, dynamic> json) => _$_TemplatePacketFromJson(json);
+  factory _TemplatePacket.fromJson(Map<String, dynamic> json) => _$TemplatePacketFromJson(json);
 
   @override
-  JsonSerializableClass fromJson(Map<String, dynamic> json) {
+  _TemplatePacket fromJson(Map<String, dynamic> json) {
     return _TemplatePacket.fromJson(json);
   }
 
@@ -64,6 +65,6 @@ class _TemplatePacket extends Packet {
   /// to JSON. The implementation simply calls the private, generated
   /// helper method `_$UserToJson`.
   @override
-  Map<String, dynamic> toJson() => _$_TemplatePacketToJson(this);
+  Map<String, dynamic> toJson() => _$TemplatePacketToJson(this);
 }
 

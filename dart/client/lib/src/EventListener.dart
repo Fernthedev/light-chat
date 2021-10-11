@@ -7,7 +7,7 @@ import 'client.dart';
 ///
 /// [result] is the result from [PacketEventHandler]
 ///
-typedef PacketListener = void Function(Packet p, [Object result]);
+typedef PacketListener = void Function(Packet p, [Object? result]);
 
 class PacketEventHandler {
   Client client;
@@ -15,13 +15,13 @@ class PacketEventHandler {
   PacketEventHandler(this.client);
 
   void received(Packet p) async {
-    Object result;
+    Object? result;
     switch (p.runtimeType) {
       case PingReceive:
         client.endTime = DateTime.now();
 
         client.milliPingDelay =
-            client.endTime.difference(client.startTime).inMilliseconds;
+            client.endTime!.difference(client.startTime!).inMilliseconds;
 
         result = client.milliPingDelay;
 
@@ -35,19 +35,19 @@ class PacketEventHandler {
         break;
 
       case MessagePacket:
-        MessagePacket packet = p;
+        var packet = p as MessagePacket;
         print('${packet.message}');
         result = packet.message;
         break;
       case IllegalConnection:
-        IllegalConnection packet = p;
+        var packet = p as IllegalConnection;
         print('Illegal connection error from server: ${packet.message}');
         result = packet.message;
 
         await client.close();
         break;
       case InitialHandshakePacket:
-        InitialHandshakePacket packet = p;
+        var packet = p as InitialHandshakePacket;
 
         if (Variables.debug) print('Data of packet: ${p.toJson()}');
 
@@ -72,7 +72,7 @@ class PacketEventHandler {
         var keyParameter = client.getKey();
 
         var keyResponsePacket =
-            KeyResponsePacket.create(keyParameter.key, packet.publicKeyAsKey);
+            KeyResponsePacket.create(keyParameter!.key, packet.publicKeyAsKey);
 
         await client.send(keyResponsePacket, false);
 
@@ -87,7 +87,7 @@ class PacketEventHandler {
         result = connectedPacket;
         break;
       case SelfMessagePacket:
-        SelfMessagePacket packet = p;
+        var packet = p as SelfMessagePacket;
         switch (packet.type) {
           case MessageType.LOST_SERVER_CONNECTION:
             await client.close();
@@ -101,10 +101,10 @@ class PacketEventHandler {
             print('The connection timed out');
             break;
           case MessageType.FILL_PASSWORD:
-            if (client.serverData.hashedPassword != null &&
-                client.serverData.hashedPassword.isNotEmpty) {
+            if (client.serverData!.hashedPassword != null &&
+                client.serverData!.hashedPassword!.isNotEmpty) {
               await client.send(HashedPasswordPacket.create(
-                  HashedPassword.fromHash(client.serverData.hashedPassword)));
+                  HashedPassword.fromHash(client.serverData!.hashedPassword!)));
             }
             break;
           default:

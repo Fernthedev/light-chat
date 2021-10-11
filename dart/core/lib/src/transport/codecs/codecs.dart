@@ -86,7 +86,7 @@ class EncryptedJSONObjectEncoder extends ObjectEncoder<AcceptablePacketTypes> {
 
       var jsonString = jsonEncode(decryptedJSON);
 
-      var key = keyEncryptionHolder.getKey();
+      var key = keyEncryptionHolder.getKey()!;
       var encryptedBytes = EncryptionUtil.encrypt(jsonString, key);
 
       var packetWrapper =
@@ -111,7 +111,7 @@ class LineBasedFrameDecoder extends ObjectDecoder<Uint8List> {
   final Encoding encoding;
   final String seperator;
 
-  Uint8List get seperatorByte => encoding.encode(seperator);
+  Uint8List get seperatorByte => Uint8List.fromList(encoding.encode(seperator));
 
   @override
   void decode(Uint8List msg, List<Object> out) {
@@ -151,7 +151,7 @@ class LineBasedFrameDecoder extends ObjectDecoder<Uint8List> {
 class LineStringSeperatorDecoder extends StringDecoder {
   final String seperator;
 
-  LineStringSeperatorDecoder(this.seperator, [Encoding encoding])
+  LineStringSeperatorDecoder(this.seperator, [Encoding encoding = utf8])
       : super(encoding);
 
   @override
@@ -203,41 +203,42 @@ class EncryptedJSONObjectDecoder extends LineStringSeperatorDecoder {
     await super.decode(msg, seperatedDecodeList);
 
     for (var decodedString in seperatedDecodeList) {
-      Map<String, dynamic> jsonMapPacketWrapper;
+      if (decodedString is String) {
+        Map<String, dynamic> jsonMapPacketWrapper;
 
-      PacketWrapper packetWrapper;
+        // await Future.sync(() {
+        jsonMapPacketWrapper = json.decode(decodedString);
+        PacketWrapper packetWrapper = ImplPacketWrapper.fromJson(jsonMapPacketWrapper);
 
-      // await Future.sync(() {
-      jsonMapPacketWrapper = json.decode(decodedString);
-      packetWrapper = ImplPacketWrapper.fromJson(jsonMapPacketWrapper);
+        Map<String, dynamic> decryptedJsonObject;
+        if (packetWrapper.encrypt) {
+          // print("Unwrapping {$decodedString} because encrypt");
 
-      Map<String, dynamic> decryptedJsonObject;
-      if (packetWrapper.encrypt) {
-        // print("Unwrapping {$decodedString} because encrypt");
+          packetWrapper = EncryptedPacketWrapper.fromJson(jsonMapPacketWrapper);
 
-        packetWrapper = EncryptedPacketWrapper.fromJson(jsonMapPacketWrapper);
+          var encryptedBytes;
 
-        var encryptedBytes;
+          encryptedBytes =
+              EncryptedBytes.fromJson(jsonDecode(packetWrapper.jsonObject!));
 
-        encryptedBytes =
-            EncryptedBytes.fromJson(jsonDecode(packetWrapper.jsonObject));
+          decryptedJsonObject = _decrypt(encryptedBytes);
+        } else {
+          packetWrapper =
+              UnencryptedPacketWrapper.fromJson(jsonMapPacketWrapper);
+          decryptedJsonObject = jsonDecode(packetWrapper.jsonObject!);
+        }
 
-        decryptedJsonObject = _decrypt(encryptedBytes);
-      } else {
-        packetWrapper = UnencryptedPacketWrapper.fromJson(jsonMapPacketWrapper);
-        decryptedJsonObject = jsonDecode(packetWrapper.jsonObject);
+        //   if (Variables.debug) print(
+        //      'Decrypted json object: $decryptedJsonObject');
+
+        if (Variables.debug) {
+          print(
+              'Parsing: ${packetWrapper.packetIdentifier}  $decryptedJsonObject');
+        }
+
+        out.add(getParsedObject(
+            packetWrapper.packetIdentifier!, decryptedJsonObject));
       }
-
-      //   if (Variables.debug) print(
-      //      'Decrypted json object: $decryptedJsonObject');
-
-      if (Variables.debug) {
-        print(
-            'Parsing: ${packetWrapper.packetIdentifier}  $decryptedJsonObject');
-      }
-
-      out.add(
-          getParsedObject(packetWrapper.packetIdentifier, decryptedJsonObject));
     }
     // }).catchError((e) {
     //   Variables.printDebug("Parsed $decodedString");

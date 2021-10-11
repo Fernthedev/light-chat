@@ -1,14 +1,11 @@
 
 import 'package:json_annotation/json_annotation.dart';
-import 'package:lombok/lombok.dart';
 
-import '../transport/packetwrapper.dart';
 import 'packets.dart';
 
 part 'latency_packets.g.dart';
 
 @JsonSerializable()
-@ToString()
 class PingPacket extends Packet {
 
   static final PingPacket constant = PingPacket();
@@ -28,7 +25,7 @@ class PingPacket extends Packet {
   factory PingPacket.fromJson(Map<String, dynamic> json) => _$PingPacketFromJson(json);
 
   @override
-  JsonSerializableClass fromJson(Map<String, dynamic> json) {
+  PingPacket fromJson(Map<String, dynamic> json) {
     return PingPacket.fromJson(json);
   }
 
@@ -40,7 +37,6 @@ class PingPacket extends Packet {
 }
 
 @JsonSerializable()
-@ToString()
 class PingReceive extends Packet {
 
   static final PingReceive constant = PingReceive();
@@ -60,7 +56,7 @@ class PingReceive extends Packet {
   factory PingReceive.fromJson(Map<String, dynamic> json) => _$PingReceiveFromJson(json);
 
   @override
-  JsonSerializableClass fromJson(Map<String, dynamic> json) {
+  PingReceive fromJson(Map<String, dynamic> json) {
     return PingReceive.fromJson(json);
   }
 
@@ -72,7 +68,6 @@ class PingReceive extends Packet {
 }
 
 @JsonSerializable()
-@ToString()
 class PongPacket extends Packet {
 
   static final PongPacket constant = PongPacket();
@@ -91,7 +86,7 @@ class PongPacket extends Packet {
   factory PongPacket.fromJson(Map<String, dynamic> json) => _$PongPacketFromJson(json);
 
   @override
-  JsonSerializableClass fromJson(Map<String, dynamic> json) {
+  PongPacket fromJson(Map<String, dynamic> json) {
     return PongPacket.fromJson(json);
   }
 

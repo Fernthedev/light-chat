@@ -26,22 +26,22 @@ class EventType<T> {
 }
 
 class Client implements IKeyEncriptionHolder {
-  Socket socket;
-  KeyParameter _key;
-  EncryptedJSONObjectEncoder _encoder;
-  EncryptedJSONObjectDecoder _decoder;
+  Socket? socket;
+  KeyParameter? _key;
+  EncryptedJSONObjectEncoder? _encoder;
+  EncryptedJSONObjectDecoder? _decoder;
 
   LineEndStringEncoder lineEndStringEncoder = LineEndStringEncoder(utf8);
 
-  DateTime startTime;
-  DateTime endTime;
+  DateTime? startTime;
+  DateTime? endTime;
 
-  int milliPingDelay;
-  ServerData _serverData;
+  int milliPingDelay = -1;
+  ServerData? _serverData;
 
   bool disconnecting = false;
 
-  ServerData get serverData => _serverData;
+  ServerData? get serverData => _serverData;
 
   final List<PacketListener> packetListeners = <PacketListener>[];
 
@@ -67,7 +67,7 @@ class Client implements IKeyEncriptionHolder {
     runCallbacks(EventType.REGISTER_EVENT, serverData);
   }
 
-  PacketEventHandler eventHandler;
+  late PacketEventHandler eventHandler;
 
   ConnectedPacket connectedPacketInfo;
 
@@ -101,9 +101,9 @@ class Client implements IKeyEncriptionHolder {
       _registered = false;
       print('Key generated');
 
-      socket.setOption(SocketOption.tcpNoDelay, true);
+      socket!.setOption(SocketOption.tcpNoDelay, true);
 
-      socket.listen(onReceive, onError: (e) async {
+      socket!.listen(onReceive, onError: (e) async {
         print('Server error: $e');
         await runCallbacks(EventType.ERROR_EVENT, e);
       }, onDone: onDoneEvent);
@@ -116,7 +116,7 @@ class Client implements IKeyEncriptionHolder {
   void registerCallback<T>(EventType<T> eventType, EventCallback<T> callback) {
     eventListeners.putIfAbsent(eventType, () => <EventCallback<dynamic>>[]);
 
-    var list = eventListeners[eventType];
+    var list = eventListeners[eventType]!;
 
     // Wrap around dynamic event call back to avoid type errors.
     var wrapper = (d) => callback(d as T);
@@ -129,20 +129,23 @@ class Client implements IKeyEncriptionHolder {
       EventType<T> eventType, EventCallback<T> callback) {
     if (!eventListeners.containsKey(eventType)) return;
 
-    eventListeners[eventType].remove(eventListenerRegistry[callback]);
+    eventListeners[eventType]!.remove(eventListenerRegistry[callback]);
     eventListenerRegistry.remove(callback);
 
-    if (eventListeners[eventType].isEmpty) eventListeners.remove(eventType);
+    if (eventListeners[eventType]!.isEmpty) eventListeners.remove(eventType);
   }
 
   void unregisterCallbacks<T>(EventCallback<T> callback) {
     eventListeners.forEach((key, value) {
-      if (value.contains(callback)) unregisterCallback<T>(key, callback);
+      if (value.contains(callback)) {
+        var keyCast = key as EventType<T>;
+        unregisterCallback<T>(keyCast, callback);
+      }
     });
   }
 
   void unregisterEvents<T>(EventType<T> eventType) {
-    eventListeners[eventType].forEach((element) {
+    eventListeners[eventType]!.forEach((element) {
       unregisterCallback(eventType, element);
     });
     eventListeners.remove(eventType);
@@ -165,9 +168,9 @@ class Client implements IKeyEncriptionHolder {
       var list = data;
 
       var decodedObjects = <Object>[];
-      await _decoder.decode(list, decodedObjects);
+      await _decoder!.decode(list, decodedObjects);
 
-      for (Packet packet in decodedObjects) {
+      for (var packet in decodedObjects.whereType<Packet>()) {
         eventHandler.received(packet);
       }
 
@@ -203,8 +206,6 @@ class Client implements IKeyEncriptionHolder {
   // }
 
   Future<void> send(AcceptablePacketTypes packet, [bool encrypt = true]) async {
-    if (packet == null) throw ArgumentError.notNull('packet');
-
     Variables.printDebug('Sending $packet');
 
     AcceptablePacketTypes json;
@@ -216,26 +217,25 @@ class Client implements IKeyEncriptionHolder {
     }
 
     var encodedMessages = <Object>[];
-    await _encoder.encode(json, encodedMessages);
+    await _encoder!.encode(json, encodedMessages);
 
-    var dataList = <Uint8List>[];
+    var dataList = <List<int>>[];
 
-    for (var o in encodedMessages) {
+    for (var o in encodedMessages.whereType()) {
       dataList.add(o);
     }
 
     for (var data in dataList) {
-      socket.add(data);
+      socket!.add(data);
     }
 
-    // await socket.flush();
-    await socket.flush();
+    await socket!.flush();
 
     return Future.value();
   }
 
   @override
-  KeyParameter getKey() {
+  KeyParameter? getKey() {
     return _key;
   }
 
@@ -252,7 +252,7 @@ class Client implements IKeyEncriptionHolder {
     packetListeners.remove(listener);
   }
 
-  void handlePacket(Packet p, [Object result]) async {
+  void handlePacket(Packet p, [Object? result]) async {
     for (var packetListener in packetListeners) {
       packetListener(p, result);
     }
@@ -263,7 +263,7 @@ class Client implements IKeyEncriptionHolder {
 
     if (socket != null) {
       print('Closing socket');
-      await socket.destroy();
+      socket!.destroy();
     }
     print('Closed');
 

@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 
 import 'package:json_annotation/json_annotation.dart';
-import 'package:lombok/lombok.dart';
 import 'package:pointycastle/export.dart';
 
 import '../data/packetdata.dart';
@@ -13,12 +12,11 @@ import 'packets.dart';
 part 'handshake_packets.g.dart';
 
 @JsonSerializable(explicitToJson: true)
-@ToString()
 class InitialHandshakePacket extends Packet {
   static final InitialHandshakePacket constant = InitialHandshakePacket();
 
-  String publicKey;
-  VersionDataString versionData;
+  late String publicKey;
+  late VersionDataString versionData;
 
   RSAPublicKey get publicKeyAsKey =>
       EncryptionUtil.rsaPublicKeyFromString(publicKey);
@@ -28,9 +26,7 @@ class InitialHandshakePacket extends Packet {
   factory InitialHandshakePacket.create(
       RSAPublicKey publicKey, VersionData versionData) {
     var packet = InitialHandshakePacket();
-    if (publicKey != null) {
-      packet.publicKey = EncryptionUtil.rsaAsymmetricKeyToString(publicKey);
-    }
+    packet.publicKey = EncryptionUtil.rsaAsymmetricKeyToString(publicKey);
     packet.versionData = versionData.toDataString();
     return packet;
   }
@@ -42,7 +38,7 @@ class InitialHandshakePacket extends Packet {
       _$InitialHandshakePacketFromJson(json);
 
   @override
-  JsonSerializableClass fromJson(Map<String, dynamic> json) {
+  InitialHandshakePacket fromJson(Map<String, dynamic> json) {
     return InitialHandshakePacket.fromJson(json);
   }
 
@@ -54,7 +50,6 @@ class InitialHandshakePacket extends Packet {
 }
 
 @JsonSerializable(explicitToJson: true)
-@ToString()
 class ConnectedPacket extends Packet {
   static final ConnectedPacket constant = ConnectedPacket();
 
@@ -70,10 +65,10 @@ class ConnectedPacket extends Packet {
     return connectedPacket;
   }
 
-  String name;
-  String os;
-  VersionDataString versionData;
-  String langFramework;
+  late String name;
+  late String os;
+  late VersionDataString versionData;
+  late String langFramework;
 
   /// A necessary factory constructor for creating a new User instance
   /// from a map. Pass the map to the generated `_$UserFromJson()` constructor.
@@ -82,7 +77,7 @@ class ConnectedPacket extends Packet {
       _$ConnectedPacketFromJson(json);
 
   @override
-  JsonSerializableClass fromJson(Map<String, dynamic> json) {
+  ConnectedPacket fromJson(Map<String, dynamic> json) {
     return ConnectedPacket.fromJson(json);
   }
 
@@ -106,13 +101,13 @@ class KeyResponsePacket extends Packet {
     return keyPacket;
   }
 
-  Uint8List secretKeyEncrypted;
+  late Uint8List secretKeyEncrypted;
 
   KeyResponsePacket.fromJson(Map<String, dynamic> json)
       : secretKeyEncrypted = json['secretKeyEncrypted'];
 
   @override
-  JsonSerializableClass fromJson(Map<String, dynamic> json) {
+  KeyResponsePacket fromJson(Map<String, dynamic> json) {
     return KeyResponsePacket.fromJson(json);
   }
 
@@ -124,7 +119,6 @@ class KeyResponsePacket extends Packet {
 }
 
 @JsonSerializable()
-@ToString()
 class RequestConnectInfoPacket extends Packet {
   static final RequestConnectInfoPacket constant = RequestConnectInfoPacket();
 
@@ -143,7 +137,7 @@ class RequestConnectInfoPacket extends Packet {
       _$RequestConnectInfoPacketFromJson(json);
 
   @override
-  JsonSerializableClass fromJson(Map<String, dynamic> json) {
+  RequestConnectInfoPacket fromJson(Map<String, dynamic> json) {
     return RequestConnectInfoPacket.fromJson(json);
   }
 

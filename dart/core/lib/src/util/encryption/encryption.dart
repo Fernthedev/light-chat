@@ -8,9 +8,10 @@ import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:light_chat_core/core.dart';
 import 'package:pointycastle/api.dart';
+
 import 'package:pointycastle/asymmetric/api.dart';
 
-import 'package:asn1lib/asn1lib.dart';
+import 'package:asn1lib/asn1lib.dart' as asn1lib;
 import 'package:pointycastle/block/aes_fast.dart';
 import 'package:pointycastle/block/modes/cbc.dart';
 import 'package:pointycastle/export.dart';
@@ -30,10 +31,10 @@ class EncryptionUtil {
   }
 
   static String rsaAsymmetricKeyToString(RSAAsymmetricKey key) {
-    var topLevel = ASN1Sequence();
+    var topLevel = asn1lib.ASN1Sequence();
 
-    topLevel.add(ASN1Integer(key.modulus));
-    topLevel.add(ASN1Integer(key.exponent));
+    topLevel.add(asn1lib.ASN1Integer(key.modulus!));
+    topLevel.add(asn1lib.ASN1Integer(key.exponent!));
 
     return base64Encode(topLevel.encodedBytes);
   }
@@ -65,11 +66,11 @@ class EncryptionUtil {
           null,
         ),
       );
-    var plainBytes = utf8.encode(plainText);
+    var plainBytes = Uint8List.fromList(utf8.encode(plainText));
 
     var cipherTextBytes;
 
-    if (plainText == null || plainText == '') {
+    if (plainText == '') {
       cipherTextBytes = plainBytes;
     } else {
       cipherTextBytes = cipher.process(plainBytes);
@@ -83,7 +84,7 @@ class EncryptionUtil {
 
   /// Code given by Richard Heap at https://stackoverflow.com/questions/59523956/how-to-encrypt-and-decrypt-using-aes-cbc-256bit-and-pkcs5padding-in-dart-and-als
   static String decrypt(EncryptedBytes data, KeyParameter keyParameter) {
-    var iv = data.params.sublist(2); // strip the 4, 16 DER header
+    var iv = data.params!.sublist(2); // strip the 4, 16 DER header
 
     var cipher = PaddedBlockCipherImpl(
       PKCS7Padding(),
@@ -113,7 +114,6 @@ class EncryptionUtil {
   static RSAPublicKey rsaPublicKeyFromString(String key) {
     var pem =
         '-----BEGIN RSA PUBLIC KEY-----\n$key\n-----END RSA PUBLIC KEY-----';
-
 
     var public = CryptoUtils.rsaPublicKeyFromPem(pem);
 

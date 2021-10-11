@@ -6,7 +6,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:light_chat_core/core.dart';
 
-import 'package:lombok/lombok.dart';
+
 import 'package:uuid/uuid.dart';
 
 part 'serverdata.g.dart';
@@ -14,36 +14,33 @@ part 'serverdata.g.dart';
 /// An annotation for the code generator to know that this class needs the
 /// JSON serialization logic to be generated.
 @JsonSerializable(createFactory: true)
-@data
 class ServerData {
-  String ip;
-  int port;
-  String _hashedPassword;
-  String _uuid;
+  late String ip;
+  late int port;
+  String? _hashedPassword;
+  String? _uuid;
 
-  get hashedPassword => _hashedPassword;
+  String? get hashedPassword => _hashedPassword;
   set hashedPasswordDoHash(String hashedPassword) =>
       _hashedPassword = EncryptionUtil.toSha256(hashedPassword);
 
-  set hashedPassword(String password) => _hashedPassword = password;
+  set hashedPassword(String? password) => _hashedPassword = password;
 
   String get uuid {
     _uuid ??= Uuid().v4();
-    return _uuid;
+    return _uuid!;
   }
 
   set uuid(String uuid) {
     _uuid = uuid;
   }
 
-  ServerData(this.ip, this.port, String hashedPassword) {
+  ServerData(this.ip, this.port, String? hashedPassword) {
     if (hashedPassword != null) {
       _hashedPassword = EncryptionUtil.toSha256(hashedPassword);
     } else {
       _hashedPassword = null;
     }
-
-    _uuid ??= Uuid().v4();
   }
 
   ServerData.fromServer(ServerData serverData) {
@@ -71,7 +68,7 @@ class ServerData {
   Map<String, dynamic> toJson() => _$ServerDataToJson(this);
 
   @override
-  bool operator ==(other) => other.uuid == uuid;
+  bool operator ==(other) => other is ServerData && other.uuid == uuid;
 
   String ipPortName() => '$ip:$port';
 
