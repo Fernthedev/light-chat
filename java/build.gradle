@@ -1,18 +1,9 @@
 
 
-//buildscript {
-//    ext.kotlin_version = '1.3.72'
-//    repositories {
-//        mavenCentral()
-//    }
-//    dependencies {
-//        classpath "org.jetbrains.kotlin.jvm:$kotlin_version"
-//    }
-//}
-
 plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version "1.8.0"
+    id 'org.jetbrains.kotlin.plugin.lombok' version '1.8.0'
     id "io.freefair.lombok" version "6.6.1"
     id 'java-library'
 }
@@ -49,10 +40,11 @@ allprojects {
     }
 }
 
-configure(allprojects.findAll {it.name != "light-chat"}) {
+configure(allprojects.findAll { it.name != "light-chat" }) {
     apply plugin: 'java'
     apply plugin: 'maven-publish'
     apply plugin: "io.freefair.lombok"
+    apply plugin: "org.jetbrains.kotlin.plugin.lombok"
     apply plugin: 'kotlin'
     apply plugin: 'java-library'
 
@@ -84,6 +76,9 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
     }
 
     dependencies {
+        compileOnly("org.projectlombok:lombok:1.18.20")
+        annotationProcessor("org.projectlombok:lombok:1.18.20")
+
         testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.1'
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.1'
 
@@ -106,10 +101,7 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
 
     sourceCompatibility = '11'
 
-    java {
-        withSourcesJar()
-        withJavadocJar()
-    }
+
 //    tasks.withType(Javadoc).all { enabled = false }
 
     javadoc {
@@ -126,33 +118,35 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
             include 'variables.json'
 
 
-            expand 'version':project.protocol_ver, 'minVersion':project.protocol_ver_min
+            expand 'version': project.protocol_ver, 'minVersion': project.protocol_ver_min
         }
 
         duplicatesStrategy = DuplicatesStrategy.WARN
     }
 
-    afterEvaluate {
-        publishing {
-            publications {
-                maven(MavenPublication) {
-                    from(components.java)
 
-                    groupId = "${rootProject.group}.${rootProject.name}"
+    javadoc {
+        failOnError = false
+    }
 
-                    artifactId = "$project.name"
+    java {
+        withSourcesJar()
+        withJavadocJar()
+    }
 
-                    println "Publishing $groupId:$artifactId:${project.version}"
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                from(components.java)
 
-                    java {
-                        withSourcesJar()
-                        withJavadocJar()
-                    }
-                }
+                groupId = "${rootProject.group}.${rootProject.name}"
+                version project.version
+                artifactId = project.name
+
+                println "Publishing $groupId:$artifactId:${project.version}"
             }
         }
     }
-
 
 
     sourceSets {
@@ -160,16 +154,14 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
+
     compileKotlin {
+        dependsOn delombok
         kotlinOptions {
             jvmTarget = "11"
         }
     }
-    compileTestKotlin {
-        kotlinOptions {
-            jvmTarget = "11"
-        }
-    }
+
 
 }
 
