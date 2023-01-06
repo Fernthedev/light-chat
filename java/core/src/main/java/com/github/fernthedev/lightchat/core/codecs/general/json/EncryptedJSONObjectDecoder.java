@@ -12,10 +12,9 @@ import com.github.fernthedev.lightchat.core.encryption.UnencryptedPacketWrapper;
 import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil;
 import com.github.fernthedev.lightchat.core.packets.Packet;
 import com.github.fernthedev.lightchat.core.util.ExceptionUtil;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.MessageToMessageDecoder;
 import lombok.NonNull;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -25,12 +24,10 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,31 +35,22 @@ import java.util.List;
  * Converts encrypted json to a decrypted object
  */
 @ChannelHandler.Sharable
-public class EncryptedJSONObjectDecoder extends StringDecoder {
+public class EncryptedJSONObjectDecoder extends MessageToMessageDecoder<String> {
 
     private final JSONHandler jsonHandler;
 
     protected IEncryptionKeyHolder encryptionKeyHolder;
-    protected Charset charset;
-
-    /**
-     * Creates a new instance with the current system character set.
-     */
-    public EncryptedJSONObjectDecoder(IEncryptionKeyHolder encryptionKeyHolder, JSONHandler jsonHandler) {
-        this(Charset.defaultCharset(), encryptionKeyHolder, jsonHandler);
-    }
 
     /**
      * Creates a new instance with the specified character set.
      *
-     * @param charset
      */
-    public EncryptedJSONObjectDecoder(Charset charset, IEncryptionKeyHolder encryptionKeyHolder, JSONHandler jsonHandler) {
-        super(charset);
-        this.charset = charset;
+    public EncryptedJSONObjectDecoder(IEncryptionKeyHolder encryptionKeyHolder, JSONHandler jsonHandler) {
         this.encryptionKeyHolder = encryptionKeyHolder;
         this.jsonHandler = jsonHandler;
     }
+
+
 
     /**
      * Returns a string list
@@ -73,28 +61,24 @@ public class EncryptedJSONObjectDecoder extends StringDecoder {
      * @throws Exception
      */
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
-        List<Object> tempDecodeList = new ArrayList<>();
-        super.decode(ctx, msg, tempDecodeList);
-
-        String decodedStr = (String) tempDecodeList.get(0);
-        StaticHandler.getCore().getLogger().debug("Decoding the string {}", decodedStr);
-        PacketWrapper<?> packetWrapper = jsonHandler.fromJson(decodedStr, PacketWrapper.class);
+    protected void decode(ChannelHandlerContext ctx, String msg, List<Object> out) throws Exception {
+        StaticHandler.getCore().getLogger().debug("Decoding the string {}", msg);
+        PacketWrapper packetWrapper = jsonHandler.fromJson(msg, PacketWrapper.class);
 
         String decryptedJSON;
 
         try {
             if (packetWrapper.encrypt()) {
-                packetWrapper = jsonHandler.fromJson(decodedStr, EncryptedPacketWrapper.class);
+                packetWrapper = jsonHandler.fromJson(msg, EncryptedPacketWrapper.class);
 
                 EncryptedBytes encryptedBytes = jsonHandler.fromJson(packetWrapper.getJsonObject(), EncryptedBytes.class);
-                decryptedJSON = decrypt(ctx, (encryptedBytes));
+                decryptedJSON = decrypt(ctx, encryptedBytes);
             } else {
-                packetWrapper = jsonHandler.fromJson(decodedStr, UnencryptedPacketWrapper.class);
+                packetWrapper = jsonHandler.fromJson(msg, UnencryptedPacketWrapper.class);
                 decryptedJSON = packetWrapper.getJsonObject();
             }
         } catch (Exception e) {
-            throw new IllegalArgumentException("Unable to parse string: " + decodedStr, e);
+            throw new IllegalArgumentException("Unable to parse string: " + msg, e);
         }
 
         out.add(getParsedObject(packetWrapper.getPacketIdentifier(), decryptedJSON, packetWrapper.getPacketId()));

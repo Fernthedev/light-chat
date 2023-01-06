@@ -31,9 +31,11 @@ import io.netty.channel.kqueue.KQueueSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.codec.MessageToByteEncoder;
-import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
 import lombok.*;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.time.StopWatch;
@@ -105,7 +107,6 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
 
     /**
      * Is null until a connection is established
-     *
      */
     @Getter
     private CompletableFuture<SecretKey> secretKey;
@@ -184,9 +185,6 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
     }
 
 
-
-
-
     public String getOSName() {
         return System.getProperty("os.name");
     }
@@ -232,16 +230,29 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
 
         b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, (int) clientSettings.getTimeoutTime());
 
-        b.handler(new ChannelInitializer<Channel>() {
+        b.handler(new ChannelInitializer<>() {
             @Override
             public void initChannel(@NotNull Channel ch) {
 
+                // inbound -> up to bottom
+                // outbound -> bottom to up
+                ch.pipeline().addLast(
+                        new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 8, 0, 8)
+                );
 
+                ch.pipeline().addLast("strDecoder", new StringDecoder(clientSettings.getCharset()));
+                ch.pipeline().addLast(
+                        new EncryptedJSONObjectDecoder(Client.this, jsonHandler),
+                        new LengthFieldPrepender(8)
+                );
 
-                ch.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler((int) clientSettings.getTimeoutTime()));
-                ch.pipeline().addLast("frameDecoder", new LineBasedFrameDecoder(StaticHandler.getLineLimit()));
-                ch.pipeline().addLast("stringDecoder", new EncryptedJSONObjectDecoder(clientSettings.getCharset(), Client.this, jsonHandler));
-                ch.pipeline().addLast("stringEncoder", new EncryptedJSONObjectEncoder(clientSettings.getCharset(), Client.this, jsonHandler));
+                ch.pipeline().addLast("strEncoder", new StringEncoder());
+                ch.pipeline().addLast(new EncryptedJSONObjectEncoder(clientSettings.getCharset(), Client.this, jsonHandler));
+
+                ch.pipeline().addLast(
+                        "handler",
+                        clientHandler
+                );
 
 
                 int compression = getClientSettingsManager().getConfigData().getCompressionLevel();
@@ -251,21 +262,19 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
                 MessageToByteEncoder<?> encoder = null;
                 ByteToMessageDecoder decoder = compressions.component2().apply(getClientSettingsManager().getConfigData());
 
-                if (compression >= 0) encoder = compressions.component1().apply(getClientSettingsManager().getConfigData());
+                if (compression >= 0)
+                    encoder = compressions.component1().apply(getClientSettingsManager().getConfigData());
 
                 if (!compressionAlgorithm.equals("NONE")) {
 
                     if (decoder != null)
-                        ch.pipeline().addFirst("compressDecoder", decoder);
+                        ch.pipeline().addBefore("strDecoder", "compressDecoder", decoder);
 
                     if (compression >= 0 && encoder != null) {
-                        ch.pipeline().addBefore("stringEncoder", "compressEncoder", encoder);
+                        ch.pipeline().addBefore("strEncoder", "compressEncoder", encoder);
                         getLogger().info("Using {} {} compression", compressionAlgorithm, compression);
                     }
                 }
-
-
-                ch.pipeline().addLast(clientHandler);
             }
         });
 
@@ -324,7 +333,8 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
 
         Pair<Integer, Long> packetIdPair = updatePacketIdPair(packet.getClass(), -1);
 
-        if (packetIdPair.getLeft() > maxPacketId || System.currentTimeMillis() - packetIdPair.getRight() > 900) updatePacketIdPair(packet.getClass(), 0);
+        if (packetIdPair.getLeft() > maxPacketId || System.currentTimeMillis() - packetIdPair.getRight() > 900)
+            updatePacketIdPair(packet.getClass(), 0);
 
         if (encrypt) {
             return channel.writeAndFlush(packet);
@@ -405,7 +415,7 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
      */
     @Override
     public Pair<Integer, Long> getPacketId(@NonNull Class<? extends Packet> clazz, ChannelHandlerContext ctx, Channel channel) {
-        packetIdMap.computeIfAbsent(clazz, aClass -> new ImmutablePair<>(0,(long) -1));
+        packetIdMap.computeIfAbsent(clazz, aClass -> new ImmutablePair<>(0, (long) -1));
 
         return packetIdMap.get(clazz);
     }
@@ -417,7 +427,6 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
     public Pair<Integer, Long> getPacketId(Class<? extends Packet> clazz) {
         return packetIdMap.get(clazz);
     }
-
 
 
     void startPingStopwatch() {
@@ -448,7 +457,6 @@ public class Client implements IEncryptionKeyHolder, AutoCloseable {
      * to relinquish the underlying resources and to internally
      * <em>mark</em> the {@code Closeable} as closed, prior to throwing
      * the {@code IOException}.
-     *
      */
     @Override
     public void close() {

@@ -124,7 +124,6 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         if (validateIsBanned(ctx)) return;
 
         ctx.flush();
-        ctx.fireChannelReadComplete();
         super.channelReadComplete(ctx);
     }
 
@@ -172,7 +171,7 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 
             if (server.getBanManager().isBanned(address.getAddress().getHostAddress())) {
 
-                server.getLogger().debug("Closing connection because it is banned for {}", address.toString());
+                server.getLogger().debug("Closing connection because it is banned for {}", address);
                 close(ctx.channel());
 
                 return true;

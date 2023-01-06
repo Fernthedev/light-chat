@@ -3,8 +3,8 @@ package com.github.fernthedev.lightchat.core.codecs.general.compression
 import com.github.fernthedev.lightchat.core.CoreSettings
 import io.netty.handler.codec.MessageToByteEncoder
 import io.netty.handler.codec.ByteToMessageDecoder
-import java.util.HashMap
 import io.netty.handler.codec.compression.*
+import java.util.*
 import java.util.function.Function
 
 typealias CompressPair = Pair<Function<CoreSettings, out MessageToByteEncoder<*>?>, Function<CoreSettings, out ByteToMessageDecoder?>>
@@ -35,7 +35,7 @@ object CompressionAlgorithms {
 
     @JvmStatic
     fun getCompressions(s: String): CompressPair {
-        return compressionAlgorithmMap[s.toLowerCase()]!!
+        return compressionAlgorithmMap[s.lowercase(Locale.getDefault())]!!
     }
 
     @JvmStatic
@@ -43,7 +43,7 @@ object CompressionAlgorithms {
         s: String,
         compression: CompressPair
     ): String {
-        val s1 = s.toLowerCase()
+        val s1 = s.lowercase(Locale.getDefault())
         compressionAlgorithmMap[s1] = compression
         return s1
     }

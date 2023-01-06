@@ -3,7 +3,6 @@ package com.github.fernthedev.lightchat.core.codecs.general.json;
 import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.core.codecs.AcceptablePacketTypes;
 import com.github.fernthedev.lightchat.core.codecs.JSONHandler;
-import com.github.fernthedev.lightchat.core.codecs.LineEndStringEncoder;
 import com.github.fernthedev.lightchat.core.encryption.EncryptedBytes;
 import com.github.fernthedev.lightchat.core.encryption.EncryptedPacketWrapper;
 import com.github.fernthedev.lightchat.core.encryption.PacketWrapper;
@@ -30,7 +29,6 @@ import java.util.List;
 public class EncryptedJSONObjectEncoder extends MessageToMessageEncoder<AcceptablePacketTypes> {
 
     private final JSONHandler jsonHandler;
-    private final LineEndStringEncoder encoder;
 
     protected IEncryptionKeyHolder encryptionKeyHolder;
     protected Charset charset;
@@ -49,7 +47,6 @@ public class EncryptedJSONObjectEncoder extends MessageToMessageEncoder<Acceptab
      * @param charset
      */
     public EncryptedJSONObjectEncoder(Charset charset, IEncryptionKeyHolder encryptionKeyHolder, JSONHandler jsonHandler) {
-        encoder = new LineEndStringEncoder(charset);
         this.charset = charset;
         this.encryptionKeyHolder = encryptionKeyHolder;
         this.jsonHandler = jsonHandler;
@@ -69,12 +66,12 @@ public class EncryptedJSONObjectEncoder extends MessageToMessageEncoder<Acceptab
     @Override
     protected void encode(ChannelHandlerContext ctx, AcceptablePacketTypes msg, List<Object> out) throws Exception {
 
-        PacketWrapper<?> packetWrapper;
+        PacketWrapper packetWrapper;
         if (msg instanceof UnencryptedPacketWrapper) {
-            packetWrapper = (PacketWrapper<?>) msg;
+            packetWrapper = (PacketWrapper) msg;
             String decryptedJSON = jsonHandler.toJson(msg);
 
-            encoder.encode(ctx, decryptedJSON, out); // Just encodes the string
+            out.add(decryptedJSON);
 
         } else {
 
@@ -89,15 +86,13 @@ public class EncryptedJSONObjectEncoder extends MessageToMessageEncoder<Acceptab
             EncryptedBytes encryptedBytes = encrypt(ctx, decryptedJSON);
 
             // Adds the encrypted json in the packet wrapper
-            packetWrapper = new EncryptedPacketWrapper(encryptedBytes, packet, encryptionKeyHolder.getPacketId(packet.getClass(), ctx, ctx.channel()).getKey());
+            packetWrapper = new EncryptedPacketWrapper(encryptedBytes, jsonHandler, packet, encryptionKeyHolder.getPacketId(packet.getClass(), ctx, ctx.channel()).getKey());
             String jsonPacketWrapper = jsonHandler.toJson(packetWrapper);
 
             // Encodes the string for sending
-            encoder.encode(ctx, jsonPacketWrapper, out);
-
+            out.add(jsonPacketWrapper);
         }
 
-//        if (!(packetWrapper.getJsonObjectInstance() instanceof LatencyPacket))
         if (StaticHandler.isDebug())
             StaticHandler.getCore().getLogger().debug("Sending {}", jsonHandler.toJson(packetWrapper));
     }

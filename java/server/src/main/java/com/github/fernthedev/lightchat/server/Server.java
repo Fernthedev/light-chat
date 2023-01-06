@@ -38,8 +38,11 @@ import io.netty.channel.kqueue.KQueueServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.codec.MessageToByteEncoder;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -114,7 +117,6 @@ public class Server implements Runnable {
     /**
      * @deprecated Might be replaced with {@link ServerShutdownEvent}
      * Use event system {@link PluginManager#registerEvents(Listener)}
-     *
      */
     @Deprecated
     private List<Runnable> shutdownListeners = new ArrayList<>();
@@ -128,6 +130,7 @@ public class Server implements Runnable {
 
     /**
      * The listener will be called when {@link #shutdownServer()} is called
+     *
      * @param runnable the listener
      */
     @APIUsage
@@ -196,7 +199,6 @@ public class Server implements Runnable {
             }, executorService);
 
 
-
             if (workerGroup != null) workerGroup.shutdownGracefully();
             if (bossGroup != null) bossGroup.shutdownGracefully();
 
@@ -207,7 +209,6 @@ public class Server implements Runnable {
             shutdownListeners.parallelStream().forEach(Runnable::run);
         } else throw new IllegalStateException("Server is already shutting down!");
     }
-
 
 
     public boolean isRunning() {
@@ -336,7 +337,8 @@ public class Server implements Runnable {
 
         try {
             shutdownServer();
-        } catch (IllegalStateException ignored) {}
+        } catch (IllegalStateException ignored) {
+        }
     }
 
     private Server initServer() {
@@ -386,11 +388,27 @@ public class Server implements Runnable {
                 .childHandler(new ChannelInitializer<Channel>() {
                     @Override
                     public void initChannel(@NotNull Channel ch) {
-                        ch.pipeline().addLast("frameDecoder", new LineBasedFrameDecoder(StaticHandler.getLineLimit()));
-                        ch.pipeline().addLast("stringDecoder", new EncryptedJSONObjectDecoder(settingsManager.getConfigData().getCharset(), keyFinder, jsonHandler));
 
+                        // inbound -> up to bottom
+                        // outbound -> bottom to up
+                        ch.pipeline().addLast(
+                                new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 8, 0, 8)
+                        );
 
-                        ch.pipeline().addLast("stringEncoder", new EncryptedJSONObjectEncoder(settingsManager.getConfigData().getCharset(), keyFinder, jsonHandler));
+                        ch.pipeline().addLast("strDecoder", new StringDecoder(settingsManager.getConfigData().getCharset()));
+                        ch.pipeline().addLast(
+                                new EncryptedJSONObjectDecoder(keyFinder, jsonHandler),
+                                new LengthFieldPrepender(8)
+                        );
+
+                        ch.pipeline().addLast("strEncoder", new StringEncoder());
+                        ch.pipeline().addLast(new EncryptedJSONObjectEncoder(settingsManager.getConfigData().getCharset(), keyFinder, jsonHandler));
+
+                        ch.pipeline().addLast(
+                                "handler",
+                                processingHandler
+                        );
+                        ch.pipeline().addLast(channelHandlers.toArray(new ChannelHandler[0]));
 
                         int compression = getSettingsManager().getConfigData().getCompressionLevel();
                         String compressionAlgorithm = getSettingsManager().getConfigData().getCompressionAlgorithm();
@@ -400,23 +418,23 @@ public class Server implements Runnable {
                         MessageToByteEncoder<?> encoder = null;
                         ByteToMessageDecoder decoder = compressions.component2().apply(getSettingsManager().getConfigData());
 
-                        if (compression >= 0) encoder = compressions.component1().apply(getSettingsManager().getConfigData());
+
+                        if (compression >= 0)
+                            encoder = compressions.component1().apply(getSettingsManager().getConfigData());
 
                         if (!compressionAlgorithm.equals("NONE")) {
 
-                            if (decoder != null)
-                                ch.pipeline().addFirst(decoder);
+                            if (decoder != null) {
+                                ch.pipeline().addBefore("strDecoder", "compressDecoder", decoder);
+                            }
 
                             if (compression >= 0 && encoder != null) {
-                                ch.pipeline().addBefore("stringEncoder", "compressEncoder", encoder);
+                                ch.pipeline().addBefore("strEncoder", "compressEncoder", encoder);
                                 getLogger().info("Using {} {} compression", compressionAlgorithm, compression);
                             }
                         }
 
 
-                        ch.pipeline().addLast(processingHandler);
-
-                        ch.pipeline().addLast(channelHandlers.toArray(new ChannelHandler[0]));
                     }
                 })
                 .option(ChannelOption.SO_BACKLOG, 128)

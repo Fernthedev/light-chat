@@ -10,13 +10,9 @@
 //    }
 //}
 
-buildscript {
-    ext.kotlin_version = '1.4.21-2'
-}
-
 plugins {
     id 'java'
-    id 'org.jetbrains.kotlin.jvm' version "$kotlin_version"
+    id 'org.jetbrains.kotlin.jvm' version "1.8.0"
     id "io.freefair.lombok" version "5.3.0"
     id 'java-library'
 }
@@ -60,7 +56,7 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
     apply plugin: 'kotlin'
     apply plugin: 'java-library'
 
-    ext.netty_ver = "4.1.59.Final"
+    ext.netty_ver = "4.1.81.Final"
     ext.jline_ver = "3.18.0"
     ext.log4j_ver = "2.14.0"
 
@@ -97,19 +93,18 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
         implementation "io.netty:netty-transport-native-epoll:$netty_ver"
         implementation "io.netty:netty-transport-native-kqueue:$netty_ver"
         implementation 'com.lmax:disruptor:3.4.2'
-        implementation platform('org.jetbrains.kotlin:kotlin-bom')
-        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+//        implementation platform('org.jetbrains.kotlin:kotlin-bom')
 
         implementation 'org.apache.commons:commons-lang3:3.11'
         api 'com.github.Fernthedev:fern-configmanager:1.3.0'
         api 'com.google.guava:guava:30.1-jre'
         implementation 'com.googlecode.json-simple:json-simple:1.1.1'
-        implementation 'com.google.code.gson:gson:2.8.6'
+        implementation 'com.google.code.gson:gson:2.8.9'
         implementation 'com.github.Fernthedev:FernUtils:1.4.0'
         api group: 'org.apache.maven', name: 'maven-artifact', version: '3.6.3'
     }
 
-    sourceCompatibility = '8'
+    sourceCompatibility = '11'
 
     java {
         withSourcesJar()
@@ -164,18 +159,17 @@ configure(allprojects.findAll {it.name != "light-chat"}) {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
-}
-repositories {
-    mavenCentral()
+    compileKotlin {
+        kotlinOptions {
+            jvmTarget = "11"
+        }
+    }
+    compileTestKotlin {
+        kotlinOptions {
+            jvmTarget = "11"
+        }
+    }
+
 }
 
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-}
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-}
+

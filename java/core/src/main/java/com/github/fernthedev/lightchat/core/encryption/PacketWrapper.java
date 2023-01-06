@@ -1,21 +1,15 @@
 package com.github.fernthedev.lightchat.core.encryption;
 
-import com.google.gson.Gson;
 import lombok.Getter;
 
 import java.io.Serializable;
 
-public class PacketWrapper<T> implements Serializable {
-
-    protected static Gson gson = new Gson();
+public class PacketWrapper implements Serializable {
 
     protected boolean ENCRYPT = false;
 
     @Getter
     private String jsonObject;
-
-    @Getter
-    private transient T jsonObjectInstance;
 
     @Getter
     private String packetIdentifier;
@@ -34,10 +28,9 @@ public class PacketWrapper<T> implements Serializable {
                 '}';
     }
 
-    public PacketWrapper(T object, String packetIdentifier, int packetId) {
+    public PacketWrapper(String object, String packetIdentifier, int packetId) {
         this.packetIdentifier = packetIdentifier;
-        this.jsonObjectInstance = object;
-        this.jsonObject = gson.toJson(object);
+        this.jsonObject = object;
         this.packetId = packetId;
     }
 

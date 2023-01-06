@@ -9,6 +9,10 @@ import com.google.gson.JsonSyntaxException;
 public class GSONHandler implements JSONHandler {
     private static final Gson gson = new Gson();
 
+    public static final GSONHandler INSTANCE = new GSONHandler();
+
+    private GSONHandler() {}
+
     @Override
     public <T> T fromJson(String json, Class<T> classOfT) throws JsonSyntaxException {
         return gson.fromJson(json, classOfT);
