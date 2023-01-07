@@ -1,46 +1,37 @@
-package com.github.fernthedev.lightchat.core.api.plugin.java;
+package com.github.fernthedev.lightchat.core.api.plugin.java
 
-
-import com.github.fernthedev.lightchat.core.StaticHandler;
-import com.github.fernthedev.lightchat.core.api.plugin.Plugin;
-import com.github.fernthedev.lightchat.core.api.plugin.PluginDescriptionFile;
-import com.github.fernthedev.lightchat.core.api.plugin.PluginLoader;
-import com.github.fernthedev.lightchat.core.api.plugin.exception.InvalidDescriptionException;
-import com.github.fernthedev.lightchat.core.api.plugin.exception.InvalidPluginException;
-import com.github.fernthedev.lightchat.core.api.plugin.exception.UnknownDependencyException;
-import com.github.fernthedev.lightchat.core.api.event.api.*;
-import org.apache.commons.lang3.Validate;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import java.util.regex.Pattern;
+import com.github.fernthedev.lightchat.core.StaticHandler
+import com.github.fernthedev.lightchat.core.api.event.api.*
+import com.github.fernthedev.lightchat.core.api.plugin.*
+import com.github.fernthedev.lightchat.core.api.plugin.exception.InvalidDescriptionException
+import com.github.fernthedev.lightchat.core.api.plugin.exception.InvalidPluginException
+import com.github.fernthedev.lightchat.core.api.plugin.exception.UnknownDependencyException
+import org.apache.commons.lang3.Validate
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.IOException
+import java.io.InputStream
+import java.lang.reflect.InvocationTargetException
+import java.lang.reflect.Method
+import java.util.*
+import java.util.jar.JarFile
+import java.util.regex.Pattern
 
 /**
  * Represents a Java com.github.fernthedev.client.plugin loader, allowing plugins in the form of .jar
  */
-public final class JavaPluginLoader implements PluginLoader {
-    private final Object server;
-    private final Pattern[] fileFilters = new Pattern[] { Pattern.compile("\\.jar$"), };
+class JavaPluginLoader @Deprecated("") constructor(instance: Any) : PluginLoader {
+    private val server: Any
+    private val fileFilters = arrayOf(Pattern.compile("\\.jar$"))
 
     /**
      * This class was not meant to be constructed explicitly
      *
      * @param instance the server instance
      */
-    @Deprecated
-    public JavaPluginLoader(Object instance) {
-        Validate.notNull(instance, "Server cannot be null");
-        server = instance;
+    init {
+        Validate.notNull(instance, "Server cannot be null")
+        server = instance
     }
 
     /*public Plugin loadPlugin(final File file) throws InvalidPluginException {
@@ -116,40 +107,32 @@ public final class JavaPluginLoader implements PluginLoader {
 
         return loader.com.github.fernthedev.client.plugin;
     }*/
-
-    public PluginDescriptionFile getPluginDescription(File file) throws InvalidDescriptionException {
-        Validate.notNull(file, "File cannot be null");
-
-        JarFile jar = null;
-        InputStream stream = null;
-
-        try {
-            jar = new JarFile(file);
-            JarEntry entry = jar.getJarEntry("com.github.fernthedev.client.plugin.yml");
-
-            if (entry == null) {
-                throw new InvalidDescriptionException(new FileNotFoundException("Jar does not contain com.github.fernthedev.client.plugin.yml"));
-            }
-
-            stream = jar.getInputStream(entry);
-
-            return new PluginDescriptionFile(stream);
-
-        } catch (IOException ex) {
-            throw new InvalidDescriptionException(ex);
+    @Throws(InvalidDescriptionException::class)
+    fun getPluginDescription(file: File): PluginDescriptionFile {
+        Validate.notNull(file, "File cannot be null")
+        var jar: JarFile? = null
+        var stream: InputStream? = null
+        return try {
+            jar = JarFile(file)
+            val entry = jar.getJarEntry("com.github.fernthedev.client.plugin.yml")
+                ?: throw InvalidDescriptionException(FileNotFoundException("Jar does not contain com.github.fernthedev.client.plugin.yml"))
+            stream = jar.getInputStream(entry)
+            PluginDescriptionFile(stream)
+        } catch (ex: IOException) {
+            throw InvalidDescriptionException(ex)
         } /*catch (YAMLException ex) {
             throw new InvalidDescriptionException(ex);
-        } */finally {
+        } */ finally {
             if (jar != null) {
                 try {
-                    jar.close();
-                } catch (IOException e) {
+                    jar.close()
+                } catch (e: IOException) {
                 }
             }
             if (stream != null) {
                 try {
-                    stream.close();
-                } catch (IOException e) {
+                    stream.close()
+                } catch (e: IOException) {
                 }
             }
         }
@@ -162,93 +145,89 @@ public final class JavaPluginLoader implements PluginLoader {
      * @return Plugin that was contained in the specified file, or null if
      * unsuccessful
      * @throws InvalidPluginException     Thrown when the specified file is not a
-     *                                    com.github.fernthedev.client.plugin
+     * com.github.fernthedev.client.plugin
      * @throws UnknownDependencyException If a required dependency could not
-     *                                    be found
+     * be found
      */
-    @Override
-    public Plugin loadPlugin(File file) throws InvalidPluginException, UnknownDependencyException {
-        return null;
+    @Throws(InvalidPluginException::class, UnknownDependencyException::class)
+    override fun loadPlugin(file: File?): Plugin? {
+        return null
     }
 
-    public Pattern[] getPluginFileFilters() {
-        return fileFilters.clone();
-    }
+    override val pluginFileFilters: Array<Pattern>?
+        get() = fileFilters.clone()
 
-
-
-    public Map<Class<? extends Event>, Set<RegisteredListener>> createRegisteredListeners(Listener listener, final Plugin plugin) {
-        Validate.notNull(plugin, "Plugin can not be null");
-        Validate.notNull(listener, "Listener can not be null");
-
-        Map<Class<? extends Event>, Set<RegisteredListener>> ret = new HashMap<>();
-        Set<Method> methods;
+    override fun createRegisteredListeners(
+        listener: Listener,
+        plugin: Plugin
+    ): Map<Class<out Event>, MutableSet<RegisteredListener>> {
+        Validate.notNull(plugin, "Plugin can not be null")
+        Validate.notNull(listener, "Listener can not be null")
+        val ret: MutableMap<Class<out Event>, MutableSet<RegisteredListener>> = HashMap()
+        val methods: Set<Method>
         try {
-            Method[] publicMethods = listener.getClass().getMethods();
-            Method[] privateMethods = listener.getClass().getDeclaredMethods();
-            methods = new HashSet<>(publicMethods.length + privateMethods.length, 1.0f);
-            for (Method method : publicMethods) {
-                methods.add(method);
-            }
-            for (Method method : privateMethods) {
-                methods.add(method);
-            }
-        } catch (NoClassDefFoundError e) {
-            StaticHandler.getCore().getLogger().error("Plugin "+ " has failed to register events for " + listener.getClass() + " because " + e.getMessage() + " does not exist.");
-            return ret;
+            val publicMethods = listener.javaClass.methods
+            val privateMethods = listener.javaClass.declaredMethods
+            methods = HashSet(publicMethods.size + privateMethods.size, 1.0f)
+            Collections.addAll(methods, *publicMethods)
+            Collections.addAll(methods, *privateMethods)
+        } catch (e: NoClassDefFoundError) {
+            StaticHandler.core.logger.error("Plugin " + " has failed to register events for " + listener.javaClass + " because " + e.message + " does not exist.")
+            return ret
         }
-
-        for (final Method method : methods) {
-            final EventHandler eh = method.getAnnotation(EventHandler.class);
-            if (eh == null) continue;
+        for (method in methods) {
+            val eh = method.getAnnotation(
+                EventHandler::class.java
+            ) ?: continue
             // Do not register bridge or synthetic methods to avoid com.github.fernthedev.client.event duplication
             // Fixes SPIGOT-893
-            if (method.isBridge() || method.isSynthetic()) {
-                continue;
+            if (method.isBridge || method.isSynthetic) {
+                continue
             }
-            final Class<?> checkClass;
-            if (method.getParameterTypes().length != 1 || !Event.class.isAssignableFrom(checkClass = method.getParameterTypes()[0])) {
-                StaticHandler.getCore().getLogger().info( " attempted to register an invalid EventHandler method signature \"" + method.toGenericString() + "\" in " + listener.getClass());
-                continue;
+            lateinit var checkClass: Class<*>
+            if (method.parameterTypes.size != 1 || !Event::class.java.isAssignableFrom(
+                    method.parameterTypes[0].also { checkClass = it })
+            ) {
+                StaticHandler.core.logger.info(" attempted to register an invalid EventHandler method signature \"" + method.toGenericString() + "\" in " + listener.javaClass)
+                continue
             }
-            final Class<? extends Event> eventClass = checkClass.asSubclass(Event.class);
-            method.setAccessible(true);
-            Set<RegisteredListener> eventSet = ret.get(eventClass);
+            val eventClass = checkClass.asSubclass(
+                Event::class.java
+            )
+            method.isAccessible = true
+            var eventSet = ret[eventClass]
             if (eventSet == null) {
-                eventSet = new HashSet<>();
-                ret.put(eventClass, eventSet);
+                eventSet = HashSet()
+                ret[eventClass] = eventSet
             }
-
-
-
-            EventExecutor executor = (listener1, event) -> {
-                try {
-                    if (!eventClass.isAssignableFrom(event.getClass())) {
-                        return;
+            val executor = object : EventExecutor {
+                override fun execute(listener: Listener, event: Event) {
+                    try {
+                        if (!event.javaClass.let { eventClass.isAssignableFrom(it) }) {
+                            return
+                        }
+                        // Spigot start
+                        method.invoke(listener, event)
+                        // Spigot end
+                    } catch (ex: InvocationTargetException) {
+                        throw EventException(ex.cause!!)
+                    } catch (t: Throwable) {
+                        throw EventException(t)
                     }
-                    // Spigot start
-                    method.invoke(listener1, event);
-                    // Spigot end
-                } catch (InvocationTargetException ex) {
-                    throw new EventException(ex.getCause());
-                } catch (Throwable t) {
-                    throw new EventException(t);
                 }
-            };
-            eventSet.add(new RegisteredListener(listener, executor,plugin, eh.priority(), eh.ignoreCancelled()));
+            }
+            eventSet.add(RegisteredListener(listener, executor, plugin, eh.priority, eh.ignoreCancelled))
         }
-        return ret;
+        return ret
     }
 
     /**
      * Disables the specified com.github.fernthedev.client.plugin
-     * <p>
+     *
+     *
      * Attempting to disable a com.github.fernthedev.client.plugin that is not enabled will have no effect
      *
      * @param plugin Plugin to disable
      */
-    @Override
-    public void disablePlugin(Plugin plugin) {
-
-    }
+    override fun disablePlugin(plugin: Plugin?) {}
 }

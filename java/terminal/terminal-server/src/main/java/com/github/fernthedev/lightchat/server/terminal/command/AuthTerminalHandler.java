@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class AuthTerminalHandler extends Command implements Listener {
 
-    private Server server;
+    private final Server server;
 
     public AuthTerminalHandler(@NonNull String name, Server server) {
         super(name);

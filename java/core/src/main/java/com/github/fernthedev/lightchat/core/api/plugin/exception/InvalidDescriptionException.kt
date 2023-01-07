@@ -1,11 +1,9 @@
-package com.github.fernthedev.lightchat.core.api.plugin.exception;
+package com.github.fernthedev.lightchat.core.api.plugin.exception
 
 /**
  * Thrown when attempting to load an invalid PluginDescriptionFile
  */
-public class InvalidDescriptionException extends Exception {
-    private static final long serialVersionUID = 5721389122281775896L;
-
+class InvalidDescriptionException : Exception {
     /**
      * Constructs a new InvalidDescriptionException based on the given
      * Exception
@@ -13,9 +11,7 @@ public class InvalidDescriptionException extends Exception {
      * @param message Brief message explaining the cause of the exception
      * @param cause Exception that triggered this Exception
      */
-    public InvalidDescriptionException(final Throwable cause, final String message) {
-        super(message, cause);
-    }
+    constructor(cause: Throwable?, message: String?) : super(message, cause)
 
     /**
      * Constructs a new InvalidDescriptionException based on the given
@@ -23,24 +19,21 @@ public class InvalidDescriptionException extends Exception {
      *
      * @param cause Exception that triggered this Exception
      */
-    public InvalidDescriptionException(final Throwable cause) {
-        super("Invalid com.github.fernthedev.client.plugin.yml", cause);
-    }
+    constructor(cause: Throwable?) : super("Invalid com.github.fernthedev.client.plugin.yml", cause)
 
     /**
      * Constructs a new InvalidDescriptionException with the given message
      *
      * @param message Brief message explaining the cause of the exception
      */
-    public InvalidDescriptionException(final String message) {
-        super(message);
-    }
+    constructor(message: String?) : super(message)
 
     /**
      * Constructs a new InvalidDescriptionException
      */
-    public InvalidDescriptionException() {
-        super("Invalid com.github.fernthedev.client.plugin.yml");
+    constructor() : super("Invalid com.github.fernthedev.client.plugin.yml")
+
+    companion object {
+        private const val serialVersionUID = 5721389122281775896L
     }
 }
-

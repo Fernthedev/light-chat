@@ -1,13 +1,5 @@
-package com.github.fernthedev.lightchat.core.packets.handshake;
+package com.github.fernthedev.lightchat.core.packets.handshake
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import java.io.Serializable
 
-import java.io.Serializable;
-
-@AllArgsConstructor
-@Getter
-class VersionDataString implements Serializable {
-    private String version;
-    private String minVersion;
-}
+class VersionDataString(val version: String, val minVersion: String) : Serializable

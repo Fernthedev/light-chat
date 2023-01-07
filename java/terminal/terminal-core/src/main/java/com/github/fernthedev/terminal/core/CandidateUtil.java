@@ -6,7 +6,8 @@ import org.jline.reader.Candidate;
 public class CandidateUtil {
 
     public static Candidate toCandidate(LightCandidate lightCandidate) {
-        return new Candidate(lightCandidate.getValue(),lightCandidate.getDispl(),lightCandidate.getGroup(),lightCandidate.getDescr(),lightCandidate.getSuffix(),lightCandidate.getKey(),lightCandidate.isComplete());
+        assert lightCandidate.value != null;
+        return new Candidate(lightCandidate.value,lightCandidate.displ,lightCandidate.group,lightCandidate.descr,lightCandidate.suffix,lightCandidate.key,lightCandidate.isComplete());
     }
 
 }

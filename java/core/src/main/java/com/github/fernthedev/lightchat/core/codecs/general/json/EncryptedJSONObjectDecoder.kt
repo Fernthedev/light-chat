@@ -1,57 +1,38 @@
-package com.github.fernthedev.lightchat.core.codecs.general.json;
+package com.github.fernthedev.lightchat.core.codecs.general.json
 
-import com.github.fernthedev.lightchat.core.PacketRegistry;
-import com.github.fernthedev.lightchat.core.StaticHandler;
-import com.github.fernthedev.lightchat.core.codecs.JSONHandler;
-import com.github.fernthedev.lightchat.core.encryption.EncryptedBytes;
-import com.github.fernthedev.lightchat.core.encryption.EncryptedPacketWrapper;
-import com.github.fernthedev.lightchat.core.encryption.PacketWrapper;
-import com.github.fernthedev.lightchat.core.encryption.RSA.IEncryptionKeyHolder;
-import com.github.fernthedev.lightchat.core.encryption.RSA.NoSecretKeyException;
-import com.github.fernthedev.lightchat.core.encryption.UnencryptedPacketWrapper;
-import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil;
-import com.github.fernthedev.lightchat.core.packets.Packet;
-import com.github.fernthedev.lightchat.core.util.ExceptionUtil;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToMessageDecoder;
-import lombok.NonNull;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.SecretKey;
-import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.List;
+import com.github.fernthedev.lightchat.core.PacketRegistry
+import com.github.fernthedev.lightchat.core.StaticHandler
+import com.github.fernthedev.lightchat.core.codecs.JSONHandler
+import com.github.fernthedev.lightchat.core.encryption.EncryptedBytes
+import com.github.fernthedev.lightchat.core.encryption.PacketWrapper
+import com.github.fernthedev.lightchat.core.encryption.RSA.IEncryptionKeyHolder
+import com.github.fernthedev.lightchat.core.encryption.RSA.NoSecretKeyException
+import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil
+import com.github.fernthedev.lightchat.core.packets.Packet
+import com.github.fernthedev.lightchat.core.util.ExceptionUtil
+import io.netty.channel.ChannelHandler.Sharable
+import io.netty.channel.ChannelHandlerContext
+import io.netty.handler.codec.MessageToMessageDecoder
+import org.apache.commons.lang3.tuple.ImmutablePair
+import org.apache.commons.lang3.tuple.Pair
+import java.io.IOException
+import java.security.InvalidAlgorithmParameterException
+import java.security.InvalidKeyException
+import java.security.NoSuchAlgorithmException
+import java.util.*
+import javax.crypto.BadPaddingException
+import javax.crypto.IllegalBlockSizeException
 
 /**
  * Converts encrypted json to a decrypted object
  */
-@ChannelHandler.Sharable
-public class EncryptedJSONObjectDecoder extends MessageToMessageDecoder<String> {
-
-    private final JSONHandler jsonHandler;
-
-    protected IEncryptionKeyHolder encryptionKeyHolder;
-
-    /**
-     * Creates a new instance with the specified character set.
-     *
-     */
-    public EncryptedJSONObjectDecoder(IEncryptionKeyHolder encryptionKeyHolder, JSONHandler jsonHandler) {
-        this.encryptionKeyHolder = encryptionKeyHolder;
-        this.jsonHandler = jsonHandler;
-    }
-
-
-
+@Sharable
+class EncryptedJSONObjectDecoder
+/**
+ * Creates a new instance with the specified character set.
+ *
+ */(private var encryptionKeyHolder: IEncryptionKeyHolder, private val jsonHandler: JSONHandler) :
+    MessageToMessageDecoder<String>() {
     /**
      * Returns a string list
      *
@@ -60,28 +41,24 @@ public class EncryptedJSONObjectDecoder extends MessageToMessageDecoder<String> 
      * @param out The returned objects
      * @throws Exception
      */
-    @Override
-    protected void decode(ChannelHandlerContext ctx, String msg, List<Object> out) throws Exception {
-        StaticHandler.getCore().getLogger().debug("Decoding the string {}", msg);
-        PacketWrapper packetWrapper = jsonHandler.fromJson(msg, PacketWrapper.class);
-
-        String decryptedJSON;
+    @Throws(Exception::class)
+    override fun decode(ctx: ChannelHandlerContext, msg: String, out: MutableList<Any>) {
+        StaticHandler.core.logger.debug("Decoding the string {}", msg)
+        val packetWrapper = jsonHandler.fromJson(msg, PacketWrapper::class.java)
+        val decryptedJSON: String
 
         try {
-            if (packetWrapper.encrypt()) {
-                packetWrapper = jsonHandler.fromJson(msg, EncryptedPacketWrapper.class);
-
-                EncryptedBytes encryptedBytes = jsonHandler.fromJson(packetWrapper.getJsonObject(), EncryptedBytes.class);
-                decryptedJSON = decrypt(ctx, encryptedBytes);
+            decryptedJSON = if (packetWrapper.encrypt) {
+                val encryptedBytes = jsonHandler.fromJson(packetWrapper.jsonObject, EncryptedBytes::class.java)
+                decrypt(ctx, encryptedBytes)
             } else {
-                packetWrapper = jsonHandler.fromJson(msg, UnencryptedPacketWrapper.class);
-                decryptedJSON = packetWrapper.getJsonObject();
+                packetWrapper.jsonObject
             }
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Unable to parse string: " + msg, e);
+        } catch (e: Exception) {
+            throw IllegalArgumentException("Unable to parse string: $msg", e)
         }
 
-        out.add(getParsedObject(packetWrapper.getPacketIdentifier(), decryptedJSON, packetWrapper.getPacketId()));
+        out.add(getParsedObject(packetWrapper.packetIdentifier, decryptedJSON, packetWrapper.packetId))
     }
 
     /**
@@ -90,42 +67,38 @@ public class EncryptedJSONObjectDecoder extends MessageToMessageDecoder<String> 
      * @param jsonObject
      * @return
      */
-    public Pair<? extends Packet, Integer> getParsedObject(String packetIdentifier, String jsonObject, int packetId) {
-        Class<? extends Packet> aClass = PacketRegistry.getPacketClassFromRegistry(packetIdentifier);
-
-        try {
-            return new ImmutablePair<>(jsonHandler.fromJson(jsonObject, aClass), packetId);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Attempting to parse packet " + packetIdentifier + " (" + aClass.getName() + ") with string\n" + jsonObject, e);
+    fun getParsedObject(packetIdentifier: String?, jsonObject: String, packetId: Int): Pair<out Packet?, Int> {
+        val aClass = PacketRegistry.getPacketClassFromRegistry(packetIdentifier)
+        return try {
+            ImmutablePair(jsonHandler.fromJson(jsonObject, aClass), packetId)
+        } catch (e: Exception) {
+            throw IllegalArgumentException(
+                """Attempting to parse packet $packetIdentifier (${aClass.name}) with string
+$jsonObject""", e
+            )
         }
     }
 
-    protected String decrypt(ChannelHandlerContext ctx, EncryptedBytes encryptedString) {
-
-        if (!encryptionKeyHolder.isEncryptionKeyRegistered(ctx, ctx.channel())) throw new NoSecretKeyException();
-
-        SecretKey secretKey = encryptionKeyHolder.getSecretKey(ctx, ctx.channel());
-
-        @NonNull Cipher decryptCipher = encryptionKeyHolder.getDecryptCipher(ctx, ctx.channel());
-
-        SecureRandom random = encryptionKeyHolder.getSecureRandom(ctx, ctx.channel());
-
-        if (secretKey == null) {
-            throw new NoSecretKeyException();
+    private fun decrypt(ctx: ChannelHandlerContext, encryptedString: EncryptedBytes): String {
+        if (!encryptionKeyHolder.isEncryptionKeyRegistered(ctx, ctx.channel())) throw NoSecretKeyException()
+        val secretKey = encryptionKeyHolder.getSecretKey(ctx, ctx.channel())
+        val decryptCipher = encryptionKeyHolder.getDecryptCipher(ctx, ctx.channel())
+        val random = encryptionKeyHolder.getSecureRandom(ctx, ctx.channel())
+        val decryptedJSON: String = try {
+            EncryptionUtil.decrypt(encryptedString, secretKey, decryptCipher, random)
+        } catch (e: BadPaddingException) {
+            throw ExceptionUtil.throwParsePacketException(e, encryptedString.data.contentToString())
+        } catch (e: IOException) {
+            throw ExceptionUtil.throwParsePacketException(e, encryptedString.data.contentToString())
+        } catch (e: NoSuchAlgorithmException) {
+            throw ExceptionUtil.throwParsePacketException(e, encryptedString.data.contentToString())
+        } catch (e: InvalidKeyException) {
+            throw ExceptionUtil.throwParsePacketException(e, encryptedString.data.contentToString())
+        } catch (e: InvalidAlgorithmParameterException) {
+            throw ExceptionUtil.throwParsePacketException(e, encryptedString.data.contentToString())
+        } catch (e: IllegalBlockSizeException) {
+            throw ExceptionUtil.throwParsePacketException(e, encryptedString.data.contentToString())
         }
-
-
-        String decryptedJSON;
-
-
-        try {
-            decryptedJSON = EncryptionUtil.decrypt(encryptedString, secretKey, decryptCipher, random);
-        } catch (BadPaddingException | IOException | NoSuchAlgorithmException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException e) {
-            throw ExceptionUtil.throwParsePacketException(e, Arrays.toString(encryptedString.getData()));
-        }
-
-
-        return decryptedJSON;
+        return decryptedJSON
     }
-
 }

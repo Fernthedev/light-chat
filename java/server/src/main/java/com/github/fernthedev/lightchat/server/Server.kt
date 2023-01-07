@@ -1,504 +1,394 @@
-package com.github.fernthedev.lightchat.server;
+package com.github.fernthedev.lightchat.server
 
-import com.github.fernthedev.config.common.Config;
-import com.github.fernthedev.fernutils.thread.ThreadUtils;
-import com.github.fernthedev.fernutils.thread.single.TaskInfo;
-import com.github.fernthedev.lightchat.core.ColorCode;
-import com.github.fernthedev.lightchat.core.CoreSettings;
-import com.github.fernthedev.lightchat.core.NoFileConfig;
-import com.github.fernthedev.lightchat.core.StaticHandler;
-import com.github.fernthedev.lightchat.core.api.APIUsage;
-import com.github.fernthedev.lightchat.core.api.event.api.Listener;
-import com.github.fernthedev.lightchat.core.api.plugin.PluginManager;
-import com.github.fernthedev.lightchat.core.codecs.Codecs;
-import com.github.fernthedev.lightchat.core.codecs.JSONHandler;
-import com.github.fernthedev.lightchat.core.codecs.general.compression.CompressionAlgorithms;
-import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectDecoder;
-import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectEncoder;
-import com.github.fernthedev.lightchat.core.encryption.util.RSAEncryptionUtil;
-import com.github.fernthedev.lightchat.core.packets.Packet;
-import com.github.fernthedev.lightchat.core.packets.SelfMessagePacket;
-import com.github.fernthedev.lightchat.server.api.IPacketHandler;
-import com.github.fernthedev.lightchat.server.event.ServerShutdownEvent;
-import com.github.fernthedev.lightchat.server.event.ServerStartupEvent;
-import com.github.fernthedev.lightchat.server.netty.KeyThread;
-import com.github.fernthedev.lightchat.server.netty.MulticastServer;
-import com.github.fernthedev.lightchat.server.netty.ProcessingHandler;
-import com.github.fernthedev.lightchat.server.security.AuthenticationManager;
-import com.github.fernthedev.lightchat.server.security.BanManager;
-import com.github.fernthedev.lightchat.server.settings.ServerSettings;
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
-import io.netty.channel.epoll.Epoll;
-import io.netty.channel.epoll.EpollEventLoopGroup;
-import io.netty.channel.epoll.EpollServerSocketChannel;
-import io.netty.channel.kqueue.KQueue;
-import io.netty.channel.kqueue.KQueueEventLoopGroup;
-import io.netty.channel.kqueue.KQueueServerSocketChannel;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.handler.codec.LengthFieldPrepender;
-import io.netty.handler.codec.MessageToByteEncoder;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.Synchronized;
-import org.apache.commons.lang3.time.StopWatch;
-import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.github.fernthedev.config.common.Config
+import com.github.fernthedev.lightchat.core.*
+import com.github.fernthedev.lightchat.core.api.APIUsage
+import com.github.fernthedev.lightchat.core.api.plugin.PluginManager
+import com.github.fernthedev.lightchat.core.codecs.Codecs
+import com.github.fernthedev.lightchat.core.codecs.general.compression.CompressionAlgorithms.getCompressions
+import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectDecoder
+import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectEncoder
+import com.github.fernthedev.lightchat.core.encryption.PacketTransporter
+import com.github.fernthedev.lightchat.core.encryption.transport
+import com.github.fernthedev.lightchat.core.encryption.util.RSAEncryptionUtil
+import com.github.fernthedev.lightchat.core.packets.Packet
+import com.github.fernthedev.lightchat.core.packets.SelfMessagePacket
+import com.github.fernthedev.lightchat.server.api.IPacketHandler
+import com.github.fernthedev.lightchat.server.event.ServerShutdownEvent
+import com.github.fernthedev.lightchat.server.event.ServerStartupEvent
+import com.github.fernthedev.lightchat.server.netty.KeyThread
+import com.github.fernthedev.lightchat.server.netty.MulticastServer
+import com.github.fernthedev.lightchat.server.netty.ProcessingHandler
+import com.github.fernthedev.lightchat.server.security.AuthenticationManager
+import com.github.fernthedev.lightchat.server.security.BanManager
+import com.github.fernthedev.lightchat.server.settings.ServerSettings
+import io.netty.bootstrap.ServerBootstrap
+import io.netty.channel.*
+import io.netty.channel.epoll.Epoll
+import io.netty.channel.epoll.EpollEventLoopGroup
+import io.netty.channel.epoll.EpollServerSocketChannel
+import io.netty.channel.kqueue.KQueue
+import io.netty.channel.kqueue.KQueueEventLoopGroup
+import io.netty.channel.kqueue.KQueueServerSocketChannel
+import io.netty.channel.nio.NioEventLoopGroup
+import io.netty.channel.socket.nio.NioServerSocketChannel
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder
+import io.netty.handler.codec.LengthFieldPrepender
+import io.netty.handler.codec.MessageToByteEncoder
+import io.netty.handler.codec.string.StringDecoder
+import io.netty.handler.codec.string.StringEncoder
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import lombok.*
+import org.apache.commons.lang3.time.StopWatch
+import org.slf4j.LoggerFactory
+import java.io.IOException
+import java.net.InetAddress
+import java.net.UnknownHostException
+import java.security.KeyPair
+import java.util.*
+import java.util.concurrent.*
+import java.util.function.Supplier
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.security.KeyPair;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.*;
-import java.util.function.Function;
-import java.util.function.Supplier;
+class Server(val port: Int) : Runnable {
+    var logger = LoggerFactory.getLogger(Server::class.java)
 
+    @APIUsage
+    var serverThread: Thread? = null
+        private set
 
-public class Server implements Runnable {
+    var authenticationManager = AuthenticationManager(this)
+    var banManager = BanManager(this)
 
-    @Getter
-    @Setter
-    private Logger logger = LoggerFactory.getLogger(Server.class);
+    @Volatile
+    private var running = false
 
-    private Thread serverThread;
+    @Volatile
+    private var shutdown = false
+    private var isPortBind = false
 
-    @Getter
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
-    private final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
+    val console: Console = Console(this)
 
-    @Setter
-    @Getter
-    private AuthenticationManager authenticationManager = new AuthenticationManager(this);
+    val pluginManager = PluginManager()
 
-    @Getter
-    @Setter
-    private BanManager banManager = new BanManager(this);
+    var settingsManager: Config<out ServerSettings> = NoFileConfig(ServerSettings())
 
-    @Getter
-    private final int port;
-    private volatile boolean running;
-    private volatile boolean shutdown = false;
-    private boolean isPortBind = false;
+    private var multicastServer: MulticastServer? = null
+    private var bossGroup: EventLoopGroup? = null
+    private var workerGroup: EventLoopGroup? = null
 
-    @Getter
-    private final Console console;
-    private final PluginManager pluginManager = new PluginManager();
-
-    @Getter
-    @Setter
-    private Config<? extends ServerSettings> settingsManager = new NoFileConfig<>(new ServerSettings());
-
-    private MulticastServer multicastServer;
-
-    private EventLoopGroup bossGroup, workerGroup;
+    val rsaKeyThread: KeyThread<KeyPair>
+    private var processingHandler: ProcessingHandler? = null
+    private val channelHandlers: MutableList<ChannelHandler> = ArrayList()
 
 
-    @Getter
-    private final KeyThread<KeyPair> rsaKeyThread;
+    var maxPacketId = StaticHandler.DEFAULT_PACKET_ID_MAX
 
-    private ProcessingHandler processingHandler;
+    @Deprecated(
+        """Might be replaced with {@link ServerShutdownEvent}
+      Use event system {@link PluginManager#registerEvents(Listener)}"""
+    )
+    private val shutdownListeners: MutableList<Runnable> = ArrayList()
 
-    private final List<ChannelHandler> channelHandlers = new ArrayList<>();
+    val startupLock = CompletableFuture<Void?>()
+    val playerHandler: PlayerHandler = PlayerHandler(this)
 
-    @Getter
-    @Setter
-    private int maxPacketId = StaticHandler.DEFAULT_PACKET_ID_MAX;
+    private var bootstrap: ServerBootstrap? = null
 
     /**
-     * @deprecated Might be replaced with {@link ServerShutdownEvent}
-     * Use event system {@link PluginManager#registerEvents(Listener)}
-     */
-    @Deprecated
-    private List<Runnable> shutdownListeners = new ArrayList<>();
-
-    @Getter
-    private final CompletableFuture<Void> startupLock = new CompletableFuture<>();
-
-    @Getter
-    private PlayerHandler playerHandler;
-    private ServerBootstrap bootstrap;
-
-    /**
-     * The listener will be called when {@link #shutdownServer()} is called
+     * The listener will be called when [.shutdownServer] is called
      *
      * @param runnable the listener
      */
     @APIUsage
-    public void addShutdownListener(Runnable runnable) {
-        shutdownListeners.add(runnable);
+    fun addShutdownListener(runnable: Runnable) {
+        shutdownListeners.add(runnable)
     }
 
     /**
      * Add channel handlers for netty functionality
      */
     @APIUsage
-    public void addChannelHandler(ChannelHandler channelHandler) {
-        channelHandlers.add(channelHandler);
+    fun addChannelHandler(channelHandler: ChannelHandler) {
+        channelHandlers.add(channelHandler)
     }
-
 
     /**
      * Custom packet handlers added by outside the main server code
      */
-    @Getter
-    private final List<IPacketHandler> packetHandlers = new ArrayList<>();
+    val packetHandlers: MutableList<IPacketHandler> = ArrayList()
 
-    public Server(int port) {
-        this.port = port;
-
-
-        console = new Console(this);
-        StaticHandler.setCore(new ServerCore(this), false);
-
-        int rsaKeyPoolSize = 15;
-
-        Supplier<Boolean> serverCondition = () -> running;
-
-        rsaKeyThread = new KeyThread<>(() -> RSAEncryptionUtil.generateKeyPairs(settingsManager.getConfigData().getRsaKeySize()), rsaKeyPoolSize, serverCondition);
+    init {
+        StaticHandler.setCore(ServerCore(this), false)
+        val rsaKeyPoolSize = 15
+        val serverCondition = Supplier { running }
+        rsaKeyThread = KeyThread(
+            { RSAEncryptionUtil.generateKeyPairs(settingsManager.configData.rsaKeySize) },
+            rsaKeyPoolSize,
+            serverCondition
+        )
     }
 
     @APIUsage
-    public void addPacketHandler(IPacketHandler iPacketHandler) {
-        packetHandlers.add(iPacketHandler);
+    fun addPacketHandler(iPacketHandler: IPacketHandler) {
+        packetHandlers.add(iPacketHandler)
     }
 
     @APIUsage
-    public void removePacketHandler(IPacketHandler packetHandler) {
-        packetHandlers.remove(packetHandler);
-    }
-
-    public synchronized void sendObjectToAllPlayers(@NonNull Packet packet) {
-        ThreadUtils.runAsync((() -> {
-            for (ClientConnection clientConnection : playerHandler.getChannelMap().values()) {
-                logger.debug("Sending to all {} to {}", packet.getPacketName(), clientConnection);
-                clientConnection.sendObject(packet);
-            }
-        }), executorService);
+    fun removePacketHandler(packetHandler: IPacketHandler) {
+        packetHandlers.remove(packetHandler)
     }
 
 
-    @Synchronized
-    public void shutdownServer() {
-        if (!shutdown) {
-            shutdown = true;
-            getLogger().info(ColorCode.RED + "Shutting down server.");
-            running = false;
-
-            ThreadUtils.runAsync(() -> {
-                if (multicastServer != null) multicastServer.stopMulticast();
-            }, executorService);
-
-
-            if (workerGroup != null) workerGroup.shutdownGracefully();
-            if (bossGroup != null) bossGroup.shutdownGracefully();
-
-            getPluginManager().callEvent(new ServerShutdownEvent());
-
-            executorService.shutdown();
-
-            shutdownListeners.parallelStream().forEach(Runnable::run);
-        } else throw new IllegalStateException("Server is already shutting down!");
+    fun sendObjectToAllPlayers(packet: Packet) {
+        sendObjectToAllPlayers(packet.transport())
     }
 
+    fun sendObjectToAllPlayers(packet: PacketTransporter) {
+        for (clientConnection in playerHandler.channelMap.values) {
+            logger.debug("Sending to all {} to {}", packet.packet.packetName, clientConnection)
+            clientConnection.sendObject(packet)
+        }
+    }
 
-    public boolean isRunning() {
-        return running && serverThread.isAlive();
+    @lombok.Synchronized
+    fun shutdownServer() {
+        if (shutdown) throw IllegalStateException("Server is already shutting down!")
+
+        shutdown = true
+        logger.info(ColorCode.RED.toString() + "Shutting down server.")
+        running = false
+
+        multicastServer?.stopMulticast()
+        if (workerGroup != null) workerGroup!!.shutdownGracefully()
+        if (bossGroup != null) bossGroup!!.shutdownGracefully()
+        pluginManager.callEvent(ServerShutdownEvent())
+        shutdownListeners.forEach { obj: Runnable -> obj.run() }
+    }
+
+    fun isRunning(): Boolean {
+        return running && serverThread!!.isAlive
     }
 
     /**
-     * When an object implementing interface <code>Runnable</code> is used
+     * When an object implementing interface `Runnable` is used
      * to create a thread, starting the thread causes the object's
-     * <code>run</code> method to be called in that separately executing
+     * `run` method to be called in that separately executing
      * thread.
-     * <p>
-     * The general contract of the method <code>run</code> is that it may
+     *
+     *
+     * The general contract of the method `run` is that it may
      * take any action whatsoever.
      *
-     * @see Thread#run()
+     * @see Thread.run
      */
-    @Override
-    public void run() {
-        serverThread = Thread.currentThread();
-
-        start();
+    override fun run() {
+        serverThread = Thread.currentThread()
+        runBlocking {
+            start()
+        }
     }
 
     /**
      * Starts the server in the current thread
      */
     @APIUsage
-    public void start() {
-        synchronized (startupLock) {
+    suspend fun start() = coroutineScope {
 
-            if (serverThread == null) serverThread = Thread.currentThread();
-
-            if (running) throw new IllegalStateException("Server is already running");
-
-            running = true;
-            shutdown = false;
-
-            StaticHandler.displayVersion();
-            List<TaskInfo<Void>> tasks = new ArrayList<>();
-
-            StopWatch stopWatch = new StopWatch();
-            stopWatch.start();
-
-
-            new Thread(playerHandler = new PlayerHandler(this), "PlayerHandlerThread").start();
-
-            tasks.add(ThreadUtils.runAsync(() -> Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                for (ClientConnection clientConnection : playerHandler.getChannelMap().values()) {
-                    if (clientConnection.getChannel().isOpen()) {
-                        getLogger().info("Gracefully shutting down");
-                        sendObjectToAllPlayers(new SelfMessagePacket(SelfMessagePacket.MessageType.LOST_SERVER_CONNECTION));
-                        clientConnection.close();
+        check(!running) { "Server is already running" }
+        running = true
+        shutdown = false
+        StaticHandler.displayVersion()
+        val tasks: MutableList<Job> = ArrayList()
+        val stopWatch = StopWatch()
+        stopWatch.start()
+        tasks.add(launch {
+            Runtime.getRuntime().addShutdownHook(Thread {
+                for (clientConnection in playerHandler.channelMap.values) {
+                    if (clientConnection.channel.isOpen) {
+                        logger.info("Gracefully shutting down")
+                        sendObjectToAllPlayers(SelfMessagePacket(SelfMessagePacket.MessageType.LOST_SERVER_CONNECTION))
+                        clientConnection.close()
                     }
                 }
-            })), executorService));
-
-
-
-
+            })
+        })
 
 
         /*
-        try {
-            new MulticastServer("Multicast",this).start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-
-            if (settingsManager.getConfigData().isUseMulticast()) {
-                tasks.add(ThreadUtils.runAsync(() -> {
-                    getLogger().info("Initializing MultiCast Server");
-                    try {
-                        multicastServer = new MulticastServer("MultiCast Thread", this, StaticHandler.getMulticastAddress());
-                        multicastServer.start();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                }, executorService));
+    try {
+        new MulticastServer("Multicast",this).start();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }*/if (settingsManager.configData.useMulticast) {
+        tasks.add(launch {
+            logger.info("Initializing MultiCast Server")
+            try {
+                multicastServer = MulticastServer("MultiCast Thread", this@Server, StaticHandler.multicastAddress)
+                multicastServer!!.start()
+            } catch (e: IOException) {
+                e.printStackTrace()
             }
-
-            tasks.add(ThreadUtils.runAsync(() -> {
-                authenticationManager = new AuthenticationManager(this);
-                getPluginManager().registerEvents(authenticationManager);
-            }, getExecutorService()));
+        })
+    }
+        tasks.add(launch {
+            authenticationManager = AuthenticationManager(this@Server)
+            pluginManager.registerEvents(authenticationManager)
+        })
 
 
 //        LoggerManager loggerManager = new LoggerManager();
 //        pluginManager.registerEvents(loggerManager, new ServerPlugin());
-
-            logger.info("Running on [{}]", StaticHandler.OS);
+        logger.info("Running on [{}]", StaticHandler.OS)
 
 
 //        await();
-            tasks.add(ThreadUtils.runAsync((Runnable) this::initServer, executorService));
 
-            for (TaskInfo<Void> taskInfo : tasks) {
-                taskInfo.awaitFinish(1);
-            }
+        tasks.add(launch {
+            initServer()
+        })
+        for (taskInfo in tasks) {
+            taskInfo.join()
+        }
 
+        logger.info("Finished initializing. Took {}ms", stopWatch.getTime(TimeUnit.MILLISECONDS))
+        launch {
+            pluginManager.callEvent(ServerStartupEvent(true))
+        }
+        startupLock.complete(null)
 
-            logger.info("Finished initializing. Took {}ms", stopWatch.getTime(TimeUnit.MILLISECONDS));
-
-            ThreadUtils.runAsync(() -> getPluginManager().callEvent(new ServerStartupEvent(true)), executorService);
-
-
-            startupLock.complete(null);
+        launch {
+            playerHandler.run()
         }
 
         while (running) {
-            if (bossGroup.isShutdown() || workerGroup.isShutdown()) {
-                running = false;
-                continue;
-            }
-
-            try {
-                queue.take().run();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (bossGroup!!.isShutdown || workerGroup!!.isShutdown) {
+                running = false
+                continue
             }
         }
-
         try {
-            shutdownServer();
-        } catch (IllegalStateException ignored) {
+            shutdownServer()
+        } catch (ignored: IllegalStateException) {
         }
     }
 
-    private Server initServer() {
-        bossGroup = new NioEventLoopGroup();
-        processingHandler = new ProcessingHandler(this);
-        workerGroup = new NioEventLoopGroup();
-        Class<? extends ServerChannel> channelClass = NioServerSocketChannel.class;
-
-        if (settingsManager.getConfigData().isUseNativeTransport()) {
-            getLogger().debug("Attempting to use native transport if available.");
-
+    private fun initServer(): Server {
+        bossGroup = NioEventLoopGroup()
+        processingHandler = ProcessingHandler(this)
+        workerGroup = NioEventLoopGroup()
+        var channelClass: Class<out ServerChannel?> = NioServerSocketChannel::class.java
+        if (settingsManager.configData.useNativeTransport) {
+            logger.debug("Attempting to use native transport if available.")
             if (Epoll.isAvailable() /*|| SystemUtils.IS_OS_LINUX*/) {
-                bossGroup = new EpollEventLoopGroup();
-                workerGroup = new EpollEventLoopGroup();
-
-                channelClass = EpollServerSocketChannel.class;
-                getLogger().info(ColorCode.GOLD + "OS IS LINUX! USING EPOLL TRANSPORT");
+                bossGroup = EpollEventLoopGroup()
+                workerGroup = EpollEventLoopGroup()
+                channelClass = EpollServerSocketChannel::class.java
+                logger.info(ColorCode.GOLD.toString() + "OS IS LINUX! USING EPOLL TRANSPORT")
             }
-
-
             if (KQueue.isAvailable() /*|| SystemUtils.IS_OS_MAC_OSX || SystemUtils.IS_OS_FREE_BSD || SystemUtils.IS_OS_NET_BSD || SystemUtils.IS_OS_OPEN_BSD*/) {
-                bossGroup = new KQueueEventLoopGroup();
-                workerGroup = new KQueueEventLoopGroup();
-
-                channelClass = KQueueServerSocketChannel.class;
-                getLogger().info(ColorCode.GOLD + "OS IS MAC/BSD! USING KQUEUE TRANSPORT");
+                bossGroup = KQueueEventLoopGroup()
+                workerGroup = KQueueEventLoopGroup()
+                channelClass = KQueueServerSocketChannel::class.java
+                logger.info(ColorCode.GOLD.toString() + "OS IS MAC/BSD! USING KQUEUE TRANSPORT")
             }
         }
-
-
-        bootstrap = new ServerBootstrap();
-
-        EncryptionKeyFinder keyFinder = new EncryptionKeyFinder(this);
-
-        JSONHandler jsonHandler = Codecs.getJsonHandler(settingsManager.getConfigData().getCodec());
-
-        if (jsonHandler == null)
-            throw new IllegalStateException("The codec " + settingsManager.getConfigData().getCodec() + " was not recognized");
+        bootstrap = ServerBootstrap()
+        val keyFinder = EncryptionKeyFinder(this)
+        val jsonHandler = Codecs.getJsonHandler(settingsManager.configData.codec)
+            ?: throw IllegalStateException("The codec " + settingsManager.configData.codec + " was not recognized")
 
         // Start key thread before initializing netty
-        rsaKeyThread.setDaemon(true);
-        rsaKeyThread.start();
-        getLogger().info("Started RSA Key thread pool. Currently {} keys", rsaKeyThread.getKeysInPool());
 
-        bootstrap.group(bossGroup, workerGroup)
-                .channel(channelClass)
-                .childHandler(new ChannelInitializer<Channel>() {
-                    @Override
-                    public void initChannel(@NotNull Channel ch) {
+        logger.info("Started RSA Key thread pool. Currently {} keys", rsaKeyThread.keysInPool)
+        bootstrap!!.group(bossGroup, workerGroup)
+            .channel(channelClass)
+            .childHandler(object : ChannelInitializer<Channel>() {
+                public override fun initChannel(ch: Channel) {
 
-                        // inbound -> up to bottom
-                        // outbound -> bottom to up
-                        ch.pipeline().addLast(
-                                new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 8, 0, 8)
-                        );
-
-                        ch.pipeline().addLast("strDecoder", new StringDecoder(settingsManager.getConfigData().getCharset()));
-                        ch.pipeline().addLast(
-                                new EncryptedJSONObjectDecoder(keyFinder, jsonHandler),
-                                new LengthFieldPrepender(8)
-                        );
-
-                        ch.pipeline().addLast("strEncoder", new StringEncoder());
-                        ch.pipeline().addLast(new EncryptedJSONObjectEncoder(settingsManager.getConfigData().getCharset(), keyFinder, jsonHandler));
-
-                        ch.pipeline().addLast(
-                                "handler",
-                                processingHandler
-                        );
-                        ch.pipeline().addLast(channelHandlers.toArray(new ChannelHandler[0]));
-
-                        int compression = getSettingsManager().getConfigData().getCompressionLevel();
-                        String compressionAlgorithm = getSettingsManager().getConfigData().getCompressionAlgorithm();
-
-                        kotlin.Pair<Function<CoreSettings, ? extends MessageToByteEncoder<?>>, Function<CoreSettings, ? extends ByteToMessageDecoder>> compressions = CompressionAlgorithms.getCompressions(compressionAlgorithm);
-
-                        MessageToByteEncoder<?> encoder = null;
-                        ByteToMessageDecoder decoder = compressions.component2().apply(getSettingsManager().getConfigData());
-
-
-                        if (compression >= 0)
-                            encoder = compressions.component1().apply(getSettingsManager().getConfigData());
-
-                        if (!compressionAlgorithm.equals("NONE")) {
-
-                            if (decoder != null) {
-                                ch.pipeline().addBefore("strDecoder", "compressDecoder", decoder);
-                            }
-
-                            if (compression >= 0 && encoder != null) {
-                                ch.pipeline().addBefore("strEncoder", "compressEncoder", encoder);
-                                getLogger().info("Using {} {} compression", compressionAlgorithm, compression);
-                            }
-                        }
-
-
+                    // inbound -> up to bottom
+                    // outbound -> bottom to up
+                    ch.pipeline().addLast(
+                        LengthFieldBasedFrameDecoder(Int.MAX_VALUE, 0, 8, 0, 8)
+                    )
+                    ch.pipeline().addLast("strDecoder", StringDecoder(settingsManager.configData.charset))
+                    ch.pipeline().addLast(
+                        EncryptedJSONObjectDecoder(keyFinder, jsonHandler),
+                        LengthFieldPrepender(8)
+                    )
+                    ch.pipeline().addLast("strEncoder", StringEncoder())
+                    ch.pipeline()
+                        .addLast(EncryptedJSONObjectEncoder(keyFinder, jsonHandler))
+                    ch.pipeline().addLast(
+                        "handler",
+                        processingHandler
+                    )
+                    ch.pipeline().addLast(*channelHandlers.toTypedArray())
+                    val compression: Int = settingsManager.configData.compressionLevel
+                    val compressionAlgorithm: String = settingsManager.configData.compressionAlgorithm
+                    val compressions = getCompressions(compressionAlgorithm)
+                    var encoder: MessageToByteEncoder<*>? = null
+                    val decoder = compressions.second.apply(settingsManager.configData)
+                    if (compression >= 0) {
+                        encoder =
+                            compressions.first.apply(settingsManager.configData)
                     }
-                })
-                .option(ChannelOption.SO_BACKLOG, 128)
-                .option(ChannelOption.RCVBUF_ALLOCATOR, new AdaptiveRecvByteBufAllocator(512, 512, 64 * 1024))
-                //       .option(EpollChannelOption.MAX_DATAGRAM_PAYLOAD_SIZE, 512)
-                .childOption(ChannelOption.SO_KEEPALIVE, true)
-                .childOption(ChannelOption.TCP_NODELAY, true);
-//                .childOption(ChannelOption.SO_TIMEOUT, 5000);
 
-        logger.info("Server socket registered");
-
-
-        return this;
-    }
-
-    public ChannelFuture bind() {
-        if (isPortBind) throw new IllegalStateException("Port is already set to bind on port " + port);
-
-        return bootstrap.bind(port)
-                .addListener((ChannelFutureListener) future -> {
-                    if (future.isSuccess()) {
-                        try {
-                            logger.info("Server started successfully at localhost (Connect with {}) using port {}", InetAddress.getLocalHost().getHostAddress(), port);
-                        } catch (UnknownHostException e) {
-                            logger.error(e.getMessage(), e);
+                    if (compressionAlgorithm != "NONE") {
+                        if (decoder != null) {
+                            ch.pipeline().addBefore("strDecoder", "compressDecoder", decoder)
                         }
-
-                        logger.info("Bind port on {}", future.channel().localAddress());
-                        isPortBind = true;
-                    } else {
-                        logger.info("Failed to bind port");
-                        isPortBind = false;
+                        if (compression >= 0 && encoder != null) {
+                            ch.pipeline().addBefore("strEncoder", "compressEncoder", encoder)
+                            logger.info("Using {} {} compression", compressionAlgorithm, compression)
+                        }
                     }
-                });
+                }
+            })
+            .option(ChannelOption.SO_BACKLOG, 128)
+            .option(
+                ChannelOption.RCVBUF_ALLOCATOR,
+                AdaptiveRecvByteBufAllocator(512, 512, 64 * 1024)
+            ) //       .option(EpollChannelOption.MAX_DATAGRAM_PAYLOAD_SIZE, 512)
+            .childOption(ChannelOption.SO_KEEPALIVE, true)
+            .childOption(ChannelOption.TCP_NODELAY, true)
+        //                .childOption(ChannelOption.SO_TIMEOUT, 5000);
+        logger.info("Server socket registered")
+        return this
     }
 
-    public PluginManager getPluginManager() {
-        return pluginManager;
+    fun bind(): ChannelFuture {
+        check(!isPortBind) { "Port is already set to bind on port $port" }
+        return bootstrap!!.bind(port)
+            .addListener(ChannelFutureListener { future: ChannelFuture ->
+                isPortBind = if (future.isSuccess) {
+                    try {
+                        logger.info(
+                            "Server started successfully at localhost (Connect with {}) using port {}",
+                            InetAddress.getLocalHost().hostAddress,
+                            port
+                        )
+                    } catch (e: UnknownHostException) {
+                        logger.error(e.message, e)
+                    }
+                    logger.info("Bind port on {}", future.channel().localAddress())
+                    true
+                } else {
+                    logger.info("Failed to bind port")
+                    false
+                }
+            })
     }
 
-    public void logInfo(String o, Object... os) {
-        List<Object> objects = new ArrayList<>();
-
-        objects.add(getName());
-        objects.addAll(Arrays.asList(os));
-
-        getLogger().info("[{}] " + o, objects.toArray());
+    fun logInfo(o: String, vararg os: Any) {
+        val objects: MutableList<Any> = ArrayList()
+        objects.add(name)
+        objects.addAll(listOf(*os))
+        logger.info("[{}] $o", *objects.toTypedArray())
     }
 
-    @APIUsage
-    public Thread getServerThread() {
-        return serverThread;
-    }
-
-    @APIUsage
-    public void runOnServerThread(Runnable runnable) {
-        if (Thread.currentThread() == serverThread) {
-            runnable.run();
-        } else {
-            queue.add(runnable);
-        }
-    }
-
-    public String getName() {
-        return serverThread.getName();
-    }
+    val name: String
+        get() = serverThread!!.name
 }

@@ -2,9 +2,12 @@ package com.github.fernthedev.lightchat.server.netty
 
 import com.github.fernthedev.lightchat.core.StaticHandler
 import com.google.common.base.Stopwatch
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.yield
 import java.io.Serializable
 import java.util.*
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.function.Supplier
@@ -14,14 +17,13 @@ import java.util.function.Supplier
  * login performance of clients
  *
  */
-class KeyThread<T : Serializable?>(
+class KeyThread<T : Serializable>(
     private val generateKey: Supplier<T>,
     initialPoolSize: Int,
     private val runningCondition: Supplier<Boolean>,
-) : Thread() {
+) {
     private val keyPool: Queue<T> = LinkedBlockingQueue()
-
-    private val futures: Queue<CompletableFuture<T>> = LinkedList()
+    private val futures: Queue<CompletableDeferred<T>> = LinkedList()
 
     /**
      * When an object implementing interface `Runnable` is used
@@ -35,7 +37,7 @@ class KeyThread<T : Serializable?>(
      *
      * @see Thread.run
      */
-    override fun run() {
+    suspend fun run() = coroutineScope {
         while (runningCondition.get()) {
             // Only create keys to saturate queue
             if (keyPool.size < poolSize) {
@@ -44,28 +46,23 @@ class KeyThread<T : Serializable?>(
                 keyPool.add(generateKey.get())
 
                 stopwatch.stop()
-                StaticHandler.getCore().logger.debug(
+                StaticHandler.core.logger.debug(
                     "Created a key. Took {}ms",
                     stopwatch.elapsed(TimeUnit.MILLISECONDS)
                 )
             }
             futures.poll()?.complete(keyPool.remove())
-
-            try {
-                sleep(15)
-            } catch (e: InterruptedException) {
-                interrupt()
-                e.printStackTrace()
-            }
+            yield()
         }
     }
 
-    val randomKey: CompletableFuture<T>
+    val randomKey: Deferred<T>
         get() {
-            return if (keyPool.size > 0)
-                CompletableFuture.completedFuture(keyPool.remove())
-            else {
-                val completableFuture = CompletableFuture<T>()
+            return if (keyPool.size > 0) {
+                CompletableDeferred(keyPool.remove())
+            } else {
+
+                val completableFuture = CompletableDeferred<T>()
                 futures.add(completableFuture)
 
                 return completableFuture

@@ -1,75 +1,57 @@
-package com.github.fernthedev.lightchat.server;
+package com.github.fernthedev.lightchat.server
 
-import com.github.fernthedev.lightchat.core.StaticHandler;
-import com.github.fernthedev.lightchat.core.VersionData;
-import com.github.fernthedev.lightchat.core.api.APIUsage;
-import com.github.fernthedev.lightchat.core.encryption.UnencryptedPacketWrapper;
-import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil;
-import com.github.fernthedev.lightchat.core.packets.Packet;
-import com.github.fernthedev.lightchat.core.packets.latency.LatencyPacket;
-import com.github.fernthedev.lightchat.core.packets.latency.PingPacket;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import org.apache.commons.lang3.time.StopWatch;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-
-import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import java.net.InetSocketAddress;
-import java.security.KeyPair;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
+import com.github.fernthedev.lightchat.core.VersionData
+import com.github.fernthedev.lightchat.core.api.APIUsage
+import com.github.fernthedev.lightchat.core.encryption.*
+import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil
+import com.github.fernthedev.lightchat.core.packets.Packet
+import com.github.fernthedev.lightchat.core.packets.latency.PingPacket
+import io.netty.channel.Channel
+import io.netty.channel.ChannelFuture
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.apache.commons.lang3.time.StopWatch
+import org.apache.commons.lang3.tuple.ImmutablePair
+import org.apache.commons.lang3.tuple.Pair
+import java.net.InetSocketAddress
+import java.security.KeyPair
+import java.security.NoSuchAlgorithmException
+import java.security.SecureRandom
+import java.util.*
+import java.util.concurrent.TimeUnit
+import java.util.function.Consumer
+import javax.crypto.Cipher
+import javax.crypto.NoSuchPaddingException
+import javax.crypto.SecretKey
 
 /**
  * Handles client data
  */
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class ClientConnection implements SenderInterface, AutoCloseable {
+@OptIn(ExperimentalCoroutinesApi::class)
+class ClientConnection(
+    private val server: Server,
+    val channel: Channel,
+    val uuid: UUID,
+    callback: Consumer<ClientConnection>
+) : SenderInterface, AutoCloseable {
+    var connected = false
+        private set
 
-    private final Server server;
+    var registered = false
 
-    @Getter
-    private boolean connected;
+    val eventListener: EventListener
 
-    @Getter
-    @Setter
-    private boolean registered = false;
+    lateinit var os: String
+        private set
 
-    @Getter
-    private final EventListener eventListener;
-
-    @Getter
-    private String os;
-
-    @Getter
-    private String langFramework;
-
-    @EqualsAndHashCode.Include()
-    @Getter
-    private final UUID uuid;
-
-    @Getter
-    @Setter
-    private VersionData versionData;
+    lateinit var langFramework: String
+        private set
 
 
+    lateinit var versionData: VersionData
 
-    @Getter
-    private final Channel channel;
 
-    @Setter
-    private String deviceName;
+    override lateinit var name: String
+        private set
 
     /**
      * The keypair encryption
@@ -77,62 +59,59 @@ public class ClientConnection implements SenderInterface, AutoCloseable {
      *
      * Used before secret key is initialized
      */
-    @Getter
-    private KeyPair tempKeyPair;
+    var tempKeyPair: KeyPair? = null
+        private set
+
+    var secretKey: SecretKey? = null
+        set(value) {
+            assert(value != null)
+            field = value
+            tempKeyPair = null
+            try {
+                secureRandom = EncryptionUtil.getSecureRandom(value!!)
+            } catch (e: NoSuchAlgorithmException) {
+                e.printStackTrace()
+            }
+        }
+
+    lateinit var encryptCipher: Cipher
+        private set
 
 
-    @Getter
-    private SecretKey secretKey;
+    lateinit var decryptCipher: Cipher
+        private set
 
-    @Getter
-    private Cipher encryptCipher;
+    lateinit var secureRandom: SecureRandom
+        private set
 
-    @Getter
-    private Cipher decryptCipher;
-
-    @Getter
-    private SecureRandom secureRandom;
+    fun encryptionRegistered(): Boolean {
+        return this::secureRandom.isInitialized
+    }
 
     /**
      * Packet:[ID,lastPacketSentTime]
      */
-    private final Map<Class<? extends Packet>, Pair<Integer, Long>> packetIdMap = new HashMap<>();
+    private val packetIdMap: MutableMap<Class<out Packet>, Pair<Int, Long>> = HashMap()
+    private val pingStopWatch = StopWatch()
 
 
-    private final StopWatch pingStopWatch = new StopWatch();
-
-    public void setSecretKey(SecretKey secretKey) {
-        this.secretKey = secretKey;
-        this.tempKeyPair = null;
-
-        try {
-            this.secureRandom = EncryptionUtil.getSecureRandom(secretKey);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    public ClientConnection(Server server, Channel channel, UUID uuid, Consumer<ClientConnection> callback) {
-        this.server = server;
-        this.channel = channel;
-        this.uuid = uuid;
-
-        server.getRsaKeyThread().getRandomKey().thenAccept(keyPair -> {
-            tempKeyPair = keyPair;
-            callback.accept(this);
-        });
-
-        try {
-            encryptCipher = EncryptionUtil.getEncryptCipher();
-            decryptCipher = EncryptionUtil.getDecryptCipher();
-        } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
+    init {
+        val keyJob = server.rsaKeyThread.randomKey
+        keyJob.invokeOnCompletion {
+            tempKeyPair = keyJob.getCompleted()
+            callback.accept(this)
         }
 
-        eventListener = new EventListener(server, this);
+        try {
+            encryptCipher = EncryptionUtil.encryptCipher
+            decryptCipher = EncryptionUtil.decryptCipher
+        } catch (e: NoSuchPaddingException) {
+            e.printStackTrace()
+        } catch (e: NoSuchAlgorithmException) {
+            e.printStackTrace()
+        }
+        eventListener = EventListener(server, this)
     }
-
 
     /**
      *
@@ -140,23 +119,23 @@ public class ClientConnection implements SenderInterface, AutoCloseable {
      * @return ping delay of client
      */
     @APIUsage
-    public long getPingDelay(TimeUnit timeUnit) {
-        return pingStopWatch.getTime(timeUnit);
+    fun getPingDelay(timeUnit: TimeUnit?): Long {
+        return pingStopWatch.getTime(timeUnit)
     }
 
-    private Pair<Integer, Long> updatePacketIdPair(Class<? extends Packet> packet, int newId) {
-        Pair<Integer, Long> packetIdPair = packetIdMap.get(packet);
-
-        if (packetIdPair == null)
-            packetIdPair = new ImmutablePair<>(0, System.currentTimeMillis());
-        else {
-            if (newId == -1) newId = packetIdPair.getKey() + 1;
-
-            packetIdPair = new ImmutablePair<>(newId, System.currentTimeMillis());
+    private fun updatePacketIdPair(packet: Class<out Packet>, newId: Int): Pair<Int, Long> {
+        var copiedId = newId
+        var packetIdPair = packetIdMap[packet]
+        if (packetIdPair == null) {
+            packetIdPair = ImmutablePair(0, System.currentTimeMillis())
+        } else {
+            if (copiedId == -1) {
+                copiedId = packetIdPair.key + 1
+            }
+            packetIdPair = ImmutablePair(copiedId, System.currentTimeMillis())
         }
-
-        packetIdMap.put(packet, packetIdPair);
-        return packetIdPair;
+        packetIdMap[packet] = packetIdPair
+        return packetIdPair
     }
 
     /**
@@ -165,114 +144,92 @@ public class ClientConnection implements SenderInterface, AutoCloseable {
      * @param encrypt if true the packet will be encrypted
      */
     @APIUsage
-    public ChannelFuture sendObject(@NonNull Packet packet, boolean encrypt) {
-        if (!(packet instanceof LatencyPacket))
-            StaticHandler.getCore().getLogger().debug("Sending packet {}:{}", packet.getPacketName(), encrypt);
-
-        Pair<Integer, Long> packetIdPair = updatePacketIdPair(packet.getClass(), -1);
-
-        if (packetIdPair.getLeft() > server.getMaxPacketId() || System.currentTimeMillis() - packetIdPair.getRight() > 900) updatePacketIdPair(packet.getClass(), 0);
-
-        if (encrypt) {
-            return channel.writeAndFlush(packet);
-        } else {
-            return channel.writeAndFlush(new UnencryptedPacketWrapper(packet, packetIdPair.getKey()));
-        }
+    @Deprecated("Use packet wrapper", ReplaceWith(
+        "sendObject(packet.transport(encrypt))",
+        "com.github.fernthedev.lightchat.core.encryption.transport"
+    )
+    )
+    fun sendObject(packet: Packet, encrypt: Boolean): ChannelFuture {
+        return sendObject(packet.transport(encrypt))
     }
 
-
-
-    /**
-     * Default usage for {@link #sendObject(Packet, boolean)}
-     * @param packet Packet to send
-     */
-    @APIUsage
-    public ChannelFuture sendObject(Packet packet) {
-        return sendObject(packet,true);
+    fun sendObject(transporter: PacketTransporter): ChannelFuture {
+        val packet = transporter.packet
+        val packetIdPair = updatePacketIdPair(packet.javaClass, -1)
+        if (packetIdPair.left > server.maxPacketId || System.currentTimeMillis() - packetIdPair.right > 900) {
+            updatePacketIdPair(
+                packet.javaClass,
+                0
+            )
+        }
+        return channel.writeAndFlush(transporter)
     }
 
     /**
      * Closes connection
      */
-    public void close() {
+    override fun close() {
 
         //DISCONNECT FROM SERVER
-        server.getLogger().info("Closing player {}", this);
-
-        if (channel != null) {
-
-            channel.close();
-
-
-            server.getPlayerHandler().getChannelMap().remove(channel);
-        }
-
-        connected = false;
-        server.getPlayerHandler().getUuidMap().remove(uuid);
+        server.logger.info("Closing player {}", this)
+        channel.close()
+        server.playerHandler.channelMap.remove(channel)
+        connected = false
+        server.playerHandler.uuidMap.remove(uuid)
 
 
         //serverSocket.close();
     }
 
-
-    @Override
-    public String toString() {
-        return "[" + getAddress() + "|" + deviceName +"]";
+    override fun toString(): String {
+        return "[$address|$name]"
     }
 
-
-    /**
-     *
-     * @return the client address
-     */
-    public String getAddress() {
-        if (channel.remoteAddress() == null) {
-            return null;
+    val address: String?
+        /**
+         *
+         * @return the client address
+         */
+        get() {
+            if (channel.remoteAddress() == null) {
+                return null
+            }
+            val address = channel.remoteAddress() as InetSocketAddress
+            return address.address.toString()
         }
-
-        InetSocketAddress address = (InetSocketAddress) channel.remoteAddress();
-
-        return address.getAddress().toString();
-    }
 
     /**
      * Pings player
      */
-    public void ping() {
-        pingStopWatch.reset();
-        pingStopWatch.start();
-        sendObject(new PingPacket(),false);
+    fun ping() {
+        pingStopWatch.reset()
+        pingStopWatch.start()
+        sendObject(PingPacket().transport(false))
     }
 
-    @NonNull
-    @Override
-    public ChannelFuture sendPacket(Packet packet) {
-        return sendObject(packet);
+    override fun sendPacket(packet: Packet): ChannelFuture {
+        return sendObject(packet.transport())
     }
 
-    @Override
-    public String getName() {
-        return deviceName;
+    override fun sendPacket(packet: PacketTransporter): ChannelFuture {
+        return sendObject(packet)
     }
 
-    public void finishPing() {
-        if (!pingStopWatch.isStopped())
-            pingStopWatch.stop();
+    fun finishPing() {
+        if (!pingStopWatch.isStopped) pingStopWatch.stop()
     }
 
     /**
      * Packet:[ID,lastPacketSentTime]
      */
-    public Pair<Integer, Long> getPacketId(Class<? extends Packet> packet) {
-        packetIdMap.computeIfAbsent(packet, aClass -> new ImmutablePair<>(0,(long) -1));
-
-        return packetIdMap.get(packet);
+    fun getPacketId(packet: Class<out Packet>): Pair<Int, Long> {
+        packetIdMap.computeIfAbsent(packet) { ImmutablePair(0, -1L) }
+        return packetIdMap[packet]!!
     }
 
-
-    void finishConstruct(String name, String os, String langFramework) {
-        this.deviceName = name;
-        this.os = os;
-        this.langFramework = langFramework;
+    fun finishConstruct(name: String, os: String, langFramework: String) {
+        this.name = name
+        this.os = os
+        this.langFramework = langFramework
     }
 }

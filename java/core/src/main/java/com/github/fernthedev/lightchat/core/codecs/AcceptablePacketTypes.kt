@@ -1,6 +1,5 @@
-package com.github.fernthedev.lightchat.core.codecs;
+package com.github.fernthedev.lightchat.core.codecs
 
-import java.io.Serializable;
+import java.io.Serializable
 
-public interface AcceptablePacketTypes extends Serializable {
-}
+interface AcceptablePacketTypes : Serializable

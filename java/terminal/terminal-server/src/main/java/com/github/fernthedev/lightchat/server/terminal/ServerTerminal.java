@@ -44,7 +44,7 @@ public class ServerTerminal {
     private static TabCompleteFinder autoCompleteHandler;
 
     @Getter
-    private static List<Command> commandList = new ArrayList<>();
+    private static final List<Command> commandList = new ArrayList<>();
 
     protected static Logger logger = LoggerFactory.getLogger(ServerTerminal.class);
 

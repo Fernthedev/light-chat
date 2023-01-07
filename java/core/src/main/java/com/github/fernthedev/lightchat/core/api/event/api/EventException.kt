@@ -1,23 +1,27 @@
-package com.github.fernthedev.lightchat.core.api.event.api;
+package com.github.fernthedev.lightchat.core.api.event.api
 
-public class EventException extends Exception {
-    private static final long serialVersionUID = 3532808232324183999L;
-    private final Throwable cause;
+class EventException : Exception {
+    /**
+     * If applicable, returns the Exception that triggered this Exception
+     *
+     * @return Inner exception, or null if one does not exist
+     */
+    override val cause: Throwable?
 
     /**
      * Constructs a new EventException based on the given Exception
      *
      * @param throwable Exception that triggered this Exception
      */
-    public EventException(Throwable throwable) {
-        cause = throwable;
+    constructor(throwable: Throwable) {
+        cause = throwable
     }
 
     /**
      * Constructs a new EventException
      */
-    public EventException() {
-        cause = null;
+    constructor() {
+        cause = null
     }
 
     /**
@@ -26,9 +30,8 @@ public class EventException extends Exception {
      * @param cause The exception that caused this
      * @param message The message
      */
-    public EventException(Throwable cause, String message) {
-        super(message);
-        this.cause = cause;
+    constructor(cause: Throwable, message: String?) : super(message) {
+        this.cause = cause
     }
 
     /**
@@ -36,19 +39,11 @@ public class EventException extends Exception {
      *
      * @param message The message
      */
-    public EventException(String message) {
-        super(message);
-        cause = null;
+    constructor(message: String?) : super(message) {
+        cause = null
     }
 
-    /**
-     * If applicable, returns the Exception that triggered this Exception
-     *
-     * @return Inner exception, or null if one does not exist
-     */
-    @Override
-    public Throwable getCause() {
-        return cause;
+    companion object {
+        private const val serialVersionUID = 3532808232324183999L
     }
 }
-

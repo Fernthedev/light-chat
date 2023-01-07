@@ -1,27 +1,25 @@
-package com.github.fernthedev.lightchat.core.packets.handshake;
+package com.github.fernthedev.lightchat.core.packets.handshake
 
-import com.github.fernthedev.lightchat.core.packets.Packet;
-import com.github.fernthedev.lightchat.core.encryption.util.RSAEncryptionUtil;
-import com.github.fernthedev.lightchat.core.packets.PacketInfo;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.SecretKey;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import com.github.fernthedev.lightchat.core.encryption.util.RSAEncryptionUtil
+import com.github.fernthedev.lightchat.core.packets.Packet
+import com.github.fernthedev.lightchat.core.packets.PacketInfo
+import java.security.InvalidKeyException
+import java.security.NoSuchAlgorithmException
+import java.security.PrivateKey
+import java.security.PublicKey
+import javax.crypto.BadPaddingException
+import javax.crypto.SecretKey
 
 @PacketInfo(name = "KEY_RESPONSE_PACKET")
-public class KeyResponsePacket extends Packet {
+class KeyResponsePacket(secretKey: SecretKey, publicKey: PublicKey?) : Packet() {
+    private val secretKeyEncrypted: ByteArray?
 
-    public KeyResponsePacket(SecretKey secretKey, PublicKey publicKey) throws InvalidKeyException {
-        this.secretKeyEncrypted = RSAEncryptionUtil.encryptKey(secretKey, publicKey);
+    init {
+        secretKeyEncrypted = RSAEncryptionUtil.encryptKey(secretKey, publicKey)
     }
-    
-    private final byte[] secretKeyEncrypted;
 
-    public SecretKey getSecretKey(PrivateKey privateKey) throws InvalidKeyException, BadPaddingException, NoSuchAlgorithmException {
-        return RSAEncryptionUtil.decryptKey(secretKeyEncrypted, privateKey);
+    @Throws(InvalidKeyException::class, BadPaddingException::class, NoSuchAlgorithmException::class)
+    fun getSecretKey(privateKey: PrivateKey): SecretKey {
+        return RSAEncryptionUtil.decryptKey(secretKeyEncrypted, privateKey)
     }
-    
 }

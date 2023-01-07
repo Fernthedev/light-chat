@@ -1,27 +1,28 @@
-package com.github.fernthedev.lightchat.core.util;
+package com.github.fernthedev.lightchat.core.util
 
-import com.github.fernthedev.lightchat.core.StaticHandler;
-import com.github.fernthedev.lightchat.core.exceptions.DebugException;
-import com.github.fernthedev.lightchat.core.exceptions.ParsePacketException;
-import com.github.fernthedev.lightchat.core.packets.Packet;
-import com.google.gson.GsonBuilder;
+import com.github.fernthedev.lightchat.core.StaticHandler
+import com.github.fernthedev.lightchat.core.exceptions.DebugException
+import com.github.fernthedev.lightchat.core.exceptions.ParsePacketException
+import com.github.fernthedev.lightchat.core.packets.Packet
+import com.google.gson.GsonBuilder
 
-public class ExceptionUtil {
-
-    public static RuntimeException throwParsePacketException(Exception e, Packet packet) {
-        RuntimeException parsePacketException = new ParsePacketException("Unable to parse packet " + packet.getPacketName(), e);
-
-        if (StaticHandler.isDebug()) parsePacketException = new DebugException("Unable to parse packet data: " + new GsonBuilder().setPrettyPrinting().create().toJson(packet), e);
-
-        return parsePacketException;
+object ExceptionUtil {
+    fun throwParsePacketException(e: Exception, packet: Packet): RuntimeException {
+        var parsePacketException: RuntimeException =
+            ParsePacketException("Unable to parse packet " + packet.packetName, e)
+        if (StaticHandler.isDebug()) parsePacketException = DebugException(
+            "Unable to parse packet data: " + GsonBuilder().setPrettyPrinting().create().toJson(packet),
+            e
+        )
+        return parsePacketException
     }
 
-    public static RuntimeException throwParsePacketException(Exception e, String packet) {
-        RuntimeException parsePacketException = new ParsePacketException("Unable to parse packet " + packet, e);
-
-        if (StaticHandler.isDebug()) parsePacketException = new DebugException("Unable to parse packet data: " + new GsonBuilder().setPrettyPrinting().create().toJson(packet), e);
-
-        return parsePacketException;
+    fun throwParsePacketException(e: Exception, packet: String): RuntimeException {
+        var parsePacketException: RuntimeException = ParsePacketException("Unable to parse packet $packet", e)
+        if (StaticHandler.isDebug()) parsePacketException = DebugException(
+            "Unable to parse packet data: " + GsonBuilder().setPrettyPrinting().create().toJson(packet),
+            e
+        )
+        return parsePacketException
     }
-
 }

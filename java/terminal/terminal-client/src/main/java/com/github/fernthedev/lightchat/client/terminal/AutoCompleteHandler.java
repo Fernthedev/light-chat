@@ -20,7 +20,7 @@ public class AutoCompleteHandler implements Completer {
     @NonNull
     private Client client;
 
-    private List<Candidate> candidateList = new ArrayList<>();
+    private final List<Candidate> candidateList = new ArrayList<>();
 
     private boolean keepCheck;
 

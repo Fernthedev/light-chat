@@ -1,74 +1,66 @@
-package com.github.fernthedev.lightchat.core;
+package com.github.fernthedev.lightchat.core
 
-import com.github.fernthedev.lightchat.core.exceptions.PacketNotInRegistryException;
-import com.github.fernthedev.lightchat.core.exceptions.PacketRegistryException;
-import com.github.fernthedev.lightchat.core.packets.Packet;
-import org.reflections.Reflections;
+import com.github.fernthedev.lightchat.core.exceptions.PacketNotInRegistryException
+import com.github.fernthedev.lightchat.core.exceptions.PacketRegistryException
+import com.github.fernthedev.lightchat.core.packets.Packet
+import org.reflections.Reflections
+import java.util.*
+import kotlin.streams.toList
 
-import java.util.*;
-import java.util.stream.Collectors;
+object PacketRegistry {
+    private val PACKET_REGISTRY = Collections.synchronizedMap(HashMap<String?, Class<out Packet?>>())
+    val packetRegistryCopy: Map<String?, Class<out Packet?>>
+        get() = HashMap(PACKET_REGISTRY)
 
-public class PacketRegistry {
-
-    private PacketRegistry() {}
-
-    private static final Map<String, Class<? extends Packet>> PACKET_REGISTRY = Collections.synchronizedMap(new HashMap<>());
-
-    public static Map<String, Class<? extends Packet>> getPacketRegistryCopy() {
-        return new HashMap<>(PACKET_REGISTRY);
+    fun getPacketClassFromRegistry(name: String?): Class<out Packet?> {
+        if (!PACKET_REGISTRY.containsKey(name)) throw PacketNotInRegistryException("The packet registry does not contain packet \"$name\" in the registry. Make sure it is spelled correctly and is case-sensitive.")
+        return PACKET_REGISTRY[name]!!
     }
 
-    public static Class<? extends Packet> getPacketClassFromRegistry(String name) {
-        if (!PACKET_REGISTRY.containsKey(name)) throw new PacketNotInRegistryException("The packet registry does not contain packet \"" + name + "\" in the registry. Make sure it is spelled correctly and is case-sensitive.");
-
-        return PACKET_REGISTRY.get(name);
+    fun registerPacket(packet: Packet): Class<out Packet> {
+        if (PACKET_REGISTRY.containsKey(packet.packetName) && PACKET_REGISTRY[packet.packetName] != packet.javaClass) throw PacketRegistryException(
+            "The packet " + packet.javaClass.name + " tried to use packet name \"" + packet.packetName + "\" which is already taken by the packet " + getPacketClassFromRegistry(
+                packet.packetName
+            )
+        )
+        PACKET_REGISTRY[packet.packetName] = packet.javaClass
+        return packet.javaClass
     }
 
-    public static Class<? extends Packet> registerPacket(Packet packet) {
-        if(PACKET_REGISTRY.containsKey(packet.getPacketName()) && PACKET_REGISTRY.get(packet.getPacketName()) != packet.getClass()) throw new PacketRegistryException("The packet " + packet.getClass().getName() + " tried to use packet name \"" + packet.getPacketName() + "\" which is already taken by the packet " + getPacketClassFromRegistry(packet.getPacketName()));
-
-        PACKET_REGISTRY.put(packet.getPacketName(), packet.getClass());
-
-        return packet.getClass();
+    fun <T : Packet> registerPacket(packet: Class<T>): Class<T> {
+        val name: String = Packet.getPacketName(packet)
+        if (PACKET_REGISTRY.containsKey(name) && PACKET_REGISTRY[name] != packet) throw PacketRegistryException(
+            "The packet name \"$name\" is already taken by the packet " + getPacketClassFromRegistry(
+                name
+            )
+        )
+        PACKET_REGISTRY[name] = packet
+        return packet
     }
 
-    public static <T extends Packet> Class<T> registerPacket(Class<T> packet) {
-        String name = Packet.getPacketName(packet);
-
-        if(PACKET_REGISTRY.containsKey(name) && PACKET_REGISTRY.get(name) != packet) throw new PacketRegistryException("The packet name \"" + name + "\" is already taken by the packet " + getPacketClassFromRegistry(name));
-
-        PACKET_REGISTRY.put(name, packet);
-
-        return packet;
+    fun checkIfRegistered(packet: Packet): RegisteredReturnValues {
+        if (!PACKET_REGISTRY.containsKey(packet.packetName)) return RegisteredReturnValues.NOT_IN_REGISTRY
+        return if (PACKET_REGISTRY[packet.packetName] == packet.javaClass) RegisteredReturnValues.IN_REGISTRY else RegisteredReturnValues.IN_REGISTRY_DIFFERENT_PACKET
     }
 
-    public static RegisteredReturnValues checkIfRegistered(Packet packet) {
-        if (!PACKET_REGISTRY.containsKey(packet.getPacketName())) return RegisteredReturnValues.NOT_IN_REGISTRY;
-
-        return PACKET_REGISTRY.get(packet.getPacketName()) == packet.getClass() ? RegisteredReturnValues.IN_REGISTRY : RegisteredReturnValues.IN_REGISTRY_DIFFERENT_PACKET;
-    }
-
-    public static void registerDefaultPackets() {
-
-        for (Package packageT : Arrays.stream(Package.getPackages())
-                .parallel()
-                .filter(aPackage -> aPackage.getName().startsWith(StaticHandler.PACKET_PACKAGE))
-                .collect(Collectors.toList())) {
-
-            StaticHandler.getCore().getLogger().debug("Registering the package {}", packageT.getName());
-            registerPacketPackage(packageT.getName());
+    fun registerDefaultPackets() {
+        for (packageT in Arrays.stream(Package.getPackages())
+            .parallel()
+            .filter { aPackage: Package -> aPackage.name.startsWith(StaticHandler.PACKET_PACKAGE) }
+            .toList()) {
+            StaticHandler.core.logger.debug("Registering the package {}", packageT.name)
+            registerPacketPackage(packageT.name)
         }
     }
 
-
     /**
      * Preferably the best choice since it guarantees it will use the package name
      * from the class rather than manually typing it in.
      * It's to avoid human errors in code
      * @param packet
      */
-    public static void registerPacketPackageFromPacket(Packet packet) {
-        registerPacketPackageFromClass(packet.getClass());
+    fun registerPacketPackageFromPacket(packet: Packet) {
+        registerPacketPackageFromClass(packet.javaClass)
     }
 
     /**
@@ -77,27 +69,26 @@ public class PacketRegistry {
      * It's to avoid human errors in code
      * @param packet
      */
-    public static void registerPacketPackageFromClass(Class<? extends Packet> packet) {
-        registerPacketPackage(packet.getPackage().getName());
+    @JvmStatic
+    fun registerPacketPackageFromClass(packet: Class<out Packet?>) {
+        registerPacketPackage(packet.getPackage().name)
     }
 
-    public static void registerPacketPackage(String packageName) {
-        Set<Class<? extends Packet>> classes = new Reflections(packageName).getSubTypesOf(Packet.class);
-
-        for (Class<? extends Packet> packetClass : classes) {
-            StaticHandler.getCore().getLogger().debug("Registering the class {}", packetClass);
-
+    fun registerPacketPackage(packageName: String) {
+        val classes = Reflections(packageName).getSubTypesOf(
+            Packet::class.java
+        )
+        for (packetClass in classes) {
+            StaticHandler.core.logger.debug("Registering the class {}", packetClass)
             try {
-                registerPacket(packetClass);
-            } catch (Exception e) {
-                e.printStackTrace();
+                registerPacket(packetClass)
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }
 
-    public enum RegisteredReturnValues {
-        NOT_IN_REGISTRY,
-        IN_REGISTRY,
-        IN_REGISTRY_DIFFERENT_PACKET
+    enum class RegisteredReturnValues {
+        NOT_IN_REGISTRY, IN_REGISTRY, IN_REGISTRY_DIFFERENT_PACKET
     }
 }

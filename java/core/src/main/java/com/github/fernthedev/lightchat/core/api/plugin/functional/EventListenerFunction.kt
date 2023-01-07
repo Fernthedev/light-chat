@@ -1,17 +1,15 @@
-package com.github.fernthedev.lightchat.core.api.plugin.functional;
+package com.github.fernthedev.lightchat.core.api.plugin.functional
 
-import com.github.fernthedev.lightchat.core.api.event.api.Event;
-import com.github.fernthedev.lightchat.core.api.event.api.EventHandler;
-import com.github.fernthedev.lightchat.core.api.event.api.Listener;
+import com.github.fernthedev.lightchat.core.api.event.api.Event
+import com.github.fernthedev.lightchat.core.api.event.api.EventHandler
+import com.github.fernthedev.lightchat.core.api.event.api.Listener
 
 /**
  * Use for functional programming
  * @param <T> The event
- */
+</T> */
 @FunctionalInterface
-public interface EventListenerFunction<T extends Event> extends Listener {
-
+interface EventListenerFunction<T : Event?> : Listener {
     @EventHandler
-    void onEvent(T event);
-
+    fun onEvent(event: T)
 }

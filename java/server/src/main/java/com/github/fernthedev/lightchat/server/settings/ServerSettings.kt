@@ -1,185 +1,132 @@
-package com.github.fernthedev.lightchat.server.settings;
+package com.github.fernthedev.lightchat.server.settings
 
-import com.github.fernthedev.fernutils.thread.ThreadUtils;
-import com.github.fernthedev.fernutils.thread.multiple.TaskInfoFunctionList;
-import com.github.fernthedev.lightchat.core.CoreSettings;
-import lombok.*;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
+import com.github.fernthedev.fernutils.thread.ThreadUtils
+import com.github.fernthedev.lightchat.core.CoreSettings
+import lombok.*
+import org.apache.commons.lang3.StringUtils
+import org.apache.commons.lang3.Validate
+import org.apache.commons.lang3.tuple.ImmutablePair
+import org.apache.commons.lang3.tuple.Pair
+import java.lang.reflect.Field
+import java.util.*
+import java.util.function.Function
+import java.util.stream.Collectors
 
-import java.lang.reflect.Field;
-import java.util.*;
-import java.util.stream.Collectors;
 
-@EqualsAndHashCode(callSuper = true)
-@Getter
-@Setter
-@Data
-@ToString
-public class ServerSettings extends CoreSettings {
-
+data class ServerSettings(
+    @SettingValue
+    var port: Int = 2000,
 
     @SettingValue
-    private int port = 2000;
+    var password: String = "password",
 
     @SettingValue
-    private String password = "password";
-
-    @SettingValue
-    private int rsaKeySize = 4096;
+    var rsaKeySize: Int = 4096,
 
     @SettingValue(name = "multicast")
-    private boolean useMulticast = false;
+    var useMulticast: Boolean = false,
 
     @SettingValue(name = "usepassword")
-    private boolean passwordRequiredForLogin = false;
+    var passwordRequiredForLogin: Boolean = false,
 
     @SettingValue(name = "usenativetransport")
-    private boolean useNativeTransport = true;
+    var useNativeTransport: Boolean = true,
 
     @SettingValue(name = "codec")
-    protected String jsonCodec = DEFAULT_CODEC;
+    var jsonCodec: String = DEFAULT_CODEC,
+) : CoreSettings() {
 
-    @Deprecated
-    public void setNewValue(@NonNull String oldValue, @NonNull String newValue) {
-
-        Object value = newValue;
-
-        switch (newValue.toLowerCase()) {
-            case "true":
-                value = true;
-                break;
-            case "false":
-                value = false;
-                break;
+    @Deprecated("")
+    fun setNewValue(oldValue: String, newValue: String) {
+        var value: Any = newValue
+        when (newValue.lowercase(Locale.getDefault())) {
+            "true" -> value = true
+            "false" -> value = false
         }
-
         if (StringUtils.isNumeric(newValue)) {
-            try {
-                value = Integer.parseInt(newValue);
-            } catch (NumberFormatException ignored) {
-                throw new IllegalArgumentException("Incorrect integer value");
+            value = try {
+                newValue.toInt()
+            } catch (ignored: NumberFormatException) {
+                throw IllegalArgumentException("Incorrect integer value")
             }
         }
-
-        if (newValue.equals("") || oldValue.equals("")) {
-            throw new IllegalArgumentException("Values cannot be empty");
+        require(!(newValue == "" || oldValue == "")) { "Values cannot be empty" }
+        when (oldValue.lowercase(Locale.getDefault())) {
+            "password" -> password = value.toString()
+            else -> throw IllegalArgumentException("No such value named $oldValue found")
         }
-
-
-        switch (oldValue.toLowerCase()) {
-            case "password":
-                setPassword((String) value);
-                break;
-            default:
-                throw new IllegalArgumentException("No such value named " + oldValue + " found");
-        }
-
     }
 
-    /**
-     * @deprecated Use {@link #getSettingValues(boolean)} or {@link #getSettingValuesAsync(boolean)} instead
-     */
-    @Deprecated
-    public List<String> getSettingNames(boolean editable) {
-        List<String> stringList = new ArrayList<>();
-        for (Field field : getClass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(SettingValue.class)) {
-                SettingValue settingValue = field.getAnnotation(SettingValue.class);
-
-                if (!editable) continue;
-
-                String name = settingValue.name();
-
-                if (name.equals("")) name = field.getName();
-
-
-                stringList.add(name);
+    @Deprecated("Use {@link #getSettingValues(boolean)} or {@link #getSettingValuesAsync(boolean)} instead")
+    fun getSettingNames(editable: Boolean): List<String> {
+        val stringList: MutableList<String> = ArrayList()
+        for (field in javaClass.declaredFields) {
+            if (field.isAnnotationPresent(SettingValue::class.java)) {
+                val settingValue = field.getAnnotation(
+                    SettingValue::class.java
+                )
+                if (!editable) continue
+                var name = settingValue.name
+                if (name == "") name = field.name
+                stringList.add(name)
             }
         }
-
-        return stringList;
+        return stringList
     }
 
-    public Map<String, List<String>> getSettingValues(boolean editable) {
-        Map<String, List<String>> stringList = new HashMap<>();
-
-        for (Field field : getClass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(SettingValue.class)) {
-                SettingValue settingValue = field.getAnnotation(SettingValue.class);
-
-                if (editable && !settingValue.editable()) continue;
-
-                String name = settingValue.name();
-                List<String> possibleValues = new ArrayList<>(Arrays.asList(settingValue.values()));
-
+    fun getSettingValues(editable: Boolean): Map<String, List<String>> {
+        val stringList: MutableMap<String, List<String>> = HashMap()
+        for (field in javaClass.declaredFields) {
+            if (field.isAnnotationPresent(SettingValue::class.java)) {
+                val settingValue = field.getAnnotation(
+                    SettingValue::class.java
+                )
+                if (editable && !settingValue.editable) continue
+                var name = settingValue.name
+                var possibleValues: MutableList<String> = ArrayList(listOf(*settingValue.values))
                 if (possibleValues.isEmpty()) {
                     // ENUM
-                    if (field.isEnumConstant()) {
-                        possibleValues = Arrays.stream(field.getClass().getEnumConstants()).map(s -> {
+                    if (field.isEnumConstant) {
+                        possibleValues = Arrays.stream(field.javaClass.enumConstants).map { s: Field ->
                             try {
-                                return s.get(this).toString();
-                            } catch (IllegalAccessException e) {
-                                return null;
+                                return@map s[this].toString()
+                            } catch (e: IllegalAccessException) {
+                                return@map null
                             }
-                        }).collect(Collectors.toList());
-
-
-//                        Arrays.stream(constants).forEach(field1 -> {
-//                            try {
-//                                possibleValues.add(field1.get(this).toString());
-//
-//                            } catch (IllegalAccessException e) {
-//                                e.printStackTrace();
-//                            }
-//                        });
+                        }.collect(Collectors.toList())
                     }
                     // Boolean
-                    if (boolean.class.equals(field.getType())) {
-                        possibleValues.add("true");
-                        possibleValues.add("false");
+                    if (Boolean::class.javaPrimitiveType == field.type) {
+                        possibleValues.add("true")
+                        possibleValues.add("false")
                     }
                 }
-
-
-                if (name.equals("")) name = field.getName();
-
-
-                stringList.put(name, possibleValues);
+                if (name == "") name = field.name
+                stringList[name] = possibleValues
             }
         }
-
-
-
-        return stringList;
+        return stringList
     }
 
-    public Map<String, List<String>> getSettingValuesAsync(boolean editable) {
-        TaskInfoFunctionList<Field, Pair<String, List<String>>> ob = ThreadUtils.runFunctionListAsync(Arrays.asList(getClass().getDeclaredFields()), (field -> {
-
-
-            if (field.isAnnotationPresent(SettingValue.class)) {
-                SettingValue settingValue = field.getAnnotation(SettingValue.class);
-
-                if (!settingValue.editable() && editable) return null;
-
-                String name = settingValue.name();
-
-                List<String> possibleValues = new ArrayList<>(Arrays.asList(settingValue.values()));
-
-
-                if (possibleValues.isEmpty()) {
-                    // ENUM
-                    if (field.isEnumConstant()) {
-                        possibleValues = Arrays.stream(field.getClass().getEnumConstants()).map(s -> {
-                            try {
-                                return s.get(this).toString();
-                            } catch (IllegalAccessException e) {
-                                return null;
-                            }
-                        }).collect(Collectors.toList());
+    fun getSettingValuesAsync(editable: Boolean): Map<String, List<String>> {
+        val ob = ThreadUtils.runFunctionListAsync(
+            listOf(*javaClass.declaredFields),
+            Function<Field, Pair<String, List<String>>?> { field: Field ->
+                if (field.isAnnotationPresent(SettingValue::class.java)) {
+                    val settingValue = field.getAnnotation(SettingValue::class.java)
+                    if (!settingValue.editable && editable) return@Function null
+                    var name = settingValue.name
+                    var possibleValues: MutableList<String> = ArrayList(listOf(*settingValue.values))
+                    if (possibleValues.isEmpty()) {
+                        // ENUM
+                        if (field.isEnumConstant) {
+                            possibleValues = Arrays.stream(field.javaClass.enumConstants).map { s: Field ->
+                                try {
+                                    return@map s[this].toString()
+                                } catch (e: IllegalAccessException) {
+                                    return@map null
+                                }
+                            }.collect(Collectors.toList())
 
 
 //                        Arrays.stream(constants).forEach(field1 -> {
@@ -191,168 +138,135 @@ public class ServerSettings extends CoreSettings {
 //                            }
 //                        });
 //                        System.out.println("Enum values: " + possibleValues);
+                        }
+                        // Boolean
+                        if (Boolean::class.javaPrimitiveType == field.type) {
+                            possibleValues.add("true")
+                            possibleValues.add("false")
+                        }
                     }
-                    // Boolean
-                    if (boolean.class.equals(field.getType())) {
-                        possibleValues.add("true");
-                        possibleValues.add("false");
-                    }
+                    if (name == "") name = field.name
+                    return@Function ImmutablePair<String, List<String>>(name, possibleValues)
                 }
-
-
-                if (name.equals("")) name = field.getName();
-                return new ImmutablePair<>(name, possibleValues);
-            }
-            return null;
-        }));
+                null
+            })
 
         // 51 ms parallel
         try {
-            ob.runThreads(ThreadUtils.ThreadExecutors.CACHED_THREADS.getExecutorService());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            ob.runThreads(ThreadUtils.ThreadExecutors.CACHED_THREADS.executorService)
+        } catch (e: InterruptedException) {
+            e.printStackTrace()
         }
-
-        Map<Field, Pair<String, List<String>>> values = ob.getValuesAndAwait(10);
-
-
-        Map<String, List<String>> returnValues = new HashMap<>();
-
-        assert values != null;
-        for (Field field : values.keySet()) {
-            Pair<String, List<String>> pair = values.get(field);
-            returnValues.put(pair.getKey(), pair.getRight());
+        val values = ob.getValuesAndAwait(10)
+        val returnValues: MutableMap<String, List<String>> = HashMap()
+        assert(values != null)
+        for (field in values!!.keys) {
+            val pair = values[field]
+            returnValues[pair!!.key] = pair.right
         }
-
-        return returnValues;
+        return returnValues
     }
 
-    public void setValue(@NonNull String key, String val) {
-        for (Field field : getClass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(SettingValue.class)) {
-                SettingValue settingValue = field.getAnnotation(SettingValue.class);
-
-                String name = settingValue.name();
-
-                if (name.equals("")) name = field.getName();
-
-                if (name.equalsIgnoreCase(key)) {
+    fun setValue(key: String, `val`: String) {
+        for (field in javaClass.declaredFields) {
+            if (field.isAnnotationPresent(SettingValue::class.java)) {
+                val settingValue = field.getAnnotation(
+                    SettingValue::class.java
+                )
+                var name = settingValue.name
+                if (name == "") name = field.name
+                if (name.equals(key, ignoreCase = true)) {
                     try {
-
-                        if (!settingValue.editable()) {
-                            throw new IllegalArgumentException("You cannot edit a value which is not editable");
-                        }
-
-                        Object wrappedVal;
-
-                        if (!field.getType().isPrimitive() && !String.class.isAssignableFrom(field.getType())) {
-                            throw new IllegalArgumentException("Setting value is not primitive type or string which is not supported.");
-                        }
-
-                        if (boolean.class.equals(field.getType()) || Boolean.class.isAssignableFrom(field.getType())) {
-
-                            wrappedVal = Boolean.parseBoolean(val);
-                            if (!wrappedVal.toString().equalsIgnoreCase(val)) throw new IllegalArgumentException("Value cannot be " + val + " must be true/false");
-
-                        } else if (int.class.equals(field.getType()) || Integer.class.isAssignableFrom(field.getType())) {
-                            wrappedVal = Integer.parseInt(val);
-                        } else if (long.class.equals(field.getType()) || Long.class.isAssignableFrom(field.getType())) {
-                            wrappedVal = Long.parseLong(val);
-                        } else if (double.class.equals(field.getType()) || Double.class.isAssignableFrom(field.getType())) {
-                            wrappedVal = Double.parseDouble(val);
-                        } else if (short.class.equals(field.getType()) || Short.class.isAssignableFrom(field.getType())) {
-                            wrappedVal = Short.parseShort(val);
-                        } else if (String.class.equals(field.getType()) || String.class.isAssignableFrom(field.getType())) {
-                            wrappedVal = val;
+                        require(settingValue.editable) { "You cannot edit a value which is not editable" }
+                        var wrappedVal: Any
+                        require(!(!field.type.isPrimitive && !String::class.java.isAssignableFrom(field.type))) { "Setting value is not primitive type or string which is not supported." }
+                        if (Boolean::class.javaPrimitiveType == field.type || Boolean::class.java.isAssignableFrom(field.type)) {
+                            wrappedVal = java.lang.Boolean.parseBoolean(`val`)
+                            require(
+                                wrappedVal.toString().equals(`val`, ignoreCase = true)
+                            ) { "Value cannot be $`val` must be true/false" }
+                        } else if (Int::class.javaPrimitiveType == field.type || Int::class.java.isAssignableFrom(field.type)) {
+                            wrappedVal = `val`.toInt()
+                        } else if (Long::class.javaPrimitiveType == field.type || Long::class.java.isAssignableFrom(
+                                field.type
+                            )
+                        ) {
+                            wrappedVal = `val`.toLong()
+                        } else if (Double::class.javaPrimitiveType == field.type || Double::class.java.isAssignableFrom(
+                                field.type
+                            )
+                        ) {
+                            wrappedVal = `val`.toDouble()
+                        } else if (Short::class.javaPrimitiveType == field.type || Short::class.java.isAssignableFrom(
+                                field.type
+                            )
+                        ) {
+                            wrappedVal = `val`.toShort()
+                        } else if (String::class.java == field.type || String::class.java.isAssignableFrom(field.type)) {
+                            wrappedVal = `val`
                         } else {
-                            throw new IllegalArgumentException("Value must be of type " + field.getType()
-                                    + " e.g if boolean then true or a number if int");
+                            throw IllegalArgumentException(
+                                "Value must be of type " + field.type
+                                        + " e.g if boolean then true or a number if int"
+                            )
                         }
+                        Validate.notNull(wrappedVal)
 
-                        Validate.notNull(wrappedVal);
-
-//                        if(field.getDeclaringClass().isInstance(val.getClass())) {
-                        field.set(this, wrappedVal);
-                        return;
-//                        } else {
-//                            throw new IllegalArgumentException("Value has to be ")
-//                        }
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
+                        field[this] = wrappedVal
+                        return
+                    } catch (e: IllegalAccessException) {
+                        e.printStackTrace()
                     }
                 }
             }
         }
-
-        throw new IllegalArgumentException("No such value named " + key + " found");
+        throw IllegalArgumentException("No such value named $key found")
     }
 
-    public void setValue(@NonNull String key, Object val) {
-        for (Field field : getClass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(SettingValue.class)) {
-                SettingValue settingValue = field.getAnnotation(SettingValue.class);
-
-                String name = settingValue.name();
-
-                if (name.equals("")) name = field.getName();
-
-                if (name.equalsIgnoreCase(key)) {
+    fun setValue(key: String, `val`: Any?) {
+        for (field in javaClass.declaredFields) {
+            if (field.isAnnotationPresent(SettingValue::class.java)) {
+                val settingValue = field.getAnnotation(
+                    SettingValue::class.java
+                )
+                var name = settingValue.name
+                if (name == "") name = field.name
+                if (name.equals(key, ignoreCase = true)) {
                     try {
+                        require(settingValue.editable) { "You cannot edit a value which is not editable" }
 
-                        if (!settingValue.editable()) {
-                            throw new IllegalArgumentException("You cannot edit a value which is not editable");
-                        }
-
-//                        if(field.getDeclaringClass().isInstance(val.getClass())) {
-                        field.set(this, val);
-                        return;
-//                        } else {
-//                            throw new IllegalArgumentException("Value has to be ")
-//                        }
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
+                        field[this] = `val`
+                        return
+                    } catch (e: IllegalAccessException) {
+                        e.printStackTrace()
                     }
                 }
             }
         }
-
-        throw new IllegalArgumentException("No such value named " + key + " found");
+        throw IllegalArgumentException("No such value named $key found")
     }
 
-    public Object getValue(@NonNull String key) {
-        for (Field field : getClass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(SettingValue.class)) {
-                SettingValue settingValue = field.getAnnotation(SettingValue.class);
-
-                String name = settingValue.name();
-
-                if (name.equals("")) name = field.getName();
-
-                if (name.equalsIgnoreCase(key)) {
+    fun getValue(key: String): Any {
+        for (field in javaClass.declaredFields) {
+            if (field.isAnnotationPresent(SettingValue::class.java)) {
+                val settingValue = field.getAnnotation(
+                    SettingValue::class.java
+                )
+                var name = settingValue.name
+                if (name == "") name = field.name
+                if (name.equals(key, ignoreCase = true)) {
                     try {
-                        return field.get(this);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
+                        return field[this]
+                    } catch (e: IllegalAccessException) {
+                        e.printStackTrace()
                     }
                 }
             }
         }
-
-        throw new IllegalArgumentException("No such value named " + key + " found");
-
-//        switch (key.toLowerCase()) {
-//            case "password":
-//                return getPassword();
-//            case "usemulticast":
-//                return isUseMulticast();
-//            case "passwordlogin":
-//                return isPasswordRequiredForLogin();
-//            default:
-//                return null;
-//        }
+        throw IllegalArgumentException("No such value named $key found")
     }
 
-    private static final Object[] emptyObject = new Object[0];
-
-
+    companion object {
+        private val emptyObject = arrayOfNulls<Any>(0)
+    }
 }

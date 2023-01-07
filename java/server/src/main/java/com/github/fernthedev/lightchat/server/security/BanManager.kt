@@ -1,104 +1,88 @@
-package com.github.fernthedev.lightchat.server.security;
+package com.github.fernthedev.lightchat.server.security
 
-import com.github.fernthedev.config.common.Config;
-import com.github.fernthedev.config.common.exceptions.ConfigLoadException;
-import com.github.fernthedev.config.gson.GsonConfig;
-import com.github.fernthedev.lightchat.server.ClientConnection;
-import com.github.fernthedev.lightchat.server.Server;
-import com.github.fernthedev.lightchat.server.event.BanEvent;
-import lombok.Getter;
-import lombok.NonNull;
-import org.apache.commons.lang3.SystemUtils;
+import com.github.fernthedev.config.common.Config
+import com.github.fernthedev.config.common.exceptions.ConfigLoadException
+import com.github.fernthedev.config.gson.GsonConfig
+import com.github.fernthedev.lightchat.server.*
+import com.github.fernthedev.lightchat.server.event.BanEvent
+import io.netty.channel.*
+import lombok.*
+import org.apache.commons.lang3.SystemUtils
+import java.io.File
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+class BanManager(private val server: Server) {
+    private var bannedDataConfig: Config<out BannedData>? = null
 
-public class BanManager {
-
-    private static final File bansFile = new File(getCurrentPath(),"banned.json");
-
-    private Config<? extends BannedData> bannedDataConfig;
-    private final Server server;
-
-    public BanManager(Server server) {
-        this.server = server;
+    init {
         try {
-            initConfig();
-        } catch (ConfigLoadException e) {
-            e.printStackTrace();
+            initConfig()
+        } catch (e: ConfigLoadException) {
+            e.printStackTrace()
         }
     }
 
-    protected void initConfig() throws ConfigLoadException {
-        bannedDataConfig = new GsonConfig<>(new BannedData(), bansFile);
-
-        bannedDataConfig.load();
+    @Throws(ConfigLoadException::class)
+    protected fun initConfig() {
+        bannedDataConfig = GsonConfig(BannedData(), bansFile)
+        (bannedDataConfig as GsonConfig<*>).load()
     }
 
-    public boolean isBanned(@NonNull ClientConnection clientConnection) {
-        return isBanned(clientConnection.getAddress());
+    fun isBanned(clientConnection: ClientConnection): Boolean {
+        return isBanned(clientConnection.address)
     }
 
-    public boolean isBanned(String ip) {
-        for(String bannedData : bannedDataConfig.getConfigData().getIpAddresses()) {
-            if(bannedData.equalsIgnoreCase(ip)) {
-                return true;
+    fun isBanned(ip: String?): Boolean {
+        for (bannedData in bannedDataConfig!!.configData.ipAddresses) {
+            if (bannedData.equals(ip, ignoreCase = true)) {
+                return true
             }
         }
-        return false;
+        return false
     }
 
-    public void ban(String ip) {
-        BanEvent banEvent = new BanEvent(true, ip);
-
-        server.getPluginManager().callEvent(banEvent);
-
-        if (banEvent.isCancelled()) return;
-
-
-        bannedDataConfig.getConfigData().getIpAddresses().add(banEvent.getBannedIP());
-
+    fun ban(ip: String) {
+        val banEvent = BanEvent(true, ip)
+        server.pluginManager.callEvent(banEvent)
+        if (banEvent.isCancelled) return
+        bannedDataConfig!!.configData.ipAddresses.add(banEvent.bannedIP)
         try {
-            bannedDataConfig.syncSave();
-        } catch (ConfigLoadException e) {
-            e.printStackTrace();
+            bannedDataConfig!!.syncSave()
+        } catch (e: ConfigLoadException) {
+            e.printStackTrace()
         }
-
-        closeAllIPs(ip);
+        closeAllIPs(ip)
     }
 
-    public void unban(String ip) {
-        BanEvent banEvent = new BanEvent(false, ip);
-
-        server.getPluginManager().callEvent(banEvent);
-
-        if (banEvent.isCancelled()) return;
-
-
-        bannedDataConfig.getConfigData().getIpAddresses().remove(banEvent.getBannedIP());
+    fun unban(ip: String) {
+        val banEvent = BanEvent(false, ip)
+        server.pluginManager.callEvent(banEvent)
+        if (banEvent.isCancelled) return
+        bannedDataConfig!!.configData.ipAddresses.remove(banEvent.bannedIP)
         try {
-            bannedDataConfig.syncSave();
-        } catch (ConfigLoadException e) {
-            e.printStackTrace();
+            bannedDataConfig!!.syncSave()
+        } catch (e: ConfigLoadException) {
+            e.printStackTrace()
         }
     }
 
-
-    protected void closeAllIPs(String ip) {
-        server.getPlayerHandler().getChannelMap().forEach((channel, clientConnection) -> {
-            if (clientConnection.getAddress().equalsIgnoreCase(ip)) clientConnection.close();
-        });
+    protected fun closeAllIPs(ip: String?) {
+        server.playerHandler.channelMap.forEach { (_: Channel?, clientConnection: ClientConnection) ->
+            if (clientConnection.address.equals(
+                    ip,
+                    ignoreCase = true
+                )
+            ) clientConnection.close()
+        }
     }
 
 
+    data class BannedData(
+        val ipAddresses: MutableList<String> = ArrayList()
+    )
 
-    private static File getCurrentPath() {
-        return SystemUtils.getUserDir();
-    }
-
-    @Getter
-    public static class BannedData {
-        private List<String> ipAddresses = new ArrayList<>();
+    companion object {
+        private val bansFile = File(currentPath, "banned.json")
+        private val currentPath: File
+            private get() = SystemUtils.getUserDir()
     }
 }

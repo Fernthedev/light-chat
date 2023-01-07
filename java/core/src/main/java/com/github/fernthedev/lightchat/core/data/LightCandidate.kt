@@ -1,30 +1,30 @@
-package com.github.fernthedev.lightchat.core.data;
+package com.github.fernthedev.lightchat.core.data
 
-import lombok.Getter;
+import java.io.Serializable
+import java.util.*
 
-import java.io.Serializable;
-import java.util.Objects;
-
-@Getter
-public class LightCandidate implements Serializable {
-
-    private final String value;
-    private final String displ;
-    private final String group;
-    private final String descr;
-    private final String suffix;
-    private final String key;
-    private final boolean complete;
-
-    /**
-     * Simple constructor with only a single String as an argument.
-     *
-     * @param value the candidate
-     */
-    public LightCandidate(String value) {
-        this(value, value, null, null, null, null, true);
-    }
-
+class LightCandidate @JvmOverloads constructor(
+    value: String?,
+    displ: String? = value,
+    group: String? = null,
+    descr: String? = null,
+    suffix: String? = null,
+    key: String? = null,
+    complete: Boolean = true
+) : Serializable {
+    @kotlin.jvm.JvmField
+    val value: String?
+    @kotlin.jvm.JvmField
+    val displ: String?
+    @kotlin.jvm.JvmField
+    val group: String?
+    @kotlin.jvm.JvmField
+    val descr: String?
+    @kotlin.jvm.JvmField
+    val suffix: String?
+    @kotlin.jvm.JvmField
+    val key: String?
+    val isComplete: Boolean
     /**
      * Constructs a new Candidate.
      *
@@ -36,14 +36,19 @@ public class LightCandidate implements Serializable {
      * @param key the key
      * @param complete the complete flag
      */
-    public LightCandidate(String value, String displ, String group, String descr, String suffix, String key, boolean complete) {
-        Objects.requireNonNull(value);
-        this.value = value;
-        this.displ = displ;
-        this.group = group;
-        this.descr = descr;
-        this.suffix = suffix;
-        this.key = key;
-        this.complete = complete;
+    /**
+     * Simple constructor with only a single String as an argument.
+     *
+     * @param value the candidate
+     */
+    init {
+        Objects.requireNonNull(value)
+        this.value = value
+        this.displ = displ
+        this.group = group
+        this.descr = descr
+        this.suffix = suffix
+        this.key = key
+        isComplete = complete
     }
 }

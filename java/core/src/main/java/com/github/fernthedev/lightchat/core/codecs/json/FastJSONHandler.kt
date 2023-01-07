@@ -1,18 +1,17 @@
-package com.github.fernthedev.lightchat.core.codecs.json;
+package com.github.fernthedev.lightchat.core.codecs.json
 
-import com.alibaba.fastjson.JSON;
-import com.github.fernthedev.lightchat.core.api.APIUsage;
-import com.github.fernthedev.lightchat.core.codecs.JSONHandler;
+import com.alibaba.fastjson.JSON
+import com.github.fernthedev.lightchat.core.api.APIUsage
+import com.github.fernthedev.lightchat.core.codecs.JSONHandler
 
 @APIUsage
-public class FastJSONHandler implements JSONHandler {
-    @Override
-    public <T> T fromJson(String json, Class<T> classOfT) {
-        return JSON.parseObject(json, classOfT);
+class FastJSONHandler : JSONHandler {
+
+    override fun <T> fromJson(decodedStr: String, packetWrapperClass: Class<T>): T {
+        return JSON.parseObject(decodedStr, packetWrapperClass)
     }
 
-    @Override
-    public String toJson(Object src) {
-        return JSON.toJSONString(src);
+    override fun toJson(src: Any?): String {
+        return JSON.toJSONString(src)
     }
 }

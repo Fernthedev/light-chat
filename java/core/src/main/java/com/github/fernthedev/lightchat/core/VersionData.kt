@@ -1,31 +1,16 @@
-package com.github.fernthedev.lightchat.core;
+package com.github.fernthedev.lightchat.core
 
-import lombok.*;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.jetbrains.annotations.Nullable;
+import com.github.fernthedev.lightchat.core.packets.handshake.VersionDataString
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion
 
-@Getter
-@RequiredArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class VersionData {
+data class VersionData(
+    val variablesJSON: VariablesJSON? = null,
+    val version: DefaultArtifactVersion,
+    val minVersion: DefaultArtifactVersion,
+) {
 
-    @Getter
-    @Nullable
-    private VariablesJSON variablesJSON;
+    constructor(variablesJSON: VariablesJSON) : this(variablesJSON = variablesJSON, version = DefaultArtifactVersion(variablesJSON.version), minVersion = DefaultArtifactVersion(variablesJSON.minVersion))
+    constructor(variablesJSON: VersionDataString) : this(variablesJSON = null, version = DefaultArtifactVersion(variablesJSON.version), minVersion = DefaultArtifactVersion(variablesJSON.minVersion))
+    constructor(v: String, mv: String) : this(variablesJSON = null, version = DefaultArtifactVersion(v), minVersion = DefaultArtifactVersion(mv))
 
-    @NonNull
-    private DefaultArtifactVersion version;
-
-    @NonNull
-    private DefaultArtifactVersion minVersion;
-
-    public VersionData(VariablesJSON variablesJSON) {
-        this(variablesJSON.getVersion(), variablesJSON.getMinVersion());
-        this.variablesJSON = variablesJSON;
-    }
-
-    public VersionData(String version, String minVersion) {
-        this.version = new DefaultArtifactVersion(version);
-        this.minVersion = new DefaultArtifactVersion(minVersion);
-    }
 }

@@ -1,25 +1,23 @@
-package com.github.fernthedev.lightchat.core.codecs.json;
+package com.github.fernthedev.lightchat.core.codecs.json
 
-import com.github.fernthedev.lightchat.core.api.APIUsage;
-import com.github.fernthedev.lightchat.core.codecs.JSONHandler;
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
+import com.github.fernthedev.lightchat.core.api.APIUsage
+import com.github.fernthedev.lightchat.core.codecs.JSONHandler
+import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 
 @APIUsage
-public class GSONHandler implements JSONHandler {
-    private static final Gson gson = new Gson();
-
-    public static final GSONHandler INSTANCE = new GSONHandler();
-
-    private GSONHandler() {}
-
-    @Override
-    public <T> T fromJson(String json, Class<T> classOfT) throws JsonSyntaxException {
-        return gson.fromJson(json, classOfT);
+class GSONHandler private constructor() : JSONHandler {
+    @Throws(JsonSyntaxException::class)
+    override fun <T> fromJson(decodedStr: String, packetWrapperClass: Class<T>): T {
+        return gson.fromJson(decodedStr, packetWrapperClass)
     }
 
-    @Override
-    public String toJson(Object src) {
-        return gson.toJson(src);
+    override fun toJson(msg: Any?): String {
+        return gson.toJson(msg)
+    }
+
+    companion object {
+        private val gson = Gson()
+        val INSTANCE = GSONHandler()
     }
 }

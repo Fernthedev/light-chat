@@ -9,9 +9,9 @@ public class ChatEvent extends Event implements Cancellable {
     private boolean cancel = false;
     private static final HandlerList handlers = new HandlerList();
 
-    private SenderInterface sender;
+    private final SenderInterface sender;
     private String message;
-    private boolean isCommand;
+    private final boolean isCommand;
 
     public ChatEvent(SenderInterface sender, String message,boolean isCommand) {
         this.sender = sender;

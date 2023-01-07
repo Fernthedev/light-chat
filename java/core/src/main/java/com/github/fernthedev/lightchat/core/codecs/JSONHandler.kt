@@ -1,7 +1,6 @@
-package com.github.fernthedev.lightchat.core.codecs;
+package com.github.fernthedev.lightchat.core.codecs
 
-public interface JSONHandler {
-    <T> T fromJson(String decodedStr, Class<T> packetWrapperClass);
-
-    String toJson(Object msg);
+interface JSONHandler {
+    fun <T> fromJson(decodedStr: String, packetWrapperClass: Class<T>): T
+    fun toJson(msg: Any?): String
 }

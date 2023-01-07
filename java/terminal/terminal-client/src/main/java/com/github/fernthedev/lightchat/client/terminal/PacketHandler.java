@@ -12,6 +12,7 @@ import com.github.fernthedev.terminal.core.packets.AutoCompletePacket;
 import com.github.fernthedev.terminal.core.packets.MessagePacket;
 import lombok.AllArgsConstructor;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @AllArgsConstructor
@@ -34,9 +35,8 @@ public class PacketHandler implements IPacketHandler, Listener {
         } else if (p instanceof SelfMessagePacket) {
             SelfMessagePacket selfMessagePacket = (SelfMessagePacket) p;
 
-            switch (selfMessagePacket.getType()) {
-                case INCORRECT_PASSWORD_FAILURE:
-                    ClientTerminal.getLogger().error(ColorCode.RED + "Failed all attempts to login.");
+            if (Objects.requireNonNull(selfMessagePacket.getType()) == SelfMessagePacket.MessageType.INCORRECT_PASSWORD_FAILURE) {
+                ClientTerminal.getLogger().error(ColorCode.RED + "Failed all attempts to login.");
             }
         }
     }

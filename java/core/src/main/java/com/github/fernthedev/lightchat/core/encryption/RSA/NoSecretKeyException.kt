@@ -1,61 +1,55 @@
-package com.github.fernthedev.lightchat.core.encryption.RSA;
+package com.github.fernthedev.lightchat.core.encryption.RSA
 
-public class NoSecretKeyException extends EncryptionException {
+class NoSecretKeyException : EncryptionException {
     /**
-     * Constructs a new runtime exception with {@code null} as its
+     * Constructs a new runtime exception with `null` as its
      * detail message.  The cause is not initialized, and may subsequently be
-     * initialized by a call to {@link #initCause}.
+     * initialized by a call to [.initCause].
      */
-    public NoSecretKeyException() {
-        super();
-    }
+    constructor() : super()
 
     /**
      * Constructs a new runtime exception with the specified detail message.
      * The cause is not initialized, and may subsequently be initialized by a
-     * call to {@link #initCause}.
+     * call to [.initCause].
      *
      * @param message the detail message. The detail message is saved for
-     *                later retrieval by the {@link #getMessage()} method.
+     * later retrieval by the [.getMessage] method.
      */
-    public NoSecretKeyException(String message) {
-        super(message);
-    }
+    constructor(message: String?) : super(message)
 
     /**
      * Constructs a new runtime exception with the specified detail message and
-     * cause.  <p>Note that the detail message associated with
-     * {@code cause} is <i>not</i> automatically incorporated in
+     * cause.
+     *
+     *Note that the detail message associated with
+     * `cause` is *not* automatically incorporated in
      * this runtime exception's detail message.
      *
      * @param message the detail message (which is saved for later retrieval
-     *                by the {@link #getMessage()} method).
+     * by the [.getMessage] method).
      * @param cause   the cause (which is saved for later retrieval by the
-     *                {@link #getCause()} method).  (A {@code null} value is
-     *                permitted, and indicates that the cause is nonexistent or
-     *                unknown.)
+     * [.getCause] method).  (A `null` value is
+     * permitted, and indicates that the cause is nonexistent or
+     * unknown.)
      * @since 1.4
      */
-    public NoSecretKeyException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    constructor(message: String?, cause: Throwable?) : super(message, cause)
 
     /**
      * Constructs a new runtime exception with the specified cause and a
-     * detail message of {@code (cause==null ? null : cause.toString())}
+     * detail message of `(cause==null ? null : cause.toString())`
      * (which typically contains the class and detail message of
-     * {@code cause}).  This constructor is useful for runtime exceptions
+     * `cause`).  This constructor is useful for runtime exceptions
      * that are little more than wrappers for other throwables.
      *
      * @param cause the cause (which is saved for later retrieval by the
-     *              {@link #getCause()} method).  (A {@code null} value is
-     *              permitted, and indicates that the cause is nonexistent or
-     *              unknown.)
+     * [.getCause] method).  (A `null` value is
+     * permitted, and indicates that the cause is nonexistent or
+     * unknown.)
      * @since 1.4
      */
-    public NoSecretKeyException(Throwable cause) {
-        super(cause);
-    }
+    constructor(cause: Throwable?) : super(cause)
 
     /**
      * Constructs a new runtime exception with the specified detail
@@ -63,15 +57,18 @@ public class NoSecretKeyException extends EncryptionException {
      * stack trace enabled or disabled.
      *
      * @param message            the detail message.
-     * @param cause              the cause.  (A {@code null} value is permitted,
-     *                           and indicates that the cause is nonexistent or unknown.)
+     * @param cause              the cause.  (A `null` value is permitted,
+     * and indicates that the cause is nonexistent or unknown.)
      * @param enableSuppression  whether or not suppression is enabled
-     *                           or disabled
+     * or disabled
      * @param writableStackTrace whether or not the stack trace should
-     *                           be writable
+     * be writable
      * @since 1.7
      */
-    protected NoSecretKeyException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
+    protected constructor(
+        message: String?,
+        cause: Throwable?,
+        enableSuppression: Boolean,
+        writableStackTrace: Boolean
+    ) : super(message, cause, enableSuppression, writableStackTrace)
 }

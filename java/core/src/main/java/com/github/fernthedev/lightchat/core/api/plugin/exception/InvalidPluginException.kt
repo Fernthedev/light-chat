@@ -1,49 +1,43 @@
-package com.github.fernthedev.lightchat.core.api.plugin.exception;
+package com.github.fernthedev.lightchat.core.api.plugin.exception
 
 /**
  * Thrown when attempting to load an invalid Plugin file
  */
-public class InvalidPluginException extends Exception {
-    private static final long serialVersionUID = -8242141640709409544L;
-
+class InvalidPluginException : Exception {
     /**
      * Constructs a new InvalidPluginException based on the given Exception
      *
      * @param cause Exception that triggered this Exception
      */
-    public InvalidPluginException(final Throwable cause) {
-        super(cause);
-    }
+    constructor(cause: Throwable?) : super(cause)
 
     /**
      * Constructs a new InvalidPluginException
      */
-    public InvalidPluginException() {
-
-    }
+    constructor()
 
     /**
      * Constructs a new InvalidPluginException with the specified detail
      * message and cause.
      *
      * @param message the detail message (which is saved for later retrieval
-     *     by the getMessage() method).
+     * by the getMessage() method).
      * @param cause the cause (which is saved for later retrieval by the
-     *     getCause() method). (A null value is permitted, and indicates that
-     *     the cause is nonexistent or unknown.)
+     * getCause() method). (A null value is permitted, and indicates that
+     * the cause is nonexistent or unknown.)
      */
-    public InvalidPluginException(final String message, final Throwable cause) {
-        super(message, cause);
-    }
+    constructor(message: String?, cause: Throwable?) : super(message, cause)
 
     /**
      * Constructs a new InvalidPluginException with the specified detail
      * message
      *
      * @param message TThe detail message is saved for later retrieval by the
-     *     getMessage() method.
+     * getMessage() method.
      */
-    public InvalidPluginException(final String message) {
-        super(message);
+    constructor(message: String?) : super(message)
+
+    companion object {
+        private const val serialVersionUID = -8242141640709409544L
     }
 }

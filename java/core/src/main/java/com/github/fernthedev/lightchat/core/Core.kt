@@ -1,17 +1,10 @@
-package com.github.fernthedev.lightchat.core;
+package com.github.fernthedev.lightchat.core
 
+import org.slf4j.Logger
 
-import org.slf4j.Logger;
-
-public interface Core {
-
-    boolean isRunning();
-
-    Logger getLogger();
-
-    String getName();
-
-
-
-    void shutdown();
+interface Core {
+    val isRunning: Boolean
+    val logger: Logger
+    val name: String
+    fun shutdown()
 }

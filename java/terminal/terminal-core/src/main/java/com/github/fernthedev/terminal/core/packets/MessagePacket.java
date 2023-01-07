@@ -10,7 +10,7 @@ public class MessagePacket extends Packet {
         this.message = message;
     }
 
-    private String message;
+    private final String message;
 
     public String getMessage() {
         return message;

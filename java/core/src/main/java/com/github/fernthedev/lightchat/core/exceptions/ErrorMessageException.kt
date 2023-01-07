@@ -1,17 +1,7 @@
-package com.github.fernthedev.lightchat.core.exceptions;
+package com.github.fernthedev.lightchat.core.exceptions
 
-public class ErrorMessageException extends Exception {
-
-    public ErrorMessageException(String string) {
-        super(string);
-    }
-
-    public ErrorMessageException(Exception ex) {
-        super(ex);
-    }
-
-    public ErrorMessageException(String s,Exception ex) {
-        super(s,ex);
-    }
-
+class ErrorMessageException : Exception {
+    constructor(string: String?) : super(string)
+    constructor(ex: Exception?) : super(ex)
+    constructor(s: String?, ex: Exception?) : super(s, ex)
 }

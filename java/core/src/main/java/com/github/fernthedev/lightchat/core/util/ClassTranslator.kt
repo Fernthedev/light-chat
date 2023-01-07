@@ -1,15 +1,8 @@
-package com.github.fernthedev.lightchat.core.util;
+package com.github.fernthedev.lightchat.core.util
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.Nullable;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Map;
+import org.jetbrains.annotations.Contract
+import java.math.BigDecimal
+import java.math.BigInteger
 
 /**
  * This translates classes to
@@ -17,64 +10,60 @@ import java.util.Map;
  * to classes in the client
  * to avoid using java class names.
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ClassTranslator {
+object ClassTranslator {
+    private val classTranslateMap: MutableMap<Class<*>, String> = HashMap()
+    private val reverseTranslationMap: MutableMap<String, Class<*>> = HashMap()
 
-    private static final Map<Class<?>, String> classTranslateMap = new HashMap<>();
-    private static final Map<String, Class<?>> reverseTranslationMap = new HashMap<>();
-
-    static {
-        registerTranslations();
-        registerReverseTranslations();
+    init {
+        registerTranslations()
+        registerReverseTranslations()
     }
 
-    private static void registerTranslations() {
-        registerTranslation(String.class, "string");
-        registerTranslation(BigInteger.class, "big_integer");
-        registerTranslation(BigDecimal.class, "big_decimal");
-        registerTranslation(Double.class, "double");
-        registerTranslation(double.class, "double");
-        registerTranslation(Long.class, "long");
-        registerTranslation(long.class, "long");
-        registerTranslation(Byte.class, "byte");
-        registerTranslation(byte.class, "byte");
-        registerTranslation(Integer.class, "int");
-        registerTranslation(int.class, "int");
-        registerTranslation(Float.class, "float");
-        registerTranslation(float.class, "float");
-        registerTranslation(Short.class, "short");
-        registerTranslation(short.class, "short");
+    private fun registerTranslations() {
+        registerTranslation(String::class.java, "string")
+        registerTranslation(BigInteger::class.java, "big_integer")
+        registerTranslation(BigDecimal::class.java, "big_decimal")
+        registerTranslation(Double::class.java, "double")
+        registerTranslation(Double::class.javaPrimitiveType!!, "double")
+        registerTranslation(Long::class.java, "long")
+        registerTranslation(Long::class.javaPrimitiveType!!, "long")
+        registerTranslation(Byte::class.java, "byte")
+        registerTranslation(Byte::class.javaPrimitiveType!!, "byte")
+        registerTranslation(Int::class.java, "int")
+        registerTranslation(Int::class.javaPrimitiveType!!, "int")
+        registerTranslation(Float::class.java, "float")
+        registerTranslation(Float::class.javaPrimitiveType!!, "float")
+        registerTranslation(Short::class.java, "short")
+        registerTranslation(Short::class.javaPrimitiveType!!, "short")
     }
 
-    private static void registerReverseTranslations() {
-        registerReverseTranslation(String.class, "string");
-        registerReverseTranslation(BigInteger.class, "big_integer");
-        registerReverseTranslation(BigDecimal.class, "big_decimal");
-        registerReverseTranslation(double.class, "double");
-        registerReverseTranslation(long.class, "long");
-        registerReverseTranslation(int.class, "int");
-        registerReverseTranslation(byte.class, "byte");
-        registerReverseTranslation(float.class, "float");
-        registerReverseTranslation(short.class, "short");
+    private fun registerReverseTranslations() {
+        registerReverseTranslation(String::class.java, "string")
+        registerReverseTranslation(BigInteger::class.java, "big_integer")
+        registerReverseTranslation(BigDecimal::class.java, "big_decimal")
+        registerReverseTranslation(Double::class.javaPrimitiveType!!, "double")
+        registerReverseTranslation(Long::class.javaPrimitiveType!!, "long")
+        registerReverseTranslation(Int::class.javaPrimitiveType!!, "int")
+        registerReverseTranslation(Byte::class.javaPrimitiveType!!, "byte")
+        registerReverseTranslation(Float::class.javaPrimitiveType!!, "float")
+        registerReverseTranslation(Short::class.javaPrimitiveType!!, "short")
     }
 
-    public static void registerTranslation(@NonNull Class<?> clazz, @NonNull String translate) {
-        classTranslateMap.put(clazz, translate);
+    fun registerTranslation(clazz: Class<*>, translate: String) {
+        classTranslateMap[clazz] = translate
     }
 
-    public static void registerReverseTranslation(@NonNull Class<?> clazz, @NonNull String translate) {
-        reverseTranslationMap.put(translate, clazz);
+    fun registerReverseTranslation(clazz: Class<*>, translate: String) {
+        reverseTranslationMap[translate] = clazz
     }
 
     @Contract("null -> null")
-    @Nullable
-    public static String translate(Class<?> clazz) {
-        return classTranslateMap.get(clazz);
-    }
-    @Contract("null -> null")
-    @Nullable
-    public static Class<?> findTranslation(String lookup) {
-        return reverseTranslationMap.get(lookup);
+    fun translate(clazz: Class<*>): String? {
+        return classTranslateMap[clazz]
     }
 
+    @Contract("null -> null")
+    fun findTranslation(lookup: String): Class<*>? {
+        return reverseTranslationMap[lookup]
+    }
 }

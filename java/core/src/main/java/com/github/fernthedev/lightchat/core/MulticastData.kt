@@ -1,39 +1,26 @@
-package com.github.fernthedev.lightchat.core;
+package com.github.fernthedev.lightchat.core
 
-import lombok.Getter;
-import lombok.Setter;
-
-import java.util.ArrayList;
-import java.util.List;
-
-@Getter
-@Setter
-public class MulticastData {
-
-    public MulticastData() {}
-
-    public MulticastData(int port, String verison, String minVersion) {
-        this.port = port;
-        this.version = verison;
-        this.minVersion = minVersion;
-        this.address = address;
+class MulticastData {
+    constructor()
+    constructor(port: Int, verison: String?, minVersion: String?) {
+        this.port = port
+        version = verison
+        this.minVersion = minVersion
+        address = address
     }
 
-    public MulticastData(int port, String version, String minVersion, int clientNumbers) {
-        this(port, version, minVersion);
-        this.clientNumbers = clientNumbers;
+    constructor(port: Int, version: String?, minVersion: String?, clientNumbers: Int) : this(
+        port,
+        version,
+        minVersion
+    ) {
+        this.clientNumbers = clientNumbers
     }
 
-    private String address;
-
-    private String version;
-    private String minVersion;
-
-    private int port;
-
-    private int clientNumbers = 0;
-    private List<String> clients =  new ArrayList<>();
-
-
-
+    var address: String? = null
+    var version: String? = null
+    var minVersion: String? = null
+    var port = 0
+    var clientNumbers = 0
+    var clients: List<String> = ArrayList()
 }

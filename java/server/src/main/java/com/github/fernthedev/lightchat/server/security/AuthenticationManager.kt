@@ -1,37 +1,28 @@
-package com.github.fernthedev.lightchat.server.security;
+package com.github.fernthedev.lightchat.server.security
 
-import com.github.fernthedev.lightchat.core.api.event.api.Listener;
-import com.github.fernthedev.lightchat.core.data.HashedPassword;
-import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil;
-import com.github.fernthedev.lightchat.core.packets.SelfMessagePacket;
-import com.github.fernthedev.lightchat.server.ClientConnection;
-import com.github.fernthedev.lightchat.server.Console;
-import com.github.fernthedev.lightchat.server.SenderInterface;
-import com.github.fernthedev.lightchat.server.Server;
-import com.github.fernthedev.lightchat.server.event.AuthenticateRequestEvent;
-import com.github.fernthedev.lightchat.server.event.AuthenticationAttemptedEvent;
-import lombok.Getter;
-import org.jetbrains.annotations.Contract;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
+import com.github.fernthedev.lightchat.core.api.event.api.Listener
+import com.github.fernthedev.lightchat.core.data.HashedPassword
+import com.github.fernthedev.lightchat.core.encryption.transport
+import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil
+import com.github.fernthedev.lightchat.core.packets.SelfMessagePacket
+import com.github.fernthedev.lightchat.server.*
+import com.github.fernthedev.lightchat.server.event.AuthenticateRequestEvent
+import com.github.fernthedev.lightchat.server.event.AuthenticationAttemptedEvent
+import com.github.fernthedev.lightchat.server.event.AuthenticationAttemptedEvent.EventStatus
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asExecutor
+import lombok.*
+import org.jetbrains.annotations.Contract
+import java.util.concurrent.CompletableFuture
 
 /**
  * Can be used to authenticate command senders.
  */
-public class AuthenticationManager implements Listener {
-    private final Server server;
-
-    private final Map<SenderInterface, PlayerInfo> checking = new HashMap<>();
-
-    public AuthenticationManager(Server server) {
-        this.server = server;
-    }
+class AuthenticationManager(private val server: Server) : Listener {
+    private val checking: MutableMap<SenderInterface, PlayerInfo> = HashMap()
 
     @Getter
-    protected int amountOfTries = 2;
-
+    protected var amountOfTries = 2
 
     /**
      * Runs asynchronously to check if the
@@ -44,46 +35,31 @@ public class AuthenticationManager implements Listener {
      *
      * @throws UserIsAuthenticatingException thrown if the user is already attempting authentication
      */
-    public CompletableFuture<Boolean> authenticate(SenderInterface sender) {
-        if (checking.containsKey(sender)) throw new UserIsAuthenticatingException("The sender " + sender + " is already attempting authentication.");
-
-        if (sender instanceof Console) {
-            return CompletableFuture.completedFuture(true);
+    fun authenticate(sender: SenderInterface): CompletableFuture<Boolean> {
+        if (checking.containsKey(sender)) throw UserIsAuthenticatingException("The sender $sender is already attempting authentication.")
+        if (sender is Console) {
+            return CompletableFuture.completedFuture(true)
         }
-
-        CompletableFuture<Boolean> completableFuture = new CompletableFuture<>();
-
-        PlayerInfo playerInfo = new PlayerInfo(sender, completableFuture);
-
-
-
-        if (sender instanceof ClientConnection) {
-            server.getExecutorService().submit(() -> {
-
-                playerInfo.mode = Mode.AUTHENTICATE;
-                AuthenticateRequestEvent event = new AuthenticateRequestEvent(playerInfo, true);
-
-                server.getPluginManager().callEvent(event);
-
-                if (event.isCancelled()) {
-                    completableFuture.complete(playerInfo.authenticated);
-                    return;
+        val completableFuture = CompletableFuture<Boolean>()
+        val playerInfo = PlayerInfo(sender, completableFuture)
+        if (sender is ClientConnection) {
+            Dispatchers.Default.asExecutor()
+                .execute {
+                    playerInfo.mode = Mode.AUTHENTICATE
+                    val event = AuthenticateRequestEvent(playerInfo, true)
+                    server.pluginManager.callEvent(event)
+                    if (event.isCancelled) {
+                        completableFuture.complete(playerInfo.authenticated)
+                        return@execute
+                    }
+                    if (!checking.containsKey(sender)) {
+                        checking[sender] = playerInfo
+                    }
+                    sender.sendObject(SelfMessagePacket(SelfMessagePacket.MessageType.FILL_PASSWORD).transport(false))
                 }
-
-                if (!checking.containsKey(sender)) {
-                    checking.put(sender, playerInfo);
-                }
-
-                ClientConnection clientConnection = (ClientConnection) sender;
-                clientConnection.sendObject(new SelfMessagePacket(SelfMessagePacket.MessageType.FILL_PASSWORD), false);
-
-
-            });
         }
-
-        return completableFuture;
+        return completableFuture
     }
-
 
     /**
      * Gets the future of the authentication
@@ -92,8 +68,8 @@ public class AuthenticationManager implements Listener {
      * @return null if not being authenticated
      */
     @Contract("null -> null")
-    public CompletableFuture<Boolean> getUserAuthenticationFuture(SenderInterface sender) {
-        return checking.get(sender).future;
+    fun getUserAuthenticationFuture(sender: SenderInterface): CompletableFuture<Boolean> {
+        return checking[sender]!!.future
     }
 
     /**
@@ -107,101 +83,78 @@ public class AuthenticationManager implements Listener {
      * @param hashedPassword
      * @param sender
      */
-    public void attemptAuthenticationHash(HashedPassword hashedPassword, SenderInterface sender) {
+    fun attemptAuthenticationHash(hashedPassword: HashedPassword, sender: SenderInterface) {
         if (checking.containsKey(sender)) {
-            PlayerInfo playerInfo = checking.get(sender);
-
-            AuthenticationAttemptedEvent event = new AuthenticationAttemptedEvent(playerInfo, true, null);
-
-
+            val playerInfo = checking[sender]!!
+            val event = AuthenticationAttemptedEvent(playerInfo, true,  EventStatus.ATTEMPT_FAILED)
             if (playerInfo.mode == Mode.AUTHENTICATE) {
-
-                String rightPass = EncryptionUtil.makeSHA256Hash(server.getSettingsManager().getConfigData().getPassword());
-
-                AuthenticationAttemptedEvent.EventStatus eventStatus;
-
-                if (rightPass.equals(hashedPassword.getPassword()))
-                    eventStatus = AuthenticationAttemptedEvent.EventStatus.SUCCESS;
-                else
-                    eventStatus = playerInfo.tries <= amountOfTries ?
-                            AuthenticationAttemptedEvent.EventStatus.ATTEMPT_FAILED :
-                            AuthenticationAttemptedEvent.EventStatus.NO_MORE_TRIES;
+                val rightPass = EncryptionUtil.makeSHA256Hash(server.settingsManager.configData.password)
+                val eventStatus: EventStatus = if (rightPass == hashedPassword.password) {
+                    EventStatus.SUCCESS
+                } else if (playerInfo.tries <= amountOfTries) {
+                    EventStatus.ATTEMPT_FAILED
+                } else {
+                    EventStatus.NO_MORE_TRIES
+                }
 
                 //Handle event
-                event.setEventStatus(eventStatus);
+                event.eventStatus = eventStatus
+                server.pluginManager.callEvent(event)
+                if (event.isCancelled) return
+                playerInfo.authenticated = event.eventStatus == EventStatus.SUCCESS
+                when (event.eventStatus) {
+                    EventStatus.SUCCESS -> {
+                        completeAuthentication(playerInfo, true)
+                        sender.sendPacket(
+                            SelfMessagePacket(SelfMessagePacket.MessageType.CORRECT_PASSWORD).transport(
+                                true
+                            )
+                        )
+                    }
 
-                server.getPluginManager().callEvent(event);
+                    EventStatus.ATTEMPT_FAILED -> {
+                        sender.sendPacket(
+                            SelfMessagePacket(SelfMessagePacket.MessageType.INCORRECT_PASSWORD_ATTEMPT).transport(
+                                true
+                            )
+                        )
+                        playerInfo.tries++
+                    }
 
-                if (event.isCancelled()) return;
-
-
-                playerInfo.authenticated = event.getEventStatus() == AuthenticationAttemptedEvent.EventStatus.SUCCESS;
-
-                switch (event.getEventStatus()) {
-
-                    case SUCCESS:
-                        completeAuthentication(playerInfo, true);
-
-                        sender.sendPacket(new SelfMessagePacket(SelfMessagePacket.MessageType.CORRECT_PASSWORD));
-                        break;
-                    case ATTEMPT_FAILED:
-                        sender.sendPacket(new SelfMessagePacket(SelfMessagePacket.MessageType.INCORRECT_PASSWORD_ATTEMPT));
-                        playerInfo.tries++;
-
-                        break;
-                    case NO_MORE_TRIES:
-
-                        String info;
-
-                        if (sender instanceof ClientConnection) info = ((ClientConnection) sender).getAddress();
-                        else info = "";
-
-                        server.getLogger().warn("{}:{} tried to authenticate but failed 2 times", sender.getName(), info);
-                        sender.sendPacket(new SelfMessagePacket(SelfMessagePacket.MessageType.INCORRECT_PASSWORD_FAILURE));
-                        completeAuthentication(playerInfo, false);
-                        break;
+                    EventStatus.NO_MORE_TRIES -> {
+                        val info: String? = if (sender is ClientConnection) sender.address else ""
+                        server.logger.warn("{}:{} tried to authenticate but failed 2 times", sender.name, info)
+                        sender.sendPacket(
+                            SelfMessagePacket(SelfMessagePacket.MessageType.INCORRECT_PASSWORD_FAILURE).transport(
+                                true
+                            )
+                        )
+                        completeAuthentication(playerInfo, false)
+                    }
                 }
             }
         }
     }
 
-    protected void completeAuthentication(PlayerInfo playerInfo, boolean authenticated) {
-        playerInfo.future.complete(authenticated);
-        checking.remove(playerInfo.sender);
+    protected fun completeAuthentication(playerInfo: PlayerInfo?, authenticated: Boolean) {
+        playerInfo!!.future.complete(authenticated)
+        checking.remove(playerInfo.sender)
     }
 
-    /**
-     * Returns a copy of the authentication queue
-     * @return copy of authentication queue
-     */
-    public Map<SenderInterface, PlayerInfo> getAwaitingAuthentications() {
-        return new HashMap<>(checking);
-    }
+    val awaitingAuthentications: Map<SenderInterface, PlayerInfo>
+        /**
+         * Returns a copy of the authentication queue
+         * @return copy of authentication queue
+         */
+        get() = HashMap(checking)
 
-    public enum Mode {
+    enum class Mode {
         AUTHENTICATE
     }
 
-    public static class PlayerInfo {
-
-        protected CompletableFuture<Boolean> future;
-
-        public final SenderInterface sender;
-
-        public boolean authenticated = false;
-
-        public AuthenticationManager.Mode mode = AuthenticationManager.Mode.AUTHENTICATE;
-        public int tries = 0;
-
-
-
-        public PlayerInfo(SenderInterface sender, CompletableFuture<Boolean> completableFuture) {
-            this.sender = sender;
-            this.future = completableFuture;
-        }
-
-
-
+    class PlayerInfo(@JvmField val sender: SenderInterface, var future: CompletableFuture<Boolean>) {
+        var authenticated = false
+        var mode = Mode.AUTHENTICATE
+        var tries = 0
     }
-
 }

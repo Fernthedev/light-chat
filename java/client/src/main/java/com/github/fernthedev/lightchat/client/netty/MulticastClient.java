@@ -24,7 +24,7 @@ public class MulticastClient {
     @Getter
     private final List<MulticastData> serversAddress = new ArrayList<>();
 
-    private Map<String, MulticastData> addressServerAddressMap = new HashMap<>();
+    private final Map<String, MulticastData> addressServerAddressMap = new HashMap<>();
 
     public void checkServers(int amount) {
         try(MulticastSocket socket = new MulticastSocket(4446)) {

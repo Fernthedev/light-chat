@@ -6,7 +6,7 @@ import com.github.fernthedev.lightchat.core.packets.PacketInfo;
 @PacketInfo(name = "COMMAND_PACKET")
 public class CommandPacket extends Packet {
 
-    private String message;
+    private final String message;
 
     public CommandPacket(String message) {
         this.message = message;

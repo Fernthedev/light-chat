@@ -4,6 +4,7 @@ package com.github.fernthedev.lightchat.server.terminal;
 import com.github.fernthedev.lightchat.core.ColorCode;
 import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.core.api.APIUsage;
+import com.github.fernthedev.lightchat.core.encryption.PacketTransporter;
 import com.github.fernthedev.lightchat.core.packets.IllegalConnectionPacket;
 import com.github.fernthedev.lightchat.core.packets.SelfMessagePacket;
 import com.github.fernthedev.lightchat.core.packets.handshake.ConnectedPacket;
@@ -24,12 +25,13 @@ import lombok.SneakyThrows;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 
 public class ServerCommandHandler {
 
-    private Server server;
+    private final Server server;
 
 
     public ServerCommandHandler(Server server) {
@@ -235,7 +237,7 @@ public class ServerCommandHandler {
                             case "name":
                                 for (ClientConnection clientConnection : new HashMap<>(server.getPlayerHandler().getChannelMap()).values()) {
                                     if (clientConnection.getName().equals(args[1])) {
-                                        clientConnection.sendObject(new MessagePacket("Banned: " + message));
+                                        clientConnection.sendObject(new PacketTransporter(new MessagePacket("Banned: " + message), true));
                                         clientConnection.close();
 
                                         server.getBanManager().ban(clientConnection.getAddress());
@@ -248,7 +250,7 @@ public class ServerCommandHandler {
                             case "ip":
                                 for (ClientConnection clientConnection : new HashMap<>(server.getPlayerHandler().getChannelMap()).values()) {
                                     if (clientConnection.getAddress().equals(args[1])) {
-                                        clientConnection.sendObject(new MessagePacket("Banned: " + message));
+                                        clientConnection.sendObject(new PacketTransporter(new MessagePacket("Banned: " + message), true));
                                         clientConnection.close();
                                     }
                                 }

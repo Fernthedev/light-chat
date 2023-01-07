@@ -1,21 +1,10 @@
-package com.github.fernthedev.lightchat.server.event;
+package com.github.fernthedev.lightchat.server.event
 
-import com.github.fernthedev.lightchat.core.api.event.api.Event;
-import com.github.fernthedev.lightchat.core.api.event.api.HandlerList;
+import com.github.fernthedev.lightchat.core.api.event.api.Event
+import com.github.fernthedev.lightchat.core.api.event.api.HandlerList
 
-public class ServerShutdownEvent extends Event {
-    private static final HandlerList handlers = new HandlerList();
-
-    public void foo() {
-
-    }
-
-    @Override
-    public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
-        return handlers;
+class ServerShutdownEvent(override val handlers: HandlerList = handlerList) : Event() {
+    companion object {
+        val handlerList = HandlerList()
     }
 }

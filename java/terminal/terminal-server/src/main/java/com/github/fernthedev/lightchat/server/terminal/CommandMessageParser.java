@@ -8,6 +8,8 @@ import com.github.fernthedev.lightchat.server.Server;
 import com.github.fernthedev.lightchat.server.terminal.command.Command;
 import com.github.fernthedev.lightchat.server.terminal.events.ChatEvent;
 import com.github.fernthedev.lightchat.server.terminal.exception.InvalidCommandArgumentException;
+import kotlin.coroutines.EmptyCoroutineContext;
+import kotlinx.coroutines.Dispatchers;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -41,7 +43,7 @@ public class CommandMessageParser implements Listener {
         }
 
         if (e.isAsynchronous()) {
-            server.getExecutorService().submit(runnable);
+            Dispatchers.getDefault().dispatch(EmptyCoroutineContext.INSTANCE, runnable);
         } else {
             runnable.run();
         }

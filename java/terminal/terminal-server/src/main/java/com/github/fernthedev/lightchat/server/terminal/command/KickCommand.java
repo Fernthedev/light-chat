@@ -1,5 +1,6 @@
 package com.github.fernthedev.lightchat.server.terminal.command;
 
+import com.github.fernthedev.lightchat.core.encryption.PacketTransporter;
 import com.github.fernthedev.lightchat.server.ClientConnection;
 import com.github.fernthedev.lightchat.server.Console;
 import com.github.fernthedev.lightchat.server.SenderInterface;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class KickCommand extends Command implements TabExecutor {
 
-    private Server server;
+    private final Server server;
 
     public KickCommand(@NonNull String command, Server server) {
         super(command);
@@ -32,7 +33,7 @@ public class KickCommand extends Command implements TabExecutor {
 
                 for (ClientConnection clientConnection : new HashMap<>(server.getPlayerHandler().getChannelMap()).values()) {
                     if (argName[0].equals(clientConnection.getName())) {
-                        clientConnection.sendObject(new MessagePacket("You have been kicked."));
+                        clientConnection.sendObject(new PacketTransporter(new MessagePacket("You have been kicked."), true));
 
                         clientConnection.close();
                     }

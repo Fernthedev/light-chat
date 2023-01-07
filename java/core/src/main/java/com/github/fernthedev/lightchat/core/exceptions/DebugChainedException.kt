@@ -1,25 +1,22 @@
-package com.github.fernthedev.lightchat.core.exceptions;
+package com.github.fernthedev.lightchat.core.exceptions
 
-public class DebugChainedException extends DebugException {
+class DebugChainedException : DebugException {
+    private var exception: Exception? = null
+    override val message: String? = null
 
-    private Exception exception;
-    private String message;
-
-    public DebugChainedException() {
-        new IllegalArgumentException("Use DebugException instead").printStackTrace();
+    constructor() {
+        IllegalArgumentException("Use DebugException instead").printStackTrace()
     }
 
-    public DebugChainedException(Exception exception,String message) {
-        super(message);
-        this.exception = exception;
+    constructor(exception: Exception?, message: String?) : super(message) {
+        this.exception = exception
     }
 
-    @Override
-    public void printStackTrace() {
-        System.out.println(message);
-        super.printStackTrace();
-        initCause(exception);
-        System.err.println("Caused by: " + getCause());
-        getCause().printStackTrace();
+    override fun printStackTrace() {
+        println(message)
+        super.printStackTrace()
+        initCause(exception)
+        System.err.println("Caused by: $cause")
+        cause!!.printStackTrace()
     }
 }

@@ -1,70 +1,68 @@
-package com.github.fernthedev.lightchat.core.api;
+package com.github.fernthedev.lightchat.core.api
 
-import lombok.Getter;
+import lombok.Getter
 
-public class ThreadLock {
-
-    private final Object threadLockObject = new Object();
-
+class ThreadLock {
+    private val threadLockObject = Any()
 
     @Getter
-    private boolean lock = false;
-
-    public void lock() {
-        lock = true;
+    private var lock = false
+    fun lock() {
+        lock = true
     }
 
     /**
      * Notifies all threads that the object is ready
      *
-     * See {@link Object#notifyAll()}
+     * See [Object.notifyAll]
      *
      */
-    public void notifyAllThreads() {
-        lock = false;
-        synchronized (threadLockObject) {
-            threadLockObject.notifyAll();
+    fun notifyAllThreads() {
+        lock = false
+        synchronized(threadLockObject) {
+//            threadLockObject.notifyAll()
         }
     }
 
     /**
-     * Waits on the {@link #threadLockObject}
+     * Waits on the [.threadLockObject]
      *
-     * See {@link Object#wait()}
+     * See [Object.wait]
      *
      * @throws InterruptedException
      */
-    public void waitOnLock() throws InterruptedException {
-        synchronized (threadLockObject) {
-            threadLockObject.wait();
+    @Throws(InterruptedException::class)
+    fun waitOnLock() {
+        synchronized(threadLockObject) {
+//            threadLockObject.wait()
         }
     }
 
     /**
-     * Waits on the {@link #threadLockObject}
+     * Waits on the [.threadLockObject]
      *
-     * See {@link Object#wait(long)}
+     * See [Object.wait]
      *
      * @throws InterruptedException
      */
-    public void waitOnLock(long timeoutMillis) throws InterruptedException {
-        synchronized (threadLockObject) {
-            threadLockObject.wait(timeoutMillis);
+    @Throws(InterruptedException::class)
+    fun waitOnLock(timeoutMillis: Long) {
+        synchronized(threadLockObject) {
+//            threadLockObject.wait(timeoutMillis)
         }
     }
 
     /**
-     * Waits on the {@link #threadLockObject}
+     * Waits on the [.threadLockObject]
      *
-     * See {@link Object#wait(long, int)}
+     * See [Object.wait]
      *
      * @throws InterruptedException
      */
-    public void waitOnLock(long timeoutMillis, int nanos) throws InterruptedException {
-        synchronized (threadLockObject) {
-            threadLockObject.wait(timeoutMillis, nanos);
+    @Throws(InterruptedException::class)
+    fun waitOnLock(timeoutMillis: Long, nanos: Int) {
+        synchronized(threadLockObject) {
+//            threadLockObject.wait(timeoutMillis, nanos)
         }
     }
-
-
 }

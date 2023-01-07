@@ -1,32 +1,18 @@
-package com.github.fernthedev.lightchat.server;
+package com.github.fernthedev.lightchat.server
 
-import com.github.fernthedev.lightchat.core.Core;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
+import com.github.fernthedev.lightchat.core.Core
+import org.slf4j.Logger
 
-@RequiredArgsConstructor
-public class ServerCore implements Core {
-    @NonNull
-    protected final Server server;
 
-    @Override
-    public boolean isRunning() {
-        return server.isRunning();
-    }
-
-    @Override
-    public Logger getLogger() {
-        return server.getLogger();
-    }
-
-    @Override
-    public String getName() {
-        return "Server";
-    }
-
-    @Override
-    public void shutdown() {
-        server.shutdownServer();
+open class ServerCore
+@JvmOverloads
+constructor(
+    val server: Server,
+    override val isRunning: Boolean = server.isRunning(),
+    override val logger: Logger = server.logger,
+    override val name: String = "Server"
+) : Core {
+    override fun shutdown() {
+        server.shutdownServer()
     }
 }

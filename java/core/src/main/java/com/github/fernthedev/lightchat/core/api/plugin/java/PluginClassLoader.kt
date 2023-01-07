@@ -1,47 +1,40 @@
-package com.github.fernthedev.lightchat.core.api.plugin.java;
+package com.github.fernthedev.lightchat.core.api.plugin.java
 
-import com.github.fernthedev.lightchat.core.StaticHandler;
-import com.github.fernthedev.lightchat.core.api.plugin.PluginDescriptionFile;
-import com.github.fernthedev.lightchat.core.api.plugin.exception.InvalidPluginException;
-import org.apache.commons.lang3.Validate;
+import com.github.fernthedev.lightchat.core.StaticHandler
+import com.github.fernthedev.lightchat.core.api.plugin.PluginDescriptionFile
+import org.apache.commons.lang3.Validate
+import java.io.File
+import java.net.URLClassLoader
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
+internal class PluginClassLoader(
+    loader: JavaPluginLoader,
+    parent: ClassLoader?,
+    description: PluginDescriptionFile?,
+    dataFolder: File?,
+    file: File
+) : URLClassLoader(
+    arrayOf(file.toURI().toURL()), parent
+) {
+    // Spigot End
+    init {
+        Validate.notNull(loader, "Loader cannot be null")
+    }
 
-final class PluginClassLoader extends URLClassLoader {
-
-    // Spigot Start
-    static
-    {
-        try
-        {
-            java.lang.reflect.Method method = ClassLoader.class.getDeclaredMethod( "registerAsParallelCapable" );
-            if ( method != null )
-            {
-                boolean oldAccessible = method.isAccessible();
-                method.setAccessible( true );
-                method.invoke( null );
-                method.setAccessible( oldAccessible );
-                StaticHandler.getCore().getLogger().info( "Set PluginClassLoader as parallel capable" );
+    companion object {
+        // Spigot Start
+        init {
+            try {
+                val method = ClassLoader::class.java.getDeclaredMethod("registerAsParallelCapable")
+                val oldAccessible = method.isAccessible
+                method.isAccessible = true
+                method.invoke(null)
+                method.isAccessible = oldAccessible
+                StaticHandler.core.logger.info("Set PluginClassLoader as parallel capable")
+            } catch (ex: NoSuchMethodException) {
+                // Ignore
+            } catch (ex: Exception) {
+                StaticHandler.core.logger.info("Error setting PluginClassLoader as parallel capable", ex)
             }
-        } catch ( NoSuchMethodException ex )
-        {
-            // Ignore
-        } catch ( Exception ex )
-        {
-            StaticHandler.getCore().getLogger().info( "Error setting PluginClassLoader as parallel capable", ex );
         }
     }
-    // Spigot End
-
-
-
-    PluginClassLoader(final JavaPluginLoader loader, final ClassLoader parent, final PluginDescriptionFile description, final File dataFolder, final File file) throws InvalidPluginException, MalformedURLException {
-        super(new URL[] {file.toURI().toURL()}, parent);
-        Validate.notNull(loader, "Loader cannot be null");
-
-    }
-
 }

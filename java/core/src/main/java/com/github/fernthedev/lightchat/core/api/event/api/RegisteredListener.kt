@@ -1,47 +1,31 @@
-package com.github.fernthedev.lightchat.core.api.event.api;
+package com.github.fernthedev.lightchat.core.api.event.api
 
-
-import com.github.fernthedev.lightchat.core.api.plugin.Plugin;
+import com.github.fernthedev.lightchat.core.api.plugin.*
 
 /**
  * Stores relevant information for plugin listeners
  */
-public class RegisteredListener {
-    private final Listener listener;
-    private final EventPriority priority;
-    private final EventExecutor executor;
-    private final boolean ignoreCancelled;
-
-    private Plugin plugin;
-
-    public RegisteredListener(final Listener listener, final EventExecutor executor, Plugin plugin, final EventPriority priority, final boolean ignoreCancelled) {
-        this.listener = listener;
-        this.priority = priority;
-        this.executor = executor;
-        this.ignoreCancelled = ignoreCancelled;
-    }
-
+class RegisteredListener(
     /**
      * Gets the listener for this registration
      *
      * @return Registered Listener
      */
-    public Listener getListener() {
-        return listener;
-    }
-
-    public Plugin getPlugin() {
-        return plugin;
-    }
-
+    val listener: Listener, private val executor: EventExecutor, plugin: Plugin?,
     /**
      * Gets the priority for this registration
      *
      * @return Registered Priority
      */
-    public EventPriority getPriority() {
-        return priority;
-    }
+    val priority: EventPriority,
+    /**
+     * Whether this listener accepts cancelled events
+     *
+     * @return True when ignoring cancelled events
+     */
+    val isIgnoringCancelled: Boolean
+) {
+    val plugin: Plugin? = null
 
     /**
      * Calls the com.github.fernthedev.client.event executor
@@ -49,21 +33,13 @@ public class RegisteredListener {
      * @param event The com.github.fernthedev.client.event
      * @throws EventException If an com.github.fernthedev.client.event handler throws an exception.
      */
-    public void callEvent(final Event event) throws EventException {
-        if (event instanceof Cancellable) {
-            if (((Cancellable) event).isCancelled() && isIgnoringCancelled()) {
-                return;
+    @Throws(EventException::class)
+    fun callEvent(event: Event) {
+        if (event is Cancellable) {
+            if ((event as Cancellable).isCancelled && isIgnoringCancelled) {
+                return
             }
         }
-        executor.execute(listener, event);
-    }
-
-    /**
-     * Whether this listener accepts cancelled events
-     *
-     * @return True when ignoring cancelled events
-     */
-    public boolean isIgnoringCancelled() {
-        return ignoreCancelled;
+        executor.execute(listener, event)
     }
 }

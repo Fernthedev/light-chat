@@ -1,38 +1,28 @@
-package com.github.fernthedev.lightchat.server.event;
+package com.github.fernthedev.lightchat.server.event
 
-import com.github.fernthedev.lightchat.core.api.event.api.Cancellable;
-import com.github.fernthedev.lightchat.core.api.event.api.HandlerList;
-import com.github.fernthedev.lightchat.server.security.AuthenticationManager;
-import lombok.Getter;
-import lombok.Setter;
+import com.github.fernthedev.lightchat.core.api.event.api.Cancellable
+import com.github.fernthedev.lightchat.core.api.event.api.HandlerList
+import com.github.fernthedev.lightchat.server.security.AuthenticationManager.PlayerInfo
 
 /**
  * Called when client has successfully established a secure and valid connection
  */
-public class AuthenticationAttemptedEvent extends AuthenticateEvent implements Cancellable {
-    private static final HandlerList handlers = new HandlerList();
+class AuthenticationAttemptedEvent : AuthenticateEvent, Cancellable {
+    var eventStatus: EventStatus
 
-    @Setter
-    @Getter
-    private EventStatus eventStatus;
-
-    public AuthenticationAttemptedEvent(AuthenticationManager.PlayerInfo playerInfo, EventStatus eventStatus) {
-        super(playerInfo);
-        this.eventStatus = eventStatus;
+    constructor(playerInfo: PlayerInfo, eventStatus: EventStatus) : super(playerInfo) {
+        this.eventStatus = eventStatus
     }
 
-    public AuthenticationAttemptedEvent(AuthenticationManager.PlayerInfo playerInfo, boolean async, EventStatus eventStatus) {
-        super(playerInfo, async);
-        this.eventStatus = eventStatus;
+    constructor(playerInfo: PlayerInfo, async: Boolean, eventStatus: EventStatus) : super(playerInfo, async) {
+        this.eventStatus = eventStatus
     }
 
-    public static HandlerList getHandlerList() {
-        return handlers;
+    enum class EventStatus {
+        SUCCESS, ATTEMPT_FAILED, NO_MORE_TRIES
     }
 
-    public enum EventStatus {
-        SUCCESS,
-        ATTEMPT_FAILED,
-        NO_MORE_TRIES
+    companion object {
+        val handlerList = HandlerList()
     }
 }

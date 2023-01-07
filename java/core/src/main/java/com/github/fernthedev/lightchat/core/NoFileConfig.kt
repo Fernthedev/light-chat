@@ -1,43 +1,29 @@
-package com.github.fernthedev.lightchat.core;
+package com.github.fernthedev.lightchat.core
 
-import com.github.fernthedev.config.common.Config;
-import lombok.NonNull;
-import lombok.SneakyThrows;
+import com.github.fernthedev.config.common.Config
+import lombok.SneakyThrows
+import java.io.File
 
-import java.io.File;
-import java.util.List;
-
-public class NoFileConfig<T> extends Config<T> {
-    @SneakyThrows
-    public NoFileConfig(@NonNull T configData) {
-        super(configData, new File("."));
-    }
-
+class NoFileConfig<T> @SneakyThrows constructor(configData: T) : Config<T>(configData, File(".")) {
     /**
      * Saves the file without verifying the contents of the file
      */
-    @Override
-    public void quickSave() { }
-
-    @Override
-    public T load() {
-        return configData;
+    override fun quickSave() {}
+    override fun load(): T {
+        return configData
     }
 
-    @Override
-    public String configToFileString() {
-        return "";
+    override fun configToFileString(): String {
+        return ""
     }
-
 
     /**
-     * Returns the object instance of {@link #configData} parsed from the file which is saved by {@link #configToFileString()}
+     * Returns the object instance of [.configData] parsed from the file which is saved by [.configToFileString]
      *
      * @param data The String data from the file.
      * @return The object instance.
      */
-    @Override
-    protected T parseConfigFromData(@NonNull List<String> data) {
-        return configData;
+    override fun parseConfigFromData(data: List<String>): T {
+        return configData
     }
 }

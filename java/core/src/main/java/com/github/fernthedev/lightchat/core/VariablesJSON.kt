@@ -1,13 +1,6 @@
-package com.github.fernthedev.lightchat.core;
+package com.github.fernthedev.lightchat.core
 
-import lombok.Data;
-
-@Data
-public class VariablesJSON {
-
-    private VariablesJSON() {}
-
-    private String version;
-    private String minVersion;
-
-}
+data class VariablesJSON(
+    var version: String,
+    var minVersion: String
+)

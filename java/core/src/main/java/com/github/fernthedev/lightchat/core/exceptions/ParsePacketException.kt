@@ -1,62 +1,51 @@
-package com.github.fernthedev.lightchat.core.exceptions;
+package com.github.fernthedev.lightchat.core.exceptions
 
-import java.security.PrivilegedActionException;
-
-public class ParsePacketException extends IllegalArgumentException {
-
+class ParsePacketException : IllegalArgumentException {
     /**
-     * Constructs an <code>IllegalArgumentException</code> with no
+     * Constructs an `IllegalArgumentException` with no
      * detail message.
      */
-    public ParsePacketException() {
-        super();
-    }
+    constructor() : super()
 
     /**
-     * Constructs an <code>IllegalArgumentException</code> with the
+     * Constructs an `IllegalArgumentException` with the
      * specified detail message.
      *
      * @param s the detail message.
      */
-    public ParsePacketException(String s) {
-        super(s);
-    }
+    constructor(s: String?) : super(s)
 
     /**
      * Constructs a new exception with the specified detail message and
      * cause.
      *
-     * <p>Note that the detail message associated with <code>cause</code> is
-     * <i>not</i> automatically incorporated in this exception's detail
+     *
+     * Note that the detail message associated with `cause` is
+     * *not* automatically incorporated in this exception's detail
      * message.
      *
      * @param message the detail message (which is saved for later retrieval
-     *                by the {@link Throwable#getMessage()} method).
+     * by the [Throwable.getMessage] method).
      * @param cause   the cause (which is saved for later retrieval by the
-     *                {@link Throwable#getCause()} method).  (A {@code null} value
-     *                is permitted, and indicates that the cause is nonexistent or
-     *                unknown.)
+     * [Throwable.getCause] method).  (A `null` value
+     * is permitted, and indicates that the cause is nonexistent or
+     * unknown.)
      * @since 1.5
      */
-    public ParsePacketException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    constructor(message: String?, cause: Throwable?) : super(message, cause)
 
     /**
      * Constructs a new exception with the specified cause and a detail
-     * message of {@code (cause==null ? null : cause.toString())} (which
-     * typically contains the class and detail message of {@code cause}).
+     * message of `(cause==null ? null : cause.toString())` (which
+     * typically contains the class and detail message of `cause`).
      * This constructor is useful for exceptions that are little more than
-     * wrappers for other throwables (for example, {@link
-     * PrivilegedActionException}).
+     * wrappers for other throwables (for example, [ ]).
      *
      * @param cause the cause (which is saved for later retrieval by the
-     *              {@link Throwable#getCause()} method).  (A {@code null} value is
-     *              permitted, and indicates that the cause is nonexistent or
-     *              unknown.)
+     * [Throwable.getCause] method).  (A `null` value is
+     * permitted, and indicates that the cause is nonexistent or
+     * unknown.)
      * @since 1.5
      */
-    public ParsePacketException(Throwable cause) {
-        super(cause);
-    }
+    constructor(cause: Throwable?) : super(cause)
 }

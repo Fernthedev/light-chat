@@ -2,6 +2,7 @@ package com.github.fernthedev.lightchat.server.terminal;
 
 import com.github.fernthedev.lightchat.core.StaticHandler;
 import com.github.fernthedev.lightchat.core.data.LightCandidate;
+import com.github.fernthedev.lightchat.core.encryption.PacketTransporter;
 import com.github.fernthedev.lightchat.core.packets.HashedPasswordPacket;
 import com.github.fernthedev.lightchat.core.packets.Packet;
 import com.github.fernthedev.lightchat.core.packets.handshake.ConnectedPacket;
@@ -24,12 +25,11 @@ public class TerminalPacketHandler implements IPacketHandler {
     public void handlePacket(Packet p, ClientConnection clientConnection, int packetId) {
 
         if (p instanceof ConnectedPacket) {
-            if(server.getSettingsManager().getConfigData().isPasswordRequiredForLogin()) {
+            if(server.getSettingsManager().getConfigData().getPasswordRequiredForLogin()) {
                 server.getAuthenticationManager().authenticate(clientConnection).thenAccept(authenticated -> {
                     if(!authenticated) {
-                        clientConnection.sendObject(new MessagePacket("Unable to authenticate"));
+                        clientConnection.sendObject(new PacketTransporter(new MessagePacket("Unable to authenticate"), true));
                         clientConnection.close();
-                        return;
                     }
                 });
 
@@ -58,7 +58,7 @@ public class TerminalPacketHandler implements IPacketHandler {
             List<LightCandidate> candidates = ServerTerminal.getAutoCompleteHandler().handleLine(clientConnection, packet.getWords());
 
             packet.setCandidateList(candidates);
-            clientConnection.sendObject(packet);
+            clientConnection.sendObject(new PacketTransporter(packet, true));
         } else if (p instanceof HashedPasswordPacket) {
             server.getAuthenticationManager().attemptAuthenticationHash(
                     ((HashedPasswordPacket) p).getHashedPassword(),

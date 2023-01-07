@@ -1,30 +1,26 @@
-package com.github.fernthedev.lightchat.core.packets.handshake;
+package com.github.fernthedev.lightchat.core.packets.handshake
 
-import com.github.fernthedev.lightchat.core.VersionData;
-import com.github.fernthedev.lightchat.core.encryption.util.RSAEncryptionUtil;
-import com.github.fernthedev.lightchat.core.packets.Packet;
-import com.github.fernthedev.lightchat.core.packets.PacketInfo;
-
-import java.security.PublicKey;
+import com.github.fernthedev.lightchat.core.VersionData
+import com.github.fernthedev.lightchat.core.encryption.util.RSAEncryptionUtil
+import com.github.fernthedev.lightchat.core.packets.Packet
+import com.github.fernthedev.lightchat.core.packets.PacketInfo
+import java.security.PublicKey
 
 @PacketInfo(name = "INITIAL_HANDSHAKE_PACKET")
-public class InitialHandshakePacket extends Packet {
+class InitialHandshakePacket(publicKey: PublicKey, versionData: VersionData) : Packet() {
+    private val publicKey: String?
+    private val versionData: VersionDataString
 
-    public InitialHandshakePacket(PublicKey publicKey, VersionData versionData) {
-        this.publicKey = RSAEncryptionUtil.toBase64(publicKey);
-        this.versionData = new VersionDataString(versionData.getVersion().toString(), versionData.getMinVersion().toString());
+    init {
+        this.publicKey = RSAEncryptionUtil.toBase64(publicKey)
+        this.versionData = VersionDataString(versionData.version.toString(), versionData.minVersion.toString())
     }
 
-    private String publicKey;
-
-    private VersionDataString versionData;
-
-    public VersionData getVersionData() {
-        return new VersionData(versionData.getVersion(), versionData.getMinVersion());
+    fun getVersionData(): VersionData {
+        return VersionData(versionData.version, versionData.minVersion)
     }
 
-    public PublicKey getPublicKey() {
-        return RSAEncryptionUtil.toPublicKey(publicKey);
+    fun getPublicKey(): PublicKey? {
+        return RSAEncryptionUtil.toPublicKey(publicKey)
     }
-
 }

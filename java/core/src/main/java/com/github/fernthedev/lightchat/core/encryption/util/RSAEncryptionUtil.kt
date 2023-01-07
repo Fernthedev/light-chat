@@ -1,21 +1,15 @@
-package com.github.fernthedev.lightchat.core.encryption.util;
+package com.github.fernthedev.lightchat.core.encryption.util
 
-import com.github.fernthedev.lightchat.core.StaticHandler;
+import com.github.fernthedev.lightchat.core.StaticHandler
+import java.security.*
+import java.security.spec.InvalidKeySpecException
+import java.security.spec.PKCS8EncodedKeySpec
+import java.security.spec.X509EncodedKeySpec
+import java.util.*
+import javax.crypto.*
+import javax.crypto.spec.SecretKeySpec
 
-import javax.crypto.*;
-import javax.crypto.spec.SecretKeySpec;
-import java.security.*;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.Arrays;
-import java.util.Base64;
-
-public class RSAEncryptionUtil {
-
-    private RSAEncryptionUtil() {}
-
-
+object RSAEncryptionUtil {
     /**
      * Encrypts the secret key with the public key
      * @param secretKey The encrypted key
@@ -23,16 +17,22 @@ public class RSAEncryptionUtil {
      * @return Encrypted key
      * @throws InvalidKeyException The key is not valid
      */
-    public static byte[] encryptKey(SecretKey secretKey, PublicKey publicKey) throws InvalidKeyException {
+    @Throws(InvalidKeyException::class)
+    fun encryptKey(secretKey: SecretKey, publicKey: PublicKey?): ByteArray? {
         try {
-            Cipher rsaCipher = Cipher.getInstance(StaticHandler.RSA_CIPHER_TRANSFORMATION);
-            rsaCipher.init(Cipher.ENCRYPT_MODE, publicKey);
-
-            return rsaCipher.doFinal(secretKey.getEncoded());
-        } catch (NoSuchPaddingException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException e) {
-            e.printStackTrace();
+            val rsaCipher = Cipher.getInstance(StaticHandler.RSA_CIPHER_TRANSFORMATION)
+            rsaCipher.init(Cipher.ENCRYPT_MODE, publicKey)
+            return rsaCipher.doFinal(secretKey.encoded)
+        } catch (e: NoSuchPaddingException) {
+            e.printStackTrace()
+        } catch (e: NoSuchAlgorithmException) {
+            e.printStackTrace()
+        } catch (e: BadPaddingException) {
+            e.printStackTrace()
+        } catch (e: IllegalBlockSizeException) {
+            e.printStackTrace()
         }
-        return null;
+        return null
     }
 
     /**
@@ -42,76 +42,74 @@ public class RSAEncryptionUtil {
      * @return Decrypted key key
      * @throws InvalidKeyException The key is not valid
      */
-    public static SecretKey decryptKey(byte[] secretKey, PrivateKey privateKey) throws InvalidKeyException, BadPaddingException, NoSuchAlgorithmException {
-        try {
-            Cipher rsaCipher = Cipher.getInstance(StaticHandler.RSA_CIPHER_TRANSFORMATION);
-            rsaCipher.init(Cipher.DECRYPT_MODE, privateKey);
+    @Throws(InvalidKeyException::class, BadPaddingException::class, NoSuchAlgorithmException::class)
+    fun decryptKey(secretKey: ByteArray?, privateKey: PrivateKey): SecretKey {
+
+        val rsaCipher = Cipher.getInstance(StaticHandler.RSA_CIPHER_TRANSFORMATION)
+        rsaCipher.init(Cipher.DECRYPT_MODE, privateKey)
 
 //            Cipher aesCipher = Cipher.getInstance("AES");
 //            aesCipher.init(Cipher.DECRYPT_MODE, secretKey);
-
-            if (secretKey == null || secretKey.length == 0) throw new IllegalArgumentException("Secret key is null or empty: " + Arrays.toString(secretKey));
-
-            byte[] decryptedKey = rsaCipher.doFinal(secretKey);
-
-            return new SecretKeySpec(decryptedKey,  StaticHandler.AES_KEY_MODE);
-        } catch (NoSuchPaddingException | IllegalBlockSizeException e) {
-            e.printStackTrace();
+        require(!(secretKey == null || secretKey.isEmpty())) {
+            "Secret key is null or empty: " + Arrays.toString(
+                secretKey
+            )
         }
-        return null;
+        val decryptedKey = rsaCipher.doFinal(secretKey)
+        return SecretKeySpec(decryptedKey, StaticHandler.AES_KEY_MODE)
+
     }
 
     /**
      * Create a key pair
      * @return The pair
      */
-    public static KeyPair generateKeyPairs(int keySize) {
-        KeyPairGenerator keyGen;
-        try {
-            keyGen = KeyPairGenerator.getInstance("RSA");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return null;
-        }
-        keyGen.initialize(keySize);
-        return keyGen.generateKeyPair();
+    fun generateKeyPairs(keySize: Int): KeyPair {
+        val keyGen: KeyPairGenerator = KeyPairGenerator.getInstance("RSA")
+
+        keyGen.initialize(keySize)
+        return keyGen.generateKeyPair()
     }
 
-
-
-    public static PublicKey toPublicKey(String base64PublicKey){
-        PublicKey publicKey;
-        try{
-            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.getDecoder().decode(base64PublicKey.getBytes()));
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            publicKey = keyFactory.generatePublic(keySpec);
-            return publicKey;
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            e.printStackTrace();
+    fun toPublicKey(base64PublicKey: String?): PublicKey? {
+        val publicKey: PublicKey
+        try {
+            val keySpec = X509EncodedKeySpec(
+                Base64.getDecoder().decode(
+                    base64PublicKey!!.toByteArray()
+                )
+            )
+            val keyFactory = KeyFactory.getInstance("RSA")
+            publicKey = keyFactory.generatePublic(keySpec)
+            return publicKey
+        } catch (e: NoSuchAlgorithmException) {
+            e.printStackTrace()
+        } catch (e: InvalidKeySpecException) {
+            e.printStackTrace()
         }
-        return null;
+        return null
     }
 
-    public static PrivateKey toPrivateKey(String base64PrivateKey){
-        PrivateKey privateKey = null;
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(base64PrivateKey.getBytes()));
-        KeyFactory keyFactory;
-        try {
-            keyFactory = KeyFactory.getInstance("RSA");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return null;
+    fun toPrivateKey(base64PrivateKey: String): PrivateKey? {
+        var privateKey: PrivateKey? = null
+        val keySpec = PKCS8EncodedKeySpec(Base64.getDecoder().decode(base64PrivateKey.toByteArray()))
+        val keyFactory: KeyFactory
+        keyFactory = try {
+            KeyFactory.getInstance("RSA")
+        } catch (e: NoSuchAlgorithmException) {
+            e.printStackTrace()
+            return null
         }
         try {
-            privateKey = keyFactory.generatePrivate(keySpec);
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
+            privateKey = keyFactory.generatePrivate(keySpec)
+        } catch (e: InvalidKeySpecException) {
+            e.printStackTrace()
         }
-        return privateKey;
+        return privateKey
     }
 
-    public static String toBase64(Key publicKey) {
-        byte[] encodedPublicKey = publicKey.getEncoded();
-        return Base64.getEncoder().encodeToString(encodedPublicKey);
+    fun toBase64(publicKey: Key): String {
+        val encodedPublicKey = publicKey.encoded
+        return Base64.getEncoder().encodeToString(encodedPublicKey)
     }
 }
