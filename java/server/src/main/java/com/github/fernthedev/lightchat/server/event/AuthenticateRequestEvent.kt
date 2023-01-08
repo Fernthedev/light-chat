@@ -11,6 +11,7 @@ class AuthenticateRequestEvent : AuthenticateEvent {
     constructor(playerInfo: PlayerInfo, async: Boolean) : super(playerInfo, async)
 
     companion object {
+        @JvmStatic
         val handlerList = HandlerList()
     }
 }

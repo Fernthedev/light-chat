@@ -15,6 +15,7 @@ open class AuthenticateEvent(val playerInfo: PlayerInfo, async: Boolean = false,
     Cancellable {
 
     companion object {
+        @JvmStatic
         val handlerList = HandlerList()
     }
 }

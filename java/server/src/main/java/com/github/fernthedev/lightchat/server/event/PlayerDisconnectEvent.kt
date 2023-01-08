@@ -18,6 +18,7 @@ class PlayerDisconnectEvent(
 
 
     companion object {
+        @JvmStatic
         val handlerList = HandlerList()
     }
 }

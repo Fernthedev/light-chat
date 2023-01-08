@@ -6,7 +6,6 @@ import io.netty.channel.ChannelFuture
 import lombok.AllArgsConstructor
 import java.io.Serializable
 
-@AllArgsConstructor
 class Console(
     @Transient
     val server: Server

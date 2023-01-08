@@ -14,16 +14,10 @@ import javax.crypto.spec.GCMParameterSpec
 object EncryptionUtil {
     private const val GCM_NONCE_LENGTH = 12
     private const val GCM_TAG_LENGTH = 16
-    fun generateSecretKey(): SecretKey? {
-        val generator: KeyGenerator
-        try {
-            generator = KeyGenerator.getInstance(StaticHandler.AES_KEY_MODE)
-            generator.init(StaticHandler.AES_KEY_SIZE) // The AES key size in number of bits (256)
-            return generator.generateKey()
-        } catch (e: NoSuchAlgorithmException) {
-            e.printStackTrace()
-        }
-        return null
+    fun generateSecretKey(): SecretKey {
+        val generator: KeyGenerator = KeyGenerator.getInstance(StaticHandler.AES_KEY_MODE)
+        generator.init(StaticHandler.AES_KEY_SIZE) // The AES key size in number of bits (256)
+        return generator.generateKey()
     }
 
     /**

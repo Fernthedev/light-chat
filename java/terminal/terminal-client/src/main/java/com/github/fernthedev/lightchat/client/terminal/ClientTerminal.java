@@ -137,10 +137,10 @@ public class ClientTerminal {
 
         client = clientSupplier.apply(host.get(), port.get());
 
-        client.setClientSettingsManager(settings.getClientSettings());
+        client.clientSettingsManager = settings.getClientSettings();
 
-        client.getClientSettingsManager().load();
-        client.getClientSettingsManager().save();
+        client.clientSettingsManager.load();
+        client.clientSettingsManager.save();
 
         StaticHandler.setCore(new ClientTermCore(client), true);
 
@@ -164,11 +164,7 @@ public class ClientTerminal {
     }
 
     public static void connect() {
-        try {
-            client.connect();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        client.connectBlocking();
     }
 
     private static String readLine(Scanner scanner, String message) {

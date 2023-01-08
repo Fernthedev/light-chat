@@ -5,6 +5,7 @@ import com.github.fernthedev.lightchat.core.api.event.api.HandlerList
 
 class ServerShutdownEvent(override val handlers: HandlerList = handlerList) : Event() {
     companion object {
+        @JvmStatic
         val handlerList = HandlerList()
     }
 }

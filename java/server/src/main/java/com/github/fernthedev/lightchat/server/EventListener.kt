@@ -25,13 +25,17 @@ class EventListener(private val server: Server, private val clientConnection: Cl
 
 
             // server.logInfo(clientConnection + " is the sender of packet");
-            if (p is PongPacket) {
-                clientConnection.finishPing()
-                clientConnection.sendPacket(PingReceive().transport())
-            } else if (p is KeyResponsePacket) {
-                StaticHandler.core.logger.debug("Received key")
-                clientConnection.secretKey = p.getSecretKey(clientConnection.tempKeyPair!!.private)
-                clientConnection.sendPacket(RequestConnectInfoPacket().transport())
+            when (p) {
+                is PongPacket -> {
+                    clientConnection.finishPing()
+                    clientConnection.sendPacket(PingReceive().transport(false))
+                }
+
+                is KeyResponsePacket -> {
+                    StaticHandler.core.logger.debug("Received key")
+                    clientConnection.secretKey = p.getSecretKey(clientConnection.tempKeyPair!!.private)
+                    clientConnection.sendPacket(RequestConnectInfoPacket().transport())
+                }
             }
 
 

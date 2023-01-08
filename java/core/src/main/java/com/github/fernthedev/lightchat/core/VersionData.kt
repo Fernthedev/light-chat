@@ -3,7 +3,9 @@ package com.github.fernthedev.lightchat.core
 import com.github.fernthedev.lightchat.core.packets.handshake.VersionDataString
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion
 
-data class VersionData(
+data class VersionData
+@JvmOverloads
+constructor(
     val variablesJSON: VariablesJSON? = null,
     val version: DefaultArtifactVersion,
     val minVersion: DefaultArtifactVersion,

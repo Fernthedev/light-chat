@@ -4,24 +4,16 @@ import com.github.fernthedev.lightchat.core.PacketRegistry
 import com.github.fernthedev.lightchat.core.StaticHandler
 import com.github.fernthedev.lightchat.core.codecs.JSONHandler
 import com.github.fernthedev.lightchat.core.encryption.EncryptedBytes
+import com.github.fernthedev.lightchat.core.encryption.PacketTransporter
 import com.github.fernthedev.lightchat.core.encryption.PacketWrapper
 import com.github.fernthedev.lightchat.core.encryption.RSA.IEncryptionKeyHolder
 import com.github.fernthedev.lightchat.core.encryption.RSA.NoSecretKeyException
 import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil
-import com.github.fernthedev.lightchat.core.packets.Packet
 import com.github.fernthedev.lightchat.core.util.ExceptionUtil
 import io.netty.channel.ChannelHandler.Sharable
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.MessageToMessageDecoder
-import org.apache.commons.lang3.tuple.ImmutablePair
-import org.apache.commons.lang3.tuple.Pair
-import java.io.IOException
-import java.security.InvalidAlgorithmParameterException
-import java.security.InvalidKeyException
-import java.security.NoSuchAlgorithmException
 import java.util.*
-import javax.crypto.BadPaddingException
-import javax.crypto.IllegalBlockSizeException
 
 /**
  * Converts encrypted json to a decrypted object
@@ -67,10 +59,10 @@ class EncryptedJSONObjectDecoder
      * @param jsonObject
      * @return
      */
-    fun getParsedObject(packetIdentifier: String?, jsonObject: String, packetId: Int): Pair<out Packet?, Int> {
+    private fun getParsedObject(packetIdentifier: String, jsonObject: String, packetId: Int): PacketTransporter {
         val aClass = PacketRegistry.getPacketClassFromRegistry(packetIdentifier)
         return try {
-            ImmutablePair(jsonHandler.fromJson(jsonObject, aClass), packetId)
+            PacketTransporter(jsonHandler.fromJson(jsonObject, aClass), encrypt = false, id = packetId)
         } catch (e: Exception) {
             throw IllegalArgumentException(
                 """Attempting to parse packet $packetIdentifier (${aClass.name}) with string
@@ -82,23 +74,17 @@ $jsonObject""", e
     private fun decrypt(ctx: ChannelHandlerContext, encryptedString: EncryptedBytes): String {
         if (!encryptionKeyHolder.isEncryptionKeyRegistered(ctx, ctx.channel())) throw NoSecretKeyException()
         val secretKey = encryptionKeyHolder.getSecretKey(ctx, ctx.channel())
-        val decryptCipher = encryptionKeyHolder.getDecryptCipher(ctx, ctx.channel())
         val random = encryptionKeyHolder.getSecureRandom(ctx, ctx.channel())
+        requireNotNull(secretKey)
+        requireNotNull(random)
+
+        val decryptCipher = encryptionKeyHolder.getDecryptCipher(ctx, ctx.channel())
         val decryptedJSON: String = try {
             EncryptionUtil.decrypt(encryptedString, secretKey, decryptCipher, random)
-        } catch (e: BadPaddingException) {
-            throw ExceptionUtil.throwParsePacketException(e, encryptedString.data.contentToString())
-        } catch (e: IOException) {
-            throw ExceptionUtil.throwParsePacketException(e, encryptedString.data.contentToString())
-        } catch (e: NoSuchAlgorithmException) {
-            throw ExceptionUtil.throwParsePacketException(e, encryptedString.data.contentToString())
-        } catch (e: InvalidKeyException) {
-            throw ExceptionUtil.throwParsePacketException(e, encryptedString.data.contentToString())
-        } catch (e: InvalidAlgorithmParameterException) {
-            throw ExceptionUtil.throwParsePacketException(e, encryptedString.data.contentToString())
-        } catch (e: IllegalBlockSizeException) {
+        } catch (e: Exception) {
             throw ExceptionUtil.throwParsePacketException(e, encryptedString.data.contentToString())
         }
+
         return decryptedJSON
     }
 }

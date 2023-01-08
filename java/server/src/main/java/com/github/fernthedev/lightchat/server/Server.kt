@@ -37,10 +37,7 @@ import io.netty.handler.codec.LengthFieldPrepender
 import io.netty.handler.codec.MessageToByteEncoder
 import io.netty.handler.codec.string.StringDecoder
 import io.netty.handler.codec.string.StringEncoder
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import lombok.*
 import org.apache.commons.lang3.time.StopWatch
 import org.slf4j.LoggerFactory
@@ -50,7 +47,6 @@ import java.net.UnknownHostException
 import java.security.KeyPair
 import java.util.*
 import java.util.concurrent.*
-import java.util.function.Supplier
 
 class Server(val port: Int) : Runnable {
     var logger = LoggerFactory.getLogger(Server::class.java)
@@ -123,7 +119,7 @@ class Server(val port: Int) : Runnable {
     init {
         StaticHandler.setCore(ServerCore(this), false)
         val rsaKeyPoolSize = 15
-        val serverCondition = Supplier { running }
+        val serverCondition = { running }
         rsaKeyThread = KeyThread(
             { RSAEncryptionUtil.generateKeyPairs(settingsManager.configData.rsaKeySize) },
             rsaKeyPoolSize,
@@ -201,29 +197,20 @@ class Server(val port: Int) : Runnable {
         running = true
         shutdown = false
         StaticHandler.displayVersion()
-        val tasks: MutableList<Job> = ArrayList()
         val stopWatch = StopWatch()
         stopWatch.start()
-        tasks.add(launch {
-            Runtime.getRuntime().addShutdownHook(Thread {
-                for (clientConnection in playerHandler.channelMap.values) {
-                    if (clientConnection.channel.isOpen) {
-                        logger.info("Gracefully shutting down")
-                        sendObjectToAllPlayers(SelfMessagePacket(SelfMessagePacket.MessageType.LOST_SERVER_CONNECTION))
-                        clientConnection.close()
-                    }
+        Runtime.getRuntime().addShutdownHook(Thread {
+            for (clientConnection in playerHandler.channelMap.values) {
+                if (clientConnection.channel.isOpen) {
+                    logger.info("Gracefully shutting down")
+                    sendObjectToAllPlayers(SelfMessagePacket(SelfMessagePacket.MessageType.LOST_SERVER_CONNECTION))
+                    clientConnection.close()
                 }
-            })
+            }
         })
 
+        if (settingsManager.configData.useMulticast) {
 
-        /*
-    try {
-        new MulticastServer("Multicast",this).start();
-    } catch (IOException e) {
-        e.printStackTrace();
-    }*/if (settingsManager.configData.useMulticast) {
-        tasks.add(launch {
             logger.info("Initializing MultiCast Server")
             try {
                 multicastServer = MulticastServer("MultiCast Thread", this@Server, StaticHandler.multicastAddress)
@@ -231,27 +218,20 @@ class Server(val port: Int) : Runnable {
             } catch (e: IOException) {
                 e.printStackTrace()
             }
-        })
-    }
-        tasks.add(launch {
-            authenticationManager = AuthenticationManager(this@Server)
-            pluginManager.registerEvents(authenticationManager)
-        })
 
-
-//        LoggerManager loggerManager = new LoggerManager();
-//        pluginManager.registerEvents(loggerManager, new ServerPlugin());
-        logger.info("Running on [{}]", StaticHandler.OS)
-
-
-//        await();
-
-        tasks.add(launch {
-            initServer()
-        })
-        for (taskInfo in tasks) {
-            taskInfo.join()
         }
+
+        authenticationManager = AuthenticationManager(this@Server)
+        pluginManager.registerEvents(authenticationManager)
+
+        // Start key thread before initializing netty
+        launch {
+            logger.info("Started RSA Key thread pool. Currently {} keys", rsaKeyThread.keysInPool)
+            rsaKeyThread.run()
+        }
+
+        logger.info("Running on [{}]", StaticHandler.OS)
+        initServer()
 
         logger.info("Finished initializing. Took {}ms", stopWatch.getTime(TimeUnit.MILLISECONDS))
         launch {
@@ -268,11 +248,16 @@ class Server(val port: Int) : Runnable {
                 running = false
                 continue
             }
+            // Let the other coroutines run
+            yield()
+            delay(10)
         }
         try {
             shutdownServer()
         } catch (ignored: IllegalStateException) {
         }
+
+        cancel("Shutting down")
     }
 
     private fun initServer(): Server {
@@ -300,9 +285,6 @@ class Server(val port: Int) : Runnable {
         val jsonHandler = Codecs.getJsonHandler(settingsManager.configData.codec)
             ?: throw IllegalStateException("The codec " + settingsManager.configData.codec + " was not recognized")
 
-        // Start key thread before initializing netty
-
-        logger.info("Started RSA Key thread pool. Currently {} keys", rsaKeyThread.keysInPool)
         bootstrap!!.group(bossGroup, workerGroup)
             .channel(channelClass)
             .childHandler(object : ChannelInitializer<Channel>() {

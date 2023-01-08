@@ -14,6 +14,7 @@ class ServerStartupEvent
     (isAsync: Boolean = false, override val handlers: HandlerList = handlerList) : Event(isAsync) {
 
     companion object {
+        @JvmStatic
         val handlerList = HandlerList()
     }
 }

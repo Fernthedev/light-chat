@@ -23,6 +23,7 @@ class AuthenticationAttemptedEvent : AuthenticateEvent, Cancellable {
     }
 
     companion object {
+        @JvmStatic
         val handlerList = HandlerList()
     }
 }

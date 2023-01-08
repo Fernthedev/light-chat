@@ -4,7 +4,6 @@ import com.github.fernthedev.lightchat.core.encryption.RSA.IEncryptionKeyHolder
 import com.github.fernthedev.lightchat.core.packets.Packet
 import io.netty.channel.Channel
 import io.netty.channel.ChannelHandlerContext
-import org.apache.commons.lang3.tuple.Pair
 import java.security.SecureRandom
 import javax.crypto.Cipher
 import javax.crypto.SecretKey
@@ -25,8 +24,8 @@ class EncryptionKeyFinder(
     ////        System.out.println("Getting public key for " + channel.remoteAddress());
     //        return PlayerHandler.socketList.get(channel).getCurrentKeyPair().getPublic();
     //    }
-    override fun getSecretKey(ctx: ChannelHandlerContext, channel: Channel): SecretKey {
-        return server.playerHandler.channelMap[channel]!!.secretKey!!
+    override fun getSecretKey(ctx: ChannelHandlerContext, channel: Channel): SecretKey? {
+        return server.playerHandler.channelMap[channel]!!.secretKey
     }
 
     override fun getEncryptCipher(ctx: ChannelHandlerContext, channel: Channel): Cipher {
@@ -37,7 +36,7 @@ class EncryptionKeyFinder(
         return server.playerHandler.channelMap[channel]!!.decryptCipher
     }
 
-    override fun getSecureRandom(ctx: ChannelHandlerContext, channel: Channel): SecureRandom {
+    override fun getSecureRandom(ctx: ChannelHandlerContext, channel: Channel): SecureRandom? {
         return server.playerHandler.channelMap[channel]!!.secureRandom
     }
 

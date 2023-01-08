@@ -1,7 +1,6 @@
 package com.github.fernthedev.lightchat.server.netty
 
 import com.github.fernthedev.lightchat.core.StaticHandler
-import com.google.common.base.Stopwatch
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.coroutineScope
@@ -9,8 +8,8 @@ import kotlinx.coroutines.yield
 import java.io.Serializable
 import java.util.*
 import java.util.concurrent.LinkedBlockingQueue
-import java.util.concurrent.TimeUnit
 import java.util.function.Supplier
+import kotlin.system.measureTimeMillis
 
 /**
  * This thread creates and pools keys asynchronously to improve
@@ -20,7 +19,7 @@ import java.util.function.Supplier
 class KeyThread<T : Serializable>(
     private val generateKey: Supplier<T>,
     initialPoolSize: Int,
-    private val runningCondition: Supplier<Boolean>,
+    private val runningCondition: () -> Boolean,
 ) {
     private val keyPool: Queue<T> = LinkedBlockingQueue()
     private val futures: Queue<CompletableDeferred<T>> = LinkedList()
@@ -38,22 +37,23 @@ class KeyThread<T : Serializable>(
      * @see Thread.run
      */
     suspend fun run() = coroutineScope {
-        while (runningCondition.get()) {
+        while (runningCondition()) {
             // Only create keys to saturate queue
-            if (keyPool.size < poolSize) {
-                val stopwatch = Stopwatch.createStarted()
-
-                keyPool.add(generateKey.get())
-
-                stopwatch.stop()
-                StaticHandler.core.logger.debug(
-                    "Created a key. Took {}ms",
-                    stopwatch.elapsed(TimeUnit.MILLISECONDS)
-                )
+            if (keyPool.size >= poolSize) {
+                yield()
+                continue
             }
+
+            val time = measureTimeMillis {
+                keyPool.add(generateKey.get())
+            }
+            StaticHandler.core.logger.debug(
+                "Created a key. Took {}ms",
+                time
+            )
             futures.poll()?.complete(keyPool.remove())
-            yield()
         }
+        StaticHandler.core.logger.debug("Shutting down RSA key thread")
     }
 
     val randomKey: Deferred<T>

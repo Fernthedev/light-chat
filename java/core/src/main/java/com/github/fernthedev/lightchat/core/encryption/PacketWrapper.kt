@@ -14,19 +14,29 @@ import javax.crypto.SecretKey
  * This should improve drastically excessive JSON serialization and memory usage
  * by cache
  */
-class PacketTransporter(
+class PacketTransporter
+@JvmOverloads constructor(
     val packet: Packet,
-    private val encrypt: Boolean
+    val encrypt: Boolean,
+    val id: Int = -1, // only used in decode
 ) {
     private lateinit var packetWrapperCache: PacketWrapper
     private lateinit var packetWrapperJSON: String
 
-    internal fun packetWrapper(jsonHandler: JSONHandler, packetId: Int, secretKey: SecretKey, cipher: Cipher, random: SecureRandom): Pair<PacketWrapper, String> {
+    internal fun packetWrapper(
+        jsonHandler: JSONHandler,
+        packetId: Int,
+        secretKey: SecretKey?,
+        cipher: Cipher,
+        random: SecureRandom?
+    ): Pair<PacketWrapper, String> {
         if (this::packetWrapperCache.isInitialized) {
             return packetWrapperCache to packetWrapperJSON
         }
 
         packetWrapperCache = if (encrypt) {
+            requireNotNull(secretKey) { "Can't encrypt with null secret key!" }
+            requireNotNull(random) { "Can't encrypt with null random!" }
             val bytes = EncryptionUtil.encrypt(jsonHandler.toJson(packet), secretKey, cipher, random)
 
             PacketWrapper.encrypted(bytes, packet.packetName, jsonHandler, packetId)

@@ -1,19 +1,17 @@
-package com.github.fernthedev.lightchat.server.event
+package com.github.fernthedev.lightchat.client.event
 
-import com.github.fernthedev.lightchat.core.api.event.api.Cancellable
 import com.github.fernthedev.lightchat.core.api.event.api.Event
 import com.github.fernthedev.lightchat.core.api.event.api.HandlerList
-import com.github.fernthedev.lightchat.server.ClientConnection
+import io.netty.channel.Channel
 
 /**
  * Called when client has successfully established a secure and valid connection
  */
-class PlayerJoinEvent(
-    val joinPlayer: ClientConnection, async: Boolean,
-    override var isCancelled: Boolean = false,
+class ServerConnectFinishEvent(
+    val channel: Channel, isAsynchronous: Boolean = false,
     override val handlers: HandlerList = handlerList
-) : Event(async),
-    Cancellable {
+) : Event(isAsynchronous) {
+
 
     companion object {
         @JvmStatic

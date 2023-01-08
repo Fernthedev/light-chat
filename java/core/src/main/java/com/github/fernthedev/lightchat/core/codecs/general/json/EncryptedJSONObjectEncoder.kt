@@ -4,8 +4,6 @@ import com.github.fernthedev.lightchat.core.StaticHandler
 import com.github.fernthedev.lightchat.core.codecs.JSONHandler
 import com.github.fernthedev.lightchat.core.encryption.*
 import com.github.fernthedev.lightchat.core.encryption.RSA.IEncryptionKeyHolder
-import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil
-import com.github.fernthedev.lightchat.core.util.ExceptionUtil
 import io.netty.channel.ChannelHandler.Sharable
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.MessageToMessageEncoder
@@ -32,11 +30,31 @@ class EncryptedJSONObjectEncoder(
      */
     @Throws(Exception::class)
     override fun encode(ctx: ChannelHandlerContext, msg: PacketTransporter, out: MutableList<Any>) {
-        val secretKey = encryptionKeyHolder.getSecretKey(ctx, ctx.channel())
         val cipher = encryptionKeyHolder.getEncryptCipher(ctx, ctx.channel())
-        val secureRandom = encryptionKeyHolder.getSecureRandom(ctx, ctx.channel())
 
-        val packetWrapper = msg.packetWrapper(jsonHandler, encryptionKeyHolder.getPacketId(msg.packet.javaClass, ctx, ctx.channel()).key, secretKey, cipher, secureRandom)
+
+
+        val packetWrapper = if (!encryptionKeyHolder.isEncryptionKeyRegistered(ctx, ctx.channel())) {
+            require(!msg.encrypt) { "Encryption is not setup yet!" }
+
+            msg.packetWrapper(
+                jsonHandler,
+                encryptionKeyHolder.getPacketId(msg.packet.javaClass, ctx, ctx.channel()).first,
+                null,
+                cipher,
+                null
+            )
+        } else {
+            val secretKey = encryptionKeyHolder.getSecretKey(ctx, ctx.channel())
+            val secureRandom = encryptionKeyHolder.getSecureRandom(ctx, ctx.channel())
+            msg.packetWrapper(
+                jsonHandler,
+                encryptionKeyHolder.getPacketId(msg.packet.javaClass, ctx, ctx.channel()).first,
+                secretKey,
+                cipher,
+                secureRandom
+            )
+        }
 
         out.add(packetWrapper.second)
 
@@ -47,21 +65,8 @@ class EncryptedJSONObjectEncoder(
         )
     }
 
-    private fun encrypt(ctx: ChannelHandlerContext, decryptedString: String?): EncryptedBytes {
-        var fixedDecryptedString = decryptedString
-
-        val secretKey = encryptionKeyHolder.getSecretKey(ctx, ctx.channel())
-        val cipher = encryptionKeyHolder.getEncryptCipher(ctx, ctx.channel())
-        val secureRandom = encryptionKeyHolder.getSecureRandom(ctx, ctx.channel())
-
-        if (fixedDecryptedString.isNullOrEmpty()) fixedDecryptedString = ""
-
-        val encryptedJSON: EncryptedBytes = try {
-            EncryptionUtil.encrypt(fixedDecryptedString, secretKey, cipher, secureRandom)
-        } catch (e: Exception) {
-            if (StaticHandler.isDebug()) e.printStackTrace()
-            throw ExceptionUtil.throwParsePacketException(e, fixedDecryptedString)
-        }
-        return encryptedJSON
+    override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
+        StaticHandler.core.logger.error(cause.message, cause)
+        super.exceptionCaught(ctx, cause)
     }
 }

@@ -5,14 +5,15 @@ import com.github.fernthedev.lightchat.core.exceptions.PacketRegistryException
 import com.github.fernthedev.lightchat.core.packets.Packet
 import org.reflections.Reflections
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.streams.toList
 
 object PacketRegistry {
-    private val PACKET_REGISTRY = Collections.synchronizedMap(HashMap<String?, Class<out Packet?>>())
-    val packetRegistryCopy: Map<String?, Class<out Packet?>>
+    private val PACKET_REGISTRY = ConcurrentHashMap<String, Class<out Packet>>()
+    val packetRegistryCopy: Map<String, Class<out Packet>>
         get() = HashMap(PACKET_REGISTRY)
 
-    fun getPacketClassFromRegistry(name: String?): Class<out Packet?> {
+    fun getPacketClassFromRegistry(name: String): Class<out Packet> {
         if (!PACKET_REGISTRY.containsKey(name)) throw PacketNotInRegistryException("The packet registry does not contain packet \"$name\" in the registry. Make sure it is spelled correctly and is case-sensitive.")
         return PACKET_REGISTRY[name]!!
     }
@@ -70,7 +71,7 @@ object PacketRegistry {
      * @param packet
      */
     @JvmStatic
-    fun registerPacketPackageFromClass(packet: Class<out Packet?>) {
+    fun registerPacketPackageFromClass(packet: Class<out Packet>) {
         registerPacketPackage(packet.getPackage().name)
     }
 

@@ -35,6 +35,7 @@ object StaticHandler {
     const val KEY_SPEC_TRANSFORMATION = "AES"
     const val KEY_FACTORY_STRING = "PBKDF2WithHmacSHA1"
 
+    @JvmStatic
     val VERSION_DATA: VersionData
     //    public static final String RSA_CIPHER_TRANSFORMATION = "RSA/ECB/OAEPWITHSHA-512ANDMGF1PADDING"; //"RSA/ECB/PKCS1Padding";
     /**
@@ -93,6 +94,7 @@ object StaticHandler {
         return VERSION_DATA.version >= otherVer.minVersion && VERSION_DATA.minVersion <= otherVer.minVersion
     }
 
+    @JvmStatic
     @APIUsage
     fun getVersionRangeStatus(otherVersion: VersionData): VersionRange {
         return getVersionRangeStatus(VERSION_DATA, otherVersion)

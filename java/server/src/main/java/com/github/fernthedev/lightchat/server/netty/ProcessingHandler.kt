@@ -1,8 +1,8 @@
 package com.github.fernthedev.lightchat.server.netty
 
 import com.github.fernthedev.lightchat.core.StaticHandler
+import com.github.fernthedev.lightchat.core.encryption.PacketTransporter
 import com.github.fernthedev.lightchat.core.encryption.transport
-import com.github.fernthedev.lightchat.core.packets.Packet
 import com.github.fernthedev.lightchat.core.packets.handshake.ConnectedPacket
 import com.github.fernthedev.lightchat.core.packets.handshake.InitialHandshakePacket
 import com.github.fernthedev.lightchat.core.packets.latency.LatencyPacket
@@ -12,8 +12,7 @@ import io.netty.buffer.ByteBuf
 import io.netty.channel.*
 import io.netty.channel.ChannelHandler.Sharable
 import io.netty.util.ReferenceCountUtil
-import kotlinx.coroutines.runBlocking
-import org.apache.commons.lang3.tuple.Pair
+import kotlinx.coroutines.*
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.util.*
@@ -68,6 +67,8 @@ class ProcessingHandler(private val server: Server) : ChannelInboundHandlerAdapt
     @Throws(Exception::class)
     override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
         if (validateIsBanned(ctx)) return
+
+
         runBlocking {
             try {
                 val connection: ClientConnection = server.playerHandler.channelMap[ctx.channel()]!!
@@ -76,28 +77,24 @@ class ProcessingHandler(private val server: Server) : ChannelInboundHandlerAdapt
                     // Discard the received data silently.
                     msg.release()
                 }
-                if (msg is Pair<*, *>) {
-                    val pair = msg as Pair<out Packet?, Int>
-                    if (pair.key is ConnectedPacket) {
-                        if (!connection.registered) {
-                            eventListener.handleConnect(pair.key as ConnectedPacket)
+                if (msg !is PacketTransporter) return@runBlocking
 
-                        } else {
-                            server.logger.warn(
-                                "Connection {} just attempted to send a connection packet while registered. Glitch or security bug? ",
-                                connection.toString()
-                            )
-                        }
+                if (msg.packet is ConnectedPacket) {
+                    if (!connection.registered) {
+                        eventListener.handleConnect(msg.packet as ConnectedPacket)
                     } else {
-                        if (server.playerHandler.channelMap.containsKey(ctx.channel())) {
-                            if (pair.key != null) {
-                                if (pair.left !is LatencyPacket) StaticHandler.core.logger.debug(
-                                    "Received the packet {} from {}", pair.left!!
-                                        .packetName, ctx.channel()
-                                )
-                                eventListener.received(pair.key!!, pair.right)
-                            }
-                        }
+                        server.logger.warn(
+                            "Connection {} just attempted to send a connection packet while registered. Glitch or security bug? ",
+                            connection.toString()
+                        )
+                    }
+                } else {
+                    if (server.playerHandler.channelMap.containsKey(ctx.channel())) {
+                        if (msg.packet !is LatencyPacket) StaticHandler.core.logger.debug(
+                            "Received the packet {} from {}", msg.packet
+                                .packetName, ctx.channel()
+                        )
+                        eventListener.received(msg.packet, msg.id)
                     }
                 }
             } finally {
@@ -114,11 +111,14 @@ class ProcessingHandler(private val server: Server) : ChannelInboundHandlerAdapt
         super.channelReadComplete(ctx)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Throws(Exception::class)
     override fun channelActive(ctx: ChannelHandlerContext) {
         // Server.getLogger().info("Channel Registering");
         if (validateIsBanned(ctx)) return
         val channel = ctx.channel()
+
+
         if (channel != null) {
             server.logger.debug("Channel active {}", channel.remoteAddress().toString())
             var uuid = UUID.randomUUID()
@@ -127,25 +127,34 @@ class ProcessingHandler(private val server: Server) : ChannelInboundHandlerAdapt
             while (server.playerHandler.uuidMap.containsKey(uuid)) {
                 uuid = UUID.randomUUID()
             }
-            val clientConnection = ClientConnection(server, channel, uuid) { clientConnection1: ClientConnection ->
-                clientConnection1.tempKeyPair?.let {
-                    InitialHandshakePacket(
-                        it.public,
-                        StaticHandler.VERSION_DATA
-                    )
-                }?.let {
-                    clientConnection1.sendObject(
-                        it.transport(
-                            false
-                        )
-                    )
-                }
-                server.logger.info("[{}] established", clientConnection1.address)
-            }
+
+
+            val clientConnection = ClientConnection(server, channel, uuid)
 
             //Server.getLogger().info("Registering " + clientConnection.getNameAddress());
             server.playerHandler.channelMap[channel] = clientConnection
             server.logger.debug("Awaiting RSA key generation for packet registration")
+
+            val keyJob = server.rsaKeyThread.randomKey
+
+            runBlocking {
+                launch {
+                    keyJob.await()
+                    val key = keyJob.getCompleted()
+                    clientConnection.setupKeypair(key)
+                    val packet = InitialHandshakePacket(
+                        key.public,
+                        StaticHandler.VERSION_DATA
+                    )
+                    clientConnection.sendObject(
+                        packet.transport(
+                            false
+                        )
+                    )
+
+                    server.logger.info("[{}] established", clientConnection.address)
+                }
+            }
         } else {
             server.logger.info("Channel is null")
             throw NullPointerException()

@@ -10,17 +10,12 @@ import io.netty.channel.Channel
 import io.netty.channel.ChannelFuture
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.apache.commons.lang3.time.StopWatch
-import org.apache.commons.lang3.tuple.ImmutablePair
-import org.apache.commons.lang3.tuple.Pair
 import java.net.InetSocketAddress
 import java.security.KeyPair
-import java.security.NoSuchAlgorithmException
 import java.security.SecureRandom
 import java.util.*
 import java.util.concurrent.TimeUnit
-import java.util.function.Consumer
 import javax.crypto.Cipher
-import javax.crypto.NoSuchPaddingException
 import javax.crypto.SecretKey
 
 /**
@@ -30,15 +25,14 @@ import javax.crypto.SecretKey
 class ClientConnection(
     private val server: Server,
     val channel: Channel,
-    val uuid: UUID,
-    callback: Consumer<ClientConnection>
+    val uuid: UUID
 ) : SenderInterface, AutoCloseable {
     var connected = false
         private set
 
     var registered = false
 
-    val eventListener: EventListener
+    val eventListener: EventListener = EventListener(server, this)
 
     lateinit var os: String
         private set
@@ -64,28 +58,24 @@ class ClientConnection(
 
     var secretKey: SecretKey? = null
         set(value) {
-            assert(value != null)
+            requireNotNull(value)
             field = value
             tempKeyPair = null
-            try {
-                secureRandom = EncryptionUtil.getSecureRandom(value!!)
-            } catch (e: NoSuchAlgorithmException) {
-                e.printStackTrace()
-            }
+            secureRandom = EncryptionUtil.getSecureRandom(value)
         }
 
-    lateinit var encryptCipher: Cipher
+    var encryptCipher: Cipher
         private set
 
 
-    lateinit var decryptCipher: Cipher
+    var decryptCipher: Cipher
         private set
 
-    lateinit var secureRandom: SecureRandom
+    var secureRandom: SecureRandom? = null
         private set
 
     fun encryptionRegistered(): Boolean {
-        return this::secureRandom.isInitialized
+        return secretKey != null
     }
 
     /**
@@ -96,21 +86,8 @@ class ClientConnection(
 
 
     init {
-        val keyJob = server.rsaKeyThread.randomKey
-        keyJob.invokeOnCompletion {
-            tempKeyPair = keyJob.getCompleted()
-            callback.accept(this)
-        }
-
-        try {
-            encryptCipher = EncryptionUtil.encryptCipher
-            decryptCipher = EncryptionUtil.decryptCipher
-        } catch (e: NoSuchPaddingException) {
-            e.printStackTrace()
-        } catch (e: NoSuchAlgorithmException) {
-            e.printStackTrace()
-        }
-        eventListener = EventListener(server, this)
+        encryptCipher = EncryptionUtil.encryptCipher
+        decryptCipher = EncryptionUtil.decryptCipher
     }
 
     /**
@@ -127,12 +104,12 @@ class ClientConnection(
         var copiedId = newId
         var packetIdPair = packetIdMap[packet]
         if (packetIdPair == null) {
-            packetIdPair = ImmutablePair(0, System.currentTimeMillis())
+            packetIdPair = Pair(0, System.currentTimeMillis())
         } else {
             if (copiedId == -1) {
-                copiedId = packetIdPair.key + 1
+                copiedId = packetIdPair.first + 1
             }
-            packetIdPair = ImmutablePair(copiedId, System.currentTimeMillis())
+            packetIdPair = Pair(copiedId, System.currentTimeMillis())
         }
         packetIdMap[packet] = packetIdPair
         return packetIdPair
@@ -144,10 +121,11 @@ class ClientConnection(
      * @param encrypt if true the packet will be encrypted
      */
     @APIUsage
-    @Deprecated("Use packet wrapper", ReplaceWith(
-        "sendObject(packet.transport(encrypt))",
-        "com.github.fernthedev.lightchat.core.encryption.transport"
-    )
+    @Deprecated(
+        "Use packet wrapper", ReplaceWith(
+            "sendObject(packet.transport(encrypt))",
+            "com.github.fernthedev.lightchat.core.encryption.transport"
+        )
     )
     fun sendObject(packet: Packet, encrypt: Boolean): ChannelFuture {
         return sendObject(packet.transport(encrypt))
@@ -156,7 +134,7 @@ class ClientConnection(
     fun sendObject(transporter: PacketTransporter): ChannelFuture {
         val packet = transporter.packet
         val packetIdPair = updatePacketIdPair(packet.javaClass, -1)
-        if (packetIdPair.left > server.maxPacketId || System.currentTimeMillis() - packetIdPair.right > 900) {
+        if (packetIdPair.first > server.maxPacketId || System.currentTimeMillis() - packetIdPair.second > 900) {
             updatePacketIdPair(
                 packet.javaClass,
                 0
@@ -176,9 +154,6 @@ class ClientConnection(
         server.playerHandler.channelMap.remove(channel)
         connected = false
         server.playerHandler.uuidMap.remove(uuid)
-
-
-        //serverSocket.close();
     }
 
     override fun toString(): String {
@@ -207,6 +182,13 @@ class ClientConnection(
         sendObject(PingPacket().transport(false))
     }
 
+    @Deprecated(
+        "Use packet transport",
+        replaceWith = ReplaceWith(
+            "sendPacket(packet.transport(true))",
+            "com.github.fernthedev.lightchat.core.encryption.transport"
+        )
+    )
     override fun sendPacket(packet: Packet): ChannelFuture {
         return sendObject(packet.transport())
     }
@@ -223,7 +205,7 @@ class ClientConnection(
      * Packet:[ID,lastPacketSentTime]
      */
     fun getPacketId(packet: Class<out Packet>): Pair<Int, Long> {
-        packetIdMap.computeIfAbsent(packet) { ImmutablePair(0, -1L) }
+        packetIdMap.computeIfAbsent(packet) { Pair(0, -1L) }
         return packetIdMap[packet]!!
     }
 
@@ -231,5 +213,9 @@ class ClientConnection(
         this.name = name
         this.os = os
         this.langFramework = langFramework
+    }
+
+    internal fun setupKeypair(key: KeyPair) {
+        tempKeyPair = key
     }
 }
