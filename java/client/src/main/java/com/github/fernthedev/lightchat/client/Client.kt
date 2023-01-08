@@ -4,7 +4,6 @@ import com.github.fernthedev.config.common.Config
 import com.github.fernthedev.lightchat.client.api.IPacketHandler
 import com.github.fernthedev.lightchat.client.event.ServerDisconnectEvent
 import com.github.fernthedev.lightchat.client.netty.ClientHandler
-import com.github.fernthedev.lightchat.core.CoreSettings
 import com.github.fernthedev.lightchat.core.NoFileConfig
 import com.github.fernthedev.lightchat.core.StaticHandler
 import com.github.fernthedev.lightchat.core.api.APIUsage
@@ -12,7 +11,7 @@ import com.github.fernthedev.lightchat.core.api.Async
 import com.github.fernthedev.lightchat.core.api.plugin.PluginManager
 import com.github.fernthedev.lightchat.core.codecs.Codecs
 import com.github.fernthedev.lightchat.core.codecs.JSONHandler
-import com.github.fernthedev.lightchat.core.codecs.general.compression.CompressionAlgorithms
+import com.github.fernthedev.lightchat.core.codecs.general.compression.SnappyCompressor
 import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectDecoder
 import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectEncoder
 import com.github.fernthedev.lightchat.core.encryption.PacketTransporter
@@ -31,10 +30,8 @@ import io.netty.channel.kqueue.KQueueEventLoopGroup
 import io.netty.channel.kqueue.KQueueSocketChannel
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.nio.NioSocketChannel
-import io.netty.handler.codec.ByteToMessageDecoder
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder
 import io.netty.handler.codec.LengthFieldPrepender
-import io.netty.handler.codec.MessageToByteEncoder
 import io.netty.handler.codec.string.StringDecoder
 import io.netty.handler.codec.string.StringEncoder
 import kotlinx.coroutines.*
@@ -45,7 +42,6 @@ import org.slf4j.LoggerFactory
 import java.net.InetAddress
 import java.security.SecureRandom
 import java.util.concurrent.TimeUnit
-import java.util.function.Function
 import javax.crypto.Cipher
 import javax.crypto.SecretKey
 
@@ -177,39 +173,32 @@ class Client(private var host: String, private var port: Int) : IEncryptionKeyHo
 
                 // inbound -> up to bottom
                 // outbound -> bottom to up
+
+                // Decoders
                 ch.pipeline().addLast(
-                    LengthFieldBasedFrameDecoder(Int.MAX_VALUE, 0, 8, 0, 8)
+                    LengthFieldBasedFrameDecoder(Int.MAX_VALUE, 0, 8, 0, 8),
+                    SnappyCompressor.snappyDecoder()
                 )
                 ch.pipeline().addLast("strDecoder", StringDecoder(clientSettings.charset))
                 ch.pipeline().addLast(
                     EncryptedJSONObjectDecoder(this@Client, jsonHandler),
-                    LengthFieldPrepender(8)
+                )
+
+
+                // Encoders
+                ch.pipeline().addLast(
+                    LengthFieldPrepender(8),
+                    SnappyCompressor.snappyFrameEncoder()
                 )
                 ch.pipeline().addLast("strEncoder", StringEncoder())
                 ch.pipeline().addLast(EncryptedJSONObjectEncoder(this@Client, jsonHandler))
+
+
+                // Handlers
                 ch.pipeline().addLast(
                     "handler",
                     clientHandler
                 )
-                val compression: Int = clientSettingsManager.configData.compressionLevel
-                val compressionAlgorithm: String = clientSettingsManager.configData.compressionAlgorithm
-                val compressions: Pair<Function<CoreSettings, out MessageToByteEncoder<*>?>, Function<CoreSettings, out ByteToMessageDecoder?>> =
-                    CompressionAlgorithms.getCompressions(compressionAlgorithm)
-                var encoder: MessageToByteEncoder<*>? = null
-                val decoder: ByteToMessageDecoder? =
-                    compressions.second.apply(clientSettingsManager.configData)
-
-                if (compression >= 0) encoder = compressions.first.apply(clientSettingsManager.configData)
-                if (compressionAlgorithm != "NONE") {
-                    if (decoder != null) {
-                        ch.pipeline().addBefore("strDecoder", "compressDecoder", decoder)
-                    }
-
-                    if (compression >= 0 && encoder != null) {
-                        ch.pipeline().addBefore("strEncoder", "compressEncoder", encoder)
-                        logger.info("Using {} {} compression", compressionAlgorithm, compression)
-                    }
-                }
             }
         })
         logger.info("Establishing connection")

@@ -18,8 +18,6 @@ import java.util.*
 // Import log4j classes.
 object StaticHandler {
     var DEFAULT_PACKET_ID_MAX = 10
-    var lineLimit = 8000
-
     const val AES_KEY_SIZE = 256
     const val AES_KEY_MODE = "AES"
     const val AES_CIPHER_TRANSFORMATION = "AES/GCM/NoPadding"
@@ -30,11 +28,6 @@ object StaticHandler {
 
     const val RSA_CIPHER_TRANSFORMATION = "RSA/ECB/PKCS1Padding"
 
-    private val gson = Gson()
-
-    const val CIPHER_TRANSFORMATION_OLD = "AES/CBC/PKCS5Padding"
-    const val KEY_SPEC_TRANSFORMATION = "AES"
-    const val KEY_FACTORY_STRING = "PBKDF2WithHmacSHA1"
 
     @JvmStatic
     val VERSION_DATA: VersionData
@@ -52,7 +45,7 @@ object StaticHandler {
     private var log4j = false
 
     init {
-        VERSION_DATA = VersionData(gson.fromJson(getFile("variables.json"), VariablesJSON::class.java))
+        VERSION_DATA = VersionData(Gson().fromJson(getFile("variables.json"), VariablesJSON::class.java))
         try {
             Class.forName("org.apache.logging.log4j.core.config.Configurator")
             log4j = true

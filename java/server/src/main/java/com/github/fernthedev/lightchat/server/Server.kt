@@ -5,7 +5,7 @@ import com.github.fernthedev.lightchat.core.*
 import com.github.fernthedev.lightchat.core.api.APIUsage
 import com.github.fernthedev.lightchat.core.api.plugin.PluginManager
 import com.github.fernthedev.lightchat.core.codecs.Codecs
-import com.github.fernthedev.lightchat.core.codecs.general.compression.CompressionAlgorithms.getCompressions
+import com.github.fernthedev.lightchat.core.codecs.general.compression.SnappyCompressor
 import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectDecoder
 import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectEncoder
 import com.github.fernthedev.lightchat.core.encryption.PacketTransporter
@@ -34,7 +34,6 @@ import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.nio.NioServerSocketChannel
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder
 import io.netty.handler.codec.LengthFieldPrepender
-import io.netty.handler.codec.MessageToByteEncoder
 import io.netty.handler.codec.string.StringDecoder
 import io.netty.handler.codec.string.StringEncoder
 import kotlinx.coroutines.*
@@ -292,41 +291,32 @@ class Server(val port: Int) : Runnable {
 
                     // inbound -> up to bottom
                     // outbound -> bottom to up
+
+                    // Decoders
                     ch.pipeline().addLast(
-                        LengthFieldBasedFrameDecoder(Int.MAX_VALUE, 0, 8, 0, 8)
+                        LengthFieldBasedFrameDecoder(Int.MAX_VALUE, 0, 8, 0, 8),
+                        SnappyCompressor.snappyDecoder()
                     )
                     ch.pipeline().addLast("strDecoder", StringDecoder(settingsManager.configData.charset))
                     ch.pipeline().addLast(
                         EncryptedJSONObjectDecoder(keyFinder, jsonHandler),
-                        LengthFieldPrepender(8)
+                    )
+
+                    // Encoders
+                    ch.pipeline().addLast(
+                        LengthFieldPrepender(8),
+                        SnappyCompressor.snappyFrameEncoder()
                     )
                     ch.pipeline().addLast("strEncoder", StringEncoder())
                     ch.pipeline()
                         .addLast(EncryptedJSONObjectEncoder(keyFinder, jsonHandler))
+
+                    // Handlers
                     ch.pipeline().addLast(
                         "handler",
                         processingHandler
                     )
                     ch.pipeline().addLast(*channelHandlers.toTypedArray())
-                    val compression: Int = settingsManager.configData.compressionLevel
-                    val compressionAlgorithm: String = settingsManager.configData.compressionAlgorithm
-                    val compressions = getCompressions(compressionAlgorithm)
-                    var encoder: MessageToByteEncoder<*>? = null
-                    val decoder = compressions.second.apply(settingsManager.configData)
-                    if (compression >= 0) {
-                        encoder =
-                            compressions.first.apply(settingsManager.configData)
-                    }
-
-                    if (compressionAlgorithm != "NONE") {
-                        if (decoder != null) {
-                            ch.pipeline().addBefore("strDecoder", "compressDecoder", decoder)
-                        }
-                        if (compression >= 0 && encoder != null) {
-                            ch.pipeline().addBefore("strEncoder", "compressEncoder", encoder)
-                            logger.info("Using {} {} compression", compressionAlgorithm, compression)
-                        }
-                    }
                 }
             })
             .option(ChannelOption.SO_BACKLOG, 128)

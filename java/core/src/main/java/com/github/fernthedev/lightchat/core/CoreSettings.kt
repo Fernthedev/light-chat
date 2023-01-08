@@ -1,17 +1,10 @@
 package com.github.fernthedev.lightchat.core
 
 import com.github.fernthedev.lightchat.core.codecs.Codecs
-import com.github.fernthedev.lightchat.core.codecs.general.compression.CompressionAlgorithms
 import io.netty.util.CharsetUtil
 import java.io.Serializable
 
 open class CoreSettings : Serializable {
-    //Avoid Kotlin compile errors with Lombok
-    @SettingValue
-    var compressionLevel = 7
-
-    @SettingValue
-    var compressionAlgorithm = CompressionAlgorithms.JDK_ZLIB_STR
 
     @Transient
     var charset = CharsetUtil.UTF_8
@@ -24,11 +17,7 @@ open class CoreSettings : Serializable {
         if (o !is CoreSettings) return false
         val other = o
         if (!other.canEqual(this as Any)) return false
-        if (compressionLevel != other.compressionLevel) return false
-        val `this$compressionAlgorithm`: Any = compressionAlgorithm
-        val `other$compressionAlgorithm`: Any = other.compressionAlgorithm
-        if (if (`this$compressionAlgorithm` == null) `other$compressionAlgorithm` != null else `this$compressionAlgorithm` != `other$compressionAlgorithm`) return false
-        return if (timeoutTime != other.timeoutTime) false else true
+        return timeoutTime == other.timeoutTime
     }
 
     protected open fun canEqual(other: Any?): Boolean {
@@ -38,16 +27,14 @@ open class CoreSettings : Serializable {
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
-        result = result * PRIME + compressionLevel
-        val `$compressionAlgorithm`: Any = compressionAlgorithm
-        result = result * PRIME + (`$compressionAlgorithm`?.hashCode() ?: 43)
+        result *= PRIME
         val `$timeoutTime` = timeoutTime
         result = result * PRIME + (`$timeoutTime` ushr 32 xor `$timeoutTime`).toInt()
         return result
     }
 
     override fun toString(): String {
-        return "CoreSettings(compressionLevel=" + compressionLevel + ", compressionAlgorithm=" + compressionAlgorithm + ", charset=" + charset + ", timeoutTime=" + timeoutTime + ", codec=" + codec + ")"
+        return "CoreSettings(charset=$charset, timeoutTime=$timeoutTime, codec=$codec)"
     }
 
     @Retention(AnnotationRetention.RUNTIME)
