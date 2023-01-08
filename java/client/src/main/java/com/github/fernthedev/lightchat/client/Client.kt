@@ -89,7 +89,7 @@ class Client(private var host: String, private var port: Int) : IEncryptionKeyHo
     fun buildConnectedPacket(): ConnectedPacket {
         StaticHandler.core.logger.debug("Using the name: {}", name)
         val javaVersion = System.getProperty("java.version") + " (" + SystemUtils.JAVA_VM_NAME + ")"
-        return ConnectedPacket(name, oSName, StaticHandler.VERSION_DATA, "Java $javaVersion")
+        return ConnectedPacket(name!!, oSName, StaticHandler.VERSION_DATA, "Java $javaVersion")
     }
 
     var decryptCipher: Cipher? = null
