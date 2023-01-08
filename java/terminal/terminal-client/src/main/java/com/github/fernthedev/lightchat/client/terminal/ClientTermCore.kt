@@ -1,23 +1,17 @@
-package com.github.fernthedev.lightchat.client.terminal;
+package com.github.fernthedev.lightchat.client.terminal
 
-import com.github.fernthedev.lightchat.client.Client;
-import com.github.fernthedev.lightchat.client.ClientCore;
-import com.github.fernthedev.terminal.core.TermCore;
-import lombok.NonNull;
+import com.github.fernthedev.lightchat.client.Client
+import com.github.fernthedev.lightchat.client.ClientCore
+import com.github.fernthedev.terminal.core.TermCore
 
-public class ClientTermCore extends ClientCore implements TermCore {
-    public ClientTermCore(@NonNull Client client) {
-        super(client);
-    }
-
-    @Override
-    public void runCommand(String command) {
-        if (client.isRegistered()) {
-            ClientTerminal.getMessageDelay().reset();
-            ClientTerminal.getMessageDelay().start();
-            ClientTerminal.sendMessage(command);
+class ClientTermCore(client: Client) : ClientCore(client), TermCore {
+    override fun runCommand(command: String) {
+        if (client.isRegistered) {
+            ClientTerminal.messageDelay.reset()
+            ClientTerminal.messageDelay.start()
+            ClientTerminal.sendMessage(command)
         } else {
-            ClientTerminal.getLogger().error("The client has not been registered yet.");
+            ClientTerminal.logger.error("The client has not been registered yet.")
         }
     }
 }

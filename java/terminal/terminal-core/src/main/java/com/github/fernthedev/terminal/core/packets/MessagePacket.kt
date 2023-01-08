@@ -1,23 +1,12 @@
-package com.github.fernthedev.terminal.core.packets;
+package com.github.fernthedev.terminal.core.packets
 
-import com.github.fernthedev.lightchat.core.packets.Packet;
-import com.github.fernthedev.lightchat.core.packets.PacketInfo;
+import com.github.fernthedev.lightchat.core.packets.Packet
+import com.github.fernthedev.lightchat.core.packets.PacketInfo
 
 @PacketInfo(name = "MESSAGE_PACKET")
-public class MessagePacket extends Packet {
+class MessagePacket(@JvmField val message: String) : Packet() {
 
-    public MessagePacket(String message) {
-        this.message = message;
-    }
-
-    private final String message;
-
-    public String getMessage() {
-        return message;
-    }
-
-    @Override
-    public String toString() {
-        return "Packet Message: " + message;
+    override fun toString(): String {
+        return "Packet Message: $message"
     }
 }

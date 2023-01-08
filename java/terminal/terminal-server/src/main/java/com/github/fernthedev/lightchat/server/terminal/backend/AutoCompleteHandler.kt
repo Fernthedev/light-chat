@@ -1,39 +1,23 @@
-package com.github.fernthedev.lightchat.server.terminal.backend;
+package com.github.fernthedev.lightchat.server.terminal.backend
 
-import com.github.fernthedev.lightchat.core.data.LightCandidate;
-import com.github.fernthedev.lightchat.server.Server;
-import com.github.fernthedev.terminal.core.CandidateUtil;
-import org.jline.reader.Candidate;
-import org.jline.reader.Completer;
-import org.jline.reader.LineReader;
-import org.jline.reader.ParsedLine;
+import com.github.fernthedev.lightchat.server.Server
+import com.github.fernthedev.terminal.core.CandidateUtil.toCandidate
+import org.jline.reader.Candidate
+import org.jline.reader.Completer
+import org.jline.reader.LineReader
+import org.jline.reader.ParsedLine
 
-import java.util.ArrayList;
-import java.util.List;
-
-
-public class AutoCompleteHandler extends TabCompleteFinder implements Completer {
-
-    public AutoCompleteHandler(Server server) {
-        super(server);
-    }
-
-
-    @Override
-    public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
+class AutoCompleteHandler(server: Server) : TabCompleteFinder(server), Completer {
+    override fun complete(reader: LineReader, line: ParsedLine, candidates: MutableList<Candidate>) {
 //        Server.getLogger().info("Handled line");
-
-
-        List<LightCandidate> candidateList = handleLine(server.getConsole(), line.words());
-
-        List<Candidate> convertedCandidate = new ArrayList<>();
-
-        for(LightCandidate lightCandidate : candidateList) {
-            convertedCandidate.add(CandidateUtil.toCandidate(lightCandidate));
+        val candidateList = handleLine(server.console, line.words())
+        val convertedCandidate: MutableList<Candidate> = ArrayList()
+        for (lightCandidate in candidateList) {
+            convertedCandidate.add(toCandidate(lightCandidate))
         }
 
-        if(!candidateList.isEmpty()) {
-            candidates.addAll(convertedCandidate);
+        if (candidateList.isNotEmpty()) {
+            candidates.addAll(convertedCandidate)
         }
     }
 }

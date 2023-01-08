@@ -1,26 +1,12 @@
-package com.github.fernthedev.lightchat.server.terminal.command;
+package com.github.fernthedev.lightchat.server.terminal.command
 
-import com.github.fernthedev.lightchat.server.SenderInterface;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import com.github.fernthedev.lightchat.server.SenderInterface
+import java.util.function.Consumer
 
-import java.util.ArrayList;
-import java.util.List;
+abstract class Command(val name: String) {
+    var usage = ""
 
-@RequiredArgsConstructor
-public abstract class Command {
-
-    @NonNull
-    @Getter
-    private String name;
-
-    @Getter
-    @Setter
-    private String usage = "";
-
-    public abstract void onCommand(SenderInterface sender, String[] args);
+    abstract fun onCommand(sender: SenderInterface, args: Array<String>)
 
     /**
      * Allows you to make autocomplete only suggest based off what is written
@@ -28,13 +14,16 @@ public abstract class Command {
      * @param possibilities All of the possibilities
      * @return The auto-complete possibilities
      */
-    public List<String> search(String arg, List<String> possibilities) {
-        List<String> newPos = new ArrayList<>();
-        possibilities.forEach(s -> {
-            if(s.startsWith(arg) || s.contains(arg)) {
-                newPos.add(s);
+    fun search(arg: String, possibilities: List<String>): List<String> {
+        val newPos: MutableList<String> = ArrayList()
+        possibilities.forEach(Consumer { s: String ->
+            if (s.startsWith(arg) || s.contains(
+                    arg
+                )
+            ) {
+                newPos.add(s)
             }
-        });
-        return newPos;
+        })
+        return newPos
     }
 }

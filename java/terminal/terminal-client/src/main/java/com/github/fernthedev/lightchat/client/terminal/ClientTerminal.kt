@@ -1,278 +1,237 @@
-package com.github.fernthedev.lightchat.client.terminal;
+package com.github.fernthedev.lightchat.client.terminal
 
-import com.github.fernthedev.fernutils.console.ArgumentArrayUtils;
-import com.github.fernthedev.lightchat.client.Client;
-import com.github.fernthedev.lightchat.client.netty.MulticastClient;
-import com.github.fernthedev.lightchat.core.MulticastData;
-import com.github.fernthedev.lightchat.core.StaticHandler;
-import com.github.fernthedev.lightchat.core.VersionData;
-import com.github.fernthedev.terminal.core.CommonUtil;
-import com.github.fernthedev.terminal.core.ConsoleHandler;
-import com.github.fernthedev.terminal.core.TermCore;
-import com.github.fernthedev.terminal.core.packets.CommandPacket;
-import com.github.fernthedev.terminal.core.packets.MessagePacket;
-import com.google.common.base.Stopwatch;
-import lombok.Getter;
-import lombok.SneakyThrows;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.github.fernthedev.fernutils.console.ArgumentArrayUtils.parseArguments
+import com.github.fernthedev.lightchat.client.Client
+import com.github.fernthedev.lightchat.client.netty.MulticastClient
+import com.github.fernthedev.lightchat.core.MulticastData
+import com.github.fernthedev.lightchat.core.StaticHandler
+import com.github.fernthedev.lightchat.core.StaticHandler.VERSION_DATA
+import com.github.fernthedev.lightchat.core.StaticHandler.core
+import com.github.fernthedev.lightchat.core.StaticHandler.getVersionRangeStatus
+import com.github.fernthedev.lightchat.core.StaticHandler.setCore
+import com.github.fernthedev.lightchat.core.StaticHandler.setDebug
+import com.github.fernthedev.lightchat.core.VersionData
+import com.github.fernthedev.terminal.core.CommonUtil.initTerminal
+import com.github.fernthedev.terminal.core.CommonUtil.registerTerminalPackets
+import com.github.fernthedev.terminal.core.CommonUtil.startSelfInCmd
+import com.github.fernthedev.terminal.core.ConsoleHandler.Companion.startConsoleHandlerAsync
+import com.github.fernthedev.terminal.core.TermCore
+import com.github.fernthedev.terminal.core.packets.CommandPacket
+import com.github.fernthedev.terminal.core.packets.MessagePacket
+import com.google.common.base.Stopwatch
+import lombok.SneakyThrows
+import org.apache.commons.lang3.tuple.ImmutablePair
+import org.apache.commons.lang3.tuple.Pair
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion
+import org.slf4j.LoggerFactory
+import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicReference
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiFunction;
+object ClientTerminal {
+    var logger = LoggerFactory.getLogger(ClientTerminal::class.java)
+        internal set
+    lateinit var autoCompleteHandler: AutoCompleteHandler
+        private set
 
-public class ClientTerminal {
+    internal lateinit var client: Client
+    internal var clientSupplier: (host: String, port: Int) -> Client =
+        { host: String, port: Int -> Client(host, port) }
 
-    @Getter
-    protected static Logger logger = LoggerFactory.getLogger(ClientTerminal.class);
 
-    @Getter
-    private static AutoCompleteHandler autoCompleteHandler;
-    protected static Client client;
+    val messageDelay = Stopwatch.createUnstarted()
 
-    protected static BiFunction<String, Integer, ? extends Client> clientSupplier = Client::new;
-
-    @Getter
-    private static final Stopwatch messageDelay = Stopwatch.createUnstarted();
-
-    public static void main(String[] args) {
-        AtomicInteger port = new AtomicInteger(-1);
-        AtomicReference<String> host = new AtomicReference<>(null);
-
-        ArgumentArrayUtils.parseArguments(args)
-                .handle("-port", queue -> {
-                    try {
-                        port.set(Integer.parseInt(queue.remove()));
-                        if (port.get() <= 0) {
-                            logger.error("-port cannot be less than 0");
-                            port.set(-1);
-                        } else logger.info("Using port {}", port);
-                    } catch (NumberFormatException e) {
-                        logger.error("-port is not a number");
-                        port.set(-1);
-                    }
-                })
-                .handle("-host", queue -> {
-                    try {
-                        host.set(queue.remove());
-                        logger.info("Using host {}", host.get());
-                    } catch (IndexOutOfBoundsException e) {
-                        logger.error("Cannot find argument for -host");
-                        host.set(null);
-                    }
-                })
-                .handle("-debug", queue -> StaticHandler.setDebug(true))
-                .apply();
-
-        init(args, ClientTerminalSettings.builder()
+    @JvmStatic
+    fun main(args: Array<String>) {
+        val port = AtomicInteger(-1)
+        val host = AtomicReference<String?>(null)
+        parseArguments(args)
+            .handle("-port") { queue: Queue<String> ->
+                try {
+                    port.set(queue.remove().toInt())
+                    if (port.get() <= 0) {
+                        logger.error("-port cannot be less than 0")
+                        port.set(-1)
+                    } else logger.info("Using port {}", port)
+                } catch (e: NumberFormatException) {
+                    logger.error("-port is not a number")
+                    port.set(-1)
+                }
+            }
+            .handle("-host") { queue: Queue<String?> ->
+                try {
+                    host.set(queue.remove())
+                    logger.info("Using host {}", host.get())
+                } catch (e: IndexOutOfBoundsException) {
+                    logger.error("Cannot find argument for -host")
+                    host.set(null)
+                }
+            }
+            .handle("-debug") { setDebug(true) }
+            .apply()
+        init(
+            args, ClientTerminalSettings.builder()
                 .host(host.get())
                 .port(port.get())
-                .build());
-
-        connect();
+                .build()
+        )
+        connect()
     }
 
-
-    public static void init(ClientTerminalSettings settings) {
-        init(new String[0], settings);
+    fun init(settings: ClientTerminalSettings) {
+        init(arrayOf(), settings)
     }
 
     @SneakyThrows
-    public static void init(String[] args, ClientTerminalSettings settings) {
-        CommonUtil.initTerminal();
-
-        final AtomicReference<String> host = new AtomicReference<>(settings.getHost());
-        final AtomicInteger port = new AtomicInteger(settings.getPort());
-
-
-        if (settings.isLaunchConsoleInCMDWhenNone())
-            CommonUtil.startSelfInCmd(args);
-
-        if (settings.isCheckForServersInMulticast()) {
-            MulticastClient multicastClient;
-            Scanner scanner = new Scanner(System.in);
-            if (host.get() == null || host.equals("") || port.get() == -1) {
-                multicastClient = new MulticastClient();
-
+    fun init(args: Array<String>, settings: ClientTerminalSettings) {
+        initTerminal()
+        val host = AtomicReference(settings.host!!)
+        val port = AtomicInteger(settings.port)
+        if (settings.isLaunchConsoleInCMDWhenNone) {
+            startSelfInCmd(args)
+        }
+        if (settings.isCheckForServersInMulticast) {
+            val multicastClient: MulticastClient
+            val scanner = Scanner(System.`in`)
+            if (host.get() == null || host.get() == "" || port.get() == -1) {
+                multicastClient = MulticastClient()
                 try {
-                    Pair<String, Integer> hostPortPair = check(multicastClient, scanner, 4);
-
+                    val hostPortPair = check(multicastClient, scanner, 4)
                     if (hostPortPair != null) {
-                        host.set(hostPortPair.getLeft());
-                        port.set(hostPortPair.getRight());
+                        host.set(hostPortPair.left)
+                        port.set(hostPortPair.right)
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
             }
         }
-
-        if (settings.isAskUserForHostPort()) {
-            Scanner scanner = new Scanner(System.in);
-            while (host.get() == null || host.get().equalsIgnoreCase("") || port.get() == -1) {
-                if (host.get() == null || host.get().equals("")) {
-                    host.set(readLine(scanner, "Host:"));
+        if (settings.isAskUserForHostPort) {
+            val scanner = Scanner(System.`in`)
+            while (host.get() == null || host.get().equals("", ignoreCase = true) || port.get() == -1) {
+                if (host.get() == null || host.get() == "") {
+                    host.set(readLine(scanner, "Host:"))
                 }
-
                 if (port.get() == -1) {
-                    port.set(readInt(scanner, "Port:"));
+                    port.set(readInt(scanner, "Port:"))
                 }
             }
         }
-
-        if (host.get() == null || host.get().equals("")) {
-            throw new IllegalStateException("Host is null or not provided. Provide in settings or allow user to provide");
+        check(!(host.get() == null || host.get() == "")) { "Host is null or not provided. Provide in settings or allow user to provide" }
+        check(port.get() != -1) { "Port is null or not provided. Provide in settings or allow user to provide" }
+        client = clientSupplier(host.get(), port.get())
+        client.clientSettingsManager = settings.clientSettings
+        client.clientSettingsManager.load()
+        client.clientSettingsManager.save()
+        setCore(ClientTermCore(client), true)
+        if (settings.isAllowTermPackets) registerTerminalPackets()
+        if (settings.isConsoleCommandHandler) {
+            autoCompleteHandler = AutoCompleteHandler(
+                client
+            )
+            startConsoleHandlerAsync((core as TermCore), autoCompleteHandler)
         }
 
-        if (port.get() == -1) {
-            throw new IllegalStateException("Port is null or not provided. Provide in settings or allow user to provide");
+        val packetHandler = PacketHandler()
+        client.addPacketHandler(packetHandler)
+        if (settings.isShutdownOnDisconnect) {
+            client.pluginManager.registerEvents(packetHandler)
         }
-
-
-        client = clientSupplier.apply(host.get(), port.get());
-
-        client.clientSettingsManager = settings.getClientSettings();
-
-        client.clientSettingsManager.load();
-        client.clientSettingsManager.save();
-
-        StaticHandler.setCore(new ClientTermCore(client), true);
-
-        if (settings.isAllowTermPackets())
-            CommonUtil.registerTerminalPackets();
-
-        if (settings.isConsoleCommandHandler()) {
-            autoCompleteHandler = new AutoCompleteHandler(client);
-
-            ConsoleHandler.startConsoleHandlerAsync((TermCore) StaticHandler.getCore(), autoCompleteHandler);
-        }
-
-        PacketHandler packetHandler = new PacketHandler();
-        client.addPacketHandler(packetHandler);
-
-        if (settings.isShutdownOnDisconnect())
-            client.getPluginManager().registerEvents(packetHandler);
-
-
-
     }
 
-    public static void connect() {
-        client.connectBlocking();
+    fun connect() {
+        client.connectBlocking()
     }
 
-    private static String readLine(Scanner scanner, String message) {
-        if (!(message == null || message.equals(""))) {
-            logger.info(message);
+    private fun readLine(scanner: Scanner, message: String): String? {
+        if (message != "") {
+            logger.info(message)
         }
-        if (scanner.hasNextLine()) {
-            return scanner.nextLine();
-        } else return null;
+        return if (scanner.hasNextLine()) {
+            scanner.nextLine()
+        } else null
     }
 
-    private static int readInt(Scanner scanner, String message) {
-        if (!(message == null || message.equals(""))) {
-            logger.info(message);
+    private fun readInt(scanner: Scanner, message: String): Int {
+        if (message != "") {
+            logger.info(message)
         }
-        if (scanner.hasNextLine()) {
-            return scanner.nextInt();
-        } else return -1;
+        return if (scanner.hasNextLine()) {
+            scanner.nextInt()
+        } else -1
     }
 
-    protected static Pair<String, Integer> check(MulticastClient multicastClient, Scanner scanner, int amount) {
-        logger.info("Looking for MultiCast servers");
-        multicastClient.checkServers(amount);
-
-        String host = null;
-        int port = -1;
-
-        if (!multicastClient.getServersAddress().isEmpty()) {
-            Map<Integer, MulticastData> servers = new HashMap<>();
-            logger.info("Select one of these servers, or use none to skip, refresh to refresh");
-            int index = 0;
-            for (MulticastData serverAddress : multicastClient.getServersAddress()) {
-                index++;
-                servers.put(index, serverAddress);
-
-                DefaultArtifactVersion serverCurrent = new DefaultArtifactVersion(serverAddress.getVersion());
-                DefaultArtifactVersion serverMin = new DefaultArtifactVersion(serverAddress.getMinVersion());
-
-                StaticHandler.VersionRange range = StaticHandler.getVersionRangeStatus(new VersionData(serverCurrent, serverMin));
-
-                if (range == StaticHandler.VersionRange.MATCH_REQUIREMENTS) {
-                    System.out.println(">" + index + " | " + serverAddress.getAddress() + ":" + serverAddress.getPort());
+    internal fun check(multicastClient: MulticastClient, scanner: Scanner, amount: Int): Pair<String?, Int>? {
+        logger.info("Looking for MultiCast servers")
+        multicastClient.checkServers(amount)
+        var host: String? = null
+        var port = -1
+        if (multicastClient.getServersAddress().isNotEmpty()) {
+            val servers: MutableMap<Int, MulticastData> = HashMap()
+            logger.info("Select one of these servers, or use none to skip, refresh to refresh")
+            var index = 0
+            for (serverAddress in multicastClient.getServersAddress()) {
+                index++
+                servers[index] = serverAddress
+                val serverCurrent = DefaultArtifactVersion(serverAddress.version)
+                val serverMin = DefaultArtifactVersion(serverAddress.minVersion)
+                val range = getVersionRangeStatus(VersionData(serverCurrent, serverMin))
+                if (range === StaticHandler.VersionRange.MATCH_REQUIREMENTS) {
+                    println(">" + index + " | " + serverAddress.address + ":" + serverAddress.port)
                 } else {
                     // Current version is smaller than the server's required minimum
-                    if (range == StaticHandler.VersionRange.WE_ARE_LOWER) {
-                        System.out.println(">" + index + " | " + serverAddress.getAddress() + ":" + serverAddress.getPort() + " (Server's required minimum version is " + serverAddress.getMinVersion() + " while your current version is smaller {" + StaticHandler.getVERSION_DATA().getVersion() + "} Incompatibility issues may arise)");
+                    if (range === StaticHandler.VersionRange.WE_ARE_LOWER) {
+                        println(">" + index + " | " + serverAddress.address + ":" + serverAddress.port + " (Server's required minimum version is " + serverAddress.minVersion + " while your current version is smaller {" + VERSION_DATA.version + "} Incompatibility issues may arise)")
                     }
 
                     // Current version is larger than server's minimum version
-                    if (range == StaticHandler.VersionRange.WE_ARE_HIGHER) {
-                        System.out.println(">" + index + " | " + serverAddress.getAddress() + ":" + serverAddress.getPort() + " (Server's version is " + serverAddress.getVersion() + " while your minimum version is larger {" + StaticHandler.getVERSION_DATA().getMinVersion() + "} Incompatibility issues may arise)");
+                    if (range === StaticHandler.VersionRange.WE_ARE_HIGHER) {
+                        println(">" + index + " | " + serverAddress.address + ":" + serverAddress.port + " (Server's version is " + serverAddress.version + " while your minimum version is larger {" + VERSION_DATA.minVersion + "} Incompatibility issues may arise)")
                     }
-
                 }
             }
-
             while (scanner.hasNextLine()) {
-                String answer = scanner.nextLine();
-
-                answer = answer.replaceAll(" ", "");
-
-                if (answer.matches("[0-9]+")) {
+                var answer = scanner.nextLine()
+                answer = answer.replace(" ".toRegex(), "")
+                if (answer.matches("[0-9]+".toRegex())) {
                     try {
-                        int serverIndex = Integer.parseInt(answer);
-
+                        val serverIndex = answer.toInt()
                         if (servers.containsKey(serverIndex)) {
-                            MulticastData serverAddress = servers.get(index);
-
-                            host = serverAddress.getAddress();
-                            port = serverAddress.getPort();
-                            logger.info("Selected {}:{}", serverAddress.getAddress(), serverAddress.getPort());
-                            break;
+                            val serverAddress = servers[index]
+                            host = serverAddress!!.address
+                            port = serverAddress.port
+                            logger.info("Selected {}:{}", serverAddress.address, serverAddress.port)
+                            break
                         } else {
-                            logger.info("Not in the list");
+                            logger.info("Not in the list")
                         }
-                    } catch (NumberFormatException ignored) {
-                        logger.info("Not a number or refresh/none");
+                    } catch (ignored: NumberFormatException) {
+                        logger.info("Not a number or refresh/none")
                     }
                 }
-
-                switch (answer) {
-                    case "none":
-                        return null;
-                    case "refresh":
-                        return check(multicastClient, scanner, 7);
-                    default:
-                        logger.info("Unknown argument");
-                        break;
+                when (answer) {
+                    "none" -> return null
+                    "refresh" -> return check(multicastClient, scanner, 7)
+                    else -> logger.info("Unknown argument")
                 }
             }
         }
-
-        return new ImmutablePair<>(host, port);
+        return ImmutablePair(host, port)
     }
 
-    public static void sendMessage(String message) {
+    fun sendMessage(message: String) {
+        var message = message
         try {
-            message = message.replaceAll(" {2}", " ");
-            if (!message.equals("") && !message.equals(" ")) {
-
+            message = message.replace(" {2}".toRegex(), " ")
+            if (message != "" && message != " ") {
                 if (message.startsWith("/")) {
-                    client.sendObject(new CommandPacket(message.substring(1)));
-                } else
-                    client.sendObject(new MessagePacket(message));
+                    client.sendObject(CommandPacket(message.substring(1)))
+                } else {
+                    client.sendObject(MessagePacket(message))
+                }
             }
-        } catch (IllegalArgumentException e) {
-            logger.error("Unable to send the message. Cause: {} {{}}", e.getMessage(), e.getClass().getName());
+        } catch (e: IllegalArgumentException) {
+            logger.error("Unable to send the message. Cause: {} {{}}", e.message, e.javaClass.name)
         }
     }
-
 }

@@ -1,43 +1,28 @@
-package com.github.fernthedev.lightchat.client.terminal;
+package com.github.fernthedev.lightchat.client.terminal
 
-import com.github.fernthedev.lightchat.client.Client;
-import com.github.fernthedev.terminal.core.packets.AutoCompletePacket;
-import com.github.fernthedev.lightchat.core.data.LightCandidate;
-import com.github.fernthedev.terminal.core.CandidateUtil;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import org.jline.reader.Candidate;
-import org.jline.reader.Completer;
-import org.jline.reader.LineReader;
-import org.jline.reader.ParsedLine;
+import com.github.fernthedev.lightchat.client.Client
+import com.github.fernthedev.lightchat.core.data.LightCandidate
+import com.github.fernthedev.terminal.core.CandidateUtil.toCandidate
+import com.github.fernthedev.terminal.core.packets.AutoCompletePacket
+import org.jline.reader.Candidate
+import org.jline.reader.Completer
+import org.jline.reader.LineReader
+import org.jline.reader.ParsedLine
 
-import java.util.ArrayList;
-import java.util.List;
-
-@RequiredArgsConstructor
-public class AutoCompleteHandler implements Completer {
-
-    @NonNull
-    private Client client;
-
-    private final List<Candidate> candidateList = new ArrayList<>();
-
-    private boolean keepCheck;
-
-    public void addCandidates(List<LightCandidate> candidates) {
-        if(candidateList != null) {
-            List<Candidate> candidateList1 = new ArrayList<>();
-            for(LightCandidate lightCandidate : candidates) {
-                candidateList1.add(CandidateUtil.toCandidate(lightCandidate));
-            }
-            candidateList.addAll(candidateList1);
-        }
-        keepCheck = false;
+class AutoCompleteHandler(private val client: Client) : Completer {
+    private val candidateList: MutableList<Candidate> = ArrayList()
+    private var keepCheck = false
+    fun addCandidates(candidates: List<LightCandidate>) {
+        candidateList.addAll(candidates.map {
+            toCandidate(it)
+        })
+        keepCheck = false
     }
 
     /**
-     * Populates <i>candidates</i> with a list of possible completions for the <i>command line</i>.
-     * <p>
+     * Populates *candidates* with a list of possible completions for the *command line*.
+     *
+     *
      * The list of candidates will be sorted and filtered by the LineReader, so that
      * the list of candidates displayed to the user will usually be smaller than
      * the list given by the completer.  Thus it is not necessary for the completer
@@ -47,28 +32,21 @@ public class AutoCompleteHandler implements Completer {
      *
      * @param reader     The line reader
      * @param line       The parsed command line
-     * @param candidates The {@link List} of candidates to populate
+     * @param candidates The [List] of candidates to populate
      */
-    @Override
-    public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
-        if(candidateList != null) {
-            candidateList.clear();
-        }
+    override fun complete(reader: LineReader, line: ParsedLine, candidates: MutableList<Candidate>) {
+        candidateList.clear()
 
-        AutoCompletePacket autoCompletePacket = new AutoCompletePacket(line.words());
-        client.sendObject(autoCompletePacket);
-
-        keepCheck = true;
+        val autoCompletePacket = AutoCompletePacket(line.words())
+        client.sendObject(autoCompletePacket)
+        keepCheck = true
         while (keepCheck) {
             try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.sleep(10)
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
             }
         }
-
-        candidates.addAll(candidateList);
-
-
+        candidates.addAll(candidateList)
     }
 }

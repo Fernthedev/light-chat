@@ -3,10 +3,10 @@ package com.github.fernthedev.lightchat.core
 import com.github.fernthedev.lightchat.core.exceptions.PacketNotInRegistryException
 import com.github.fernthedev.lightchat.core.exceptions.PacketRegistryException
 import com.github.fernthedev.lightchat.core.packets.Packet
+import com.github.fernthedev.lightchat.core.packets.handshake.ConnectedPacket
+import com.github.fernthedev.lightchat.core.packets.latency.LatencyPacket
 import org.reflections.Reflections
-import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.streams.toList
 
 object PacketRegistry {
     private val PACKET_REGISTRY = ConcurrentHashMap<String, Class<out Packet>>()
@@ -41,12 +41,21 @@ object PacketRegistry {
 
     fun checkIfRegistered(packet: Packet): RegisteredReturnValues {
         if (!PACKET_REGISTRY.containsKey(packet.packetName)) return RegisteredReturnValues.NOT_IN_REGISTRY
-        return if (PACKET_REGISTRY[packet.packetName] == packet.javaClass) RegisteredReturnValues.IN_REGISTRY else RegisteredReturnValues.IN_REGISTRY_DIFFERENT_PACKET
+        return if (PACKET_REGISTRY[packet.packetName] == packet.javaClass) {
+            RegisteredReturnValues.IN_REGISTRY
+        } else {
+            RegisteredReturnValues.IN_REGISTRY_DIFFERENT_PACKET
+        }
     }
 
     fun registerDefaultPackets() {
-        for (packageT in Arrays.stream(Package.getPackages())
-            .parallel()
+        // Force load these classes
+        // since Kotlin does some weird stuff that doesn't eagerly load them?
+        Packet::class.java.packageName
+        LatencyPacket::class.java.packageName
+        ConnectedPacket::class.java.packageName
+
+        for (packageT in Package.getPackages()
             .filter { aPackage: Package -> aPackage.name.startsWith(StaticHandler.PACKET_PACKAGE) }
             .toList()) {
             StaticHandler.core.logger.debug("Registering the package {}", packageT.name)

@@ -2,6 +2,7 @@ package com.github.fernthedev.lightchat.core
 
 import com.github.fernthedev.lightchat.core.api.APIUsage
 import com.github.fernthedev.lightchat.core.exceptions.DebugException
+import com.github.fernthedev.lightchat.core.packets.Packet
 import com.github.fernthedev.lightchat.core.util.Log4jDebug
 import com.google.gson.Gson
 import io.netty.util.CharsetUtil
@@ -22,7 +23,7 @@ object StaticHandler {
     const val AES_KEY_SIZE = 256
     const val AES_KEY_MODE = "AES"
     const val AES_CIPHER_TRANSFORMATION = "AES/GCM/NoPadding"
-    const val PACKET_PACKAGE = "com.github.fernthedev.lightchat.core.packets"
+    val PACKET_PACKAGE: String by lazy { Packet::class.java.packageName }
 
     val CHARSET_FOR_STRING: Charset = CharsetUtil.UTF_8
     val OS: String = System.getProperty("os.name")
@@ -86,7 +87,9 @@ object StaticHandler {
 
         // Updates debug config
         setDebug(debug)
-        if (initialized) PacketRegistry.registerDefaultPackets()
+        if (!initialized) {
+            PacketRegistry.registerDefaultPackets()
+        }
     }
 
     @APIUsage

@@ -6,9 +6,9 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion
 data class VersionData
 @JvmOverloads
 constructor(
-    val variablesJSON: VariablesJSON? = null,
     val version: DefaultArtifactVersion,
     val minVersion: DefaultArtifactVersion,
+    val variablesJSON: VariablesJSON? = null,
 ) {
 
     constructor(variablesJSON: VariablesJSON) : this(variablesJSON = variablesJSON, version = DefaultArtifactVersion(variablesJSON.version), minVersion = DefaultArtifactVersion(variablesJSON.minVersion))

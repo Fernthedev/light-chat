@@ -1,182 +1,160 @@
-package com.github.fernthedev.lightchat.server.terminal;
+package com.github.fernthedev.lightchat.server.terminal
 
-import com.github.fernthedev.config.common.Config;
-import com.github.fernthedev.config.common.exceptions.ConfigLoadException;
-import com.github.fernthedev.fernutils.console.ArgumentArrayUtils;
-import com.github.fernthedev.lightchat.core.StaticHandler;
-import com.github.fernthedev.lightchat.server.Console;
-import com.github.fernthedev.lightchat.server.SenderInterface;
-import com.github.fernthedev.lightchat.server.Server;
-import com.github.fernthedev.lightchat.server.settings.ServerSettings;
-import com.github.fernthedev.lightchat.server.terminal.backend.AutoCompleteHandler;
-import com.github.fernthedev.lightchat.server.terminal.backend.TabCompleteFinder;
-import com.github.fernthedev.lightchat.server.terminal.command.AuthTerminalHandler;
-import com.github.fernthedev.lightchat.server.terminal.command.Command;
-import com.github.fernthedev.lightchat.server.terminal.command.SettingsCommand;
-import com.github.fernthedev.terminal.core.CommonUtil;
-import com.github.fernthedev.terminal.core.ConsoleHandler;
-import com.github.fernthedev.terminal.core.TermCore;
-import com.github.fernthedev.terminal.core.packets.MessagePacket;
-import lombok.Getter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.github.fernthedev.config.common.Config
+import com.github.fernthedev.config.common.exceptions.ConfigLoadException
+import com.github.fernthedev.fernutils.console.ArgumentArrayUtils.parseArguments
+import com.github.fernthedev.lightchat.core.StaticHandler.core
+import com.github.fernthedev.lightchat.core.StaticHandler.setCore
+import com.github.fernthedev.lightchat.core.StaticHandler.setDebug
+import com.github.fernthedev.lightchat.core.encryption.transport
+import com.github.fernthedev.lightchat.server.Console
+import com.github.fernthedev.lightchat.server.SenderInterface
+import com.github.fernthedev.lightchat.server.Server
+import com.github.fernthedev.lightchat.server.settings.ServerSettings
+import com.github.fernthedev.lightchat.server.terminal.backend.AutoCompleteHandler
+import com.github.fernthedev.lightchat.server.terminal.backend.TabCompleteFinder
+import com.github.fernthedev.lightchat.server.terminal.command.AuthTerminalHandler
+import com.github.fernthedev.lightchat.server.terminal.command.Command
+import com.github.fernthedev.lightchat.server.terminal.command.SettingsCommand
+import com.github.fernthedev.terminal.core.CommonUtil.initTerminal
+import com.github.fernthedev.terminal.core.CommonUtil.registerTerminalPackets
+import com.github.fernthedev.terminal.core.CommonUtil.startSelfInCmd
+import com.github.fernthedev.terminal.core.ConsoleHandler.Companion.startConsoleHandlerAsync
+import com.github.fernthedev.terminal.core.TermCore
+import com.github.fernthedev.terminal.core.packets.MessagePacket
+import org.slf4j.LoggerFactory
+import java.nio.file.Paths
+import java.util.*
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+object ServerTerminal {
+    lateinit var settingsManager: Config<out ServerSettings>
+        private set
 
-public class ServerTerminal {
+    lateinit var commandHandler: ServerCommandHandler
+        private set
 
-    @Getter
-    private static Config<? extends ServerSettings> settingsManager;
+    internal lateinit var server: Server
 
-    @Getter
-    private static ServerCommandHandler commandHandler;
+    lateinit var commandMessageParser: CommandMessageParser
+        private set
+    lateinit var autoCompleteHandler: TabCompleteFinder
+        private set
 
-    protected static Server server;
+    private val commandList: MutableList<Command> = ArrayList()
 
-    @Getter
-    private static CommandMessageParser commandMessageParser;
+    internal var logger = LoggerFactory.getLogger(ServerTerminal::class.java)
 
-    @Getter
-    private static TabCompleteFinder autoCompleteHandler;
-
-    @Getter
-    private static final List<Command> commandList = new ArrayList<>();
-
-    protected static Logger logger = LoggerFactory.getLogger(ServerTerminal.class);
-
-    public static void main(String[] args) {
-
-        AtomicInteger port = new AtomicInteger(-1);
-
-        ArgumentArrayUtils.parseArguments(args)
-                .handle("-port", queue -> {
-
-                    try {
-                        port.set(Integer.parseInt(queue.remove()));
-                        if (port.get() <= 0) {
-                            logger.error("-port cannot be less than 0");
-                            port.set(-1);
-                        } else logger.info("Using port {}", port);
-                    } catch (NumberFormatException e) {
-                        logger.error("-port is not a number");
-                        port.set(-1);
-                    }
-
-
-
-                })
-                .handle("-debug", queue -> StaticHandler.setDebug(true))
-                .apply();
-
-        init(args,
-                ServerTerminalSettings.builder()
+    @JvmStatic
+    fun main(args: Array<String>) {
+        val port = AtomicInteger(-1)
+        parseArguments(args)
+            .handle("-port") { queue: Queue<String> ->
+                try {
+                    port.set(queue.remove().toInt())
+                    if (port.get() <= 0) {
+                        logger.error("-port cannot be less than 0")
+                        port.set(-1)
+                    } else logger.info("Using port {}", port)
+                } catch (e: NumberFormatException) {
+                    logger.error("-port is not a number")
+                    port.set(-1)
+                }
+            }
+            .handle("-debug") { queue: Queue<String> -> setDebug(true) }
+            .apply()
+        init(
+            args,
+            ServerTerminalSettings.builder()
                 .port(port.get())
-                .build());
-        startBind();
+                .build()
+        )
+        startBind()
     }
 
-    public static void init(ServerTerminalSettings terminalSettings) {
-        init(new String[0], terminalSettings);
+    fun init(terminalSettings: ServerTerminalSettings) {
+        init(arrayOf(), terminalSettings)
     }
 
-    public static void init(String[] args, ServerTerminalSettings terminalSettings) {
-        CommonUtil.initTerminal();
+    fun init(args: Array<String>, terminalSettings: ServerTerminalSettings) {
+        initTerminal()
 
 
         //  Logger.getLogger("io.netty").setLevel(java.util.logging.Level.OFF);
-
-
-        int port = terminalSettings.port;
-
-
-        if (terminalSettings.isLaunchConsoleInCMDWhenNone())
-            CommonUtil.startSelfInCmd(args);
-
-
+        var port = terminalSettings.port
+        if (terminalSettings.isLaunchConsoleInCMDWhenNone) startSelfInCmd(args)
         try {
-            settingsManager = terminalSettings.getServerSettings();
-            settingsManager.load();
-            settingsManager.save();
-        } catch (ConfigLoadException e) {
-            e.printStackTrace();
+            settingsManager = terminalSettings.serverSettings
+            settingsManager.load()
+            settingsManager.save()
+        } catch (e: ConfigLoadException) {
+            e.printStackTrace()
+        }
+        if (port == -1) port = settingsManager.configData.port
+
+        server = Server(port)
+        server.addPacketHandler(TerminalPacketHandler(server))
+        server.settingsManager = settingsManager
+
+        commandHandler = ServerCommandHandler(server)
+        setCore(ServerTermCore(server), true)
+        if (terminalSettings.isAllowTermPackets) registerTerminalPackets()
+        if (terminalSettings.isConsoleCommandHandler) {
+            server.startupLock.thenRun {
+                startConsoleHandlerAsync((core as TermCore), AutoCompleteHandler(server))
+                logger.info("Command handler ready! Type Command: (try help)")
+            }
         }
 
+        commandMessageParser = CommandMessageParser(server)
+        server.pluginManager.registerEvents(commandMessageParser)
+        registerCommand(SettingsCommand(server))
+        if (terminalSettings.isAllowChangePassword) registerCommand(AuthTerminalHandler("changepassword", server))
+        autoCompleteHandler = TabCompleteFinder(server)
+    }
 
-        if (port == -1) port = settingsManager.getConfigData().getPort();
-
-
-        server = new Server(port);
-        server.addPacketHandler(new TerminalPacketHandler(server));
-        server.setSettingsManager(settingsManager);
-        commandHandler = new ServerCommandHandler(server);
-
-
-
-        StaticHandler.setCore(new ServerTermCore(server), true);
-
-        if (terminalSettings.isAllowTermPackets())
-            CommonUtil.registerTerminalPackets();
-
-        if (terminalSettings.isConsoleCommandHandler()) {
-            server.getStartupLock().thenRun(() -> {
-                ConsoleHandler.startConsoleHandlerAsync((TermCore) StaticHandler.getCore(), new AutoCompleteHandler(server));
-                logger.info("Command handler ready! Type Command: (try help)");
-            });
+    fun startBind() {
+        // Run on startup
+        server.startupLock.thenRunAsync {
+            try {
+                if (!server.bind()
+                        .await(15, TimeUnit.SECONDS)
+                ) server.logger.error("Unable to bind port. Took longer than 15 seconds")
+            } catch (e: InterruptedException) {
+                Thread.currentThread().interrupt()
+                e.printStackTrace()
+            }
         }
+        server.run()
 
-        commandMessageParser = new CommandMessageParser(server);
-        server.getPluginManager().registerEvents(commandMessageParser);
-
-        registerCommand(new SettingsCommand(server));
-
-        if (terminalSettings.isAllowChangePassword())
-            registerCommand(new AuthTerminalHandler("changepassword", server));
-
-        autoCompleteHandler = new TabCompleteFinder(server);
     }
 
-    public static void startBind() {
-        new Thread(() -> {
-
-            // Run on startup
-            server.getStartupLock().thenRunAsync(() -> {
-                try {
-                    if (!server.bind().await(15, TimeUnit.SECONDS)) server.getLogger().error("Unable to bind port. Took longer than 15 seconds");
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    e.printStackTrace();
-                }
-            });
-
-            server.run();
-
-        }, "ServerMainStartupThread").start();
+    fun registerCommand(command: Command): Command {
+        commandList.add(command)
+        return command
     }
 
-    public static Command registerCommand(Command command) {
-        commandList.add(command);
-        return command;
+    val commands: List<Command>
+        get() = commandList
+    val currentPath: String
+        get() = Paths.get("").toAbsolutePath().toString()
+
+    fun broadcast(message: String?) {
+        server.logger.info(message)
+        server.sendObjectToAllPlayers(MessagePacket(message!!))
     }
 
-    public static List<Command> getCommands() {
-        return commandList;
+    fun sendMessage(senderInterface: SenderInterface?, message: String?) {
+        if (senderInterface is Console) logger.info(message) else senderInterface!!.sendPacket(
+            MessagePacket(
+                message!!
+            )
+                .transport(true)
+        )
     }
 
-    public static String getCurrentPath() {
-        return Paths.get("").toAbsolutePath().toString();
-    }
-
-    public static void broadcast(String message) {
-        server.getLogger().info(message);
-        server.sendObjectToAllPlayers(new MessagePacket(message));
-    }
-
-    public static void sendMessage(SenderInterface senderInterface, String message) {
-        if (senderInterface instanceof Console) logger.info(message);
-        else senderInterface.sendPacket(new MessagePacket(message));
+    fun getCommandList(): List<Command> {
+        return commandList
     }
 }

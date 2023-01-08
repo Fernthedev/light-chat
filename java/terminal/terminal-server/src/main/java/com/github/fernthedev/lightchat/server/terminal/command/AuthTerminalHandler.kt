@@ -1,82 +1,70 @@
-package com.github.fernthedev.lightchat.server.terminal.command;
+package com.github.fernthedev.lightchat.server.terminal.command
 
-import com.github.fernthedev.config.common.exceptions.ConfigLoadException;
-import com.github.fernthedev.lightchat.core.ColorCode;
-import com.github.fernthedev.lightchat.core.api.event.api.EventHandler;
-import com.github.fernthedev.lightchat.core.api.event.api.Listener;
-import com.github.fernthedev.lightchat.core.data.HashedPassword;
-import com.github.fernthedev.lightchat.server.SenderInterface;
-import com.github.fernthedev.lightchat.server.Server;
-import com.github.fernthedev.lightchat.server.event.AuthenticationAttemptedEvent;
-import com.github.fernthedev.lightchat.server.security.AuthenticationManager;
-import com.github.fernthedev.lightchat.server.terminal.ServerTerminal;
-import com.github.fernthedev.lightchat.server.terminal.events.ChatEvent;
-import lombok.NonNull;
-import org.apache.commons.lang3.StringUtils;
+import com.github.fernthedev.config.common.exceptions.ConfigLoadException
+import com.github.fernthedev.lightchat.core.ColorCode
+import com.github.fernthedev.lightchat.core.api.event.api.EventHandler
+import com.github.fernthedev.lightchat.core.api.event.api.Listener
+import com.github.fernthedev.lightchat.core.data.HashedPassword
+import com.github.fernthedev.lightchat.server.SenderInterface
+import com.github.fernthedev.lightchat.server.Server
+import com.github.fernthedev.lightchat.server.event.AuthenticationAttemptedEvent
+import com.github.fernthedev.lightchat.server.event.AuthenticationAttemptedEvent.EventStatus
+import com.github.fernthedev.lightchat.server.security.AuthenticationManager.PlayerInfo
+import com.github.fernthedev.lightchat.server.terminal.ServerTerminal
+import com.github.fernthedev.lightchat.server.terminal.events.ChatEvent
+import org.apache.commons.lang3.StringUtils
 
-import java.util.Map;
-
-public class AuthTerminalHandler extends Command implements Listener {
-
-    private final Server server;
-
-    public AuthTerminalHandler(@NonNull String name, Server server) {
-        super(name);
-        this.server = server;
-    }
-
-    @Override
-    public void onCommand(SenderInterface sender, String[] args) {
-
-        if (args.length == 0) {
-            ServerTerminal.sendMessage(sender, "Please provide new password");
-            return;
+class AuthTerminalHandler(name: String, private val server: Server) : Command(name), Listener {
+    override fun onCommand(sender: SenderInterface, args: Array<String>) {
+        if (args.isEmpty()) {
+            ServerTerminal.sendMessage(sender, "Please provide new password")
+            return
         }
 
         if (StringUtils.isAlphanumeric(args[0])) {
-            server.getAuthenticationManager().authenticate(sender).thenAccept(aBoolean -> {
+            server.authenticationManager.authenticate(sender).thenAccept { aBoolean: Boolean ->
                 if (aBoolean) {
-                    ServerTerminal.sendMessage(sender, "Setting password now");
-                    server.getSettingsManager().getConfigData().setPassword(args[0]);
+                    ServerTerminal.sendMessage(sender, "Setting password now")
+                    server.settingsManager.configData.password = args[0]
                     try {
-                        server.getSettingsManager().save();
-                    } catch (ConfigLoadException e) {
-                        e.printStackTrace();
+                        server.settingsManager.save()
+                    } catch (e: ConfigLoadException) {
+                        e.printStackTrace()
                     }
                 }
-            });
-        } else ServerTerminal.sendMessage(sender, "Password can only be alphanumeric");
+            }
+        } else ServerTerminal.sendMessage(sender, "Password can only be alphanumeric")
     }
 
     @EventHandler
-    public void onChatEvent(ChatEvent event) {
-        AuthenticationManager authenticationManager = server.getAuthenticationManager();
+    fun onChatEvent(event: ChatEvent) {
+        val authenticationManager = server.authenticationManager
+        val checking: Map<SenderInterface, PlayerInfo> = authenticationManager.awaitingAuthentications
 
-        Map<SenderInterface, AuthenticationManager.PlayerInfo> checking = authenticationManager.getAwaitingAuthentications();
-
-        if(checking.containsKey(event.getSender())) {
-
-            event.setCancelled(true);
-
-            server.getAuthenticationManager().attemptAuthenticationHash(new HashedPassword(event.getMessage()), event.getSender());
+        if (checking.containsKey(event.sender)) {
+            event.isCancelled = true
+            server.authenticationManager.attemptAuthenticationHash(HashedPassword(event.message), event.sender)
         }
     }
 
     @EventHandler
-    public void onAuthenticateEvent(AuthenticationAttemptedEvent e) {
-        switch (e.getEventStatus()) {
+    fun onAuthenticateEvent(e: AuthenticationAttemptedEvent) {
+        when (e.eventStatus) {
+            EventStatus.SUCCESS ->                 // Success
+                ServerTerminal.sendMessage(
+                    e.playerInfo.sender,
+                    ColorCode.GREEN.toString() + "Correct password. Successfully authenticated:"
+                )
 
-            case SUCCESS:
-                // Success
-                ServerTerminal.sendMessage(e.getPlayerInfo().sender, ColorCode.GREEN + "Correct password. Successfully authenticated:");
-                break;
-            case ATTEMPT_FAILED:
-                ServerTerminal.sendMessage(e.getPlayerInfo().sender, ColorCode.RED + "Incorrect password");
-                break;
-            case NO_MORE_TRIES:
-                ServerTerminal.sendMessage(e.getPlayerInfo().sender, ColorCode.RED + "Too many tries. Failed to authenticate");
-                break;
+            EventStatus.ATTEMPT_FAILED -> ServerTerminal.sendMessage(
+                e.playerInfo.sender,
+                ColorCode.RED.toString() + "Incorrect password"
+            )
+
+            EventStatus.NO_MORE_TRIES -> ServerTerminal.sendMessage(
+                e.playerInfo.sender,
+                ColorCode.RED.toString() + "Too many tries. Failed to authenticate"
+            )
         }
-
     }
 }

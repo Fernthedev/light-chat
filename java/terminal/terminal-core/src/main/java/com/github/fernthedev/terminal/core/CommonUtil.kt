@@ -1,57 +1,51 @@
-package com.github.fernthedev.terminal.core;
+package com.github.fernthedev.terminal.core
 
-import com.github.fernthedev.lightchat.core.PacketRegistry;
-import com.github.fernthedev.lightchat.core.StaticHandler;
-import com.github.fernthedev.terminal.core.packets.MessagePacket;
-import org.apache.commons.lang3.SystemUtils;
-import org.fusesource.jansi.AnsiConsole;
+import com.github.fernthedev.lightchat.core.PacketRegistry.registerPacketPackageFromClass
+import com.github.fernthedev.lightchat.core.StaticHandler.isDebug
+import com.github.fernthedev.lightchat.core.StaticHandler.setupLoggers
+import com.github.fernthedev.terminal.core.packets.MessagePacket
+import org.apache.commons.lang3.SystemUtils
+import org.fusesource.jansi.AnsiConsole
+import java.io.File
+import java.io.IOException
+import java.net.URISyntaxException
+import java.util.logging.Level
+import java.util.logging.Logger
+import kotlin.system.exitProcess
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-public class CommonUtil {
-
-    public static void registerTerminalPackets() {
-        PacketRegistry.registerPacketPackageFromClass(MessagePacket.class);
+object CommonUtil {
+    @JvmStatic
+    fun registerTerminalPackets() {
+        registerPacketPackageFromClass(MessagePacket::class.java)
     }
 
-    public static void initTerminal() {
-        AnsiConsole.systemInstall();
-        java.util.logging.Logger.getLogger("io.netty").setLevel(java.util.logging.Level.OFF);
-        StaticHandler.setupLoggers();
+    @JvmStatic
+    fun initTerminal() {
+        AnsiConsole.systemInstall()
+        Logger.getLogger("io.netty").level = Level.OFF
+        setupLoggers()
     }
 
-    public static void startSelfInCmd(String[] args) {
-        if (System.console() == null && !StaticHandler.isDebug() && SystemUtils.IS_OS_WINDOWS) {
-
-            String filename = null;
-
+    @JvmStatic
+    fun startSelfInCmd(args: Array<String>) {
+        if (System.console() == null && !isDebug() && SystemUtils.IS_OS_WINDOWS) {
+            val filename: String?
             try {
-                filename = new File(CommonUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath();
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-                System.exit(1);
+                filename = File(CommonUtil::class.java.protectionDomain.codeSource.location.toURI()).path
+            } catch (e: URISyntaxException) {
+                e.printStackTrace()
+                exitProcess(1)
             }
-
-            System.err.println("No console found. Starting with CMD assuming it's Windows");
-
-            String[] newArgs = new String[]{"cmd", "/c", "start", "cmd", "/c", "java -jar \"" + filename + "\" -Xmx2G -Xms2G"};
-
-            List<String> launchArgs = new ArrayList<>(Arrays.asList(newArgs));
-            launchArgs.addAll(Arrays.asList(args));
-
+            System.err.println("No console found. Starting with CMD assuming it's Windows")
+            val newArgs = arrayOf("cmd", "/c", "start", "cmd", "/c", "java -jar \"$filename\" -Xmx2G -Xms2G")
+            val launchArgs: MutableList<String> = ArrayList(listOf(*newArgs))
+            launchArgs.addAll(listOf(*args))
             try {
-                Runtime.getRuntime().exec(launchArgs.toArray(new String[]{}));
-                System.exit(0);
-            } catch (IOException e) {
-                e.printStackTrace();
+                Runtime.getRuntime().exec(launchArgs.toTypedArray())
+                exitProcess(0)
+            } catch (e: IOException) {
+                e.printStackTrace()
             }
-
         }
     }
-
 }

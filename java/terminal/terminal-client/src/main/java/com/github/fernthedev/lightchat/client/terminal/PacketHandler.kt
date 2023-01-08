@@ -1,49 +1,47 @@
-package com.github.fernthedev.lightchat.client.terminal;
+package com.github.fernthedev.lightchat.client.terminal
 
-import com.github.fernthedev.lightchat.client.api.IPacketHandler;
-import com.github.fernthedev.lightchat.client.event.ServerDisconnectEvent;
-import com.github.fernthedev.lightchat.core.ColorCode;
-import com.github.fernthedev.lightchat.core.StaticHandler;
-import com.github.fernthedev.lightchat.core.api.event.api.EventHandler;
-import com.github.fernthedev.lightchat.core.api.event.api.Listener;
-import com.github.fernthedev.lightchat.core.packets.Packet;
-import com.github.fernthedev.lightchat.core.packets.SelfMessagePacket;
-import com.github.fernthedev.terminal.core.packets.AutoCompletePacket;
-import com.github.fernthedev.terminal.core.packets.MessagePacket;
-import lombok.AllArgsConstructor;
+import com.github.fernthedev.lightchat.client.api.IPacketHandler
+import com.github.fernthedev.lightchat.client.event.ServerDisconnectEvent
+import com.github.fernthedev.lightchat.core.ColorCode
+import com.github.fernthedev.lightchat.core.StaticHandler.core
+import com.github.fernthedev.lightchat.core.api.event.api.EventHandler
+import com.github.fernthedev.lightchat.core.api.event.api.Listener
+import com.github.fernthedev.lightchat.core.packets.Packet
+import com.github.fernthedev.lightchat.core.packets.SelfMessagePacket
+import com.github.fernthedev.terminal.core.packets.AutoCompletePacket
+import com.github.fernthedev.terminal.core.packets.MessagePacket
+import java.util.*
+import java.util.concurrent.TimeUnit
+import kotlin.system.exitProcess
 
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
+class PacketHandler : IPacketHandler, Listener {
+    override fun handlePacket(packet: Packet, packetId: Int) {
+        when (packet) {
+            is AutoCompletePacket -> {
+                ClientTerminal.autoCompleteHandler.addCandidates(packet.candidateList)
+            }
 
-@AllArgsConstructor
-public class PacketHandler implements IPacketHandler, Listener {
+            is MessagePacket -> {
+                ClientTerminal.logger.info(packet.message)
+                if (ClientTerminal.messageDelay.isRunning) ClientTerminal.messageDelay.stop()
+                ClientTerminal.logger.debug(
+                    "Time taken for message: {}", ClientTerminal.messageDelay.elapsed(
+                        TimeUnit.MILLISECONDS
+                    )
+                )
+            }
 
-    @Override
-    public void handlePacket(Packet p, int packetId) {
-        if(p instanceof AutoCompletePacket) {
-            AutoCompletePacket packet = (AutoCompletePacket) p;
-            ClientTerminal.getAutoCompleteHandler().addCandidates(packet.getCandidateList());
-        } else if (p instanceof MessagePacket) {
-            MessagePacket messagePacket = (MessagePacket) p;
-            ClientTerminal.getLogger().info(messagePacket.getMessage());
-
-            if (ClientTerminal.getMessageDelay().isRunning())
-                ClientTerminal.getMessageDelay().stop();
-
-            ClientTerminal.getLogger().debug("Time taken for message: {}", ClientTerminal.getMessageDelay().elapsed(TimeUnit.MILLISECONDS));
-
-        } else if (p instanceof SelfMessagePacket) {
-            SelfMessagePacket selfMessagePacket = (SelfMessagePacket) p;
-
-            if (Objects.requireNonNull(selfMessagePacket.getType()) == SelfMessagePacket.MessageType.INCORRECT_PASSWORD_FAILURE) {
-                ClientTerminal.getLogger().error(ColorCode.RED + "Failed all attempts to login.");
+            is SelfMessagePacket -> {
+                if (Objects.requireNonNull(packet.type) === SelfMessagePacket.MessageType.INCORRECT_PASSWORD_FAILURE) {
+                    ClientTerminal.logger.error(ColorCode.RED.toString() + "Failed all attempts to login.")
+                }
             }
         }
     }
 
     @EventHandler
-    public void onDisconnect(ServerDisconnectEvent e) {
-        StaticHandler.getCore().getLogger().info("CLOSING CLIENT");
-        System.exit(0);
+    fun onDisconnect(e: ServerDisconnectEvent?) {
+        core.logger.info("CLOSING CLIENT")
+        exitProcess(0)
     }
 }

@@ -18,88 +18,98 @@ import com.github.fernthedev.lightchat.core.packets.latency.PingPacket
 import com.github.fernthedev.lightchat.core.packets.latency.PingReceive
 import com.github.fernthedev.lightchat.core.packets.latency.PongPacket
 import com.github.fernthedev.lightchat.core.util.ExceptionUtil.throwParsePacketException
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.security.InvalidKeyException
 import java.util.concurrent.TimeUnit
 
-class EventListener(protected var client: Client) {
-    @OptIn(ExperimentalCoroutinesApi::class)
-    suspend fun received(p: Packet?, packetId: Int) = coroutineScope{
+class EventListener(private var client: Client) {
+    suspend fun received(p: Packet, packetId: Int) = coroutineScope{
         try {
-            if (p is PingPacket) {
-                client.startPingStopwatch()
-                client.sendObject(PongPacket().transport(false))
-            } else if (p is PingReceive) {
-                client.endPingStopwatch()
-                client.logger.debug("Ping: {}", client.getPingTime(TimeUnit.MILLISECONDS).toString() + "ms")
-            } else if (p is IllegalConnectionPacket) {
-                client.logger.info(p.message)
-                client.disconnect(DisconnectStatus.CONNECTION_LOST)
-            } else if (p is InitialHandshakePacket) {
-                // Handles object encryption key sharing
-                val versionData = p.getVersionData()
-                val versionRange = getVersionRangeStatus(versionData)
-                if (versionRange === StaticHandler.VersionRange.MATCH_REQUIREMENTS) // Current version is smaller than the server's required minimum
-
-                    // Current version is larger than server's minimum version
-                {
-                    client.logger
-                        .info("Version range requirements match Server version.")
-                } else {
-                    // Current version is smaller than the server's required minimum
-                    if (versionRange === StaticHandler.VersionRange.WE_ARE_LOWER) {
-                        client.logger.info(
-                            "The client version ({}) does not meet server's minimum version ({}) requirements. Expect incompatibility issues",
-                            VERSION_DATA.version,
-                            versionData.minVersion
-                        )
-                    }
-
-                    // Current version is larger than server's minimum version
-                    if (versionRange === StaticHandler.VersionRange.WE_ARE_HIGHER) {
-                        client.logger.info(
-                            "The server version ({}) does not meet client's minimum version ({}) requirements. Expect incompatibility issues",
-                            versionData.version,
-                            VERSION_DATA.minVersion
-                        )
-                    }
-                }
-                launch {
-                    val secretKey = client.secretKey!!.await()
-                    try {
-                        val responsePacket = KeyResponsePacket(secretKey, p.getPublicKey())
-                        client.sendObject(responsePacket.transport(false))
-                    } catch (e: InvalidKeyException) {
-                        e.printStackTrace()
-                    }
+            when (p) {
+                is PingPacket -> {
+                    client.startPingStopwatch()
+                    client.sendObject(PongPacket().transport(false))
                 }
 
-                client.pluginManager.callEvent(ServerConnectHandshakeEvent(client.channel!!))
-            } else if (p is RequestConnectInfoPacket) {
-                val connectedPacket = client.buildConnectedPacket()
-                client.sendObject(connectedPacket)
-                client.logger.info("Sent the connection Packet for request")
-            } else if (p is SelfMessagePacket) {
-                when (p.type) {
-                    SelfMessagePacket.MessageType.TIMED_OUT_REGISTRATION -> {
-                        client.logger.info("Timed out on registering.")
-                        client.disconnect(DisconnectStatus.TIMEOUT)
+                is PingReceive -> {
+                    client.endPingStopwatch()
+                    client.logger.debug("Ping: {}", client.getPingTime(TimeUnit.MILLISECONDS).toString() + "ms")
+                }
+
+                is IllegalConnectionPacket -> {
+                    client.logger.info(p.message)
+                    client.disconnect(DisconnectStatus.CONNECTION_LOST)
+                }
+
+                is InitialHandshakePacket -> {
+                    // Handles object encryption key sharing
+                    val versionData = p.getVersionData()
+                    val versionRange = getVersionRangeStatus(versionData)
+                    if (versionRange === StaticHandler.VersionRange.MATCH_REQUIREMENTS) // Current version is smaller than the server's required minimum
+
+                    // Current version is larger than server's minimum version
+                    {
+                        client.logger
+                            .info("Version range requirements match Server version.")
+                    } else {
+                        // Current version is smaller than the server's required minimum
+                        if (versionRange === StaticHandler.VersionRange.WE_ARE_LOWER) {
+                            client.logger.info(
+                                "The client version ({}) does not meet server's minimum version ({}) requirements. Expect incompatibility issues",
+                                VERSION_DATA.version,
+                                versionData.minVersion
+                            )
+                        }
+
+                        // Current version is larger than server's minimum version
+                        if (versionRange === StaticHandler.VersionRange.WE_ARE_HIGHER) {
+                            client.logger.info(
+                                "The server version ({}) does not meet client's minimum version ({}) requirements. Expect incompatibility issues",
+                                versionData.version,
+                                VERSION_DATA.minVersion
+                            )
+                        }
+                    }
+                    launch {
+                        val secretKey = client.secretKey!!.await()
+                        try {
+                            val responsePacket = KeyResponsePacket(secretKey, p.getPublicKey())
+                            client.sendObject(responsePacket.transport(false))
+                        } catch (e: InvalidKeyException) {
+                            e.printStackTrace()
+                        }
                     }
 
-                    SelfMessagePacket.MessageType.REGISTER_PACKET -> {
-                        client.isRegistered = true
-                        client.logger.info("Successfully connected to server")
-                        client.pluginManager.callEvent(ServerConnectFinishEvent(client.channel!!))
-                    }
+                    client.pluginManager.callEvent(ServerConnectHandshakeEvent(client.channel!!))
+                }
 
-                    SelfMessagePacket.MessageType.LOST_SERVER_CONNECTION -> {
-                        client.logger.info("Lost connection to server! Must have shutdown!")
-                        client.disconnect(DisconnectStatus.CONNECTION_LOST)
-                    }
+                is RequestConnectInfoPacket -> {
+                    val connectedPacket = client.buildConnectedPacket()
+                    client.sendObject(connectedPacket)
+                    client.logger.info("Sent the connection Packet for request")
+                }
 
-                    else -> {}
+                is SelfMessagePacket -> {
+                    when (p.type) {
+                        SelfMessagePacket.MessageType.TIMED_OUT_REGISTRATION -> {
+                            client.logger.info("Timed out on registering.")
+                            client.disconnect(DisconnectStatus.TIMEOUT)
+                        }
+
+                        SelfMessagePacket.MessageType.REGISTER_PACKET -> {
+                            client.isRegistered = true
+                            client.logger.info("Successfully connected to server")
+                            client.pluginManager.callEvent(ServerConnectFinishEvent(client.channel!!))
+                        }
+
+                        SelfMessagePacket.MessageType.LOST_SERVER_CONNECTION -> {
+                            client.logger.info("Lost connection to server! Must have shutdown!")
+                            client.disconnect(DisconnectStatus.CONNECTION_LOST)
+                        }
+
+                        else -> {}
+                    }
                 }
             }
 
@@ -107,13 +117,13 @@ class EventListener(protected var client: Client) {
                 try {
                     packetHandler.handlePacket(p, packetId)
                 } catch (e: Exception) {
-                    throw throwParsePacketException(e, p!!)
+                    throw throwParsePacketException(e, p)
                 }
             }
         } catch (e: ParsePacketException) {
             throw e
         } catch (e: Exception) {
-            throw throwParsePacketException(e, p!!)
+            throw throwParsePacketException(e, p)
         }
     }
 }

@@ -1,19 +1,14 @@
-package com.github.fernthedev.lightchat.server.terminal.command;
+package com.github.fernthedev.lightchat.server.terminal.command
 
-import com.github.fernthedev.lightchat.server.SenderInterface;
+import com.github.fernthedev.lightchat.server.SenderInterface
+import java.util.*
 
-import java.util.LinkedList;
-import java.util.List;
-
-public interface TabExecutor {
-
+interface TabExecutor {
     /**
      * Returns a list of completions based on the arguments given
      * @param sender
      * @param args
      * @return
      */
-    List<String> getCompletions(SenderInterface sender, LinkedList<String> args);
-
-
+    fun getCompletions(sender: SenderInterface, args: Deque<String>): List<String>
 }

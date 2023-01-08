@@ -1,26 +1,42 @@
-package com.github.fernthedev.terminal.core.packets;
+package com.github.fernthedev.terminal.core.packets
 
-import com.github.fernthedev.lightchat.core.data.LightCandidate;
-import com.github.fernthedev.lightchat.core.packets.Packet;
-import com.github.fernthedev.lightchat.core.packets.PacketInfo;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
+import com.github.fernthedev.lightchat.core.data.LightCandidate
+import com.github.fernthedev.lightchat.core.packets.Packet
+import com.github.fernthedev.lightchat.core.packets.PacketInfo
 
-import java.util.ArrayList;
-import java.util.List;
-
-@EqualsAndHashCode(callSuper = true)
-@Data
 @PacketInfo(name = "AUTO_COMPLETE_PACKET")
-public class AutoCompletePacket extends Packet {
+class AutoCompletePacket(@JvmField var words: List<String>) : Packet() {
+    var candidateList: List<LightCandidate> = ArrayList()
 
-    private List<LightCandidate> candidateList = new ArrayList<>();
+    override fun toString(): String {
+        return "AutoCompletePacket(candidateList=" + candidateList + ", words=" + words + ")"
+    }
 
-    @NonNull
-    private List<String> words;
+    override fun equals(o: Any?): Boolean {
+        if (o === this) return true
+        if (o !is AutoCompletePacket) return false
+        val other = o
+        if (!other.canEqual(this as Any)) return false
+        if (!super.equals(o)) return false
+        val `this$candidateList`: Any = candidateList
+        val `other$candidateList`: Any = other.candidateList
+        if (if (`this$candidateList` == null) `other$candidateList` != null else `this$candidateList` != `other$candidateList`) return false
+        val `this$words`: Any = words
+        val `other$words`: Any = other.words
+        return if (if (`this$words` == null) `other$words` != null else `this$words` != `other$words`) false else true
+    }
 
-    public AutoCompletePacket(List<String> words) {
-        this.words = words;
+    protected fun canEqual(other: Any?): Boolean {
+        return other is AutoCompletePacket
+    }
+
+    override fun hashCode(): Int {
+        val PRIME = 59
+        var result = super.hashCode()
+        val `$candidateList`: Any = candidateList
+        result = result * PRIME + (`$candidateList`?.hashCode() ?: 43)
+        val `$words`: Any = words
+        result = result * PRIME + (`$words`?.hashCode() ?: 43)
+        return result
     }
 }

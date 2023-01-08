@@ -1,9 +1,7 @@
-package com.github.fernthedev.terminal.core;
+package com.github.fernthedev.terminal.core
 
-import com.github.fernthedev.lightchat.core.Core;
+import com.github.fernthedev.lightchat.core.Core
 
-public interface TermCore extends Core {
-
-    void runCommand(String command);
-
+interface TermCore : Core {
+    fun runCommand(command: String)
 }

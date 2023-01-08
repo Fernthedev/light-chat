@@ -1,19 +1,14 @@
-package com.github.fernthedev.lightchat.server.terminal;
+package com.github.fernthedev.lightchat.server.terminal
 
-import com.github.fernthedev.lightchat.server.Server;
-import com.github.fernthedev.lightchat.server.ServerCore;
-import com.github.fernthedev.terminal.core.TermCore;
-import lombok.NonNull;
+import com.github.fernthedev.lightchat.server.Server
+import com.github.fernthedev.lightchat.server.ServerCore
+import com.github.fernthedev.terminal.core.TermCore
+import kotlinx.coroutines.runBlocking
 
-public class ServerTermCore extends ServerCore implements TermCore {
-
-    public ServerTermCore(@NonNull Server server) {
-        super(server);
+class ServerTermCore(server: Server) : ServerCore(server), TermCore {
+    override fun runCommand(command: String) {
+        runBlocking {
+            ServerTerminal.commandHandler.dispatchCommand(command)
+        }
     }
-
-    @Override
-    public void runCommand(String command) {
-        ServerTerminal.getCommandHandler().dispatchCommand(command);
-    }
-
 }
