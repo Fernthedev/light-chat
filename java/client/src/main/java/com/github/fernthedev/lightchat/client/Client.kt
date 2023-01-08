@@ -196,7 +196,10 @@ class Client(private var host: String, private var port: Int) : IEncryptionKeyHo
 
                 if (compression >= 0) encoder = compressions.first.apply(clientSettingsManager.configData)
                 if (compressionAlgorithm != "NONE") {
-                    if (decoder != null) ch.pipeline().addBefore("strDecoder", "compressDecoder", decoder)
+                    if (decoder != null) {
+                        ch.pipeline().addBefore("strDecoder", "compressDecoder", decoder)
+                    }
+
                     if (compression >= 0 && encoder != null) {
                         ch.pipeline().addBefore("strEncoder", "compressEncoder", encoder)
                         logger.info("Using {} {} compression", compressionAlgorithm, compression)

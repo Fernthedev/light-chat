@@ -20,8 +20,6 @@ import com.github.fernthedev.terminal.core.packets.CommandPacket
 import com.github.fernthedev.terminal.core.packets.MessagePacket
 import com.google.common.base.Stopwatch
 import lombok.SneakyThrows
-import org.apache.commons.lang3.tuple.ImmutablePair
-import org.apache.commons.lang3.tuple.Pair
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -34,12 +32,12 @@ object ClientTerminal {
     lateinit var autoCompleteHandler: AutoCompleteHandler
         private set
 
-    internal lateinit var client: Client
-    internal var clientSupplier: (host: String, port: Int) -> Client =
+    lateinit var client: Client
+    var clientSupplier: (host: String, port: Int) -> Client =
         { host: String, port: Int -> Client(host, port) }
 
 
-    val messageDelay = Stopwatch.createUnstarted()
+    val messageDelay: Stopwatch = Stopwatch.createUnstarted()
 
     @JvmStatic
     fun main(args: Array<String>) {
@@ -98,8 +96,8 @@ object ClientTerminal {
                 try {
                     val hostPortPair = check(multicastClient, scanner, 4)
                     if (hostPortPair != null) {
-                        host.set(hostPortPair.left)
-                        port.set(hostPortPair.right)
+                        host.set(hostPortPair.first)
+                        port.set(hostPortPair.second)
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -216,7 +214,7 @@ object ClientTerminal {
                 }
             }
         }
-        return ImmutablePair(host, port)
+        return Pair(host, port)
     }
 
     fun sendMessage(message: String) {

@@ -30,21 +30,14 @@ import java.util.concurrent.atomic.AtomicInteger
 
 object ServerTerminal {
     lateinit var settingsManager: Config<out ServerSettings>
-        private set
-
     lateinit var commandHandler: ServerCommandHandler
-        private set
-
-    internal lateinit var server: Server
+    lateinit var server: Server
 
     lateinit var commandMessageParser: CommandMessageParser
-        private set
     lateinit var autoCompleteHandler: TabCompleteFinder
-        private set
-
     private val commandList: MutableList<Command> = ArrayList()
 
-    internal var logger = LoggerFactory.getLogger(ServerTerminal::class.java)
+    val logger = LoggerFactory.getLogger(ServerTerminal::class.java)
 
     @JvmStatic
     fun main(args: Array<String>) {
