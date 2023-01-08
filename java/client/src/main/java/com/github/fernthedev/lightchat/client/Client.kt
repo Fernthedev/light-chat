@@ -69,7 +69,9 @@ class Client(private var host: String, private var port: Int) : IEncryptionKeyHo
     val pluginManager = PluginManager()
     var isRunning = false
     val packetHandlers: MutableList<IPacketHandler> = ArrayList()
-    val name: String by lazy { InetAddress.getLocalHost().hostName }
+
+    @APIUsage
+    var name: String? = null
 
     /**
      * Is null until a connection is established
@@ -101,6 +103,9 @@ class Client(private var host: String, private var port: Int) : IEncryptionKeyHo
         StaticHandler.setCore(ClientCore(this), false)
         listener = EventListener(this)
         clientHandler = ClientHandler(this, listener)
+        if (name == null) {
+            name = InetAddress.getLocalHost().hostName
+        }
         initialize(host, port)
     }
 

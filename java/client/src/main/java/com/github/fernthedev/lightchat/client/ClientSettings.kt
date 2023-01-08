@@ -2,7 +2,7 @@ package com.github.fernthedev.lightchat.client
 
 import com.github.fernthedev.lightchat.core.CoreSettings
 
-class ClientSettings : CoreSettings() {
+open class ClientSettings : CoreSettings() {
     var isRunNatives = true
     override fun toString(): String {
         return "ClientSettings(runNatives=" + isRunNatives + ")"
