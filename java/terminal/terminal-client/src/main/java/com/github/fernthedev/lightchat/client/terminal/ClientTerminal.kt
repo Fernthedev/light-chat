@@ -133,7 +133,7 @@ object ClientTerminal {
         val packetHandler = PacketHandler()
         client.addPacketHandler(packetHandler)
         if (settings.isShutdownOnDisconnect) {
-            client.eventHandler.add(ServerDisconnectEvent::class.java) {
+            client.eventHandler.add<ServerDisconnectEvent> {
                 packetHandler.onDisconnect(it)
             }
         }

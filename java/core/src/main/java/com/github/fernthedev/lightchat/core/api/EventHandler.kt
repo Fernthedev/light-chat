@@ -1,7 +1,7 @@
 package com.github.fernthedev.lightchat.core.api
 
 @FunctionalInterface
-interface EventListener<T : Event> {
+fun interface EventListener<T : Event> {
     fun invoke(event: T)
 }
 
@@ -9,14 +9,12 @@ class EventHandler {
 
     private val map: MutableMap<Class<out Event>, MutableList<EventListener<out Event>>> = HashMap()
 
-    fun <T : Event> add(clazz: Class<T>, listener: (event: T) -> Unit): EventListener<T> {
-        val listener = object : EventListener<T> {
-            override fun invoke(event: T) {
-                listener(event)
-            }
+    inline fun <reified T : Event> add(crossinline listener: (event: T) -> Unit): EventListener<T> {
+        val wrapper = EventListener<T>{
+            listener(it)
         }
-        add(clazz, listener)
-        return listener
+        add(wrapper)
+        return wrapper
     }
 
     fun <T : Event> add(clazz: Class<T>, listener: EventListener<T>) {
@@ -29,8 +27,16 @@ class EventHandler {
         }
     }
 
+    inline fun <reified T: Event> add(listener: EventListener<T>) {
+        add(T::class.java, listener)
+    }
+
     fun <T : Event> remove(clazz: Class<T>, listener: EventListener<T>) {
         map[clazz]?.remove(listener)
+    }
+
+    inline fun <reified T: Event> remove(listener: EventListener<T>) {
+        remove(T::class.java, listener)
     }
 
     fun <T : Event> callEvent(event: T) {
