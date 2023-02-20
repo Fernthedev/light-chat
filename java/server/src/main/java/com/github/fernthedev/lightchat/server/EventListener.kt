@@ -70,7 +70,8 @@ class EventListener(private val server: Server, private val clientConnection: Cl
             }
             clientConnection.finishConstruct(packet.name, packet.os, packet.langFramework)
             val versionData = packet.versionData
-            val versionRange = StaticHandler.getVersionRangeStatus(VersionData(versionData))
+            clientConnection.versionData = VersionData(versionData)
+            val versionRange = StaticHandler.getVersionRangeStatus(clientConnection.versionData)
             if (versionRange == StaticHandler.VersionRange.MATCH_REQUIREMENTS) server.logInfo(
                 "{}'s version range requirements match Server version.",
                 clientConnection

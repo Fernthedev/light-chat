@@ -9,7 +9,7 @@ object ProtobufRegistry {
 
 
     fun <T: Message> addMessage(messageLite: T) {
-        map[messageLite.descriptorForType.fullName] = {bytes -> messageLite.newBuilderForType().mergeFrom(bytes).build() }
+        map[messageLite.descriptorForType.fullName] = {bytes -> messageLite.parserForType.parseFrom(bytes) }
     }
 
     fun <T: MessageLite> decode(name: String, bytes: ByteArray): T? {

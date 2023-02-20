@@ -1,7 +1,7 @@
 package com.github.fernthedev.lightchat.core.encryption
 
+import com.github.fernthedev.lightchat.core.util.asBytesArrayFast
 import io.netty.buffer.ByteBuf
-import io.netty.buffer.ByteBufUtil
 import io.netty.buffer.Unpooled
 
 data class EncryptedBytes(val data: ByteArray, val params: ByteArray, val paramAlgorithm: String) {
@@ -18,8 +18,8 @@ data class EncryptedBytes(val data: ByteArray, val params: ByteArray, val paramA
             val paramsAlgorithm = buf.readBytes(paramsAlgorithmSize).toString(Charsets.UTF_8)
 
             return EncryptedBytes(
-                data = ByteBufUtil.getBytes(data),
-                params = ByteBufUtil.getBytes(params),
+                data = data.asBytesArrayFast(),
+                params = params.asBytesArrayFast(),
                 paramAlgorithm = paramsAlgorithm
             )
         }

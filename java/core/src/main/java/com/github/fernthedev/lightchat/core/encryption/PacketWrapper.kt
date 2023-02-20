@@ -3,9 +3,9 @@ package com.github.fernthedev.lightchat.core.encryption
 import com.github.fernthedev.lightchat.core.codecs.AcceptablePacketTypes
 import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil
 import com.github.fernthedev.lightchat.core.packets.PacketJSON
+import com.github.fernthedev.lightchat.core.util.asBytesArrayFast
 import com.google.gson.annotations.SerializedName
 import io.netty.buffer.ByteBuf
-import io.netty.buffer.ByteBufUtil
 import io.netty.buffer.Unpooled
 import java.io.Serializable
 import java.security.SecureRandom
@@ -84,7 +84,7 @@ internal data class PacketWrapper internal constructor(
             packetId: Int,
         ): PacketWrapper {
             return PacketWrapper(
-                ByteBufUtil.getBytes(encryptedBytes.encode()),
+                encryptedBytes.encode().asBytesArrayFast(),
                 packetName,
                 packetId,
                 encrypt = true,
@@ -117,7 +117,7 @@ internal data class PacketWrapper internal constructor(
             val jsonObject = buf.readBytes(jsonObjectSize)
 
             return PacketWrapper(
-                jsonObject = ByteBufUtil.getBytes(jsonObject),
+                jsonObject = jsonObject.asBytesArrayFast(),
                 packetId = id,
                 packetIdentifier = identifier.toString(Charsets.UTF_8),
                 encrypt = encrypt,
