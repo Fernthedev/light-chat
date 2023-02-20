@@ -10,6 +10,7 @@ import com.github.fernthedev.lightchat.core.encryption.RSA.IEncryptionKeyHolder
 import com.github.fernthedev.lightchat.core.encryption.RSA.NoSecretKeyException
 import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil
 import com.github.fernthedev.lightchat.core.util.ExceptionUtil
+import io.netty.buffer.ByteBuf
 import io.netty.channel.ChannelHandler.Sharable
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.MessageToMessageDecoder
@@ -24,7 +25,7 @@ class EncryptedJSONObjectDecoder
  * Creates a new instance with the specified character set.
  *
  */(private var encryptionKeyHolder: IEncryptionKeyHolder, private val jsonHandler: JSONHandler) :
-    MessageToMessageDecoder<String>() {
+    MessageToMessageDecoder<ByteBuf>() {
     /**
      * Returns a string list
      *
@@ -34,17 +35,19 @@ class EncryptedJSONObjectDecoder
      * @throws Exception
      */
     @Throws(Exception::class)
-    override fun decode(ctx: ChannelHandlerContext, msg: String, out: MutableList<Any>) {
+    override fun decode(ctx: ChannelHandlerContext, msg: ByteBuf, out: MutableList<Any>) {
         StaticHandler.core.logger.debug("Decoding the string {}", msg)
-        val packetWrapper = jsonHandler.fromJson(msg, PacketWrapper::class.java)
+        val packetWrapper = PacketWrapper.decode(msg) //jsonHandler.fromJson(msg, PacketWrapper::class.java)
         val decryptedJSON: String
+
+
 
         try {
             decryptedJSON = if (packetWrapper.encrypt) {
-                val encryptedBytes = jsonHandler.fromJson(packetWrapper.jsonObject, EncryptedBytes::class.java)
+                val encryptedBytes = jsonHandler.fromJson(packetWrapper.jsonObject.toString(Charsets.UTF_8), EncryptedBytes::class.java)
                 decrypt(ctx, encryptedBytes)
             } else {
-                packetWrapper.jsonObject
+                packetWrapper.jsonObject.toString(Charsets.UTF_8)
             }
         } catch (e: Exception) {
             throw IllegalArgumentException("Unable to parse string: $msg", e)

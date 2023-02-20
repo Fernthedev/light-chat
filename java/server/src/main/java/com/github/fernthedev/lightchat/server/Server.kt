@@ -34,8 +34,6 @@ import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.nio.NioServerSocketChannel
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder
 import io.netty.handler.codec.LengthFieldPrepender
-import io.netty.handler.codec.string.StringDecoder
-import io.netty.handler.codec.string.StringEncoder
 import kotlinx.coroutines.*
 import lombok.*
 import org.apache.commons.lang3.time.StopWatch
@@ -297,7 +295,6 @@ class Server(val port: Int) : Runnable {
                         LengthFieldBasedFrameDecoder(Int.MAX_VALUE, 0, 8, 0, 8),
                         SnappyCompressor.snappyDecoder()
                     )
-                    ch.pipeline().addLast("strDecoder", StringDecoder(settingsManager.configData.charset))
                     ch.pipeline().addLast(
                         EncryptedJSONObjectDecoder(keyFinder, jsonHandler),
                     )
@@ -307,7 +304,6 @@ class Server(val port: Int) : Runnable {
                         LengthFieldPrepender(8),
                         SnappyCompressor.snappyFrameEncoder()
                     )
-                    ch.pipeline().addLast("strEncoder", StringEncoder())
                     ch.pipeline()
                         .addLast(EncryptedJSONObjectEncoder(keyFinder, jsonHandler))
 

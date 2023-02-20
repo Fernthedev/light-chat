@@ -4,6 +4,10 @@ import com.github.fernthedev.lightchat.core.codecs.JSONHandler
 import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil
 import com.github.fernthedev.lightchat.core.packets.Packet
 import com.google.gson.annotations.SerializedName
+import com.google.protobuf.Message
+import io.netty.buffer.ByteBuf
+import io.netty.buffer.ByteBufUtil
+import io.netty.buffer.Unpooled
 import java.io.Serializable
 import java.security.SecureRandom
 import javax.crypto.Cipher
@@ -21,7 +25,7 @@ class PacketTransporter
     val id: Int = -1, // only used in decode
 ) {
     private lateinit var packetWrapperCache: PacketWrapper
-    private lateinit var packetWrapperJSON: String
+    private lateinit var packetWrapperJSON: ByteBuf
 
     internal fun packetWrapper(
         jsonHandler: JSONHandler,
@@ -29,7 +33,7 @@ class PacketTransporter
         secretKey: SecretKey?,
         cipher: Cipher,
         random: SecureRandom?
-    ): Pair<PacketWrapper, String> {
+    ): Pair<PacketWrapper, ByteBuf> {
         if (this::packetWrapperCache.isInitialized) {
             return packetWrapperCache to packetWrapperJSON
         }
@@ -44,7 +48,7 @@ class PacketTransporter
             PacketWrapper.plain(packet, jsonHandler, packetId)
         }
 
-        packetWrapperJSON = jsonHandler.toJson(packetWrapperCache)
+        packetWrapperJSON = packetWrapperCache.encode()
 
         return packetWrapperCache to packetWrapperJSON
     }
@@ -54,8 +58,14 @@ fun Packet.transport(encrypt: Boolean = true): PacketTransporter {
     return PacketTransporter(this, encrypt)
 }
 
+enum class PacketType(val i: Byte) {
+    UNKNOWN(-1),
+    JSON(0), // 0
+    PROTOBUF(1) // 1
+}
+
 internal data class PacketWrapper internal constructor(
-    var jsonObject: String,
+    var jsonObject: ByteArray,
     var packetIdentifier: String,
     /**
      * For packet order
@@ -64,6 +74,8 @@ internal data class PacketWrapper internal constructor(
 
     @SerializedName("ENCRYPT")
     val encrypt: Boolean,
+
+    val packetType: PacketType
 ) : Serializable {
 
     companion object {
@@ -73,16 +85,102 @@ internal data class PacketWrapper internal constructor(
             handler: JSONHandler,
             packetId: Int
         ): PacketWrapper {
-            return PacketWrapper(handler.toJson(encryptedBytes), packetName, packetId, encrypt = true)
+            return PacketWrapper(
+                handler.toJson(encryptedBytes).toByteArray(),
+                packetName,
+                packetId,
+                encrypt = true,
+                packetType = PacketType.JSON
+            )
         }
 
         fun plain(jsonObject: Packet, jsonHandler: JSONHandler, packetId: Int): PacketWrapper {
             return PacketWrapper(
-                jsonHandler.toJson(jsonObject),
+                jsonHandler.toJson(jsonObject).toByteArray(),
                 jsonObject.packetName,
                 packetId,
-                encrypt = false
+                encrypt = false,
+                packetType = PacketType.JSON
+            )
+        }
+
+        fun protobuf(message: Message, packetId: Int, encrypt: Boolean): PacketWrapper {
+            return PacketWrapper(
+                jsonObject = message.toByteArray(),
+                packetId = packetId,
+                encrypt = encrypt,
+                packetIdentifier = message.descriptorForType.fullName,
+                packetType = PacketType.PROTOBUF
+            )
+        }
+
+
+        fun decode(buf: ByteBuf): PacketWrapper {
+
+
+            val encrypt = buf.readBoolean()
+            val id = buf.readInt()
+            val packetType = buf.readByte()
+            val packetTypeEnum = PacketType.values().find { it.i == packetType } ?: PacketType.UNKNOWN
+
+            val identifierSize = buf.readInt()
+            val identifier = buf.readBytes(identifierSize)
+
+            val jsonObjectSize = buf.readInt()
+            val jsonObject = buf.readBytes(jsonObjectSize)
+
+            return PacketWrapper(
+                jsonObject = ByteBufUtil.getBytes(jsonObject),
+                packetId = id,
+                packetIdentifier = identifier.toString(Charsets.UTF_8),
+                encrypt = encrypt,
+                packetType = packetTypeEnum
             )
         }
     }
+
+    fun encode(): ByteBuf {
+        val identifier = packetIdentifier.toByteArray()
+
+        // in respective order
+        val stream = Unpooled.buffer( 1 + 4 + 1 + 4 + identifier.size + 4 + jsonObject.size)
+
+
+
+
+        stream.writeBoolean(encrypt)
+        stream.writeInt(packetId) // BigEndian
+        stream.writeByte(packetType.i.toInt())
+
+        stream.writeInt(identifier.size)
+        stream.writeBytes(identifier)
+
+        stream.writeInt(jsonObject.size)
+        stream.writeBytes(jsonObject)
+
+        return stream
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is PacketWrapper) return false
+
+        if (!jsonObject.contentEquals(other.jsonObject)) return false
+        if (packetIdentifier != other.packetIdentifier) return false
+        if (packetId != other.packetId) return false
+        if (encrypt != other.encrypt) return false
+        if (packetType != other.packetType) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = jsonObject.contentHashCode()
+        result = 31 * result + packetIdentifier.hashCode()
+        result = 31 * result + packetId
+        result = 31 * result + encrypt.hashCode()
+        result = 31 * result + packetType.hashCode()
+        return result
+    }
+
 }
