@@ -1,7 +1,7 @@
 package com.github.fernthedev.lightchat.core.packets
 
 @PacketInfo(name = "SELF_MESSAGE_PACKET")
-class SelfMessagePacket(val type: MessageType) : Packet() {
+class SelfMessagePacket(val type: MessageType) : PacketJSON() {
 
     override fun toString(): String {
         return "SelfMessagePacket(type=" + type + ")"

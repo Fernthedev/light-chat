@@ -81,10 +81,10 @@ object EncryptionUtil {
         IOException::class,
         InvalidAlgorithmParameterException::class
     )
-    fun encrypt(data: String, secret: SecretKey, cipher: Cipher, secureRandom: SecureRandom): EncryptedBytes {
+    fun encrypt(data: ByteArray, secret: SecretKey, cipher: Cipher, secureRandom: SecureRandom): EncryptedBytes {
         val spec = getAlgorithmSpec(secureRandom)
         cipher.init(Cipher.ENCRYPT_MODE, secret, spec)
-        val encodedData = cipher.doFinal(data.toByteArray(StaticHandler.CHARSET_FOR_STRING))
+        val encodedData = cipher.doFinal(data)
         val params = cipher.parameters.encoded
         val paramAlgorithm = cipher.parameters.algorithm
         return EncryptedBytes(encodedData, params, paramAlgorithm)
@@ -119,10 +119,10 @@ object EncryptionUtil {
         secret: SecretKey,
         cipher: Cipher,
         secureRandom: SecureRandom
-    ): String {
+    ): ByteArray {
         val spec = getAlgorithmSpec(secureRandom)
         cipher.init(Cipher.DECRYPT_MODE, secret, spec)
-        return cipher.doFinal(encryptedBytes.data).toString(StaticHandler.CHARSET_FOR_STRING)
+        return cipher.doFinal(encryptedBytes.data)
     }
 
     /**

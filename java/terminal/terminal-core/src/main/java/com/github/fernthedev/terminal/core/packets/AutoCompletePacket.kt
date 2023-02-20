@@ -1,11 +1,11 @@
 package com.github.fernthedev.terminal.core.packets
 
 import com.github.fernthedev.lightchat.core.data.LightCandidate
-import com.github.fernthedev.lightchat.core.packets.Packet
+import com.github.fernthedev.lightchat.core.packets.PacketJSON
 import com.github.fernthedev.lightchat.core.packets.PacketInfo
 
 @PacketInfo(name = "AUTO_COMPLETE_PACKET")
-class AutoCompletePacket(@JvmField var words: List<String>) : Packet() {
+class AutoCompletePacket(@JvmField var words: List<String>) : PacketJSON() {
     var candidateList: List<LightCandidate> = ArrayList()
 
     override fun toString(): String {

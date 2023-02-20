@@ -3,6 +3,7 @@ package com.github.fernthedev.lightchat.server.netty
 import com.github.fernthedev.lightchat.core.StaticHandler
 import com.github.fernthedev.lightchat.core.encryption.PacketTransporter
 import com.github.fernthedev.lightchat.core.encryption.transport
+import com.github.fernthedev.lightchat.core.packets.PacketJSON
 import com.github.fernthedev.lightchat.core.packets.handshake.ConnectedPacket
 import com.github.fernthedev.lightchat.core.packets.handshake.InitialHandshakePacket
 import com.github.fernthedev.lightchat.core.packets.latency.LatencyPacket
@@ -77,24 +78,29 @@ class ProcessingHandler(private val server: Server) : ChannelInboundHandlerAdapt
                     // Discard the received data silently.
                     msg.release()
                 }
+
                 if (msg !is PacketTransporter) return@runBlocking
 
-                if (msg.packet is ConnectedPacket) {
-                    if (!connection.registered) {
-                        eventListener.handleConnect(msg.packet as ConnectedPacket)
-                    } else {
-                        server.logger.warn(
-                            "Connection {} just attempted to send a connection packet while registered. Glitch or security bug? ",
-                            connection.toString()
-                        )
+                val packet = msg.packet
+                when {
+                    packet is ConnectedPacket -> {
+                        if (!connection.registered) {
+                            eventListener.handleConnect(packet)
+                        } else {
+                            server.logger.warn(
+                                "Connection {} just attempted to send a connection packet while registered. Glitch or security bug? ",
+                                connection.toString()
+                            )
+                        }
                     }
-                } else {
-                    if (server.playerHandler.channelMap.containsKey(ctx.channel())) {
+
+                    packet is PacketJSON &&
+                            server.playerHandler.channelMap.containsKey(ctx.channel()) -> {
                         if (msg.packet !is LatencyPacket) StaticHandler.core.logger.debug(
                             "Received the packet {} from {}", msg.packet
                                 .packetName, ctx.channel()
                         )
-                        eventListener.received(msg.packet, msg.id)
+                        eventListener.received(packet, msg.id)
                     }
                 }
             } finally {

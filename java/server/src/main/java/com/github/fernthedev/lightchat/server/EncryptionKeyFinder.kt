@@ -1,7 +1,7 @@
 package com.github.fernthedev.lightchat.server
 
-import com.github.fernthedev.lightchat.core.encryption.RSA.IEncryptionKeyHolder
-import com.github.fernthedev.lightchat.core.packets.Packet
+import com.github.fernthedev.lightchat.core.codecs.AcceptablePacketTypes
+import com.github.fernthedev.lightchat.core.encryption.rsa.IEncryptionKeyHolder
 import io.netty.channel.Channel
 import io.netty.channel.ChannelHandlerContext
 import java.security.SecureRandom
@@ -49,7 +49,7 @@ class EncryptionKeyFinder(
     /**
      * Packet:[ID,lastPacketSentTime]
      */
-    override fun getPacketId(clazz: Class<out Packet>, ctx: ChannelHandlerContext, channel: Channel): Pair<Int, Long> {
+    override fun getPacketId(clazz: Class<out AcceptablePacketTypes>, ctx: ChannelHandlerContext, channel: Channel): Pair<Int, Long> {
         return server.playerHandler.channelMap[channel]!!.getPacketId(clazz)
     }
 }

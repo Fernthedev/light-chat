@@ -1,10 +1,9 @@
 package com.github.fernthedev.lightchat.core.encryption
 
-import com.github.fernthedev.lightchat.core.codecs.JSONHandler
+import com.github.fernthedev.lightchat.core.codecs.AcceptablePacketTypes
 import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil
-import com.github.fernthedev.lightchat.core.packets.Packet
+import com.github.fernthedev.lightchat.core.packets.PacketJSON
 import com.google.gson.annotations.SerializedName
-import com.google.protobuf.Message
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.ByteBufUtil
 import io.netty.buffer.Unpooled
@@ -20,7 +19,7 @@ import javax.crypto.SecretKey
  */
 class PacketTransporter
 @JvmOverloads constructor(
-    val packet: Packet,
+    val packet: AcceptablePacketTypes,
     val encrypt: Boolean,
     val id: Int = -1, // only used in decode
 ) {
@@ -28,7 +27,7 @@ class PacketTransporter
     private lateinit var packetWrapperJSON: ByteBuf
 
     internal fun packetWrapper(
-        jsonHandler: JSONHandler,
+        toBytes: (p: AcceptablePacketTypes) -> ByteArray,
         packetId: Int,
         secretKey: SecretKey?,
         cipher: Cipher,
@@ -41,11 +40,11 @@ class PacketTransporter
         packetWrapperCache = if (encrypt) {
             requireNotNull(secretKey) { "Can't encrypt with null secret key!" }
             requireNotNull(random) { "Can't encrypt with null random!" }
-            val bytes = EncryptionUtil.encrypt(jsonHandler.toJson(packet), secretKey, cipher, random)
+            val bytes = EncryptionUtil.encrypt(toBytes(packet), secretKey, cipher, random)
 
-            PacketWrapper.encrypted(bytes, packet.packetName, jsonHandler, packetId)
+            PacketWrapper.encrypted(bytes, packet.packetName, packetId)
         } else {
-            PacketWrapper.plain(packet, jsonHandler, packetId)
+            PacketWrapper.plain(packet, toBytes(packet), packetId)
         }
 
         packetWrapperJSON = packetWrapperCache.encode()
@@ -54,7 +53,7 @@ class PacketTransporter
     }
 }
 
-fun Packet.transport(encrypt: Boolean = true): PacketTransporter {
+fun PacketJSON.transport(encrypt: Boolean = true): PacketTransporter {
     return PacketTransporter(this, encrypt)
 }
 
@@ -82,11 +81,10 @@ internal data class PacketWrapper internal constructor(
         fun encrypted(
             encryptedBytes: EncryptedBytes,
             packetName: String,
-            handler: JSONHandler,
-            packetId: Int
+            packetId: Int,
         ): PacketWrapper {
             return PacketWrapper(
-                handler.toJson(encryptedBytes).toByteArray(),
+                ByteBufUtil.getBytes(encryptedBytes.encode()),
                 packetName,
                 packetId,
                 encrypt = true,
@@ -94,26 +92,15 @@ internal data class PacketWrapper internal constructor(
             )
         }
 
-        fun plain(jsonObject: Packet, jsonHandler: JSONHandler, packetId: Int): PacketWrapper {
+        fun plain(jsonObject: AcceptablePacketTypes, byteArray: ByteArray, packetId: Int): PacketWrapper {
             return PacketWrapper(
-                jsonHandler.toJson(jsonObject).toByteArray(),
+                byteArray,
                 jsonObject.packetName,
                 packetId,
                 encrypt = false,
                 packetType = PacketType.JSON
             )
         }
-
-        fun protobuf(message: Message, packetId: Int, encrypt: Boolean): PacketWrapper {
-            return PacketWrapper(
-                jsonObject = message.toByteArray(),
-                packetId = packetId,
-                encrypt = encrypt,
-                packetIdentifier = message.descriptorForType.fullName,
-                packetType = PacketType.PROTOBUF
-            )
-        }
-
 
         fun decode(buf: ByteBuf): PacketWrapper {
 
@@ -143,7 +130,7 @@ internal data class PacketWrapper internal constructor(
         val identifier = packetIdentifier.toByteArray()
 
         // in respective order
-        val stream = Unpooled.buffer( 1 + 4 + 1 + 4 + identifier.size + 4 + jsonObject.size)
+        val stream = Unpooled.buffer(1 + 4 + 1 + 4 + identifier.size + 4 + jsonObject.size)
 
 
 

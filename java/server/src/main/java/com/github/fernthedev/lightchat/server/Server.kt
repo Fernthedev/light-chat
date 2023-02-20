@@ -13,7 +13,7 @@ import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObj
 import com.github.fernthedev.lightchat.core.encryption.PacketTransporter
 import com.github.fernthedev.lightchat.core.encryption.transport
 import com.github.fernthedev.lightchat.core.encryption.util.RSAEncryptionUtil
-import com.github.fernthedev.lightchat.core.packets.Packet
+import com.github.fernthedev.lightchat.core.packets.PacketJSON
 import com.github.fernthedev.lightchat.core.packets.SelfMessagePacket
 import com.github.fernthedev.lightchat.server.api.IPacketHandler
 import com.github.fernthedev.lightchat.server.event.ServerShutdownEvent
@@ -111,8 +111,8 @@ class Server(val port: Int) : Runnable {
     }
 
 
-    fun sendObjectToAllPlayers(packet: Packet) {
-        sendObjectToAllPlayers(packet.transport())
+    fun sendObjectToAllPlayers(packetJSON: PacketJSON) {
+        sendObjectToAllPlayers(packetJSON.transport())
     }
 
     fun sendObjectToAllPlayers(packet: PacketTransporter) {

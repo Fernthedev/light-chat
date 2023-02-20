@@ -16,7 +16,6 @@ import com.github.fernthedev.lightchat.server.terminal.backend.TabCompleteFinder
 import com.github.fernthedev.lightchat.server.terminal.command.AuthTerminalHandler
 import com.github.fernthedev.lightchat.server.terminal.command.Command
 import com.github.fernthedev.lightchat.server.terminal.command.SettingsCommand
-import com.github.fernthedev.lightchat.server.terminal.events.ChatEvent
 import com.github.fernthedev.terminal.core.CommonUtil.initTerminal
 import com.github.fernthedev.terminal.core.CommonUtil.registerTerminalPackets
 import com.github.fernthedev.terminal.core.CommonUtil.startSelfInCmd
@@ -102,8 +101,6 @@ object ServerTerminal {
         }
 
         commandMessageParser = CommandMessageParser(server)
-
-        server.eventHandler.add(ChatEvent::class.java) { e -> commandMessageParser.onCommand(e) }
 
         registerCommand(SettingsCommand(server))
         if (terminalSettings.isAllowChangePassword) registerCommand(AuthTerminalHandler("changepassword", server))

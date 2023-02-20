@@ -1,6 +1,6 @@
-package com.github.fernthedev.lightchat.core.encryption.RSA
+package com.github.fernthedev.lightchat.core.encryption.rsa
 
-class NoSecretKeyException : EncryptionException {
+open class EncryptionException : RuntimeException {
     /**
      * Constructs a new runtime exception with `null` as its
      * detail message.  The cause is not initialized, and may subsequently be

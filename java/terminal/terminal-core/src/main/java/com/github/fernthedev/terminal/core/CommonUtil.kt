@@ -1,6 +1,6 @@
 package com.github.fernthedev.terminal.core
 
-import com.github.fernthedev.lightchat.core.PacketRegistry.registerPacketPackageFromClass
+import com.github.fernthedev.lightchat.core.PacketJsonRegistry.registerPacketPackageFromClass
 import com.github.fernthedev.lightchat.core.StaticHandler.isDebug
 import com.github.fernthedev.lightchat.core.StaticHandler.setupLoggers
 import com.github.fernthedev.terminal.core.packets.MessagePacket

@@ -2,12 +2,12 @@ package com.github.fernthedev.lightchat.core.packets.handshake
 
 import com.github.fernthedev.lightchat.core.VersionData
 import com.github.fernthedev.lightchat.core.encryption.util.RSAEncryptionUtil
-import com.github.fernthedev.lightchat.core.packets.Packet
+import com.github.fernthedev.lightchat.core.packets.PacketJSON
 import com.github.fernthedev.lightchat.core.packets.PacketInfo
 import java.security.PublicKey
 
 @PacketInfo(name = "INITIAL_HANDSHAKE_PACKET")
-class InitialHandshakePacket(publicKey: PublicKey, versionData: VersionData) : Packet() {
+class InitialHandshakePacket(publicKey: PublicKey, versionData: VersionData) : PacketJSON() {
     private val publicKey: String?
     private val versionData: VersionDataString
 

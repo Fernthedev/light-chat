@@ -9,17 +9,18 @@ import com.github.fernthedev.lightchat.core.StaticHandler
 import com.github.fernthedev.lightchat.core.api.APIUsage
 import com.github.fernthedev.lightchat.core.api.Async
 import com.github.fernthedev.lightchat.core.api.EventHandler
+import com.github.fernthedev.lightchat.core.codecs.AcceptablePacketTypes
 import com.github.fernthedev.lightchat.core.codecs.Codecs
 import com.github.fernthedev.lightchat.core.codecs.JSONHandler
 import com.github.fernthedev.lightchat.core.codecs.general.compression.SnappyCompressor
 import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectDecoder
 import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectEncoder
 import com.github.fernthedev.lightchat.core.encryption.PacketTransporter
-import com.github.fernthedev.lightchat.core.encryption.RSA.IEncryptionKeyHolder
+import com.github.fernthedev.lightchat.core.encryption.rsa.IEncryptionKeyHolder
 import com.github.fernthedev.lightchat.core.encryption.transport
 import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil
 import com.github.fernthedev.lightchat.core.exceptions.DebugException
-import com.github.fernthedev.lightchat.core.packets.Packet
+import com.github.fernthedev.lightchat.core.packets.PacketJSON
 import com.github.fernthedev.lightchat.core.packets.handshake.ConnectedPacket
 import com.google.common.base.Stopwatch
 import io.netty.bootstrap.Bootstrap
@@ -77,7 +78,7 @@ class Client(private var host: String, private var port: Int) : IEncryptionKeyHo
     /**
      * Packet:[ID,lastPacketSentTime]
      */
-    private val packetIdMap: MutableMap<Class<out Packet>, Pair<Int, Long>> = HashMap()
+    private val packetJSONIdMap: MutableMap<Class<out AcceptablePacketTypes>, Pair<Int, Long>> = HashMap()
     var maxPacketId: Int = StaticHandler.DEFAULT_PACKET_ID_MAX
 
     fun buildConnectedPacket(): ConnectedPacket {
@@ -229,22 +230,22 @@ class Client(private var host: String, private var port: Int) : IEncryptionKeyHo
     }
 
     private fun updatePacketIdPair(
-        packet: Class<out Packet>,
+        packetJSON: Class<out AcceptablePacketTypes>,
         newId: Int
     ): Pair<Int, Long> {
         var newId = newId
 
-        var packetIdPair = getPacketId(packet)
+        var packetIdPair = getPacketId(packetJSON)
 
         if (newId == -1) newId = packetIdPair.first + 1
         packetIdPair = Pair(newId, System.currentTimeMillis())
-        packetIdMap[packet] = packetIdPair
+        packetJSONIdMap[packetJSON] = packetIdPair
         return packetIdPair
     }
 
     /**
      *
-     * @param packet Packet to send
+     * @param packetJSON Packet to send
      * @param encrypt if true the packet will be encrypted
      */
     @APIUsage
@@ -254,8 +255,8 @@ class Client(private var host: String, private var port: Int) : IEncryptionKeyHo
             "com.github.fernthedev.lightchat.core.encryption.transport"
         )
     )
-    fun sendObject(packet: Packet, encrypt: Boolean): ChannelFuture {
-        return sendObject(packet.transport(encrypt))
+    fun sendObject(packetJSON: PacketJSON, encrypt: Boolean): ChannelFuture {
+        return sendObject(packetJSON.transport(encrypt))
     }
 
     @APIUsage
@@ -272,8 +273,8 @@ class Client(private var host: String, private var port: Int) : IEncryptionKeyHo
     }
 
     @APIUsage
-    fun sendObject(packet: Packet?): ChannelFuture {
-        return sendObject(packet!!, true)
+    fun sendObject(packetJSON: PacketJSON): ChannelFuture {
+        return sendObject(packetJSON.transport(true))
     }
 
     @JvmOverloads
@@ -328,7 +329,7 @@ class Client(private var host: String, private var port: Int) : IEncryptionKeyHo
      * Packet:[ID,lastPacketSentTime]
      */
     override fun getPacketId(
-        clazz: Class<out Packet>,
+        clazz: Class<out AcceptablePacketTypes>,
         ctx: ChannelHandlerContext,
         channel: Channel
     ): Pair<Int, Long> {
@@ -340,17 +341,17 @@ class Client(private var host: String, private var port: Int) : IEncryptionKeyHo
      */
     @APIUsage
     fun getPacketId(
-        clazz: Class<out Packet>
+        clazz: Class<out AcceptablePacketTypes>
     ): Pair<Int, Long> {
-        packetIdMap.computeIfAbsent(
+        packetJSONIdMap.computeIfAbsent(
             clazz
-        ) { aClass: Class<out Packet>? ->
+        ) { aClass: Class<out AcceptablePacketTypes>? ->
             Pair(
                 0,
                 -1L
             )
         }
-        return packetIdMap[clazz]!!
+        return packetJSONIdMap[clazz]!!
     }
 
     fun startPingStopwatch() {

@@ -1,6 +1,6 @@
-package com.github.fernthedev.lightchat.core.encryption.RSA
+package com.github.fernthedev.lightchat.core.encryption.rsa
 
-import com.github.fernthedev.lightchat.core.packets.Packet
+import com.github.fernthedev.lightchat.core.codecs.AcceptablePacketTypes
 import io.netty.channel.Channel
 import io.netty.channel.ChannelHandlerContext
 import java.security.SecureRandom
@@ -24,5 +24,5 @@ interface IEncryptionKeyHolder {
      */
     fun getSecureRandom(ctx: ChannelHandlerContext, channel: Channel): SecureRandom?
     fun isEncryptionKeyRegistered(ctx: ChannelHandlerContext, channel: Channel): Boolean
-    fun getPacketId(clazz: Class<out Packet>, ctx: ChannelHandlerContext, channel: Channel): Pair<Int, Long>
+    fun getPacketId(clazz: Class<out AcceptablePacketTypes>, ctx: ChannelHandlerContext, channel: Channel): Pair<Int, Long>
 }

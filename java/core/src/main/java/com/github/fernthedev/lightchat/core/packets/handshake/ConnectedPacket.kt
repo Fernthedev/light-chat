@@ -1,14 +1,14 @@
 package com.github.fernthedev.lightchat.core.packets.handshake
 
 import com.github.fernthedev.lightchat.core.VersionData
-import com.github.fernthedev.lightchat.core.packets.Packet
+import com.github.fernthedev.lightchat.core.packets.PacketJSON
 import com.github.fernthedev.lightchat.core.packets.PacketInfo
 
 /**
  * The final packet sent in the handshake
  */
 @PacketInfo(name = "CONNECTED_PACKET")
-class ConnectedPacket(val name: String, val os: String, versionData: VersionData, langFramework: String) : Packet() {
+class ConnectedPacket(val name: String, val os: String, versionData: VersionData, langFramework: String) : PacketJSON() {
     val versionData: VersionDataString
     val langFramework: String
     fun getVersionData(): VersionData {

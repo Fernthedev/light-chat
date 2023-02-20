@@ -4,7 +4,7 @@ import com.github.fernthedev.lightchat.client.api.IPacketHandler
 import com.github.fernthedev.lightchat.client.event.ServerDisconnectEvent
 import com.github.fernthedev.lightchat.core.ColorCode
 import com.github.fernthedev.lightchat.core.StaticHandler.core
-import com.github.fernthedev.lightchat.core.packets.Packet
+import com.github.fernthedev.lightchat.core.packets.PacketJSON
 import com.github.fernthedev.lightchat.core.packets.SelfMessagePacket
 import com.github.fernthedev.terminal.core.packets.AutoCompletePacket
 import com.github.fernthedev.terminal.core.packets.MessagePacket
@@ -13,14 +13,14 @@ import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
 
 class PacketHandler : IPacketHandler {
-    override fun handlePacket(packet: Packet, packetId: Int) {
-        when (packet) {
+    override fun handlePacket(packetJSON: PacketJSON, packetId: Int) {
+        when (packetJSON) {
             is AutoCompletePacket -> {
-                ClientTerminal.autoCompleteHandler.addCandidates(packet.candidateList)
+                ClientTerminal.autoCompleteHandler.addCandidates(packetJSON.candidateList)
             }
 
             is MessagePacket -> {
-                ClientTerminal.logger.info(packet.message)
+                ClientTerminal.logger.info(packetJSON.message)
                 if (ClientTerminal.messageDelay.isRunning) ClientTerminal.messageDelay.stop()
                 ClientTerminal.logger.debug(
                     "Time taken for message: {}", ClientTerminal.messageDelay.elapsed(
@@ -30,7 +30,7 @@ class PacketHandler : IPacketHandler {
             }
 
             is SelfMessagePacket -> {
-                if (Objects.requireNonNull(packet.type) === SelfMessagePacket.MessageType.INCORRECT_PASSWORD_FAILURE) {
+                if (Objects.requireNonNull(packetJSON.type) === SelfMessagePacket.MessageType.INCORRECT_PASSWORD_FAILURE) {
                     ClientTerminal.logger.error(ColorCode.RED.toString() + "Failed all attempts to login.")
                 }
             }

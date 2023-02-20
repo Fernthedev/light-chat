@@ -2,9 +2,10 @@ package com.github.fernthedev.lightchat.server
 
 import com.github.fernthedev.lightchat.core.VersionData
 import com.github.fernthedev.lightchat.core.api.APIUsage
+import com.github.fernthedev.lightchat.core.codecs.AcceptablePacketTypes
 import com.github.fernthedev.lightchat.core.encryption.*
 import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil
-import com.github.fernthedev.lightchat.core.packets.Packet
+import com.github.fernthedev.lightchat.core.packets.PacketJSON
 import com.github.fernthedev.lightchat.core.packets.latency.PingPacket
 import io.netty.channel.Channel
 import io.netty.channel.ChannelFuture
@@ -81,7 +82,7 @@ class ClientConnection(
     /**
      * Packet:[ID,lastPacketSentTime]
      */
-    private val packetIdMap: MutableMap<Class<out Packet>, Pair<Int, Long>> = HashMap()
+    private val packetJSONIdMap: MutableMap<Class<out AcceptablePacketTypes>, Pair<Int, Long>> = HashMap()
     private val pingStopWatch = StopWatch()
 
 
@@ -100,9 +101,9 @@ class ClientConnection(
         return pingStopWatch.getTime(timeUnit)
     }
 
-    private fun updatePacketIdPair(packet: Class<out Packet>, newId: Int): Pair<Int, Long> {
+    private fun updatePacketIdPair(packetJSON: Class<out AcceptablePacketTypes>, newId: Int): Pair<Int, Long> {
         var copiedId = newId
-        var packetIdPair = packetIdMap[packet]
+        var packetIdPair = packetJSONIdMap[packetJSON]
         if (packetIdPair == null) {
             packetIdPair = Pair(0, System.currentTimeMillis())
         } else {
@@ -111,13 +112,13 @@ class ClientConnection(
             }
             packetIdPair = Pair(copiedId, System.currentTimeMillis())
         }
-        packetIdMap[packet] = packetIdPair
+        packetJSONIdMap[packetJSON] = packetIdPair
         return packetIdPair
     }
 
     /**
      *
-     * @param packet Packet to send
+     * @param packetJSON Packet to send
      * @param encrypt if true the packet will be encrypted
      */
     @APIUsage
@@ -127,8 +128,8 @@ class ClientConnection(
             "com.github.fernthedev.lightchat.core.encryption.transport"
         )
     )
-    fun sendObject(packet: Packet, encrypt: Boolean): ChannelFuture {
-        return sendObject(packet.transport(encrypt))
+    fun sendObject(packetJSON: PacketJSON, encrypt: Boolean): ChannelFuture {
+        return sendObject(packetJSON.transport(encrypt))
     }
 
     fun sendObject(transporter: PacketTransporter): ChannelFuture {
@@ -189,8 +190,8 @@ class ClientConnection(
             "com.github.fernthedev.lightchat.core.encryption.transport"
         )
     )
-    override fun sendPacket(packet: Packet): ChannelFuture {
-        return sendObject(packet.transport())
+    override fun sendPacket(packetJSON: PacketJSON): ChannelFuture {
+        return sendObject(packetJSON.transport())
     }
 
     override fun sendPacket(packet: PacketTransporter): ChannelFuture {
@@ -204,9 +205,9 @@ class ClientConnection(
     /**
      * Packet:[ID,lastPacketSentTime]
      */
-    fun getPacketId(packet: Class<out Packet>): Pair<Int, Long> {
-        packetIdMap.computeIfAbsent(packet) { Pair(0, -1L) }
-        return packetIdMap[packet]!!
+    fun getPacketId(packetJSON: Class<out AcceptablePacketTypes>): Pair<Int, Long> {
+        packetJSONIdMap.computeIfAbsent(packetJSON) { Pair(0, -1L) }
+        return packetJSONIdMap[packetJSON]!!
     }
 
     fun finishConstruct(name: String, os: String, langFramework: String) {

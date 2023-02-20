@@ -5,7 +5,7 @@ import com.github.fernthedev.lightchat.core.VersionData
 import com.github.fernthedev.lightchat.core.encryption.transport
 import com.github.fernthedev.lightchat.core.exceptions.ParsePacketException
 import com.github.fernthedev.lightchat.core.packets.IllegalConnectionPacket
-import com.github.fernthedev.lightchat.core.packets.Packet
+import com.github.fernthedev.lightchat.core.packets.PacketJSON
 import com.github.fernthedev.lightchat.core.packets.SelfMessagePacket
 import com.github.fernthedev.lightchat.core.packets.handshake.ConnectedPacket
 import com.github.fernthedev.lightchat.core.packets.handshake.KeyResponsePacket
@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import org.apache.commons.lang3.StringUtils
 
 class EventListener(private val server: Server, private val clientConnection: ClientConnection) {
-    suspend fun received(p: Packet, packetId: Int) = coroutineScope {
+    suspend fun received(p: PacketJSON, packetId: Int) = coroutineScope {
         try {
             //Packet p = (Packet) EncryptionHandler.decrypt(pe, clientConnection.getServerKey());
 

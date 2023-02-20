@@ -2,16 +2,14 @@ package com.github.fernthedev.lightchat.core
 
 import com.github.fernthedev.lightchat.core.api.APIUsage
 import com.github.fernthedev.lightchat.core.exceptions.DebugException
-import com.github.fernthedev.lightchat.core.packets.Packet
+import com.github.fernthedev.lightchat.core.packets.PacketJSON
 import com.github.fernthedev.lightchat.core.util.Log4jDebug
 import com.google.gson.Gson
-import io.netty.util.CharsetUtil
 import org.apache.commons.lang3.SystemUtils
 import org.slf4j.Logger
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
-import java.nio.charset.Charset
 import java.util.*
 
 // Import log4j classes.
@@ -20,9 +18,8 @@ object StaticHandler {
     const val AES_KEY_SIZE = 256
     const val AES_KEY_MODE = "AES"
     const val AES_CIPHER_TRANSFORMATION = "AES/GCM/NoPadding"
-    val PACKET_PACKAGE: String by lazy { Packet::class.java.packageName }
+    val PACKET_JSON_PACKAGE: String by lazy { PacketJSON::class.java.packageName }
 
-    val CHARSET_FOR_STRING: Charset = CharsetUtil.UTF_8
     val OS: String = System.getProperty("os.name")
 
     const val RSA_CIPHER_TRANSFORMATION = "RSA/ECB/PKCS1Padding"
@@ -80,7 +77,7 @@ object StaticHandler {
         // Updates debug config
         setDebug(debug)
         if (!initialized) {
-            PacketRegistry.registerDefaultPackets()
+            PacketJsonRegistry.registerDefaultPackets()
         }
     }
 

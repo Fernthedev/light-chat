@@ -1,9 +1,11 @@
 package com.github.fernthedev.lightchat.core.codecs.general.json
 
 import com.github.fernthedev.lightchat.core.StaticHandler
+import com.github.fernthedev.lightchat.core.codecs.AcceptablePacketTypes
 import com.github.fernthedev.lightchat.core.codecs.JSONHandler
 import com.github.fernthedev.lightchat.core.encryption.*
-import com.github.fernthedev.lightchat.core.encryption.RSA.IEncryptionKeyHolder
+import com.github.fernthedev.lightchat.core.encryption.rsa.IEncryptionKeyHolder
+import com.google.protobuf.MessageLite
 import io.netty.channel.ChannelHandler.Sharable
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.MessageToMessageEncoder
@@ -32,13 +34,20 @@ class EncryptedJSONObjectEncoder(
     override fun encode(ctx: ChannelHandlerContext, msg: PacketTransporter, out: MutableList<Any>) {
         val cipher = encryptionKeyHolder.getEncryptCipher(ctx, ctx.channel())
 
+        val toBytes: (AcceptablePacketTypes) -> ByteArray = { p: AcceptablePacketTypes ->
+            when (p.packetType) {
+                PacketType.UNKNOWN -> TODO()
+                PacketType.JSON -> jsonHandler.toJson(p).toByteArray()
+                PacketType.PROTOBUF -> (p as MessageLite).toByteArray()
+            }
 
+        }
 
         val packetWrapper = if (!encryptionKeyHolder.isEncryptionKeyRegistered(ctx, ctx.channel())) {
             require(!msg.encrypt) { "Encryption is not setup yet!" }
 
             msg.packetWrapper(
-                jsonHandler,
+                toBytes,
                 encryptionKeyHolder.getPacketId(msg.packet.javaClass, ctx, ctx.channel()).first,
                 null,
                 cipher,
@@ -48,7 +57,7 @@ class EncryptedJSONObjectEncoder(
             val secretKey = encryptionKeyHolder.getSecretKey(ctx, ctx.channel())
             val secureRandom = encryptionKeyHolder.getSecureRandom(ctx, ctx.channel())
             msg.packetWrapper(
-                jsonHandler,
+                toBytes,
                 encryptionKeyHolder.getPacketId(msg.packet.javaClass, ctx, ctx.channel()).first,
                 secretKey,
                 cipher,
@@ -61,7 +70,7 @@ class EncryptedJSONObjectEncoder(
 
         if (StaticHandler.isDebug()) StaticHandler.core.logger.debug(
             "Sending {}",
-            packetWrapper.second
+            packetWrapper.first.packetIdentifier
         )
     }
 

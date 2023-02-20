@@ -5,7 +5,7 @@ import com.github.fernthedev.lightchat.core.data.HashedPassword
 @PacketInfo(name = "HASHED_PASSWORD_PACKET")
 class HashedPasswordPacket(
     var hashedPassword: HashedPassword
-) : Packet() {
+) : PacketJSON() {
 
     constructor(password: String) : this(HashedPassword(password))
 }

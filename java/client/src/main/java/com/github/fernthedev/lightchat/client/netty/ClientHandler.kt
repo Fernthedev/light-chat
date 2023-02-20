@@ -6,6 +6,7 @@ import com.github.fernthedev.lightchat.client.event.ServerDisconnectEvent.Discon
 import com.github.fernthedev.lightchat.core.StaticHandler.core
 import com.github.fernthedev.lightchat.core.StaticHandler.isDebug
 import com.github.fernthedev.lightchat.core.encryption.PacketTransporter
+import com.github.fernthedev.lightchat.core.packets.PacketJSON
 import io.netty.channel.ChannelHandler.Sharable
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
@@ -36,7 +37,10 @@ open class ClientHandler(protected var client: Client, protected var listener: E
         if (msg is PacketTransporter) {
             core.logger.debug("Received the packet {} from {}", msg.packet.packetName, ctx.channel())
             runBlocking {
-                listener.received(msg.packet, msg.id)
+                val packet = msg.packet
+                if (packet is PacketJSON) {
+                    listener.received(packet, msg.id)
+                }
             }
         }
         super.channelRead(ctx, msg)

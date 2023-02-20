@@ -1,7 +1,7 @@
 package com.github.fernthedev.lightchat.server
 
 import com.github.fernthedev.lightchat.core.encryption.PacketTransporter
-import com.github.fernthedev.lightchat.core.packets.Packet
+import com.github.fernthedev.lightchat.core.packets.PacketJSON
 import io.netty.channel.ChannelFuture
 
 interface SenderInterface {
@@ -11,7 +11,7 @@ interface SenderInterface {
             "com.github.fernthedev.lightchat.core.encryption.transport"
         )
     )
-    fun sendPacket(packet: Packet): ChannelFuture
+    fun sendPacket(packetJSON: PacketJSON): ChannelFuture
     fun sendPacket(packet: PacketTransporter): ChannelFuture
 
     val name: String

@@ -1,7 +1,7 @@
 package com.github.fernthedev.lightchat.server
 
 import com.github.fernthedev.lightchat.core.encryption.PacketTransporter
-import com.github.fernthedev.lightchat.core.packets.Packet
+import com.github.fernthedev.lightchat.core.packets.PacketJSON
 import io.netty.channel.ChannelFuture
 import java.io.Serializable
 
@@ -11,7 +11,7 @@ class Console(
 ) : SenderInterface, Serializable {
 
     @Deprecated("", ReplaceWith("null"))
-    override fun sendPacket(packet: Packet): ChannelFuture {
+    override fun sendPacket(packetJSON: PacketJSON): ChannelFuture {
         return null!!
     }
 
