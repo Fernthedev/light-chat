@@ -2,6 +2,7 @@ package com.github.fernthedev.lightchat.core.util
 
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.ByteBufUtil
+import io.netty.buffer.Unpooled
 
 
 fun ByteBuf.asBytesArrayFast(): ByteArray {
@@ -21,4 +22,12 @@ fun ByteBuf.asBytesArrayFastOffset(): Pair<ByteArray, Int> {
     }
 
     return array to offset
+}
+
+fun <T> ByteArray.toTempByteBuf(invoke: (byteBuf: ByteBuf) -> T): T {
+    val buf = Unpooled.wrappedBuffer(this)
+    val r = invoke(buf)
+    buf.release()
+
+    return r
 }

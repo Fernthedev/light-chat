@@ -40,35 +40,36 @@ class EncryptedJSONObjectDecoder
      */
     @Throws(Exception::class)
     override fun decode(ctx: ChannelHandlerContext, msg: ByteBuf, out: MutableList<Any>) {
-        val packetWrapper = PacketWrapper.decode(msg)
-        val decryptedJSON: ByteArray
-
-
-
         try {
-            decryptedJSON = if (packetWrapper.encrypt) {
-                val encryptedBytes = EncryptedBytes.decode(Unpooled.wrappedBuffer(packetWrapper.jsonObject))
-                decrypt(ctx, encryptedBytes)
+            val packetWrapper = PacketWrapper.decode(msg)
+            val decryptedJSON = if (packetWrapper.encrypt) {
+                val tempByteBuf = packetWrapper.jsonObject
+                val encryptedBytes = EncryptedBytes.decode(tempByteBuf)
+                Unpooled.wrappedBuffer(decrypt(ctx, encryptedBytes))
             } else {
                 packetWrapper.jsonObject
             }
+
+
+            val obj: Any? = when (packetWrapper.packetType) {
+                PacketType.UNKNOWN -> TODO()
+                PacketType.JSON -> getParsedObject(
+                    packetWrapper.packetIdentifier,
+                    decryptedJSON.toString(Charsets.UTF_8),
+                    packetWrapper.packetId
+                )
+
+                PacketType.PROTOBUF -> ProtobufRegistry.decode<MessageLite>(
+                    packetWrapper.packetIdentifier,
+                    decryptedJSON
+                )
+            }
+            StaticHandler.core.logger.debug("Received {}", packetWrapper.packetIdentifier)
+            if (obj != null) {
+                out.add(obj)
+            }
         } catch (e: Exception) {
-            throw IllegalArgumentException("Unable to parse string: $msg", e)
-        }
-
-        val obj: Any? = when (packetWrapper.packetType) {
-            PacketType.UNKNOWN -> TODO()
-            PacketType.JSON -> getParsedObject(
-                packetWrapper.packetIdentifier,
-                decryptedJSON.toString(Charsets.UTF_8),
-                packetWrapper.packetId
-            )
-
-            PacketType.PROTOBUF -> ProtobufRegistry.decode<MessageLite>(packetWrapper.packetIdentifier, decryptedJSON)
-        }
-        StaticHandler.core.logger.debug("Received {}", packetWrapper.packetIdentifier)
-        if (obj != null) {
-            out.add(obj)
+            throw IllegalArgumentException("Unable to parse packet: $msg", e)
         }
     }
 

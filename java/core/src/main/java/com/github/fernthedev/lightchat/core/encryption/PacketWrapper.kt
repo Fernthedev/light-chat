@@ -2,8 +2,6 @@ package com.github.fernthedev.lightchat.core.encryption
 
 import com.github.fernthedev.lightchat.core.codecs.AcceptablePacketTypes
 import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil
-import com.github.fernthedev.lightchat.core.packets.PacketJSON
-import com.github.fernthedev.lightchat.core.util.asBytesArrayFast
 import com.google.gson.annotations.SerializedName
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
@@ -44,7 +42,7 @@ class PacketTransporter
 
             PacketWrapper.encrypted(bytes, packet.packetName, packetId)
         } else {
-            PacketWrapper.plain(packet, toBytes(packet), packetId)
+            PacketWrapper.plain(packet, Unpooled.wrappedBuffer(toBytes(packet)), packetId)
         }
 
         packetWrapperJSON = packetWrapperCache.encode()
@@ -53,7 +51,7 @@ class PacketTransporter
     }
 }
 
-fun PacketJSON.transport(encrypt: Boolean = true): PacketTransporter {
+fun AcceptablePacketTypes.transport(encrypt: Boolean = true): PacketTransporter {
     return PacketTransporter(this, encrypt)
 }
 
@@ -64,7 +62,7 @@ enum class PacketType(val i: Byte) {
 }
 
 internal data class PacketWrapper internal constructor(
-    var jsonObject: ByteArray,
+    var jsonObject: ByteBuf,
     var packetIdentifier: String,
     /**
      * For packet order
@@ -84,7 +82,7 @@ internal data class PacketWrapper internal constructor(
             packetId: Int,
         ): PacketWrapper {
             return PacketWrapper(
-                encryptedBytes.encode().asBytesArrayFast(),
+                encryptedBytes.encode(),
                 packetName,
                 packetId,
                 encrypt = true,
@@ -92,7 +90,7 @@ internal data class PacketWrapper internal constructor(
             )
         }
 
-        fun plain(jsonObject: AcceptablePacketTypes, byteArray: ByteArray, packetId: Int): PacketWrapper {
+        fun plain(jsonObject: AcceptablePacketTypes, byteArray: ByteBuf, packetId: Int): PacketWrapper {
             return PacketWrapper(
                 byteArray,
                 jsonObject.packetName,
@@ -103,21 +101,19 @@ internal data class PacketWrapper internal constructor(
         }
 
         fun decode(buf: ByteBuf): PacketWrapper {
-
-
             val encrypt = buf.readBoolean()
             val id = buf.readInt()
             val packetType = buf.readByte()
             val packetTypeEnum = PacketType.values().find { it.i == packetType } ?: PacketType.UNKNOWN
 
             val identifierSize = buf.readInt()
-            val identifier = buf.readBytes(identifierSize)
+            val identifier = buf.readSlice(identifierSize)
 
             val jsonObjectSize = buf.readInt()
-            val jsonObject = buf.readBytes(jsonObjectSize)
+            val jsonObject = buf.readSlice(jsonObjectSize)
 
             return PacketWrapper(
-                jsonObject = jsonObject.asBytesArrayFast(),
+                jsonObject = jsonObject,
                 packetId = id,
                 packetIdentifier = identifier.toString(Charsets.UTF_8),
                 encrypt = encrypt,
@@ -130,10 +126,7 @@ internal data class PacketWrapper internal constructor(
         val identifier = packetIdentifier.toByteArray()
 
         // in respective order
-        val stream = Unpooled.buffer(1 + 4 + 1 + 4 + identifier.size + 4 + jsonObject.size)
-
-
-
+        val stream = Unpooled.buffer(1 + 4 + 1 + 4 + identifier.size + 4 + jsonObject.readableBytes())
 
         stream.writeBoolean(encrypt)
         stream.writeInt(packetId) // BigEndian
@@ -142,32 +135,11 @@ internal data class PacketWrapper internal constructor(
         stream.writeInt(identifier.size)
         stream.writeBytes(identifier)
 
-        stream.writeInt(jsonObject.size)
+        stream.writeInt(jsonObject.readableBytes())
         stream.writeBytes(jsonObject)
 
         return stream
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is PacketWrapper) return false
-
-        if (!jsonObject.contentEquals(other.jsonObject)) return false
-        if (packetIdentifier != other.packetIdentifier) return false
-        if (packetId != other.packetId) return false
-        if (encrypt != other.encrypt) return false
-        if (packetType != other.packetType) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = jsonObject.contentHashCode()
-        result = 31 * result + packetIdentifier.hashCode()
-        result = 31 * result + packetId
-        result = 31 * result + encrypt.hashCode()
-        result = 31 * result + packetType.hashCode()
-        return result
-    }
 
 }

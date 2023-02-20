@@ -9,13 +9,13 @@ data class EncryptedBytes(val data: ByteArray, val params: ByteArray, val paramA
     companion object {
         fun decode(buf: ByteBuf): EncryptedBytes {
             val dataSize = buf.readInt()
-            val data = buf.readBytes(dataSize)
+            val data = buf.readSlice(dataSize)
 
             val paramsSize = buf.readInt()
-            val params = buf.readBytes(paramsSize)
+            val params = buf.readSlice(paramsSize)
 
             val paramsAlgorithmSize = buf.readInt()
-            val paramsAlgorithm = buf.readBytes(paramsAlgorithmSize).toString(Charsets.UTF_8)
+            val paramsAlgorithm = buf.readSlice(paramsAlgorithmSize).toString(Charsets.UTF_8)
 
             return EncryptedBytes(
                 data = data.asBytesArrayFast(),
