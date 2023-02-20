@@ -13,7 +13,6 @@ import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObj
 import com.github.fernthedev.lightchat.core.encryption.PacketTransporter
 import com.github.fernthedev.lightchat.core.encryption.transport
 import com.github.fernthedev.lightchat.core.encryption.util.RSAEncryptionUtil
-import com.github.fernthedev.lightchat.core.packets.PacketJSON
 import com.github.fernthedev.lightchat.core.packets.SelfMessagePacket
 import com.github.fernthedev.lightchat.server.api.IPacketHandler
 import com.github.fernthedev.lightchat.server.event.ServerShutdownEvent
@@ -111,14 +110,14 @@ class Server(val port: Int) : Runnable {
     }
 
 
-    fun sendObjectToAllPlayers(packetJSON: PacketJSON) {
-        sendObjectToAllPlayers(packetJSON.transport())
+    fun sendObjectToAllPlayersBlocking(packetJSON: PacketTransporter) = runBlocking {
+        sendObjectToAllPlayers(packetJSON)
     }
 
-    fun sendObjectToAllPlayers(packet: PacketTransporter) {
+    suspend fun sendObjectToAllPlayers(packet: PacketTransporter) {
         for (clientConnection in playerHandler.channelMap.values) {
             logger.debug("Sending to all {} to {}", packet.packet.packetName, clientConnection)
-            clientConnection.sendObject(packet)
+            clientConnection.sendPacketLaunch(packet)
         }
     }
 
@@ -172,11 +171,13 @@ class Server(val port: Int) : Runnable {
         val stopWatch = StopWatch()
         stopWatch.start()
         Runtime.getRuntime().addShutdownHook(Thread {
-            for (clientConnection in playerHandler.channelMap.values) {
-                if (clientConnection.channel.isOpen) {
-                    logger.info("Gracefully shutting down")
-                    sendObjectToAllPlayers(SelfMessagePacket(SelfMessagePacket.MessageType.LOST_SERVER_CONNECTION))
-                    clientConnection.close()
+            runBlocking {
+                for (clientConnection in playerHandler.channelMap.values) {
+                    if (clientConnection.channel.isOpen) {
+                        logger.info("Gracefully shutting down")
+                        sendObjectToAllPlayers(SelfMessagePacket(SelfMessagePacket.MessageType.LOST_SERVER_CONNECTION).transport())
+                        clientConnection.close()
+                    }
                 }
             }
         })

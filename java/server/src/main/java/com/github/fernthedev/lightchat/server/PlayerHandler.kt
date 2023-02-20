@@ -1,5 +1,6 @@
 package com.github.fernthedev.lightchat.server
 
+import com.github.fernthedev.lightchat.core.encryption.transport
 import com.github.fernthedev.lightchat.core.packets.SelfMessagePacket
 import io.netty.channel.Channel
 import kotlinx.coroutines.coroutineScope
@@ -39,9 +40,8 @@ class PlayerHandler(
                 }
 
                 if (timeoutData.registerTimeout >= server.settingsManager.configData.timeoutTime / 1000 && !clientConnection.registered) {
-                    clientConnection.sendObject(
-                        SelfMessagePacket(SelfMessagePacket.MessageType.TIMED_OUT_REGISTRATION),
-                        false
+                    clientConnection.sendPacketLaunch(
+                        SelfMessagePacket(SelfMessagePacket.MessageType.TIMED_OUT_REGISTRATION).transport(false),
                     )
                     clientConnection.close()
                 }

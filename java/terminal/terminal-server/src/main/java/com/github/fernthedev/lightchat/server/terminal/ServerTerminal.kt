@@ -133,13 +133,13 @@ object ServerTerminal {
     val currentPath: String
         get() = Paths.get("").toAbsolutePath().toString()
 
-    fun broadcast(message: String?) {
+    suspend fun broadcast(message: String?) {
         server.logger.info(message)
-        server.sendObjectToAllPlayers(MessagePacket(message!!))
+        server.sendObjectToAllPlayers(MessagePacket(message!!).transport())
     }
 
-    fun sendMessage(senderInterface: SenderInterface?, message: String?) {
-        if (senderInterface is Console) logger.info(message) else senderInterface!!.sendPacket(
+    suspend fun sendMessage(senderInterface: SenderInterface?, message: String?) {
+        if (senderInterface is Console) logger.info(message) else senderInterface!!.sendPacketLaunch(
             MessagePacket(
                 message!!
             )

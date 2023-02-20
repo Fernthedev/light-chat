@@ -6,7 +6,7 @@ import java.util.function.Consumer
 abstract class Command(val name: String) {
     var usage = ""
 
-    abstract fun onCommand(sender: SenderInterface, args: Array<String>)
+    abstract suspend fun onCommand(sender: SenderInterface, args: Array<String>)
 
     /**
      * Allows you to make autocomplete only suggest based off what is written

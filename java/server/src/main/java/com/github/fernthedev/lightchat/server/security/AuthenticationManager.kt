@@ -8,10 +8,11 @@ import com.github.fernthedev.lightchat.server.*
 import com.github.fernthedev.lightchat.server.event.AuthenticateRequestEvent
 import com.github.fernthedev.lightchat.server.event.AuthenticationAttemptedEvent
 import com.github.fernthedev.lightchat.server.event.AuthenticationAttemptedEvent.EventStatus
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.asExecutor
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import org.jetbrains.annotations.Contract
-import java.util.concurrent.CompletableFuture
 
 /**
  * Can be used to authenticate command senders.
@@ -21,7 +22,7 @@ class AuthenticationManager(private val server: Server) {
 
 
     var amountOfTries = 2
-    private set
+        private set
 
     /**
      * Runs asynchronously to check if the
@@ -34,30 +35,30 @@ class AuthenticationManager(private val server: Server) {
      *
      * @throws UserIsAuthenticatingException thrown if the user is already attempting authentication
      */
-    fun authenticate(sender: SenderInterface): CompletableFuture<Boolean> {
+    suspend fun authenticate(sender: SenderInterface): Deferred<Boolean> = coroutineScope {
         if (checking.containsKey(sender)) throw UserIsAuthenticatingException("The sender $sender is already attempting authentication.")
         if (sender is Console) {
-            return CompletableFuture.completedFuture(true)
+            return@coroutineScope CompletableDeferred(true)
         }
-        val completableFuture = CompletableFuture<Boolean>()
+        val completableFuture = CompletableDeferred<Boolean>()
         val playerInfo = PlayerInfo(sender, completableFuture)
         if (sender is ClientConnection) {
-            Dispatchers.Default.asExecutor()
-                .execute {
-                    playerInfo.mode = Mode.AUTHENTICATE
-                    val event = AuthenticateRequestEvent(playerInfo, true)
-                    server.eventHandler.callEvent(event)
-                    if (event.isCancelled) {
-                        completableFuture.complete(playerInfo.authenticated)
-                        return@execute
-                    }
-                    if (!checking.containsKey(sender)) {
-                        checking[sender] = playerInfo
-                    }
-                    sender.sendObject(SelfMessagePacket(SelfMessagePacket.MessageType.FILL_PASSWORD).transport(false))
+            launch {
+                playerInfo.mode = Mode.AUTHENTICATE
+                val event = AuthenticateRequestEvent(playerInfo, true)
+                server.eventHandler.callEvent(event)
+                if (event.isCancelled) {
+                    completableFuture.complete(playerInfo.authenticated)
+                    return@launch
                 }
+                if (!checking.containsKey(sender)) {
+                    checking[sender] = playerInfo
+                }
+
+                sender.sendPacketLaunch(SelfMessagePacket(SelfMessagePacket.MessageType.FILL_PASSWORD).transport(false))
+            }
         }
-        return completableFuture
+        return@coroutineScope completableFuture
     }
 
     /**
@@ -67,7 +68,7 @@ class AuthenticationManager(private val server: Server) {
      * @return null if not being authenticated
      */
     @Contract("null -> null")
-    fun getUserAuthenticationFuture(sender: SenderInterface): CompletableFuture<Boolean> {
+    fun getUserAuthenticationFuture(sender: SenderInterface): CompletableDeferred<Boolean> {
         return checking[sender]!!.future
     }
 
@@ -82,10 +83,10 @@ class AuthenticationManager(private val server: Server) {
      * @param hashedPassword
      * @param sender
      */
-    fun attemptAuthenticationHash(hashedPassword: HashedPassword, sender: SenderInterface) {
+    suspend fun attemptAuthenticationHash(hashedPassword: HashedPassword, sender: SenderInterface) = coroutineScope {
         if (checking.containsKey(sender)) {
             val playerInfo = checking[sender]!!
-            val event = AuthenticationAttemptedEvent(playerInfo, true,  EventStatus.ATTEMPT_FAILED)
+            val event = AuthenticationAttemptedEvent(playerInfo, true, EventStatus.ATTEMPT_FAILED)
             if (playerInfo.mode == Mode.AUTHENTICATE) {
                 val rightPass = EncryptionUtil.makeSHA256Hash(server.settingsManager.configData.password)
                 val eventStatus: EventStatus = if (rightPass == hashedPassword.password) {
@@ -99,12 +100,12 @@ class AuthenticationManager(private val server: Server) {
                 //Handle event
                 event.eventStatus = eventStatus
                 server.eventHandler.callEvent(event)
-                if (event.isCancelled) return
+                if (event.isCancelled) return@coroutineScope
                 playerInfo.authenticated = event.eventStatus == EventStatus.SUCCESS
                 when (event.eventStatus) {
                     EventStatus.SUCCESS -> {
                         completeAuthentication(playerInfo, true)
-                        sender.sendPacket(
+                        sender.sendPacketLaunch(
                             SelfMessagePacket(SelfMessagePacket.MessageType.CORRECT_PASSWORD).transport(
                                 true
                             )
@@ -112,7 +113,7 @@ class AuthenticationManager(private val server: Server) {
                     }
 
                     EventStatus.ATTEMPT_FAILED -> {
-                        sender.sendPacket(
+                        sender.sendPacketLaunch(
                             SelfMessagePacket(SelfMessagePacket.MessageType.INCORRECT_PASSWORD_ATTEMPT).transport(
                                 true
                             )
@@ -123,7 +124,7 @@ class AuthenticationManager(private val server: Server) {
                     EventStatus.NO_MORE_TRIES -> {
                         val info: String? = if (sender is ClientConnection) sender.address else ""
                         server.logger.warn("{}:{} tried to authenticate but failed 2 times", sender.name, info)
-                        sender.sendPacket(
+                        sender.sendPacketLaunch(
                             SelfMessagePacket(SelfMessagePacket.MessageType.INCORRECT_PASSWORD_FAILURE).transport(
                                 true
                             )
@@ -135,8 +136,8 @@ class AuthenticationManager(private val server: Server) {
         }
     }
 
-    protected fun completeAuthentication(playerInfo: PlayerInfo?, authenticated: Boolean) {
-        playerInfo!!.future.complete(authenticated)
+    protected fun completeAuthentication(playerInfo: PlayerInfo, authenticated: Boolean) {
+        playerInfo.future.complete(authenticated)
         checking.remove(playerInfo.sender)
     }
 
@@ -151,7 +152,7 @@ class AuthenticationManager(private val server: Server) {
         AUTHENTICATE
     }
 
-    class PlayerInfo(@JvmField val sender: SenderInterface, var future: CompletableFuture<Boolean>) {
+    class PlayerInfo(@JvmField val sender: SenderInterface, var future: CompletableDeferred<Boolean>) {
         var authenticated = false
         var mode = Mode.AUTHENTICATE
         var tries = 0

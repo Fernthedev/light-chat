@@ -36,14 +36,12 @@ class ServerCommandHandler(private val server: Server) {
     }
 
     @APIUsage
-    suspend fun dispatchCommand(command: String) = coroutineScope{
-        var command = command
-        command = command.replace(" {2}".toRegex(), "").trim { it <= ' ' }
-        val finalCommand = command
-        require(!(command == "" || command == " ")) { "Command cannot be \"\"" }
+    suspend fun dispatchCommand(command: String) = coroutineScope {
+        val commandSplit = command.replace(" {2}".toRegex(), "").trim { it <= ' ' }
+        require(!(commandSplit == "" || commandSplit == " ")) { "Command cannot be \"\"" }
 
         launch {
-            val chatEvent = ChatEvent(server.console, finalCommand, isCommand = true, async = true)
+            val chatEvent = ChatEvent(server.console, commandSplit, isCommand = true, async = true)
             server.eventHandler.callEvent(chatEvent)
             ServerTerminal.commandMessageParser.onCommand(chatEvent)
         }
@@ -51,13 +49,11 @@ class ServerCommandHandler(private val server: Server) {
 
     @APIUsage
     suspend fun dispatchCommand(sender: SenderInterface, command: String) = coroutineScope {
-        var command = command
-        command = command.replace(" {2}".toRegex(), "").trim { it <= ' ' }
-        val finalCommand = command
-        require(!(command == "" || command == " ")) { "Command cannot be \"\"" }
+        val splitCommand = command.replace(" {2}".toRegex(), "").trim { it <= ' ' }
+        require(!(splitCommand == "" || splitCommand == " ")) { "Command cannot be \"\"" }
 
         launch {
-            val chatEvent = ChatEvent(sender, finalCommand, isCommand = true, async = true)
+            val chatEvent = ChatEvent(sender, splitCommand, isCommand = true, async = true)
             server.eventHandler.callEvent(chatEvent)
             ServerTerminal.commandMessageParser.onCommand(chatEvent)
         }
@@ -65,11 +61,11 @@ class ServerCommandHandler(private val server: Server) {
 
     private fun registerCommands() {
         ServerTerminal.registerCommand(object : Command("exit") {
-            override fun onCommand(sender: SenderInterface, args: Array<String>) {
+            override suspend fun onCommand(sender: SenderInterface, args: Array<String>) {
                 when (sender) {
                     is Console -> {
                         ServerTerminal.sendMessage(sender, "Exiting")
-                        server!!.shutdownServer()
+                        server.shutdownServer()
                         exitProcess(0)
                     }
 
@@ -80,7 +76,7 @@ class ServerCommandHandler(private val server: Server) {
             }
         }).usage = "Safely closes the server."
         ServerTerminal.registerCommand(object : Command("stop") {
-            override fun onCommand(sender: SenderInterface, args: Array<String>) {
+            override suspend fun onCommand(sender: SenderInterface, args: Array<String>) {
                 when (sender) {
                     is Console -> {
                         ServerTerminal.sendMessage(sender, "Exiting")
@@ -95,7 +91,7 @@ class ServerCommandHandler(private val server: Server) {
             }
         }).usage = "Safely closes the server."
         ServerTerminal.registerCommand(object : Command("broadcast") {
-            override fun onCommand(sender: SenderInterface, args: Array<String>) {
+            override suspend fun onCommand(sender: SenderInterface, args: Array<String>) {
                 when (sender) {
                     is Console -> {
                         if (args.isNotEmpty()) {
@@ -120,9 +116,9 @@ class ServerCommandHandler(private val server: Server) {
             }
         }).usage = "Sends a broadcast message to all clients"
         ServerTerminal.registerCommand(object : Command("ping") {
-            override fun onCommand(sender: SenderInterface, args: Array<String>) {
+            override suspend fun onCommand(sender: SenderInterface, args: Array<String>) {
                 if (sender is Console) {
-                    server!!.playerHandler.channelMap.forEach { (_: Channel?, connection: ClientConnection) -> connection.ping() }
+                    server.playerHandler.channelMap.forEach { (_: Channel?, connection: ClientConnection) -> connection.ping() }
                 }
                 if (sender is ClientConnection) {
                     sender.ping()
@@ -130,22 +126,22 @@ class ServerCommandHandler(private val server: Server) {
             }
         }).usage = "Sends a ping packet to all clients"
         ServerTerminal.registerCommand(object : Command("list") {
-            override fun onCommand(sender: SenderInterface, args: Array<String>) {
+            override suspend fun onCommand(sender: SenderInterface, args: Array<String>) {
                 if (sender is Console) {
-                    ServerTerminal.sendMessage(sender, "Players: (" + server!!.playerHandler.uuidMap.size + ")")
+                    ServerTerminal.sendMessage(sender, "Players: (${server.playerHandler.uuidMap.size})")
                     for (clientConnection in HashMap(
                         server.playerHandler.channelMap
                     ).values) {
                         ServerTerminal.sendMessage(
                             sender,
-                            clientConnection.name + " :" + clientConnection.uuid + " {" + clientConnection.address + "} [" + clientConnection.os + "/" + clientConnection.langFramework + "] Ping:" + clientConnection.getPingDelay(
+                            "${clientConnection.name} :${clientConnection.uuid} {${clientConnection.address}} [${clientConnection.os}/${clientConnection.langFramework}] Ping:" + clientConnection.getPingDelay(
                                 TimeUnit.MILLISECONDS
                             ) + "ms"
                         )
                     }
                 }
                 if (sender is ClientConnection) {
-                    var message = "Players: (" + (server!!.playerHandler.uuidMap.size - 1) + ")"
+                    var message = "Players: (${server.playerHandler.uuidMap.size - 1})"
                     for (clientConnection in HashMap(
                         server.playerHandler.channelMap
                     ).values) {
@@ -167,10 +163,10 @@ class ServerCommandHandler(private val server: Server) {
         }).usage = "Lists all players with ip, id and name"
         if (isDebug()) {
             ServerTerminal.registerCommand(object : Command("testpackets") {
-                override fun onCommand(sender: SenderInterface, args: Array<String>) {
+                override suspend fun onCommand(sender: SenderInterface, args: Array<String>) {
                     val connections: MutableList<ClientConnection> = ArrayList()
                     if (sender is Console) {
-                        connections.addAll(server!!.playerHandler.channelMap.values)
+                        connections.addAll(server.playerHandler.channelMap.values)
                     }
                     if (sender is ClientConnection) {
                         connections.add(sender)
@@ -180,19 +176,19 @@ class ServerCommandHandler(private val server: Server) {
                             sender,
                             ColorCode.YELLOW.toString() + "Running packets on " + connection.name
                         )
-                        connection.sendPacket(MessagePacket("test").transport(true))
-                        connection.sendPacket(PingPacket().transport(true))
-                        connection.sendPacket(PingReceive().transport(true))
-                        connection.sendPacket(PongPacket().transport(true))
+                        connection.sendPacketLaunch(MessagePacket("test").transport(true))
+                        connection.sendPacketLaunch(PingPacket().transport(true))
+                        connection.sendPacketLaunch(PingReceive().transport(true))
+                        connection.sendPacketLaunch(PongPacket().transport(true))
                         if (connection.tempKeyPair != null) {
-                            connection.sendPacket(
+                            connection.sendPacketLaunch(
                                 InitialHandshakePacket(
                                     connection.tempKeyPair!!.public,
                                     connection.versionData
                                 )
                                     .transport(true)
                             )
-                            connection.sendPacket(
+                            connection.sendPacketLaunch(
                                 KeyResponsePacket(
                                     connection.secretKey!!,
                                     connection.tempKeyPair!!.public
@@ -200,8 +196,8 @@ class ServerCommandHandler(private val server: Server) {
                                     .transport(true)
                             )
                         }
-                        connection.sendPacket(RequestConnectInfoPacket().transport(true))
-                        connection.sendPacket(
+                        connection.sendPacketLaunch(RequestConnectInfoPacket().transport(true))
+                        connection.sendPacketLaunch(
                             ConnectedPacket(
                                 connection.name,
                                 connection.os,
@@ -211,16 +207,16 @@ class ServerCommandHandler(private val server: Server) {
                                 .transport(true)
                         )
                         for (messageType in SelfMessagePacket.MessageType.values()) {
-                            connection.sendPacket(SelfMessagePacket(messageType).transport(true))
+                            connection.sendPacketLaunch(SelfMessagePacket(messageType).transport(true))
                         }
-                        connection.sendPacket(IllegalConnectionPacket("test packet").transport(true))
+                        connection.sendPacketLaunch(IllegalConnectionPacket("test packet").transport(true))
                     }
                 }
             })
         }
         ServerTerminal.registerCommand(KickCommand("kick", server))
         ServerTerminal.registerCommand(object : Command("ban") {
-            override fun onCommand(sender: SenderInterface, args: Array<String>) {
+            override suspend fun onCommand(sender: SenderInterface, args: Array<String>) {
                 if (sender is Console) {
                     if (args.size <= 1) {
                         ServerTerminal.sendMessage(
@@ -238,10 +234,10 @@ class ServerCommandHandler(private val server: Server) {
                         }
                         when (args[0].lowercase(Locale.getDefault())) {
                             "name" -> for (clientConnection in HashMap(
-                                server!!.playerHandler.channelMap
+                                server.playerHandler.channelMap
                             ).values) {
                                 if (clientConnection.name == args[1]) {
-                                    clientConnection.sendObject(
+                                    clientConnection.sendPacketLaunch(
                                         PacketTransporter(
                                             MessagePacket("Banned: $message"),
                                             true
@@ -255,10 +251,10 @@ class ServerCommandHandler(private val server: Server) {
 
                             "ip" -> {
                                 for (clientConnection in HashMap(
-                                    server!!.playerHandler.channelMap
+                                    server.playerHandler.channelMap
                                 ).values) {
                                     if (clientConnection.address == args[1]) {
-                                        clientConnection.sendObject(
+                                        clientConnection.sendPacketLaunch(
                                             PacketTransporter(
                                                 MessagePacket("Banned: $message"),
                                                 true
@@ -267,7 +263,7 @@ class ServerCommandHandler(private val server: Server) {
                                         clientConnection.close()
                                     }
                                 }
-                                server.banManager.ban(args[1]!!)
+                                server.banManager.ban(args[1])
                             }
 
                             else -> {
@@ -281,7 +277,7 @@ class ServerCommandHandler(private val server: Server) {
             }
         }).usage = "Used to ban players using id. "
         ServerTerminal.registerCommand(object : Command("help") {
-            override fun onCommand(sender: SenderInterface, args: Array<String>) {
+            override suspend fun onCommand(sender: SenderInterface, args: Array<String>) {
                 if (args.isEmpty()) {
                     ServerTerminal.sendMessage(sender, "Following commands: ")
                     for (serverCommand in ServerTerminal.commands) {

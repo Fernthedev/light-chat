@@ -1,18 +1,21 @@
 package com.github.fernthedev.lightchat.server
 
 import com.github.fernthedev.lightchat.core.encryption.PacketTransporter
-import com.github.fernthedev.lightchat.core.packets.PacketJSON
 import io.netty.channel.ChannelFuture
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.runBlocking
 
 interface SenderInterface {
-    @Deprecated(
-        "Use packet transport", ReplaceWith(
-            "sendPacket(packet.transport(true))",
-            "com.github.fernthedev.lightchat.core.encryption.transport"
-        )
-    )
-    fun sendPacket(packetJSON: PacketJSON): ChannelFuture
-    fun sendPacket(packet: PacketTransporter): ChannelFuture
+
+    suspend fun sendPacketDeferred(transporter: PacketTransporter): Deferred<ChannelFuture>
+    suspend fun sendPacketLaunch(transporter: PacketTransporter): Job
+
+    fun sendPacketBlocking(transporter: PacketTransporter): ChannelFuture {
+        return runBlocking {
+            return@runBlocking sendPacketDeferred(transporter).await()
+        }
+    }
 
     val name: String
 }

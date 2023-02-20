@@ -5,11 +5,9 @@ import com.github.fernthedev.lightchat.core.api.APIUsage
 import com.github.fernthedev.lightchat.core.codecs.AcceptablePacketTypes
 import com.github.fernthedev.lightchat.core.encryption.*
 import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil
-import com.github.fernthedev.lightchat.core.packets.PacketJSON
 import com.github.fernthedev.lightchat.core.packets.latency.PingPacket
 import io.netty.channel.Channel
-import io.netty.channel.ChannelFuture
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import org.apache.commons.lang3.time.StopWatch
 import java.net.InetSocketAddress
 import java.security.KeyPair
@@ -116,33 +114,6 @@ class ClientConnection(
         return packetIdPair
     }
 
-    /**
-     *
-     * @param packetJSON Packet to send
-     * @param encrypt if true the packet will be encrypted
-     */
-    @APIUsage
-    @Deprecated(
-        "Use packet wrapper", ReplaceWith(
-            "sendObject(packet.transport(encrypt))",
-            "com.github.fernthedev.lightchat.core.encryption.transport"
-        )
-    )
-    fun sendObject(packetJSON: PacketJSON, encrypt: Boolean): ChannelFuture {
-        return sendObject(packetJSON.transport(encrypt))
-    }
-
-    fun sendObject(transporter: PacketTransporter): ChannelFuture {
-        val packet = transporter.packet
-        val packetIdPair = updatePacketIdPair(packet.javaClass, -1)
-        if (packetIdPair.first > server.maxPacketId || System.currentTimeMillis() - packetIdPair.second > 900) {
-            updatePacketIdPair(
-                packet.javaClass,
-                0
-            )
-        }
-        return channel.writeAndFlush(transporter)
-    }
 
     /**
      * Closes connection
@@ -177,25 +148,38 @@ class ClientConnection(
     /**
      * Pings player
      */
-    fun ping() {
+    suspend fun ping() {
         pingStopWatch.reset()
         pingStopWatch.start()
-        sendObject(PingPacket().transport(false))
+        sendPacketLaunch(PingPacket().transport(false))
     }
 
-    @Deprecated(
-        "Use packet transport",
-        replaceWith = ReplaceWith(
-            "sendPacket(packet.transport(true))",
-            "com.github.fernthedev.lightchat.core.encryption.transport"
-        )
-    )
-    override fun sendPacket(packetJSON: PacketJSON): ChannelFuture {
-        return sendObject(packetJSON.transport())
+    override suspend fun sendPacketDeferred(transporter: PacketTransporter) = coroutineScope {
+        val packet = transporter.packet
+        val packetIdPair = updatePacketIdPair(packet.javaClass, -1)
+        if (packetIdPair.first > server.maxPacketId || System.currentTimeMillis() - packetIdPair.second > 900) {
+            updatePacketIdPair(
+                packet.javaClass,
+                0
+            )
+        }
+        return@coroutineScope async(Dispatchers.IO) {
+            return@async channel.writeAndFlush(transporter)
+        }
     }
 
-    override fun sendPacket(packet: PacketTransporter): ChannelFuture {
-        return sendObject(packet)
+    override suspend fun sendPacketLaunch(transporter: PacketTransporter): Job = coroutineScope {
+        val packet = transporter.packet
+        val packetIdPair = updatePacketIdPair(packet.javaClass, -1)
+        if (packetIdPair.first > server.maxPacketId || System.currentTimeMillis() - packetIdPair.second > 900) {
+            updatePacketIdPair(
+                packet.javaClass,
+                0
+            )
+        }
+        return@coroutineScope launch(Dispatchers.IO) {
+            channel.writeAndFlush(transporter)
+        }
     }
 
     fun finishPing() {

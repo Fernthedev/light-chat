@@ -13,29 +13,26 @@ import com.github.fernthedev.lightchat.server.terminal.events.ChatEvent
 import org.apache.commons.lang3.StringUtils
 
 class AuthTerminalHandler(name: String, private val server: Server) : Command(name) {
-    override fun onCommand(sender: SenderInterface, args: Array<String>) {
+    override suspend fun onCommand(sender: SenderInterface, args: Array<String>) {
         if (args.isEmpty()) {
             ServerTerminal.sendMessage(sender, "Please provide new password")
             return
         }
 
         if (StringUtils.isAlphanumeric(args[0])) {
-            server.authenticationManager.authenticate(sender).thenAccept { aBoolean: Boolean ->
-                if (aBoolean) {
-                    ServerTerminal.sendMessage(sender, "Setting password now")
-                    server.settingsManager.configData.password = args[0]
-                    try {
-                        server.settingsManager.save()
-                    } catch (e: ConfigLoadException) {
-                        e.printStackTrace()
-                    }
-                }
+            val authenticated = server.authenticationManager.authenticate(sender).await()
+            ServerTerminal.sendMessage(sender, "Setting password now")
+            server.settingsManager.configData.password = args[0]
+            try {
+                server.settingsManager.save()
+            } catch (e: ConfigLoadException) {
+                e.printStackTrace()
             }
         } else ServerTerminal.sendMessage(sender, "Password can only be alphanumeric")
     }
 
 
-    fun onChatEvent(event: ChatEvent) {
+    suspend fun onChatEvent(event: ChatEvent) {
         val authenticationManager = server.authenticationManager
         val checking: Map<SenderInterface, PlayerInfo> = authenticationManager.awaitingAuthentications
 
@@ -45,7 +42,7 @@ class AuthTerminalHandler(name: String, private val server: Server) : Command(na
         }
     }
 
-    fun onAuthenticateEvent(e: AuthenticationAttemptedEvent) {
+    suspend fun onAuthenticateEvent(e: AuthenticationAttemptedEvent) {
         when (e.eventStatus) {
             EventStatus.SUCCESS ->                 // Success
                 ServerTerminal.sendMessage(

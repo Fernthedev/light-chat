@@ -1,6 +1,6 @@
 package com.github.fernthedev.lightchat.server.terminal.command
 
-import com.github.fernthedev.lightchat.core.encryption.PacketTransporter
+import com.github.fernthedev.lightchat.core.encryption.transport
 import com.github.fernthedev.lightchat.server.ClientConnection
 import com.github.fernthedev.lightchat.server.Console
 import com.github.fernthedev.lightchat.server.SenderInterface
@@ -17,7 +17,7 @@ class KickCommand(command: String, server: Server) : Command(command), TabExecut
         this.server = server
     }
 
-    override fun onCommand(sender: SenderInterface, args: Array<String>) {
+    override suspend fun onCommand(sender: SenderInterface, args: Array<String>) {
         if (sender is Console) {
             if (args.isEmpty()) {
                 ServerTerminal.sendMessage(sender, "No player to kick?")
@@ -25,10 +25,10 @@ class KickCommand(command: String, server: Server) : Command(command), TabExecut
                 val argName = args.joinToString("")
 
                 for (clientConnection in HashMap(
-                    server!!.playerHandler.channelMap
+                    server.playerHandler.channelMap
                 ).values) {
                     if (argName == clientConnection.name) {
-                        clientConnection.sendObject(PacketTransporter(MessagePacket("You have been kicked."), true))
+                        clientConnection.sendPacketLaunch(MessagePacket("You have been kicked.").transport())
                         clientConnection.close()
                     }
                 }

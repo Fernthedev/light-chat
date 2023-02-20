@@ -84,7 +84,7 @@ class Client(private var host: String, private var port: Int) : IEncryptionKeyHo
     fun buildConnectedPacket(): ConnectedPacket {
         StaticHandler.core.logger.debug("Using the name: {}", name)
         val javaVersion = System.getProperty("java.version") + " (" + SystemUtils.JAVA_VM_NAME + ")"
-        return ConnectedPacket(name!!, oSName, StaticHandler.VERSION_DATA, "Java $javaVersion")
+        return ConnectedPacket(name!!, osName, StaticHandler.VERSION_DATA, "Java $javaVersion")
     }
 
     var decryptCipher: ThreadLocal<Cipher>? = null
@@ -130,7 +130,7 @@ class Client(private var host: String, private var port: Int) : IEncryptionKeyHo
         StaticHandler.displayVersion()
     }
 
-    val oSName: String
+    val osName: String
         get() = System.getProperty("os.name")
 
     fun connectBlocking(): ChannelFuture = runBlocking {

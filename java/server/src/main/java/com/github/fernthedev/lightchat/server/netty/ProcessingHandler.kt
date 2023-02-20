@@ -9,7 +9,6 @@ import com.github.fernthedev.lightchat.core.packets.handshake.InitialHandshakePa
 import com.github.fernthedev.lightchat.core.packets.latency.LatencyPacket
 import com.github.fernthedev.lightchat.server.*
 import com.github.fernthedev.lightchat.server.event.PlayerDisconnectEvent
-import io.netty.buffer.ByteBuf
 import io.netty.channel.*
 import io.netty.channel.ChannelHandler.Sharable
 import io.netty.util.ReferenceCountUtil
@@ -74,9 +73,10 @@ class ProcessingHandler(private val server: Server) : ChannelInboundHandlerAdapt
             try {
                 val connection: ClientConnection = server.playerHandler.channelMap[ctx.channel()]!!
                 val eventListener = connection.eventListener
-                if (msg is ByteBuf && !server.playerHandler.channelMap.containsKey(ctx.channel())) {
+                if (!server.playerHandler.channelMap.containsKey(ctx.channel())) {
                     // Discard the received data silently.
-                    msg.release()
+                    ReferenceCountUtil.release(msg)
+                    return@runBlocking
                 }
 
                 if (msg !is PacketTransporter) return@runBlocking
@@ -145,14 +145,13 @@ class ProcessingHandler(private val server: Server) : ChannelInboundHandlerAdapt
 
             runBlocking {
                 launch {
-                    keyJob.await()
-                    val key = keyJob.getCompleted()
+                    val key = keyJob.await()
                     clientConnection.setupKeypair(key)
                     val packet = InitialHandshakePacket(
                         key.public,
                         StaticHandler.VERSION_DATA
                     )
-                    clientConnection.sendObject(
+                    clientConnection.sendPacketLaunch(
                         packet.transport(
                             false
                         )

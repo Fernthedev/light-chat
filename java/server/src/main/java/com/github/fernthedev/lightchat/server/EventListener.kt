@@ -21,20 +21,16 @@ import org.apache.commons.lang3.StringUtils
 class EventListener(private val server: Server, private val clientConnection: ClientConnection) {
     suspend fun received(p: PacketJSON, packetId: Int) = coroutineScope {
         try {
-            //Packet p = (Packet) EncryptionHandler.decrypt(pe, clientConnection.getServerKey());
-
-
-            // server.logInfo(clientConnection + " is the sender of packet");
             when (p) {
                 is PongPacket -> {
                     clientConnection.finishPing()
-                    clientConnection.sendPacket(PingReceive().transport(false))
+                    clientConnection.sendPacketLaunch(PingReceive().transport(false))
                 }
 
                 is KeyResponsePacket -> {
                     StaticHandler.core.logger.debug("Received key")
                     clientConnection.secretKey = p.getSecretKey(clientConnection.tempKeyPair!!.private)
-                    clientConnection.sendPacket(RequestConnectInfoPacket().transport())
+                    clientConnection.sendPacketLaunch(RequestConnectInfoPacket().transport())
                 }
             }
 
@@ -105,7 +101,7 @@ class EventListener(private val server: Server, private val clientConnection: Cl
                 clientConnection.os,
                 clientConnection.langFramework
             )
-            clientConnection.sendPacket(SelfMessagePacket(SelfMessagePacket.MessageType.REGISTER_PACKET).transport())
+            clientConnection.sendPacketLaunch(SelfMessagePacket(SelfMessagePacket.MessageType.REGISTER_PACKET).transport())
 
             launch {
                 server.eventHandler.callEvent(
@@ -128,15 +124,15 @@ class EventListener(private val server: Server, private val clientConnection: Cl
         )
     }
 
-    private fun disconnectIllegalName(packet: ConnectedPacket?, message: String) {
+    private suspend fun disconnectIllegalName(packet: ConnectedPacket, message: String) {
         server.logInfo(
             "{} was disconnected for illegal name. Name: {} Reason: {} ID {}",
             clientConnection,
-            packet!!.name,
+            packet.name,
             message,
             clientConnection.uuid.mostSignificantBits
         )
-        clientConnection.sendPacket(
+        clientConnection.sendPacketLaunch(
             IllegalConnectionPacket("You have been disconnected for an illegal name. Name: " + packet.name + " Reason: " + message).transport()
         )
         clientConnection.close()
