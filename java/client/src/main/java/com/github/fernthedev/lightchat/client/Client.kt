@@ -8,7 +8,7 @@ import com.github.fernthedev.lightchat.core.NoFileConfig
 import com.github.fernthedev.lightchat.core.StaticHandler
 import com.github.fernthedev.lightchat.core.api.APIUsage
 import com.github.fernthedev.lightchat.core.api.Async
-import com.github.fernthedev.lightchat.core.api.plugin.PluginManager
+import com.github.fernthedev.lightchat.core.api.EventHandler
 import com.github.fernthedev.lightchat.core.codecs.Codecs
 import com.github.fernthedev.lightchat.core.codecs.JSONHandler
 import com.github.fernthedev.lightchat.core.codecs.general.compression.SnappyCompressor
@@ -60,7 +60,7 @@ class Client(private var host: String, private var port: Int) : IEncryptionKeyHo
     protected var workerGroup: EventLoopGroup? = null
     var isRegistered = false
 
-    val pluginManager = PluginManager()
+    val eventHandler = EventHandler()
     var isRunning = false
     val packetHandlers: MutableList<IPacketHandler> = ArrayList()
 
@@ -295,7 +295,7 @@ class Client(private var host: String, private var port: Int) : IEncryptionKeyHo
             }
         }
         channel?.let {
-            pluginManager.callEvent(ServerDisconnectEvent(it, disconnectStatus))
+            eventHandler.callEvent(ServerDisconnectEvent(it, disconnectStatus))
         }
         workerGroup?.shutdownGracefully()
         channel = null

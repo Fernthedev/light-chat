@@ -189,7 +189,7 @@ class ProcessingHandler(private val server: Server) : ChannelInboundHandlerAdapt
             server.playerHandler.channelMap.remove(clientConnection.channel)
         }
         if (clientConnection.registered) {
-            server.pluginManager.callEvent(PlayerDisconnectEvent(clientConnection))
+            server.eventHandler.callEvent(PlayerDisconnectEvent(clientConnection))
             server.logInfo("[{}] has disconnected from the server", clientConnection.name)
         }
         clientConnection.close()

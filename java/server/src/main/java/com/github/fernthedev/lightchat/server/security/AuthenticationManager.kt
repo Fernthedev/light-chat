@@ -1,6 +1,5 @@
 package com.github.fernthedev.lightchat.server.security
 
-import com.github.fernthedev.lightchat.core.api.event.api.Listener
 import com.github.fernthedev.lightchat.core.data.HashedPassword
 import com.github.fernthedev.lightchat.core.encryption.transport
 import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil
@@ -11,18 +10,18 @@ import com.github.fernthedev.lightchat.server.event.AuthenticationAttemptedEvent
 import com.github.fernthedev.lightchat.server.event.AuthenticationAttemptedEvent.EventStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
-import lombok.*
 import org.jetbrains.annotations.Contract
 import java.util.concurrent.CompletableFuture
 
 /**
  * Can be used to authenticate command senders.
  */
-class AuthenticationManager(private val server: Server) : Listener {
+class AuthenticationManager(private val server: Server) {
     private val checking: MutableMap<SenderInterface, PlayerInfo> = HashMap()
 
-    @Getter
-    protected var amountOfTries = 2
+
+    var amountOfTries = 2
+    private set
 
     /**
      * Runs asynchronously to check if the
@@ -47,7 +46,7 @@ class AuthenticationManager(private val server: Server) : Listener {
                 .execute {
                     playerInfo.mode = Mode.AUTHENTICATE
                     val event = AuthenticateRequestEvent(playerInfo, true)
-                    server.pluginManager.callEvent(event)
+                    server.eventHandler.callEvent(event)
                     if (event.isCancelled) {
                         completableFuture.complete(playerInfo.authenticated)
                         return@execute
@@ -99,7 +98,7 @@ class AuthenticationManager(private val server: Server) : Listener {
 
                 //Handle event
                 event.eventStatus = eventStatus
-                server.pluginManager.callEvent(event)
+                server.eventHandler.callEvent(event)
                 if (event.isCancelled) return
                 playerInfo.authenticated = event.eventStatus == EventStatus.SUCCESS
                 when (event.eventStatus) {

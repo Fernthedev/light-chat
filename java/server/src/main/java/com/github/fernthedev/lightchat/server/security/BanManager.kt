@@ -6,7 +6,6 @@ import com.github.fernthedev.config.gson.GsonConfig
 import com.github.fernthedev.lightchat.server.*
 import com.github.fernthedev.lightchat.server.event.BanEvent
 import io.netty.channel.*
-import lombok.*
 import org.apache.commons.lang3.SystemUtils
 import java.io.File
 
@@ -42,7 +41,7 @@ class BanManager(private val server: Server) {
 
     fun ban(ip: String) {
         val banEvent = BanEvent(true, ip)
-        server.pluginManager.callEvent(banEvent)
+        server.eventHandler.callEvent(banEvent)
         if (banEvent.isCancelled) return
         bannedDataConfig!!.configData.ipAddresses.add(banEvent.bannedIP)
         try {
@@ -55,7 +54,7 @@ class BanManager(private val server: Server) {
 
     fun unban(ip: String) {
         val banEvent = BanEvent(false, ip)
-        server.pluginManager.callEvent(banEvent)
+        server.eventHandler.callEvent(banEvent)
         if (banEvent.isCancelled) return
         bannedDataConfig!!.configData.ipAddresses.remove(banEvent.bannedIP)
         try {

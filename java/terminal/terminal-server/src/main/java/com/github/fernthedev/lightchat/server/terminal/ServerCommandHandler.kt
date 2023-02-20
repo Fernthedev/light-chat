@@ -25,7 +25,6 @@ import com.github.fernthedev.terminal.core.packets.MessagePacket
 import io.netty.channel.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import lombok.SneakyThrows
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
@@ -45,7 +44,7 @@ class ServerCommandHandler(private val server: Server) {
 
         launch {
             val chatEvent = ChatEvent(server.console, finalCommand, isCommand = true, async = true)
-            server.pluginManager.callEvent(chatEvent)
+            server.eventHandler.callEvent(chatEvent)
             ServerTerminal.commandMessageParser.onCommand(chatEvent)
         }
     }
@@ -59,7 +58,7 @@ class ServerCommandHandler(private val server: Server) {
 
         launch {
             val chatEvent = ChatEvent(sender, finalCommand, isCommand = true, async = true)
-            server.pluginManager.callEvent(chatEvent)
+            server.eventHandler.callEvent(chatEvent)
             ServerTerminal.commandMessageParser.onCommand(chatEvent)
         }
     }
@@ -168,7 +167,6 @@ class ServerCommandHandler(private val server: Server) {
         }).usage = "Lists all players with ip, id and name"
         if (isDebug()) {
             ServerTerminal.registerCommand(object : Command("testpackets") {
-                @SneakyThrows
                 override fun onCommand(sender: SenderInterface, args: Array<String>) {
                     val connections: MutableList<ClientConnection> = ArrayList()
                     if (sender is Console) {

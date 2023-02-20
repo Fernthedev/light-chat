@@ -29,7 +29,7 @@ class TerminalPacketHandler(private val server: Server) : IPacketHandler {
             is MessagePacket -> {
                 core.logger.debug("Handling message {}", packet.message)
                 val chatEvent = ChatEvent(clientConnection, packet.message, isCommand = false, async = true)
-                server.pluginManager.callEvent(chatEvent)
+                server.eventHandler.callEvent(chatEvent)
 
                 ServerTerminal.commandMessageParser.onCommand(chatEvent)
             }
@@ -37,7 +37,7 @@ class TerminalPacketHandler(private val server: Server) : IPacketHandler {
             is CommandPacket -> {
                 val command = packet.message
                 val chatEvent = ChatEvent(clientConnection, command, isCommand = true, async = true)
-                server.pluginManager.callEvent(chatEvent)
+                server.eventHandler.callEvent(chatEvent)
                 ServerTerminal.commandMessageParser.onCommand(chatEvent)
             }
 

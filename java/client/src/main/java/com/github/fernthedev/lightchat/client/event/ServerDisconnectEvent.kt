@@ -1,7 +1,6 @@
 package com.github.fernthedev.lightchat.client.event
 
-import com.github.fernthedev.lightchat.core.api.event.api.Event
-import com.github.fernthedev.lightchat.core.api.event.api.HandlerList
+import com.github.fernthedev.lightchat.core.api.Event
 import com.github.fernthedev.lightchat.core.packets.IllegalConnectionPacket
 import io.netty.channel.*
 
@@ -14,8 +13,7 @@ import io.netty.channel.*
  */
 class ServerDisconnectEvent(
     val channel: Channel,
-    val disconnectStatus: DisconnectStatus,
-    override val handlers: HandlerList = handlerList, isAsynchronous: Boolean = false
+    val disconnectStatus: DisconnectStatus, isAsynchronous: Boolean = false
 ) : Event(isAsynchronous) {
 
 
@@ -46,8 +44,4 @@ class ServerDisconnectEvent(
         EXCEPTION
     }
 
-    companion object {
-        @JvmStatic
-        val handlerList = HandlerList()
-    }
 }

@@ -1,4 +1,4 @@
-package com.github.fernthedev.lightchat.core.api.event.api
+package com.github.fernthedev.lightchat.core.api
 
 interface Cancellable {
     /**

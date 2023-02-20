@@ -1,7 +1,6 @@
 package com.github.fernthedev.lightchat.server.event
 
-import com.github.fernthedev.lightchat.core.api.event.api.Cancellable
-import com.github.fernthedev.lightchat.core.api.event.api.HandlerList
+import com.github.fernthedev.lightchat.core.api.Cancellable
 import com.github.fernthedev.lightchat.server.security.AuthenticationManager.PlayerInfo
 
 /**
@@ -20,10 +19,5 @@ class AuthenticationAttemptedEvent : AuthenticateEvent, Cancellable {
 
     enum class EventStatus {
         SUCCESS, ATTEMPT_FAILED, NO_MORE_TRIES
-    }
-
-    companion object {
-        @JvmStatic
-        val handlerList = HandlerList()
     }
 }

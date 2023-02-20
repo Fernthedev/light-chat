@@ -27,7 +27,7 @@ open class ClientHandler(protected var client: Client, protected var listener: E
      */
     @Throws(Exception::class)
     override fun channelActive(ctx: ChannelHandlerContext) {
-        client.pluginManager.callEvent(ServerConnectFinishEvent(ctx.channel()))
+        client.eventHandler.callEvent(ServerConnectFinishEvent(ctx.channel()))
         super.channelActive(ctx)
     }
 

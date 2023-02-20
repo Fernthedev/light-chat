@@ -2,7 +2,6 @@ package com.github.fernthedev.lightchat.server.settings
 
 import com.github.fernthedev.fernutils.thread.ThreadUtils
 import com.github.fernthedev.lightchat.core.CoreSettings
-import lombok.*
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.Validate
 import org.apache.commons.lang3.tuple.ImmutablePair

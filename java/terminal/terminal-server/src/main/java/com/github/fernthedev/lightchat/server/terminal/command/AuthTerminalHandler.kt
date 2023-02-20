@@ -2,8 +2,6 @@ package com.github.fernthedev.lightchat.server.terminal.command
 
 import com.github.fernthedev.config.common.exceptions.ConfigLoadException
 import com.github.fernthedev.lightchat.core.ColorCode
-import com.github.fernthedev.lightchat.core.api.event.api.EventHandler
-import com.github.fernthedev.lightchat.core.api.event.api.Listener
 import com.github.fernthedev.lightchat.core.data.HashedPassword
 import com.github.fernthedev.lightchat.server.SenderInterface
 import com.github.fernthedev.lightchat.server.Server
@@ -14,7 +12,7 @@ import com.github.fernthedev.lightchat.server.terminal.ServerTerminal
 import com.github.fernthedev.lightchat.server.terminal.events.ChatEvent
 import org.apache.commons.lang3.StringUtils
 
-class AuthTerminalHandler(name: String, private val server: Server) : Command(name), Listener {
+class AuthTerminalHandler(name: String, private val server: Server) : Command(name) {
     override fun onCommand(sender: SenderInterface, args: Array<String>) {
         if (args.isEmpty()) {
             ServerTerminal.sendMessage(sender, "Please provide new password")
@@ -36,7 +34,7 @@ class AuthTerminalHandler(name: String, private val server: Server) : Command(na
         } else ServerTerminal.sendMessage(sender, "Password can only be alphanumeric")
     }
 
-    @EventHandler
+
     fun onChatEvent(event: ChatEvent) {
         val authenticationManager = server.authenticationManager
         val checking: Map<SenderInterface, PlayerInfo> = authenticationManager.awaitingAuthentications
@@ -47,7 +45,6 @@ class AuthTerminalHandler(name: String, private val server: Server) : Command(na
         }
     }
 
-    @EventHandler
     fun onAuthenticateEvent(e: AuthenticationAttemptedEvent) {
         when (e.eventStatus) {
             EventStatus.SUCCESS ->                 // Success

@@ -1,12 +1,11 @@
 package com.github.fernthedev.lightchat.core.api
 
-import lombok.Getter
-
 class ThreadLock {
     private val threadLockObject = Any()
 
-    @Getter
-    private var lock = false
+
+    var lock = false
+        private set
     fun lock() {
         lock = true
     }

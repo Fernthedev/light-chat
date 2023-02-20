@@ -4,8 +4,6 @@ import com.github.fernthedev.lightchat.client.api.IPacketHandler
 import com.github.fernthedev.lightchat.client.event.ServerDisconnectEvent
 import com.github.fernthedev.lightchat.core.ColorCode
 import com.github.fernthedev.lightchat.core.StaticHandler.core
-import com.github.fernthedev.lightchat.core.api.event.api.EventHandler
-import com.github.fernthedev.lightchat.core.api.event.api.Listener
 import com.github.fernthedev.lightchat.core.packets.Packet
 import com.github.fernthedev.lightchat.core.packets.SelfMessagePacket
 import com.github.fernthedev.terminal.core.packets.AutoCompletePacket
@@ -14,7 +12,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
 
-class PacketHandler : IPacketHandler, Listener {
+class PacketHandler : IPacketHandler {
     override fun handlePacket(packet: Packet, packetId: Int) {
         when (packet) {
             is AutoCompletePacket -> {
@@ -39,7 +37,6 @@ class PacketHandler : IPacketHandler, Listener {
         }
     }
 
-    @EventHandler
     fun onDisconnect(e: ServerDisconnectEvent?) {
         core.logger.info("CLOSING CLIENT")
         exitProcess(0)

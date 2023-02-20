@@ -6,7 +6,6 @@ import com.github.fernthedev.lightchat.core.packets.Packet
 import com.github.fernthedev.lightchat.core.util.Log4jDebug
 import com.google.gson.Gson
 import io.netty.util.CharsetUtil
-import lombok.Synchronized
 import org.apache.commons.lang3.SystemUtils
 import org.slf4j.Logger
 import java.io.File

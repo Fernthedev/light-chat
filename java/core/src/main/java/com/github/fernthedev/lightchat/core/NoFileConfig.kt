@@ -1,10 +1,9 @@
 package com.github.fernthedev.lightchat.core
 
 import com.github.fernthedev.config.common.Config
-import lombok.SneakyThrows
 import java.io.File
 
-class NoFileConfig<T> @SneakyThrows constructor(configData: T) : Config<T>(configData, File(".")) {
+class NoFileConfig<T> constructor(configData: T) : Config<T>(configData, File(".")) {
     /**
      * Saves the file without verifying the contents of the file
      */

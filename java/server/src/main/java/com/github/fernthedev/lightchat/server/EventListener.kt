@@ -107,7 +107,7 @@ class EventListener(private val server: Server, private val clientConnection: Cl
             clientConnection.sendPacket(SelfMessagePacket(SelfMessagePacket.MessageType.REGISTER_PACKET).transport())
 
             launch {
-                server.pluginManager.callEvent(
+                server.eventHandler.callEvent(
                     PlayerJoinEvent(
                         clientConnection, true
                     )

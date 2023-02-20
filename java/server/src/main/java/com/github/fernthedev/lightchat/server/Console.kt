@@ -3,7 +3,6 @@ package com.github.fernthedev.lightchat.server
 import com.github.fernthedev.lightchat.core.encryption.PacketTransporter
 import com.github.fernthedev.lightchat.core.packets.Packet
 import io.netty.channel.ChannelFuture
-import lombok.AllArgsConstructor
 import java.io.Serializable
 
 class Console(

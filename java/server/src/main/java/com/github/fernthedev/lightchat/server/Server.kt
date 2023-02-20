@@ -1,9 +1,11 @@
 package com.github.fernthedev.lightchat.server
 
 import com.github.fernthedev.config.common.Config
-import com.github.fernthedev.lightchat.core.*
+import com.github.fernthedev.lightchat.core.ColorCode
+import com.github.fernthedev.lightchat.core.NoFileConfig
+import com.github.fernthedev.lightchat.core.StaticHandler
 import com.github.fernthedev.lightchat.core.api.APIUsage
-import com.github.fernthedev.lightchat.core.api.plugin.PluginManager
+import com.github.fernthedev.lightchat.core.api.EventHandler
 import com.github.fernthedev.lightchat.core.codecs.Codecs
 import com.github.fernthedev.lightchat.core.codecs.general.compression.SnappyCompressor
 import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectDecoder
@@ -35,25 +37,18 @@ import io.netty.channel.socket.nio.NioServerSocketChannel
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder
 import io.netty.handler.codec.LengthFieldPrepender
 import kotlinx.coroutines.*
-import lombok.*
 import org.apache.commons.lang3.time.StopWatch
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.net.InetAddress
 import java.net.UnknownHostException
 import java.security.KeyPair
-import java.util.*
-import java.util.concurrent.*
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
+import java.util.function.Consumer
 
 class Server(val port: Int) : Runnable {
-    var logger = LoggerFactory.getLogger(Server::class.java)
-
-    @APIUsage
-    var serverThread: Thread? = null
-        private set
-
-    var authenticationManager = AuthenticationManager(this)
-    var banManager = BanManager(this)
 
     @Volatile
     private var running = false
@@ -62,51 +57,32 @@ class Server(val port: Int) : Runnable {
     private var shutdown = false
     private var isPortBind = false
 
-    val console: Console = Console(this)
-
-    val pluginManager = PluginManager()
-
-    var settingsManager: Config<out ServerSettings> = NoFileConfig(ServerSettings())
-
     private var multicastServer: MulticastServer? = null
     private var bossGroup: EventLoopGroup? = null
     private var workerGroup: EventLoopGroup? = null
 
-    val rsaKeyThread: KeyThread<KeyPair>
     private var processingHandler: ProcessingHandler? = null
-    private val channelHandlers: MutableList<ChannelHandler> = ArrayList()
+    private var bootstrap: ServerBootstrap? = null
 
-
+    var channelHandlers: Consumer<ChannelPipeline>? = null
     var maxPacketId = StaticHandler.DEFAULT_PACKET_ID_MAX
-
-    @Deprecated(
-        """Might be replaced with {@link ServerShutdownEvent}
-      Use event system {@link PluginManager#registerEvents(Listener)}"""
-    )
-    private val shutdownListeners: MutableList<Runnable> = ArrayList()
 
     val startupLock = CompletableFuture<Void?>()
     val playerHandler: PlayerHandler = PlayerHandler(this)
+    val rsaKeyThread: KeyThread<KeyPair>
 
-    private var bootstrap: ServerBootstrap? = null
+    val console: Console = Console(this)
+    val eventHandler = EventHandler()
 
-    /**
-     * The listener will be called when [.shutdownServer] is called
-     *
-     * @param runnable the listener
-     */
+    var settingsManager: Config<out ServerSettings> = NoFileConfig(ServerSettings())
+    var logger: Logger = LoggerFactory.getLogger(Server::class.java)
+
     @APIUsage
-    fun addShutdownListener(runnable: Runnable) {
-        shutdownListeners.add(runnable)
-    }
+    var serverThread: Thread? = null
+        private set
 
-    /**
-     * Add channel handlers for netty functionality
-     */
-    @APIUsage
-    fun addChannelHandler(channelHandler: ChannelHandler) {
-        channelHandlers.add(channelHandler)
-    }
+    var authenticationManager = AuthenticationManager(this)
+    var banManager = BanManager(this)
 
     /**
      * Custom packet handlers added by outside the main server code
@@ -146,7 +122,7 @@ class Server(val port: Int) : Runnable {
         }
     }
 
-    @lombok.Synchronized
+    @Synchronized
     fun shutdownServer() {
         if (shutdown) throw IllegalStateException("Server is already shutting down!")
 
@@ -157,8 +133,7 @@ class Server(val port: Int) : Runnable {
         multicastServer?.stopMulticast()
         if (workerGroup != null) workerGroup!!.shutdownGracefully()
         if (bossGroup != null) bossGroup!!.shutdownGracefully()
-        pluginManager.callEvent(ServerShutdownEvent())
-        shutdownListeners.forEach { obj: Runnable -> obj.run() }
+        eventHandler.callEvent(ServerShutdownEvent())
     }
 
     fun isRunning(): Boolean {
@@ -219,7 +194,6 @@ class Server(val port: Int) : Runnable {
         }
 
         authenticationManager = AuthenticationManager(this@Server)
-        pluginManager.registerEvents(authenticationManager)
 
         // Start key thread before initializing netty
         launch {
@@ -232,8 +206,9 @@ class Server(val port: Int) : Runnable {
 
         logger.info("Finished initializing. Took {}ms", stopWatch.getTime(TimeUnit.MILLISECONDS))
         launch {
-            pluginManager.callEvent(ServerStartupEvent(true))
+            eventHandler.callEvent(ServerStartupEvent(true))
         }
+
         startupLock.complete(null)
 
         launch {
@@ -312,7 +287,8 @@ class Server(val port: Int) : Runnable {
                         "handler",
                         processingHandler
                     )
-                    ch.pipeline().addLast(*channelHandlers.toTypedArray())
+
+                    channelHandlers?.accept(ch.pipeline())
                 }
             })
             .option(ChannelOption.SO_BACKLOG, 128)

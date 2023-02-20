@@ -2,6 +2,7 @@ package com.github.fernthedev.lightchat.client.terminal
 
 import com.github.fernthedev.fernutils.console.ArgumentArrayUtils.parseArguments
 import com.github.fernthedev.lightchat.client.Client
+import com.github.fernthedev.lightchat.client.event.ServerDisconnectEvent
 import com.github.fernthedev.lightchat.client.netty.MulticastClient
 import com.github.fernthedev.lightchat.core.MulticastData
 import com.github.fernthedev.lightchat.core.StaticHandler
@@ -19,7 +20,6 @@ import com.github.fernthedev.terminal.core.TermCore
 import com.github.fernthedev.terminal.core.packets.CommandPacket
 import com.github.fernthedev.terminal.core.packets.MessagePacket
 import com.google.common.base.Stopwatch
-import lombok.SneakyThrows
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -80,7 +80,7 @@ object ClientTerminal {
         init(arrayOf(), settings)
     }
 
-    @SneakyThrows
+
     fun init(args: Array<String>, settings: ClientTerminalSettings) {
         initTerminal()
         val host = AtomicReference(settings.host!!)
@@ -133,7 +133,9 @@ object ClientTerminal {
         val packetHandler = PacketHandler()
         client.addPacketHandler(packetHandler)
         if (settings.isShutdownOnDisconnect) {
-            client.pluginManager.registerEvents(packetHandler)
+            client.eventHandler.add(ServerDisconnectEvent::class.java) {
+                packetHandler.onDisconnect(it)
+            }
         }
     }
 

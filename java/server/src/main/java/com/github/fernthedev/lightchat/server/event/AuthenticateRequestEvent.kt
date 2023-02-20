@@ -1,6 +1,5 @@
 package com.github.fernthedev.lightchat.server.event
 
-import com.github.fernthedev.lightchat.core.api.event.api.HandlerList
 import com.github.fernthedev.lightchat.server.security.AuthenticationManager.PlayerInfo
 
 /**
@@ -10,8 +9,4 @@ class AuthenticateRequestEvent : AuthenticateEvent {
     constructor(playerInfo: PlayerInfo) : super(playerInfo)
     constructor(playerInfo: PlayerInfo, async: Boolean) : super(playerInfo, async)
 
-    companion object {
-        @JvmStatic
-        val handlerList = HandlerList()
-    }
 }

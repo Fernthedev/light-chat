@@ -3,7 +3,6 @@ package com.github.fernthedev.lightchat.client.terminal
 import com.github.fernthedev.config.common.Config
 import com.github.fernthedev.config.gson.GsonConfig
 import com.github.fernthedev.lightchat.client.ClientSettings
-import lombok.SneakyThrows
 import java.io.File
 
 class ClientTerminalSettings internal constructor(
@@ -177,7 +176,6 @@ class ClientTerminalSettings internal constructor(
     }
 
     companion object {
-        @SneakyThrows
         protected fun createConfigWithoutException(): Config<out ClientSettings> {
             return GsonConfig(ClientSettings(), File("client_settings.json"))
         }

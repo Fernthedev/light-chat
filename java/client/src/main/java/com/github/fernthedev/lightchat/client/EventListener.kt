@@ -81,7 +81,7 @@ class EventListener(private var client: Client) {
                         }
                     }
 
-                    client.pluginManager.callEvent(ServerConnectHandshakeEvent(client.channel!!))
+                    client.eventHandler.callEvent(ServerConnectHandshakeEvent(client.channel!!))
                 }
 
                 is RequestConnectInfoPacket -> {
@@ -100,7 +100,7 @@ class EventListener(private var client: Client) {
                         SelfMessagePacket.MessageType.REGISTER_PACKET -> {
                             client.isRegistered = true
                             client.logger.info("Successfully connected to server")
-                            client.pluginManager.callEvent(ServerConnectFinishEvent(client.channel!!))
+                            client.eventHandler.callEvent(ServerConnectFinishEvent(client.channel!!))
                         }
 
                         SelfMessagePacket.MessageType.LOST_SERVER_CONNECTION -> {

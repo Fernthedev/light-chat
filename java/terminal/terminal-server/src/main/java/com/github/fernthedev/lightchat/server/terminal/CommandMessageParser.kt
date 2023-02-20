@@ -1,7 +1,6 @@
 package com.github.fernthedev.lightchat.server.terminal
 
 import com.github.fernthedev.lightchat.core.ColorCode
-import com.github.fernthedev.lightchat.core.api.event.api.Listener
 import com.github.fernthedev.lightchat.server.Console
 import com.github.fernthedev.lightchat.server.SenderInterface
 import com.github.fernthedev.lightchat.server.Server
@@ -10,7 +9,7 @@ import com.github.fernthedev.lightchat.server.terminal.exception.InvalidCommandA
 import kotlinx.coroutines.Dispatchers.Default
 import kotlin.coroutines.EmptyCoroutineContext
 
-class CommandMessageParser(private val server: Server) : Listener {
+class CommandMessageParser(private val server: Server) {
     fun onCommand(e: ChatEvent) {
         val sender = e.sender
         if (e.isCancelled) return
