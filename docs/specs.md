@@ -12,124 +12,28 @@ The networking specifications will be found here. You may also follow the **offi
 Packets are sent using JSON and a JSON wrapper.
 The packet schema is as follows:
 
-### Unencrypted data
+### Packet Format 
+The packet is sent in binary with the following format:
+| **PacketWrapper** | |  |  |  |  |  |  |
+| :--------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------: | :-: | :-: | :-: | :-: | :-: | :-: |
+|packetLen|encrypt| packetId | packetType | identifierLen | identifier | payloadLen | payload |
+| 8 | 1 | 4 | 1 | 4 | identifierLen | 4 | payloadLen |
 
-```json5
-{
-  "ENCRYPT": false, // Used to check if the jsonObject field is encrypted
-  "jsonObject": "", // The packet object as a JSON string
-  "packetIdentifier": "PACKET_IDENTIFIER_FOR_PARSING", // When parsing the packet, this field is used to identify what class to use when parsing. Should use the same identifier for both server and client
-  "packetId": 0 // Packet ID for checking if a newer packet of the same type has been received. Useful for games.
-}
-```
+When `encrypt` is non-zero, the packet is encrypted and the `payload` looks as follows:
+|**EncryptedBytes** | |  |  |  |  | 
+| :--------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------: | :-: | :-: | :-: | :-: |
+|dataLen|data| paramsLen | params | algorithmLen | algorithm | 
+| 4 | dataLen | 4 | paramsLen | 4 | algorithmLen |
 
-### Encrypted data
+`packetLen -> {encrypt|packetId|packetType|identifierLen|identifier|payloadLen|payload}`
 
-```json5
-{
-  "ENCRYPT": true, // Used to check if the jsonObject field is encrypted
-  "jsonObject": "{
-      \"data\":[ENCRYPTED_DATA_AS_BYTE_ARRAY], // The packet object as a JSON string and encrypted as a byte array.
-      \"params\":[ENCRYPTION_PARAMETERS], // The AES key parameters used for encryption
-      \"paramAlgorithm\":\"AES\" // The key algorithm, in case you are using a different key
-      }",
-  "packetIdentifier": "PACKET_IDENTIFIER_FOR_PARSING",
-  "packetId": 0 // Packet ID for checking if a newer packet of the same type has been received. Useful for games.
-}
-```
-
-Java code used:
-
-```java
-
-public class PacketWrapper<T> implements Serializable {
-
-    protected static Gson gson = new Gson();
-
-    protected boolean ENCRYPT = false;
-
-    @Getter
-    private String jsonObject;
-
-    @Getter
-    private transient T jsonObjectInstance;
-
-    @Getter
-    private String packetIdentifier;
-
-    /**
-     * For packet order
-     */
-    @Getter
-    private int packetId;
-
-    public PacketWrapper(T object, String packetIdentifier, int packetId) {
-        this.packetIdentifier = packetIdentifier;
-        this.jsonObjectInstance = object;
-        this.jsonObject = gson.toJson(object);
-        this.packetId = packetId;
-    }
-
-    public boolean encrypt() {
-        return ENCRYPT;
-    }
-
-
-
-    protected PacketWrapper() {}
-}
-
-/**
- * Wraps a packet not meant to be encrypted
- */
-public class UnencryptedPacketWrapper extends PacketWrapper<AcceptablePacketTypes> implements AcceptablePacketTypes {
-
-    protected UnencryptedPacketWrapper() {}
-
-    public UnencryptedPacketWrapper(Packet jsonObject, int packetId) {
-        super(jsonObject, jsonObject.getPacketName(), packetId);
-
-        if (PacketRegistry.checkIfRegistered(jsonObject) == PacketRegistry.RegisteredReturnValues.NOT_IN_REGISTRY) {
-            throw new IllegalArgumentException("The packet trying to be wrapped is not registered. \"" + jsonObject.getClass() + "\"");
-        }
-
-        ENCRYPT = false;
-    }
-
-
-}
-
-@RequiredArgsConstructor
-@Getter
-public class EncryptedBytes {
-
-    private final byte[] data;
-    private final byte[] params;
-    private final String paramAlgorithm;
-
-}
-
-public class EncryptedPacketWrapper extends PacketWrapper<EncryptedBytes> {
-
-    public EncryptedPacketWrapper(EncryptedBytes encryptedBytes, Packet packet, int packetId) {
-        super(encryptedBytes, packet.getPacketName(), packetId);
-        ENCRYPT = true;
-    }
-
-
-}
-```
-
-A real-world example of this is as follows
-
-```json5
-{
-  "ENCRYPT": false,
-  "jsonObject": "{\"publicKey\":\"MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAty110pSGwvJyzzK6P0mx6Qoc96VkQiXrSmEMfWpXbN+qBu+3W6fTR5N2MrtFlB3LI5xhagHi662k3RHL+rPbQBqcivE6pAa2O3GrDKIUL+3KCVQQ553va7aLgEQy9H4gZnKTk7nyf5y6uKuJQj6lg8PxWd2pCUMqWOa5JGGvX2LYFUUEKq7vR1bZHAoVwC2i15JBJP8VhlsqZ2brFU1kRzHLlEUH+bwIve6Auvyuw947kxQOnA/KGQUlgdTWXKwtPq2dFr3cteLLrBboYH0ODp7gLnhO4Mp5M4u9VAd6zWorbK5dBNgELPDAViznHMpN2eCbzk8+O2q/qACT2z+gm3kj7s1uPhJ7wuUOgAWYUVrXihdqXhfa3x33r78EfZdT4vh/iTdT9wSMlRv1QlsproOwe44+BlD/F8DLzUi2fheK4seqftPvQepd8MlMLPAI7HoT7NmT0Gz6ozXdDZG0WSXQFMaKEyxtxsT2OiSRNBsr09VGH+eVx4UNb5SEUhNHoPn93qs1w8d4aOUqJsqJ5Fxna+RLY9URoD2FfP0RwIC7S1lfSWfErQTMEepxaMIliR1s/7TQn4g9RiUhgb08dTOAtMOUWaLagEiulBrLXH3VNX1bUHYdraYXHpdt2b6enlujw0GjJOxWrRBHZYiFSdLL/4P6gfaai82dkeXW7dECAwEAAQ\\u003d\\u003d\",\"versionData\":{\"version\":\"1.5.3\",\"minVersion\":\"1.5.3\"}}",
-  "packetIdentifier": "INITIAL_HANDSHAKE_PACKET",
-  "packetId": 0
-}
-```
+#### Packet Type:
+Packet Type can be the following:
+| Type | Bit |
+| :-: | :-: |
+| Unknown | -1 |
+| JSON | 0 |
+| Protobuf | 1 |
 
 ## Initializing the connection
 
