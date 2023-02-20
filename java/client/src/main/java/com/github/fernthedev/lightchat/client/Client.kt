@@ -87,9 +87,9 @@ class Client(private var host: String, private var port: Int) : IEncryptionKeyHo
         return ConnectedPacket(name!!, oSName, StaticHandler.VERSION_DATA, "Java $javaVersion")
     }
 
-    var decryptCipher: Cipher? = null
+    var decryptCipher: ThreadLocal<Cipher>? = null
         private set
-    var encryptCipher: Cipher? = null
+    var encryptCipher: ThreadLocal<Cipher>? = null
         private set
     var secureRandom: SecureRandom? = null
         private set
@@ -206,8 +206,9 @@ class Client(private var host: String, private var port: Int) : IEncryptionKeyHo
 
         launch {
             val key = secretKey!!.await()
-            encryptCipher = EncryptionUtil.encryptCipher
-            decryptCipher = EncryptionUtil.decryptCipher
+
+            encryptCipher = ThreadLocal.withInitial { EncryptionUtil.generateEncryptCipher() }
+            decryptCipher = ThreadLocal.withInitial { EncryptionUtil.generateDecryptCipher() }
             secureRandom = EncryptionUtil.getSecureRandom(key)
         }
 
@@ -309,11 +310,11 @@ class Client(private var host: String, private var port: Int) : IEncryptionKeyHo
         return secretKey!!.getCompleted()
     }
 
-    override fun getEncryptCipher(ctx: ChannelHandlerContext, channel: Channel): Cipher {
+    override fun getEncryptCipher(ctx: ChannelHandlerContext, channel: Channel): ThreadLocal<Cipher> {
         return encryptCipher!!
     }
 
-    override fun getDecryptCipher(ctx: ChannelHandlerContext, channel: Channel): Cipher {
+    override fun getDecryptCipher(ctx: ChannelHandlerContext, channel: Channel): ThreadLocal<Cipher> {
         return decryptCipher!!
     }
 

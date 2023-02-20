@@ -30,7 +30,7 @@ class PacketTransporter
         toBytes: (p: AcceptablePacketTypes) -> ByteArray,
         packetId: Int,
         secretKey: SecretKey?,
-        cipher: Cipher,
+        cipher: ThreadLocal<Cipher>,
         random: SecureRandom?
     ): Pair<PacketWrapper, ByteBuf> {
         if (this::packetWrapperCache.isInitialized) {

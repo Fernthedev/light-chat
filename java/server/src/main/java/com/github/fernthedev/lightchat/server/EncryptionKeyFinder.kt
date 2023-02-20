@@ -28,11 +28,11 @@ class EncryptionKeyFinder(
         return server.playerHandler.channelMap[channel]!!.secretKey
     }
 
-    override fun getEncryptCipher(ctx: ChannelHandlerContext, channel: Channel): Cipher {
+    override fun getEncryptCipher(ctx: ChannelHandlerContext, channel: Channel): ThreadLocal<Cipher> {
         return server.playerHandler.channelMap[channel]!!.encryptCipher
     }
 
-    override fun getDecryptCipher(ctx: ChannelHandlerContext, channel: Channel): Cipher {
+    override fun getDecryptCipher(ctx: ChannelHandlerContext, channel: Channel): ThreadLocal<Cipher> {
         return server.playerHandler.channelMap[channel]!!.decryptCipher
     }
 

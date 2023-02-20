@@ -65,11 +65,11 @@ class ClientConnection(
             secureRandom = EncryptionUtil.getSecureRandom(value)
         }
 
-    var encryptCipher: Cipher
+    var encryptCipher: ThreadLocal<Cipher>
         private set
 
 
-    var decryptCipher: Cipher
+    var decryptCipher: ThreadLocal<Cipher>
         private set
 
     var secureRandom: SecureRandom? = null
@@ -87,8 +87,8 @@ class ClientConnection(
 
 
     init {
-        encryptCipher = EncryptionUtil.encryptCipher
-        decryptCipher = EncryptionUtil.decryptCipher
+        encryptCipher = ThreadLocal.withInitial { EncryptionUtil.generateEncryptCipher() }
+        decryptCipher = ThreadLocal.withInitial { EncryptionUtil.generateDecryptCipher() }
     }
 
     /**

@@ -13,8 +13,8 @@ interface IEncryptionKeyHolder {
     //
     //    @NonNull PublicKey getPublicKey(ChannelHandlerContext ctx, Channel channel);
     fun getSecretKey(ctx: ChannelHandlerContext, channel: Channel): SecretKey?
-    fun getEncryptCipher(ctx: ChannelHandlerContext, channel: Channel): Cipher
-    fun getDecryptCipher(ctx: ChannelHandlerContext, channel: Channel): Cipher
+    fun getEncryptCipher(ctx: ChannelHandlerContext, channel: Channel): ThreadLocal<Cipher>
+    fun getDecryptCipher(ctx: ChannelHandlerContext, channel: Channel): ThreadLocal<Cipher>
 
     /**
      * Should be a secure random with the seed based on the key

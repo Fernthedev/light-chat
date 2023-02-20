@@ -3,7 +3,6 @@ package com.github.fernthedev.lightchat.core.encryption.util
 import com.github.fernthedev.lightchat.core.StaticHandler
 import com.github.fernthedev.lightchat.core.encryption.EncryptedBytes
 import java.io.IOException
-import java.io.Serializable
 import java.nio.charset.StandardCharsets
 import java.security.*
 import java.security.spec.AlgorithmParameterSpec
@@ -20,28 +19,6 @@ object EncryptionUtil {
         return generator.generateKey()
     }
 
-    /**
-     * Encrypt object with password
-     *
-     * @param object Object to be encrypted
-     * @param secret Password to use for encryption
-     * @return Encrypted version of object
-     */
-    @Deprecated("")
-    fun encrypt(`object`: Serializable?, secret: SecretKey?): SealedObject? {
-        try {
-            val cipher = Cipher.getInstance(StaticHandler.AES_CIPHER_TRANSFORMATION)
-            cipher.init(Cipher.ENCRYPT_MODE, secret)
-
-
-            // properly encode the complete ciphertext
-            //logEncrypt(password, object);
-            return SealedObject(`object`, cipher)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return null
-    }
 
     @Throws(NoSuchAlgorithmException::class)
     fun getSecureRandom(secretKey: SecretKey): SecureRandom {
@@ -57,16 +34,13 @@ object EncryptionUtil {
         return GCMParameterSpec(GCM_TAG_LENGTH * 8, nonce)
     }
 
-    @get:Throws(NoSuchPaddingException::class, NoSuchAlgorithmException::class)
-    val encryptCipher: Cipher
-        /**
-         * Initializes and creates an encryption cipher
-         * @return the cipher
-         *
-         * @throws NoSuchPaddingException
-         * @throws NoSuchAlgorithmException
-         */
-        get() = Cipher.getInstance(StaticHandler.AES_CIPHER_TRANSFORMATION)
+    @Throws(NoSuchPaddingException::class, NoSuchAlgorithmException::class)
+    fun generateEncryptCipher(): Cipher = Cipher.getInstance(StaticHandler.AES_CIPHER_TRANSFORMATION)
+
+
+    @Throws(NoSuchPaddingException::class, NoSuchAlgorithmException::class)
+    fun generateDecryptCipher(): Cipher = Cipher.getInstance(StaticHandler.AES_CIPHER_TRANSFORMATION)
+
 
     /**
      * Encrypt object with password
@@ -81,24 +55,17 @@ object EncryptionUtil {
         IOException::class,
         InvalidAlgorithmParameterException::class
     )
-    fun encrypt(data: ByteArray, secret: SecretKey, cipher: Cipher, secureRandom: SecureRandom): EncryptedBytes {
+    fun encrypt(data: ByteArray, secret: SecretKey, cipherWrapper: ThreadLocal<Cipher>, secureRandom: SecureRandom): EncryptedBytes {
         val spec = getAlgorithmSpec(secureRandom)
+
+        val cipher = cipherWrapper.get()
         cipher.init(Cipher.ENCRYPT_MODE, secret, spec)
         val encodedData = cipher.doFinal(data)
+
         val params = cipher.parameters.encoded
         val paramAlgorithm = cipher.parameters.algorithm
         return EncryptedBytes(encodedData, params, paramAlgorithm)
     }
-
-    @get:Throws(NoSuchPaddingException::class, NoSuchAlgorithmException::class)
-    val decryptCipher: Cipher
-        /**
-         * Initializes and creates a decryption cipher
-         * @return the cipher
-         * @throws NoSuchPaddingException
-         * @throws NoSuchAlgorithmException
-         */
-        get() = Cipher.getInstance(StaticHandler.AES_CIPHER_TRANSFORMATION)
 
     /**
      * Decrypt data with secret
@@ -117,10 +84,12 @@ object EncryptionUtil {
     fun decrypt(
         encryptedBytes: EncryptedBytes,
         secret: SecretKey,
-        cipher: Cipher,
+        cipherWrapper: ThreadLocal<Cipher>,
         secureRandom: SecureRandom
     ): ByteArray {
         val spec = getAlgorithmSpec(secureRandom)
+
+        val cipher = cipherWrapper.get()
         cipher.init(Cipher.DECRYPT_MODE, secret, spec)
         return cipher.doFinal(encryptedBytes.data)
     }
