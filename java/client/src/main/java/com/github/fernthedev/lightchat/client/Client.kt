@@ -12,7 +12,6 @@ import com.github.fernthedev.lightchat.core.api.EventHandler
 import com.github.fernthedev.lightchat.core.codecs.AcceptablePacketTypes
 import com.github.fernthedev.lightchat.core.codecs.Codecs
 import com.github.fernthedev.lightchat.core.codecs.JSONHandler
-import com.github.fernthedev.lightchat.core.codecs.general.compression.SnappyCompressor
 import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectDecoder
 import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectEncoder
 import com.github.fernthedev.lightchat.core.encryption.PacketTransporter
@@ -175,20 +174,24 @@ class Client(private var host: String, private var port: Int) : IEncryptionKeyHo
 
                 // Decoders
                 ch.pipeline().addLast(
-                    LengthFieldBasedFrameDecoder(Int.MAX_VALUE, 0, 8, 0, 8),
-                    SnappyCompressor.snappyDecoder()
+                    "frameDecoder",
+                    LengthFieldBasedFrameDecoder(Int.MAX_VALUE, 0, 8, 0, 8)
                 )
                 ch.pipeline().addLast(
+                    "objectDecoder",
                     EncryptedJSONObjectDecoder(this@Client, jsonHandler),
                 )
 
 
                 // Encoders
                 ch.pipeline().addLast(
-                    LengthFieldPrepender(8),
-                    SnappyCompressor.snappyFrameEncoder()
+                    "frameEncoder",
+                    LengthFieldPrepender(8)
                 )
-                ch.pipeline().addLast(EncryptedJSONObjectEncoder(this@Client, jsonHandler))
+                ch.pipeline().addLast(
+                    "objectEncoder",
+                    EncryptedJSONObjectEncoder(this@Client, jsonHandler)
+                )
 
 
                 // Handlers

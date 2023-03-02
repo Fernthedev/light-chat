@@ -7,7 +7,6 @@ import com.github.fernthedev.lightchat.core.StaticHandler
 import com.github.fernthedev.lightchat.core.api.APIUsage
 import com.github.fernthedev.lightchat.core.api.EventHandler
 import com.github.fernthedev.lightchat.core.codecs.Codecs
-import com.github.fernthedev.lightchat.core.codecs.general.compression.SnappyCompressor
 import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectDecoder
 import com.github.fernthedev.lightchat.core.codecs.general.json.EncryptedJSONObjectEncoder
 import com.github.fernthedev.lightchat.core.encryption.PacketTransporter
@@ -268,20 +267,24 @@ class Server(val port: Int) : Runnable {
 
                     // Decoders
                     ch.pipeline().addLast(
+                        "frameDecoder",
                         LengthFieldBasedFrameDecoder(Int.MAX_VALUE, 0, 8, 0, 8),
-                        SnappyCompressor.snappyDecoder()
                     )
                     ch.pipeline().addLast(
+                        "objectDecoder",
                         EncryptedJSONObjectDecoder(keyFinder, jsonHandler),
                     )
 
                     // Encoders
                     ch.pipeline().addLast(
+                        "frameEncoder",
                         LengthFieldPrepender(8),
-                        SnappyCompressor.snappyFrameEncoder()
                     )
                     ch.pipeline()
-                        .addLast(EncryptedJSONObjectEncoder(keyFinder, jsonHandler))
+                        .addLast(
+                            "objectEncoder",
+                            EncryptedJSONObjectEncoder(keyFinder, jsonHandler)
+                        )
 
                     // Handlers
                     ch.pipeline().addLast(
