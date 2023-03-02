@@ -22,8 +22,8 @@ The packet is sent in binary with the following format:
 When `encrypt` is non-zero, the packet is encrypted and the `payload` looks as follows:
 |**EncryptedBytes** | |  |  |  |  | 
 | :--------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------: | :-: | :-: | :-: | :-: |
-|dataLen|data| paramsLen | params | algorithmLen | algorithm | 
-| 4 | dataLen | 4 | paramsLen | 4 | algorithmLen |
+|dataLen|data| paramsLen | params | ivLen | iv | 
+| 4 | dataLen | 4 | ivLen |
 
 `packetLen -> {encrypt|packetId|packetType|identifierLen|identifier|payloadLen|payload}`
 

@@ -100,7 +100,7 @@ $jsonObject""", e
 
         val decryptCipher = encryptionKeyHolder.getDecryptCipher(ctx, ctx.channel())
         val decryptedJSON = try {
-            EncryptionUtil.decrypt(encryptedString, secretKey, decryptCipher, random)
+            EncryptionUtil.decrypt(encryptedString, secretKey, decryptCipher, encryptedString.nonce)
         } catch (e: Exception) {
             throw ExceptionUtil.throwParsePacketException(e, encryptedString.data.contentToString())
         }

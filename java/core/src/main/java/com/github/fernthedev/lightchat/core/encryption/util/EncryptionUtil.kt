@@ -5,7 +5,6 @@ import com.github.fernthedev.lightchat.core.encryption.EncryptedBytes
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.security.*
-import java.security.spec.AlgorithmParameterSpec
 import java.util.*
 import javax.crypto.*
 import javax.crypto.spec.GCMParameterSpec
@@ -27,11 +26,16 @@ object EncryptionUtil {
         return random
     }
 
-    private fun getAlgorithmSpec(random: SecureRandom): AlgorithmParameterSpec {
+    private fun getAlgorithmSpec(random: SecureRandom): GCMParameterSpec {
         // Create our IV from random bytes with the correct block size
         val nonce = ByteArray(GCM_NONCE_LENGTH)
         random.nextBytes(nonce)
         return GCMParameterSpec(GCM_TAG_LENGTH * 8, nonce)
+    }
+
+    private fun getAlgorithmSpec(bytes: ByteArray): GCMParameterSpec {
+        assert(bytes.size == GCM_NONCE_LENGTH)
+        return GCMParameterSpec(GCM_TAG_LENGTH * 8, bytes)
     }
 
     @Throws(NoSuchPaddingException::class, NoSuchAlgorithmException::class)
@@ -55,16 +59,19 @@ object EncryptionUtil {
         IOException::class,
         InvalidAlgorithmParameterException::class
     )
-    fun encrypt(data: ByteArray, secret: SecretKey, cipherWrapper: ThreadLocal<Cipher>, secureRandom: SecureRandom): EncryptedBytes {
+    fun encrypt(
+        data: ByteArray,
+        secret: SecretKey,
+        cipherWrapper: ThreadLocal<Cipher>,
+        secureRandom: SecureRandom
+    ): EncryptedBytes {
         val spec = getAlgorithmSpec(secureRandom)
 
         val cipher = cipherWrapper.get()
         cipher.init(Cipher.ENCRYPT_MODE, secret, spec)
         val encodedData = cipher.doFinal(data)
 
-        val params = cipher.parameters.encoded
-        val paramAlgorithm = cipher.parameters.algorithm
-        return EncryptedBytes(encodedData, params, paramAlgorithm)
+        return EncryptedBytes(encodedData, spec.iv)
     }
 
     /**
@@ -85,9 +92,9 @@ object EncryptionUtil {
         encryptedBytes: EncryptedBytes,
         secret: SecretKey,
         cipherWrapper: ThreadLocal<Cipher>,
-        secureRandom: SecureRandom
+        nonce: ByteArray
     ): ByteArray {
-        val spec = getAlgorithmSpec(secureRandom)
+        val spec = getAlgorithmSpec(nonce)
 
         val cipher = cipherWrapper.get()
         cipher.init(Cipher.DECRYPT_MODE, secret, spec)
