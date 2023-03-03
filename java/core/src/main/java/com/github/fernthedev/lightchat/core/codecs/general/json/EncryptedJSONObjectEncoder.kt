@@ -6,7 +6,7 @@ import com.github.fernthedev.lightchat.core.codecs.JSONHandler
 import com.github.fernthedev.lightchat.core.encryption.*
 import com.github.fernthedev.lightchat.core.encryption.rsa.IEncryptionKeyHolder
 import com.github.fernthedev.lightchat.core.packets.PacketJSON
-import com.google.protobuf.MessageLite
+import com.github.fernthedev.lightchat.core.packets.PacketProto
 import io.netty.channel.ChannelHandler.Sharable
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.MessageToMessageEncoder
@@ -38,7 +38,7 @@ class EncryptedJSONObjectEncoder(
         val toBytes: (AcceptablePacketTypes) -> ByteArray = { p: AcceptablePacketTypes ->
             when (p) {
                 is PacketJSON -> jsonHandler.toJson(p).toByteArray()
-                is MessageLite -> p.toByteArray()
+                is PacketProto -> p.message.toByteArray()
                 else -> TODO()
             }
 

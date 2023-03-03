@@ -42,7 +42,7 @@ class EncryptedJSONObjectDecoder
     override fun decode(ctx: ChannelHandlerContext, msg: ByteBuf, out: MutableList<Any>) {
         try {
             val packetWrapper = PacketWrapper.decode(msg)
-            val decryptedJSON = if (packetWrapper.encrypt) {
+            val decryptedBytes = if (packetWrapper.encrypt) {
                 val tempByteBuf = packetWrapper.jsonObject
                 val encryptedBytes = EncryptedBytes.decode(tempByteBuf)
                 Unpooled.wrappedBuffer(decrypt(ctx, encryptedBytes))
@@ -55,7 +55,7 @@ class EncryptedJSONObjectDecoder
                 PacketType.UNKNOWN -> TODO()
                 PacketType.JSON -> getParsedObject(
                     packetWrapper.packetIdentifier,
-                    decryptedJSON.toString(Charsets.UTF_8),
+                    decryptedBytes.toString(Charsets.UTF_8),
                     packetWrapper.packetId
                 )
 
@@ -63,7 +63,7 @@ class EncryptedJSONObjectDecoder
                     PacketProto(
                         ProtobufRegistry.decode(
                             packetWrapper.packetIdentifier,
-                            decryptedJSON
+                            decryptedBytes
                         )!!
                     ),
                     encrypt = packetWrapper.encrypt
