@@ -44,9 +44,9 @@ class PacketTransporter
             requireNotNull(random) { "Can't encrypt with null random!" }
             val bytes = EncryptionUtil.encrypt(toBytes(packet), secretKey, cipher, random)
 
-            PacketWrapper.encrypted(bytes, packet.packetName, packetId)
+            PacketWrapper.encrypted(bytes, packet.packetName, packetId, packet.packetType)
         } else {
-            PacketWrapper.plain(packet, Unpooled.wrappedBuffer(toBytes(packet)), packetId)
+            PacketWrapper.plain(packet, Unpooled.wrappedBuffer(toBytes(packet)), packetId, packet.packetType)
         }
 
         packetWrapperJSON = packetWrapperCache.encode()
@@ -58,6 +58,7 @@ class PacketTransporter
 fun AcceptablePacketTypes.transport(encrypt: Boolean = true): PacketTransporter {
     return PacketTransporter(this, encrypt)
 }
+
 fun Message.transport(encrypt: Boolean = true): PacketTransporter {
     return PacketTransporter(PacketProto(this), encrypt)
 }
@@ -87,23 +88,27 @@ internal data class PacketWrapper internal constructor(
             encryptedBytes: EncryptedBytes,
             packetName: String,
             packetId: Int,
+            packetType: PacketType
         ): PacketWrapper {
             return PacketWrapper(
                 encryptedBytes.encode(),
                 packetName,
                 packetId,
                 encrypt = true,
-                packetType = PacketType.JSON
+                packetType = packetType
             )
         }
 
-        fun plain(jsonObject: AcceptablePacketTypes, byteArray: ByteBuf, packetId: Int): PacketWrapper {
+        fun plain(
+            jsonObject: AcceptablePacketTypes, byteArray: ByteBuf, packetId: Int,
+            packetType: PacketType
+        ): PacketWrapper {
             return PacketWrapper(
                 byteArray,
                 jsonObject.packetName,
                 packetId,
                 encrypt = false,
-                packetType = PacketType.JSON
+                packetType = packetType
             )
         }
 
