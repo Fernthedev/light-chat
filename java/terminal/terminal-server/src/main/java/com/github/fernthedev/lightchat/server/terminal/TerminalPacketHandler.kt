@@ -1,10 +1,10 @@
 package com.github.fernthedev.lightchat.server.terminal
 
 import com.github.fernthedev.lightchat.core.StaticHandler.core
+import com.github.fernthedev.lightchat.core.codecs.AcceptablePacketTypes
 import com.github.fernthedev.lightchat.core.encryption.PacketTransporter
 import com.github.fernthedev.lightchat.core.encryption.transport
 import com.github.fernthedev.lightchat.core.packets.HashedPasswordPacket
-import com.github.fernthedev.lightchat.core.packets.PacketJSON
 import com.github.fernthedev.lightchat.core.packets.handshake.ConnectedPacket
 import com.github.fernthedev.lightchat.server.ClientConnection
 import com.github.fernthedev.lightchat.server.Server
@@ -17,9 +17,9 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 class TerminalPacketHandler(private val server: Server) : IPacketHandler {
-    override suspend fun handlePacket(packetJSON: PacketJSON, clientConnection: ClientConnection, packetId: Int): Unit =
+    override suspend fun handlePacket(acceptablePacketTypes: AcceptablePacketTypes, clientConnection: ClientConnection, packetId: Int): Unit =
         coroutineScope {
-            when (packetJSON) {
+            when (acceptablePacketTypes) {
                 is ConnectedPacket -> {
                     if (server.settingsManager.configData.passwordRequiredForLogin) {
                         launch {
@@ -33,29 +33,29 @@ class TerminalPacketHandler(private val server: Server) : IPacketHandler {
                 }
 
                 is MessagePacket -> {
-                    core.logger.debug("Handling message {}", packetJSON.message)
-                    val chatEvent = ChatEvent(clientConnection, packetJSON.message, isCommand = false, async = true)
+                    core.logger.debug("Handling message {}", acceptablePacketTypes.message)
+                    val chatEvent = ChatEvent(clientConnection, acceptablePacketTypes.message, isCommand = false, async = true)
                     server.eventHandler.callEvent(chatEvent)
 
                     ServerTerminal.commandMessageParser.onCommand(chatEvent)
                 }
 
                 is CommandPacket -> {
-                    val command = packetJSON.message
+                    val command = acceptablePacketTypes.message
                     val chatEvent = ChatEvent(clientConnection, command, isCommand = true, async = true)
                     server.eventHandler.callEvent(chatEvent)
                     ServerTerminal.commandMessageParser.onCommand(chatEvent)
                 }
 
                 is AutoCompletePacket -> {
-                    val candidates = ServerTerminal.autoCompleteHandler.handleLine(clientConnection, packetJSON.words)
-                    packetJSON.candidateList = candidates
-                    clientConnection.sendPacketLaunch(PacketTransporter(packetJSON, true))
+                    val candidates = ServerTerminal.autoCompleteHandler.handleLine(clientConnection, acceptablePacketTypes.words)
+                    acceptablePacketTypes.candidateList = candidates
+                    clientConnection.sendPacketLaunch(PacketTransporter(acceptablePacketTypes, true))
                 }
 
                 is HashedPasswordPacket -> {
                     server.authenticationManager.attemptAuthenticationHash(
-                        packetJSON.hashedPassword,
+                        acceptablePacketTypes.hashedPassword,
                         clientConnection
                     )
                 }

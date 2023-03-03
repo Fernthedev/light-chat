@@ -3,7 +3,6 @@ package com.github.fernthedev.lightchat.server.netty
 import com.github.fernthedev.lightchat.core.StaticHandler
 import com.github.fernthedev.lightchat.core.encryption.PacketTransporter
 import com.github.fernthedev.lightchat.core.encryption.transport
-import com.github.fernthedev.lightchat.core.packets.PacketJSON
 import com.github.fernthedev.lightchat.core.packets.handshake.ConnectedPacket
 import com.github.fernthedev.lightchat.core.packets.handshake.InitialHandshakePacket
 import com.github.fernthedev.lightchat.core.packets.latency.LatencyPacket
@@ -94,8 +93,8 @@ class ProcessingHandler(private val server: Server) : ChannelInboundHandlerAdapt
                         }
                     }
 
-                    packet is PacketJSON &&
-                            server.playerHandler.channelMap.containsKey(ctx.channel()) -> {
+
+                    server.playerHandler.channelMap.containsKey(ctx.channel()) -> {
                         if (msg.packet !is LatencyPacket) StaticHandler.core.logger.debug(
                             "Received the packet {} from {}", msg.packet
                                 .packetName, ctx.channel()

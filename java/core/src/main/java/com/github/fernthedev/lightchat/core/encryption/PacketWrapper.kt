@@ -2,7 +2,9 @@ package com.github.fernthedev.lightchat.core.encryption
 
 import com.github.fernthedev.lightchat.core.codecs.AcceptablePacketTypes
 import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil
+import com.github.fernthedev.lightchat.core.packets.PacketProto
 import com.google.gson.annotations.SerializedName
+import com.google.protobuf.Message
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import java.io.Serializable
@@ -24,6 +26,8 @@ class PacketTransporter
     private lateinit var packetWrapperCache: PacketWrapper
     private lateinit var packetWrapperJSON: ByteBuf
 
+
+    /// toBytes func here because gson is passed from the server/client
     internal fun packetWrapper(
         toBytes: (p: AcceptablePacketTypes) -> ByteArray,
         packetId: Int,
@@ -53,6 +57,9 @@ class PacketTransporter
 
 fun AcceptablePacketTypes.transport(encrypt: Boolean = true): PacketTransporter {
     return PacketTransporter(this, encrypt)
+}
+fun Message.transport(encrypt: Boolean = true): PacketTransporter {
+    return PacketTransporter(PacketProto(this), encrypt)
 }
 
 enum class PacketType(val i: Byte) {

@@ -6,10 +6,10 @@ import com.github.fernthedev.lightchat.client.event.ServerDisconnectEvent.Discon
 import com.github.fernthedev.lightchat.core.StaticHandler
 import com.github.fernthedev.lightchat.core.StaticHandler.VERSION_DATA
 import com.github.fernthedev.lightchat.core.StaticHandler.getVersionRangeStatus
+import com.github.fernthedev.lightchat.core.codecs.AcceptablePacketTypes
 import com.github.fernthedev.lightchat.core.encryption.transport
 import com.github.fernthedev.lightchat.core.exceptions.ParsePacketException
 import com.github.fernthedev.lightchat.core.packets.IllegalConnectionPacket
-import com.github.fernthedev.lightchat.core.packets.PacketJSON
 import com.github.fernthedev.lightchat.core.packets.SelfMessagePacket
 import com.github.fernthedev.lightchat.core.packets.handshake.InitialHandshakePacket
 import com.github.fernthedev.lightchat.core.packets.handshake.KeyResponsePacket
@@ -24,7 +24,7 @@ import java.security.InvalidKeyException
 import java.util.concurrent.TimeUnit
 
 class EventListener(private var client: Client) {
-    suspend fun received(p: PacketJSON, packetId: Int) = coroutineScope{
+    suspend fun received(p: AcceptablePacketTypes, packetId: Int) = coroutineScope {
         try {
             when (p) {
                 is PingPacket -> {

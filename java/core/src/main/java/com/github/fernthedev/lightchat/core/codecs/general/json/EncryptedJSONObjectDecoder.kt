@@ -11,8 +11,8 @@ import com.github.fernthedev.lightchat.core.encryption.PacketWrapper
 import com.github.fernthedev.lightchat.core.encryption.rsa.IEncryptionKeyHolder
 import com.github.fernthedev.lightchat.core.encryption.rsa.NoSecretKeyException
 import com.github.fernthedev.lightchat.core.encryption.util.EncryptionUtil
+import com.github.fernthedev.lightchat.core.packets.PacketProto
 import com.github.fernthedev.lightchat.core.util.ExceptionUtil
-import com.google.protobuf.MessageLite
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import io.netty.channel.ChannelHandler.Sharable
@@ -51,7 +51,7 @@ class EncryptedJSONObjectDecoder
             }
 
 
-            val obj: Any? = when (packetWrapper.packetType) {
+            val obj: PacketTransporter = when (packetWrapper.packetType) {
                 PacketType.UNKNOWN -> TODO()
                 PacketType.JSON -> getParsedObject(
                     packetWrapper.packetIdentifier,
@@ -59,15 +59,18 @@ class EncryptedJSONObjectDecoder
                     packetWrapper.packetId
                 )
 
-                PacketType.PROTOBUF -> ProtobufRegistry.decode<MessageLite>(
-                    packetWrapper.packetIdentifier,
-                    decryptedJSON
+                PacketType.PROTOBUF -> PacketTransporter(
+                    PacketProto(
+                        ProtobufRegistry.decode(
+                            packetWrapper.packetIdentifier,
+                            decryptedJSON
+                        )!!
+                    ),
+                    encrypt = packetWrapper.encrypt
                 )
             }
             StaticHandler.core.logger.debug("Received {}", packetWrapper.packetIdentifier)
-            if (obj != null) {
-                out.add(obj)
-            }
+            out.add(obj)
         } catch (e: Exception) {
             throw IllegalArgumentException("Unable to parse packet: $msg", e)
         }

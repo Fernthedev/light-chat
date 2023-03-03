@@ -38,9 +38,9 @@ open class ClientHandler(protected var client: Client, protected var listener: E
             core.logger.debug("Received the packet {} from {}", msg.packet.packetName, ctx.channel())
             runBlocking {
                 val packet = msg.packet
-                if (packet is PacketJSON) {
+
                     listener.received(packet, msg.id)
-                }
+
             }
         }
         super.channelRead(ctx, msg)
