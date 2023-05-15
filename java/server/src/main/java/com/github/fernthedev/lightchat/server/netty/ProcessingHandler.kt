@@ -40,6 +40,8 @@ class ProcessingHandler(private val server: Server) : ChannelInboundHandlerAdapt
         //clientConnection.close();
     }
 
+
+
     /**
      * Calls [ChannelHandlerContext.fireExceptionCaught] to forward
      * to the next [ChannelHandler] in the [ChannelPipeline].
@@ -52,6 +54,7 @@ class ProcessingHandler(private val server: Server) : ChannelInboundHandlerAdapt
      */
     @Throws(Exception::class)
     override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
+        StaticHandler.core.logger.error("Suffered error in ctx {}", ctx)
         if (validateIsBanned(ctx)) return
         if (cause is IOException || cause.cause is IOException) {
             server.logger.info("The channel {} has been closed from the client side.", ctx.channel())
@@ -60,7 +63,10 @@ class ProcessingHandler(private val server: Server) : ChannelInboundHandlerAdapt
                 server.playerHandler.uuidMap.remove(clientConnection.uuid)
             }
             close(ctx.channel())
-        } else super.exceptionCaught(ctx, cause)
+        } else {
+            StaticHandler.core.logger.error("Suffered error in ctx {} {} ", ctx, cause)
+            super.exceptionCaught(ctx, cause)
+        }
     }
 
     @Throws(Exception::class)

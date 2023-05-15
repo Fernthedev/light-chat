@@ -1,10 +1,13 @@
 package com.github.fernthedev.lightchat.core.packets
 
+import com.squareup.moshi.JsonClass
+
+@JsonClass(generateAdapter = true)
 @PacketInfo(name = "SELF_MESSAGE_PACKET")
 class SelfMessagePacket(val type: MessageType) : PacketJSON() {
 
     override fun toString(): String {
-        return "SelfMessagePacket(type=" + type + ")"
+        return "SelfMessagePacket(type=$type)"
     }
 
     enum class MessageType {

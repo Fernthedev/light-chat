@@ -2,19 +2,24 @@ package com.github.fernthedev.lightchat.core.packets.handshake
 
 import com.github.fernthedev.lightchat.core.VersionData
 import com.github.fernthedev.lightchat.core.encryption.util.RSAEncryptionUtil
-import com.github.fernthedev.lightchat.core.packets.PacketJSON
 import com.github.fernthedev.lightchat.core.packets.PacketInfo
+import com.github.fernthedev.lightchat.core.packets.PacketJSON
 import java.security.PublicKey
 
-@PacketInfo(name = "INITIAL_HANDSHAKE_PACKET")
-class InitialHandshakePacket(publicKey: PublicKey, versionData: VersionData) : PacketJSON() {
-    private val publicKey: String?
-    private val versionData: VersionDataString
 
-    init {
-        this.publicKey = RSAEncryptionUtil.toBase64(publicKey)
-        this.versionData = VersionDataString(versionData.version.toString(), versionData.minVersion.toString())
-    }
+@PacketInfo(name = "INITIAL_HANDSHAKE_PACKET")
+class InitialHandshakePacket private constructor(
+    private val publicKey: String,
+    private val versionData: VersionDataString
+) : PacketJSON() {
+
+
+
+    constructor(publicKey: PublicKey, versionData: VersionData) : this(
+        RSAEncryptionUtil.toBase64(publicKey),
+        VersionDataString(versionData.version.toString(), versionData.minVersion.toString())
+    )
+
 
     fun getVersionData(): VersionData {
         return VersionData(versionData.version, versionData.minVersion)

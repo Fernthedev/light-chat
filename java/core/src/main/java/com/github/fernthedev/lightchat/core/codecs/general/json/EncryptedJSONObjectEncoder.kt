@@ -33,46 +33,59 @@ class EncryptedJSONObjectEncoder(
      */
     @Throws(Exception::class)
     override fun encode(ctx: ChannelHandlerContext, msg: PacketTransporter, out: MutableList<Any>) {
-        val cipher = encryptionKeyHolder.getEncryptCipher(ctx, ctx.channel())
+        if (StaticHandler.isDebug()) {
+            StaticHandler.core.logger.debug(
+                "Sending before {}",
+                msg.packet.packetName
+            )
+        }
+        try {
+            val cipher = encryptionKeyHolder.getEncryptCipher(ctx, ctx.channel())
 
-        val toBytes: (AcceptablePacketTypes) -> ByteArray = { p: AcceptablePacketTypes ->
-            when (p) {
-                is PacketJSON -> jsonHandler.toJson(p).toByteArray()
-                is PacketProto -> p.message.toByteArray()
-                else -> TODO()
+            val toBytes: (AcceptablePacketTypes) -> ByteArray = { p: AcceptablePacketTypes ->
+                when (p) {
+                    is PacketJSON -> jsonHandler.toJson(p).toByteArray()
+                    is PacketProto -> p.message.toByteArray()
+                    else -> TODO()
+                }
+
             }
 
+            val packetWrapper = if (!encryptionKeyHolder.isEncryptionKeyRegistered(ctx, ctx.channel())) {
+                require(!msg.encrypt) { "Encryption is not setup yet!" }
+
+                msg.packetWrapper(
+                    toBytes,
+                    encryptionKeyHolder.getPacketId(msg.packet.javaClass, ctx, ctx.channel()).first,
+                    null,
+                    cipher,
+                    null
+                )
+            } else {
+                val secretKey = encryptionKeyHolder.getSecretKey(ctx, ctx.channel())
+                val secureRandom = encryptionKeyHolder.getSecureRandom(ctx, ctx.channel())
+                msg.packetWrapper(
+                    toBytes,
+                    encryptionKeyHolder.getPacketId(msg.packet.javaClass, ctx, ctx.channel()).first,
+                    secretKey,
+                    cipher,
+                    secureRandom
+                )
+            }
+
+            out.add(packetWrapper.second)
+
+
+            if (StaticHandler.isDebug()) {
+                StaticHandler.core.logger.debug(
+                    "Sending {}",
+                    packetWrapper.first.packetIdentifier
+                )
+            }
+        } catch (e: Throwable) {
+            StaticHandler.core.logger.error("Suffered error encoding", e)
+            throw e
         }
-
-        val packetWrapper = if (!encryptionKeyHolder.isEncryptionKeyRegistered(ctx, ctx.channel())) {
-            require(!msg.encrypt) { "Encryption is not setup yet!" }
-
-            msg.packetWrapper(
-                toBytes,
-                encryptionKeyHolder.getPacketId(msg.packet.javaClass, ctx, ctx.channel()).first,
-                null,
-                cipher,
-                null
-            )
-        } else {
-            val secretKey = encryptionKeyHolder.getSecretKey(ctx, ctx.channel())
-            val secureRandom = encryptionKeyHolder.getSecureRandom(ctx, ctx.channel())
-            msg.packetWrapper(
-                toBytes,
-                encryptionKeyHolder.getPacketId(msg.packet.javaClass, ctx, ctx.channel()).first,
-                secretKey,
-                cipher,
-                secureRandom
-            )
-        }
-
-        out.add(packetWrapper.second)
-
-
-        if (StaticHandler.isDebug()) StaticHandler.core.logger.debug(
-            "Sending {}",
-            packetWrapper.first.packetIdentifier
-        )
     }
 
     override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {

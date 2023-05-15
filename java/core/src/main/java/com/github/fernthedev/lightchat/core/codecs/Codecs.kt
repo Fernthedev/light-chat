@@ -2,6 +2,7 @@ package com.github.fernthedev.lightchat.core.codecs
 
 import com.github.fernthedev.lightchat.core.codecs.json.FastJSONHandler
 import com.github.fernthedev.lightchat.core.codecs.json.GSONHandler
+import com.github.fernthedev.lightchat.core.codecs.json.MoshiHandler
 import java.util.*
 
 /**
@@ -9,13 +10,16 @@ import java.util.*
  */
 object Codecs {
     private val jsonHandlerMap: MutableMap<String, JSONHandler> = HashMap()
-    var GSON_STR = "GSON"
-    val GSON: JSONHandler = GSONHandler.Companion.INSTANCE
-    var FASTSON_STR = "ALIBABA_FASTJSON"
+    const val GSON_STR = "GSON"
+    val GSON: JSONHandler = GSONHandler.INSTANCE
+    const val MOSHI_STR = "MOSHI"
+    val MOSHI: JSONHandler = MoshiHandler.INSTANCE
+    const val FASTSON_STR = "ALIBABA_FASTJSON"
     val ALIBABA_FASTJSON: JSONHandler = FastJSONHandler()
 
     init {
         registerJsonHandler(GSON_STR, GSON)
+        registerJsonHandler(MOSHI_STR, MOSHI)
         registerJsonHandler(FASTSON_STR, ALIBABA_FASTJSON)
     }
 

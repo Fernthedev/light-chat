@@ -2,12 +2,12 @@ package com.github.fernthedev.lightchat.core.packets
 
 import com.github.fernthedev.lightchat.core.codecs.AcceptablePacketTypes
 import com.github.fernthedev.lightchat.core.encryption.PacketType
+import com.squareup.moshi.Json
 import java.lang.reflect.Modifier
 import java.util.concurrent.ConcurrentHashMap
 
 abstract class PacketJSON protected constructor() : AcceptablePacketTypes {
-
-
+    @Json(ignore = true)
     private val packetInfo: PacketInfo
         get() {
             check(javaClass.isAnnotationPresent(PacketInfo::class.java)) { "Class ${javaClass.name} does not have PacketInfo" }

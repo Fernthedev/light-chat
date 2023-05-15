@@ -42,6 +42,6 @@ open class CoreSettings : Serializable {
     annotation class SettingValue(val name: String = "", val editable: Boolean = true, val values: Array<String> = [])
     companion object {
         @JvmStatic
-        protected val DEFAULT_CODEC = Codecs.GSON_STR
+        protected val DEFAULT_CODEC = Codecs.MOSHI_STR
     }
 }

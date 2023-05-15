@@ -49,6 +49,7 @@ class EncryptedJSONObjectDecoder
             } else {
                 packetWrapper.jsonObject
             }
+            StaticHandler.core.logger.debug("Received before {}", packetWrapper.packetIdentifier)
 
 
             val obj: PacketTransporter = when (packetWrapper.packetType) {
@@ -85,7 +86,7 @@ class EncryptedJSONObjectDecoder
     private fun getParsedObject(packetIdentifier: String, jsonObject: String, packetId: Int): PacketTransporter {
         val aClass = PacketJsonRegistry.getPacketClassFromRegistry(packetIdentifier)
         return try {
-            PacketTransporter(jsonHandler.fromJson(jsonObject, aClass), encrypt = false, id = packetId)
+            PacketTransporter(jsonHandler.fromJson(jsonObject, aClass)!!, encrypt = false, id = packetId)
         } catch (e: Exception) {
             throw IllegalArgumentException(
                 """Attempting to parse packet $packetIdentifier (${aClass.name}) with string
@@ -109,5 +110,10 @@ $jsonObject""", e
         }
 
         return decryptedJSON
+    }
+
+    override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
+        StaticHandler.core.logger.error(cause.message, cause)
+        super.exceptionCaught(ctx, cause)
     }
 }
